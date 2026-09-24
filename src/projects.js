@@ -87,28 +87,6 @@ export const projects = [
     },
   },
   {
-    cmd: 'robinscape',
-    slug: 'robinscape',
-    group: 'games',
-    name: 'Robinscape',
-    kind: 'Dark forest castle roguelite',
-    blurb:
-      'Solo castle runs from a shared town. Point-and-click combat, nine boons, run loot, and a town worth returning to. Free-play beta in your browser.',
-    url: 'https://robinscape.quest/play',
-    frame: false,
-    links: [
-      { label: 'Play', href: 'https://robinscape.quest/play' },
-      { label: 'Site', href: 'https://robinscape.quest' },
-    ],
-    image: {
-      src: '/img/robinscape.webp',
-      width: 800,
-      height: 420,
-      alt: 'Robinscape landing page: the title in pale serif type beside a pixel-art swordsman in a green cloak.',
-    },
-    note: 'Best with a mouse and keyboard on desktop.',
-  },
-  {
     cmd: 'bitcorn',
     slug: 'bitcorn',
     group: 'games',
