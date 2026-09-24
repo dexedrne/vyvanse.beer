@@ -169,11 +169,12 @@ export const projects = [
   },
 ];
 
-// The Radbros, rendered in 3D with transparent backgrounds, all playable in Rug Run.
+// The Radbros, rendered in 3D with transparent backgrounds.
 // `num` is what the terminal takes (`info 4764`). `featured` = the site mascot.
+// `soon` = built for Rug Run but not playable there yet; drop it once he is.
 export const crew = {
   title: 'The crew',
-  line: 'Radbros #652, #4764 and #2564, built in 3D and playable in Rug Run.',
+  line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in Rug Run.',
   playIn: 'rugrun',
   members: [
     {
@@ -211,6 +212,18 @@ export const crew = {
         width: 265,
         height: 500,
         alt: 'Radbro #2564, the ghost, in 3D: white face, pale lavender hair under a crumpled tin-foil hat and white kufi, black aviators, and a RAD RESPONSE plate carrier, one arm held out.',
+      },
+    },
+    {
+      num: '723',
+      slug: 'radbro-723',
+      name: 'Radbro #723',
+      line: 'The new guy. Cowboy hat, a wink, HOT TOPIC BRO vest.',
+      image: {
+        src: '/img/radbros/radbro-723.webp',
+        width: 336,
+        height: 500,
+        alt: 'Radbro #723 in 3D, tipping his hat: a brown wide-brim cowboy hat over shaggy brown hair, one big amber anime eye open and the other winking, and a black plate carrier with a HOT TOPIC BRO name patch and a TempleOS patch over a black shirt, dark jeans and brown boots.',
       },
     },
   ],

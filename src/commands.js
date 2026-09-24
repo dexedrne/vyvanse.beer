@@ -103,7 +103,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page })
           {},
           line(strong(b.name), b.featured ? muted('  the mascot') : null),
           line(muted(b.line)),
-          playIn ? line('playable in ', run(`open ${playIn.cmd}`)) : null,
+          playIn ? line(b.soon ? 'coming soon to ' : 'playable in ', run(`open ${playIn.cmd}`)) : null,
         ),
       ),
     );
