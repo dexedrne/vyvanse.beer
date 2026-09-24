@@ -59,11 +59,32 @@ function bottle(p) {
 </li>`;
 }
 
+function bro(b) {
+  return `<li class="bro" id="${esc(b.slug)}">
+  <figure class="bro__card">
+    ${img(b.image, false)}
+    <figcaption>
+      <span class="bro__name">${esc(b.name)}</span>
+      <span class="bro__line">${esc(b.line)}</span>
+    </figcaption>
+  </figure>
+</li>`;
+}
+
+function crew(s) {
+  const cta = s.cta
+    ? `<p class="crew__cta"><span class="capsule"><a class="capsule__half" href="${esc(s.cta.href)}" rel="noopener">${esc(s.cta.label)}</a></span></p>`
+    : '';
+  return `<ul class="crew" role="list">\n${s.items.map(bro).join('\n')}\n</ul>\n  ${cta}`;
+}
+
 function section(s, first) {
   const body =
     s.kind === 'bottles'
       ? `<ul class="shelf" role="list">\n${s.items.map(bottle).join('\n')}\n</ul>`
-      : s.items.map((p, i) => tap(p, first ? i : -1)).join('\n');
+      : s.kind === 'crew'
+        ? crew(s)
+        : s.items.map((p, i) => tap(p, first ? i : -1)).join('\n');
 
   return `<section class="wrap menu-section menu-section--${esc(s.kind)}" id="${esc(s.id)}" aria-labelledby="${esc(s.id)}-title">
   <header class="menu-section__head">

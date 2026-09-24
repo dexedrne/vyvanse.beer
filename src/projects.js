@@ -6,6 +6,7 @@
 //   kicker    one line under the heading
 //   kind      'taps'   = full cards, `featured` ones get the big image layout
 //             'bottles' = compact grid of small cards, the whole card is one link
+//             'crew'    = a row of Radbro figures
 //   items     the projects
 //
 // Tap fields ('taps' sections):
@@ -21,6 +22,10 @@
 //
 // Bottle fields ('bottles' sections):
 //   slug, name, line (one short plain-text line), href, image { src, width, height, alt }
+//
+// Crew fields ('crew' section, Radbro renders with transparent backgrounds):
+//   slug, name, line, image { src, width, height, alt }; the section takes an optional
+//   cta { label, href } rendered as one capsule under the row
 //
 // Card images are 800px wide webp: 800x420 for featured taps, 800x500 for bottles.
 
@@ -108,6 +113,48 @@ export const sections = [
         ],
       },
     ],
+  },
+  {
+    id: 'crew',
+    title: 'The crew',
+    kicker: 'Radbros #652, #4764 and #2564, built in 3D and playable in Rug Run.',
+    kind: 'crew',
+    items: [
+      {
+        slug: 'radbro-652',
+        name: 'Radbro #652',
+        line: 'Brown mop, big blue eyes, the Nobody sweatshirt.',
+        image: {
+          src: '/img/radbros/radbro-652.webp',
+          width: 280,
+          height: 500,
+          alt: 'Radbro #652 in 3D: shaggy brown hair, big blue anime eyes, a black Nobody sweatshirt and brown trousers, one fist raised in a cheer.',
+        },
+      },
+      {
+        slug: 'radbro-4764',
+        name: 'Radbro #4764',
+        line: 'Skull shades, scribble hoodie, katana on his back.',
+        image: {
+          src: '/img/radbros/radbro-4764.webp',
+          width: 263,
+          height: 500,
+          alt: 'Radbro #4764 in 3D: bright blue hair, black sunglasses with skull lenses, a white hoodie covered in blue scribbles and a katana strapped across his back, mid-stride.',
+        },
+      },
+      {
+        slug: 'radbro-2564',
+        name: 'Radbro #2564',
+        line: 'The ghost. Foil hat, aviators, RAD RESPONSE vest.',
+        image: {
+          src: '/img/radbros/radbro-2564.webp',
+          width: 265,
+          height: 500,
+          alt: 'Radbro #2564, the ghost, in 3D: white face, pale lavender hair under a crumpled tin-foil hat and white kufi, black aviators, and a RAD RESPONSE plate carrier, one arm held out.',
+        },
+      },
+    ],
+    cta: { label: 'Play them in Rug Run', href: 'https://rugrun.vyvanse.beer' },
   },
   {
     id: 'bottle-shop',

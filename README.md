@@ -1,6 +1,7 @@
 # vyvanse.beer
 
-Project shelf for [dexedrne](https://github.com/dexedrne). Live at https://vyvanse.beer.
+Project shelf for dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com/dexedrne).
+Live at https://vyvanse.beer.
 
 Plain static site: Vite builds `index.html` + one stylesheet into `dist/`, and ships no client JS.
 The menu (every section and card) is rendered into the HTML at build time.
@@ -22,6 +23,9 @@ npm run build    # -> dist/
 - [Robinscape](https://robinscape.quest), dark forest castle roguelite
 - [BITCORN](https://bitcorn.lol), website with Cornelius's 3D corn maze and a pixel farm
 
+**The crew**: Radbros #652, #4764 and #2564 as 3D figures, all playable in
+[Rug Run](https://rugrun.vyvanse.beer). #4764 also stands in the foam head up top.
+
 **Bottle shop**, coin and meme sites:
 
 - [HOG on Solana](https://www.crankmyhog.lol)
@@ -42,6 +46,20 @@ grid, and a new section only needs a new object in `sections`.
 Card images live in `public/img/`: 800px-wide webp, under 80 KB, 800x420 for a big card and
 800x500 for a bottle. They are cropped from a 1280x720 screenshot of the live site, or taken
 from the site's own share image when the landing page shows a contract address or needs a click.
+
+## Radbro renders
+
+`public/img/radbros/` holds flat renders of the rigged Radbro models: the base-colour texture
+straight into an emission shader (no lighting, so the colours match the NFT art), Standard view
+transform, transparent background, orthographic 3/4 view, rendered headless in Blender and
+saved as webp with alpha. `radbro-4764-hero.webp` is 719x1100 (Big_Wave_Hello); the crew
+figures are 500px tall.
+
+## Theme
+
+One dark pour for everyone: a midnight ube stout. Dusky violet foam head, near-black violet
+body, lilac cards and amethyst accents. The colour tokens are at the top of
+[`src/style.css`](src/style.css).
 
 ## Share card and icons
 

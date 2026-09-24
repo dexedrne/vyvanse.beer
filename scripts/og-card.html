@@ -24,24 +24,25 @@
       body {
         position: relative;
         font-family: 'Schibsted Grotesk', sans-serif;
-        background: linear-gradient(to bottom, #f8cd4e, #eba420 55%, #c9760a);
-        color: #3b1c04;
+        background: linear-gradient(to bottom, #22163b, #180e2b 55%, #120a1f);
+        color: #ebe4f7;
       }
       .head {
         position: relative;
         z-index: 2;
-        height: 360px;
+        height: 340px;
         padding: 0 72px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding-bottom: 34px;
-        background-color: #fff8e6;
+        padding-bottom: 36px;
+        color: #efe9fa;
+        background-color: #31224f;
         background-image:
-          radial-gradient(circle at 20% 30%, transparent 0 4px, #f4e7c6 4px 5.5px, transparent 6px),
-          radial-gradient(circle at 70% 60%, transparent 0 7px, #f4e7c6 7px 8.5px, transparent 9px),
-          radial-gradient(circle at 40% 80%, transparent 0 2.5px, #f4e7c6 2.5px 3.5px, transparent 4px);
+          radial-gradient(circle at 20% 30%, transparent 0 4px, #3d2d5f 4px 5.5px, transparent 6px),
+          radial-gradient(circle at 70% 60%, transparent 0 7px, #3d2d5f 7px 8.5px, transparent 9px),
+          radial-gradient(circle at 40% 80%, transparent 0 2.5px, #3d2d5f 2.5px 3.5px, transparent 4px);
         background-size: 41px 37px, 83px 71px, 29px 31px;
       }
       .head::after {
@@ -52,46 +53,61 @@
         top: calc(100% - 1px);
         height: 40px;
         background:
-          radial-gradient(circle at 50% 0, #fff8e6 0 24px, transparent 24.5px) 0 0 / 62px 40px repeat-x,
-          radial-gradient(circle at 50% 0, #fff8e6 0 15px, transparent 15.5px) 19px 0 / 41px 40px repeat-x,
-          radial-gradient(circle at 50% 0, #fff8e6 0 32px, transparent 32.5px) 44px 0 / 137px 40px repeat-x;
+          radial-gradient(circle at 50% 0, #31224f 0 24px, transparent 24.5px) 0 0 / 62px 40px repeat-x,
+          radial-gradient(circle at 50% 0, #31224f 0 15px, transparent 15.5px) 19px 0 / 41px 40px repeat-x,
+          radial-gradient(circle at 50% 0, #31224f 0 32px, transparent 32.5px) 44px 0 / 137px 40px repeat-x;
       }
       h1 {
         margin: 0;
         font-family: 'Shrikhand', serif;
         font-weight: 400;
-        font-size: 150px;
+        font-size: 100px;
         line-height: 1;
         letter-spacing: -0.01em;
-        text-shadow: 0 6px 0 #f4e7c6;
+        text-shadow: 0 5px 0 #1d1233;
       }
       p {
         position: absolute;
         z-index: 1;
         left: 72px;
-        bottom: 64px;
+        bottom: 62px;
         margin: 0;
-        font-size: 46px;
+        font-size: 44px;
         font-weight: 700;
         line-height: 1.2;
+      }
+      p span {
+        display: block;
+        margin-top: 8px;
+        font-size: 26px;
+        font-weight: 600;
+        color: #b8a9d9;
+      }
+      .bro {
+        position: absolute;
+        z-index: 3;
+        right: 60px;
+        bottom: 24px;
+        height: 560px;
+        filter: drop-shadow(0 16px 20px rgba(4, 0, 12, 0.45));
       }
       .b {
         position: absolute;
         border-radius: 50%;
-        border: 2px solid rgba(255, 250, 235, 0.8);
-        background: radial-gradient(circle at 35% 35%, rgba(255, 250, 235, 0.8), transparent 70%);
+        border: 2px solid rgba(199, 185, 226, 0.45);
+        background: radial-gradient(circle at 35% 35%, rgba(199, 185, 226, 0.45), transparent 70%);
       }
     </style>
   </head>
   <body>
     <div class="head"><h1>vyvanse.beer</h1></div>
-    <p>projects by dexedrne</p>
-    <span class="b" style="left: 820px; top: 430px; width: 22px; height: 22px"></span>
-    <span class="b" style="left: 880px; top: 520px; width: 12px; height: 12px"></span>
-    <span class="b" style="left: 955px; top: 470px; width: 30px; height: 30px"></span>
-    <span class="b" style="left: 1040px; top: 560px; width: 16px; height: 16px"></span>
-    <span class="b" style="left: 1090px; top: 425px; width: 10px; height: 10px"></span>
-    <span class="b" style="left: 1010px; top: 590px; width: 8px; height: 8px"></span>
-    <span class="b" style="left: 760px; top: 575px; width: 9px; height: 9px"></span>
+    <p>projects by dexedrne<span>featuring Radbro #4764</span></p>
+    <img class="bro" src="../public/img/radbros/radbro-4764-hero.webp" alt="" />
+    <span class="b" style="left: 610px; top: 440px; width: 20px; height: 20px"></span>
+    <span class="b" style="left: 660px; top: 530px; width: 12px; height: 12px"></span>
+    <span class="b" style="left: 560px; top: 575px; width: 9px; height: 9px"></span>
+    <span class="b" style="left: 720px; top: 470px; width: 14px; height: 14px"></span>
+    <span class="b" style="left: 1150px; top: 430px; width: 10px; height: 10px"></span>
+    <span class="b" style="left: 1135px; top: 560px; width: 16px; height: 16px"></span>
   </body>
 </html>

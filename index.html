@@ -7,10 +7,11 @@
     <meta name="description" content="Projects by dexedrne: browser games and worlds, coin and meme sites, a byte-identical GBA decompilation, and whatever's fermenting next." />
     <link rel="canonical" href="https://vyvanse.beer/" />
 
-    <meta name="theme-color" content="#fff8e6" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#e9d3aa" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#31224f" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" as="image" href="/img/radbros/radbro-4764-hero.webp" type="image/webp" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="vyvanse.beer" />
@@ -20,9 +21,11 @@
     <meta property="og:image" content="https://vyvanse.beer/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="vyvanse.beer written in the foam head of a pint, with bubbles rising through amber beer." />
+    <meta property="og:image:alt" content="vyvanse.beer written in the lilac foam head of a midnight-purple pint, with Radbro #4764 waving beside it." />
 
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@dexedrne" />
+    <meta name="twitter:creator" content="@dexedrne" />
     <meta name="twitter:title" content="vyvanse.beer" />
     <meta name="twitter:description" content="Projects by dexedrne. Browser games, meme sites, decomps, and whatever's fermenting next." />
     <meta name="twitter:image" content="https://vyvanse.beer/og.png" />
@@ -30,14 +33,33 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <symbol id="i-github" viewBox="0 0 16 16">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+      </symbol>
+      <symbol id="i-x" viewBox="0 0 24 24">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </symbol>
+    </svg>
+
     <header class="head">
       <div class="wrap">
         <nav class="head__bar" aria-label="Elsewhere">
-          <a href="https://github.com/dexedrne" rel="noopener">dexedrne on GitHub</a>
+          <ul class="elsewhere" role="list">
+            <li><a href="https://github.com/dexedrne" rel="me noopener"><svg aria-hidden="true"><use href="#i-github" /></svg><span class="vh">dexedrne on </span>GitHub</a></li>
+            <li><a href="https://x.com/dexedrne" rel="me noopener"><svg aria-hidden="true"><use href="#i-x" /></svg><span class="vh">dexedrne on </span>X</a></li>
+          </ul>
         </nav>
-        <h1 class="mark">vyvanse.beer</h1>
-        <p class="lede">Things dexedrne makes for the internet: browser games, meme sites, decomps, and whatever's fermenting next.</p>
-        <nav class="jump" aria-label="Sections"><!-- menu --></nav>
+        <div class="head__grid">
+          <div class="head__text">
+            <h1 class="mark">vyvanse.beer</h1>
+            <p class="lede">Things dexedrne makes for the internet: browser games, meme sites, decomps, and whatever's fermenting next.</p>
+            <nav class="jump" aria-label="Sections"><!-- menu --></nav>
+          </div>
+          <figure class="head__bro">
+            <img src="/img/radbros/radbro-4764-hero.webp" width="719" height="1100" alt="Radbro #4764 in 3D, waving hello: bright blue hair, black sunglasses with skull lenses, a white hoodie covered in blue scribbles, black trousers, and a katana strapped across his back." fetchpriority="high" decoding="async" />
+          </figure>
+        </div>
       </div>
     </header>
 
@@ -48,7 +70,11 @@
 
     <footer class="dregs">
       <div class="wrap dregs__inner">
-        <p>Poured by <a href="https://github.com/dexedrne" rel="noopener">dexedrne</a>.</p>
+        <p>Poured by dexedrne.</p>
+        <ul class="elsewhere" role="list">
+          <li><a href="https://github.com/dexedrne" rel="me noopener"><svg aria-hidden="true"><use href="#i-github" /></svg>github.com/dexedrne</a></li>
+          <li><a href="https://x.com/dexedrne" rel="me noopener"><svg aria-hidden="true"><use href="#i-x" /></svg>x.com/dexedrne</a></li>
+        </ul>
         <p class="dregs__small">Not a pharmacy. Not a brewery.</p>
       </div>
     </footer>
