@@ -176,12 +176,14 @@ export const crew = {
   title: 'The crew',
   line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in Rug Run.',
   playIn: 'rugrun',
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '78 MB' },
   members: [
     {
       num: '652',
       slug: 'radbro-652',
       name: 'Radbro #652',
       line: 'Brown mop, big blue eyes, the Nobody sweatshirt.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v2.zip', label: '3D model .zip', size: '17 MB' },
       image: {
         src: '/img/radbros/radbro-652.webp',
         width: 280,
@@ -194,6 +196,7 @@ export const crew = {
       slug: 'radbro-4764',
       name: 'Radbro #4764',
       line: 'Skull shades, scribble hoodie, katana on his back.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v2.zip', label: '3D model .zip', size: '18 MB' },
       featured: true,
       image: {
         src: '/img/radbros/radbro-4764.webp',

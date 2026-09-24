@@ -97,8 +97,11 @@ function crewSection(crew, projects) {
   </li>`,
     )
     .join('\n');
+  const all = crew.downloadAll
+    ? ` <a class="bro__dl bro__dl--all" href="${esc(crew.downloadAll.href)}" download rel="noopener">↓ ${esc(crew.downloadAll.label)} <span class="bro__dl-size">${esc(crew.downloadAll.size)}</span></a>`
+    : '';
   const cta = play
-    ? `<p class="crew__cta"><a class="btn btn--ghost" ${ext(play.url)} data-cmd="open ${esc(play.cmd)}">Play them in ${esc(play.name)}${newTab}</a></p>`
+    ? `<p class="crew__cta"><a class="btn btn--ghost" ${ext(play.url)} data-cmd="open ${esc(play.cmd)}">Play them in ${esc(play.name)}${newTab}</a>${all}</p>`
     : '';
   return `<section class="sec sec--crew" id="crew" aria-labelledby="crew-title">
   ${sectionHead('crew', crew.title, crew.line)}
