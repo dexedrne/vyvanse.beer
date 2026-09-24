@@ -1,12 +1,13 @@
 import { defineConfig } from 'vite';
-import { projects } from './src/projects.js';
-import { renderProjects, renderBubbles } from './src/render.js';
+import { sections } from './src/projects.js';
+import { renderSections, renderMenu, renderBubbles } from './src/render.js';
 
 const tapList = {
   name: 'tap-list',
   transformIndexHtml(html) {
     return html
-      .replace('<!-- tap-list -->', renderProjects(projects))
+      .replace('<!-- menu -->', renderMenu(sections))
+      .replace('<!-- sections -->', renderSections(sections))
       .replace('<!-- bubbles -->', renderBubbles());
   },
 };
