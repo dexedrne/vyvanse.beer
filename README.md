@@ -26,16 +26,11 @@ npm run build    # -> dist/
 **The crew**: Radbros #652, #4764 and #2564 as 3D figures, all playable in
 [Rug Run](https://rugrun.vyvanse.beer). #4764 also stands in the foam head up top.
 
-**Bottle shop**, coin and meme sites:
-
-- [HOG on Solana](https://www.crankmyhog.lol)
-- [Dood](https://doodpfp.lol)
-
 **From the cellar**, older pours and code:
 
 - [BULK OS](https://www.bulked.lol/os), an old web desktop full of early games and hand-edited sprites
 - [$SANIC](https://www.sanic.fun), playable WebGL ring runner
-- [KH:CoM decomp](https://github.com/dexedrne/khcom), byte-identical GBA decompilation
+- [HOG on Solana](https://www.crankmyhog.lol), a 2D motorcycle sim
 
 ## Add a project
 

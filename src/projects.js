@@ -157,41 +157,9 @@ export const sections = [
     cta: { label: 'Play them in Rug Run', href: 'https://rugrun.vyvanse.beer' },
   },
   {
-    id: 'bottle-shop',
-    title: 'Bottle shop',
-    kicker: 'Coin and meme sites. Small pours, strong opinions.',
-    kind: 'bottles',
-    items: [
-      {
-        slug: 'hog',
-        name: 'HOG on Solana',
-        line: 'A 2D motorcycle sim: rev the engine, hold the RPM, don’t stall.',
-        href: 'https://www.crankmyhog.lol',
-        image: {
-          src: '/img/hog.webp',
-          width: 800,
-          height: 500,
-          alt: 'HOG site: a smiling bearded figure presenting a motorcycle, over the words “Your hog, king”.',
-        },
-      },
-      {
-        slug: 'dood',
-        name: 'Dood',
-        line: 'Dood on Solana. A pfp, a cloud, and two very small wings.',
-        href: 'https://doodpfp.lol',
-        image: {
-          src: '/img/dood.webp',
-          width: 800,
-          height: 500,
-          alt: 'Dood site: a cartoon dood with tiny angel wings sitting on a cloud above the yellow “dood” logo.',
-        },
-      },
-    ],
-  },
-  {
     id: 'cellar',
     title: 'From the cellar',
-    kicker: 'Older pours and code, aged slowly.',
+    kicker: 'Older pours, aged slowly.',
     kind: 'taps',
     items: [
       {
@@ -214,12 +182,11 @@ export const sections = [
         links: [{ label: 'Play', href: 'https://www.sanic.fun' }],
       },
       {
-        slug: 'khcom',
-        name: 'KH:CoM decomp',
-        style: 'Game Boy Advance decompilation',
-        blurb:
-          'Decompilation of Kingdom Hearts: Chain of Memories for the GBA. Builds byte-identical to the original.',
-        links: [{ label: 'Source', href: 'https://github.com/dexedrne/khcom' }],
+        slug: 'hog',
+        name: 'HOG on Solana',
+        style: 'A 2D motorcycle sim on a meme site',
+        blurb: 'Rev the engine, hold the RPM, don’t stall.',
+        links: [{ label: 'Ride', href: 'https://www.crankmyhog.lol' }],
       },
     ],
   },
