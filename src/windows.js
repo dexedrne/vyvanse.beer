@@ -14,9 +14,10 @@ export function createWindows({ layer, dock, termEl, onChange }) {
   let active = null;
   let placed = 0;
 
-  // Where new windows go: the page column on desktop (left of the terminal), else the viewport.
+  // Where new windows go: the page column when the terminal is docked beside it, else the viewport.
   function area() {
-    const right = media.wide.matches ? termEl.getBoundingClientRect().left : innerWidth;
+    const docked = media.wide.matches && document.documentElement.classList.contains('term-open');
+    const right = docked ? termEl.getBoundingClientRect().left : innerWidth;
     return { w: right, h: innerHeight };
   }
 

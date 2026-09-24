@@ -72,18 +72,19 @@
         <!-- footer -->
       </div>
 
-      <aside class="term" id="term" aria-label="Terminal">
+      <aside class="term" id="term" aria-label="Radbro OS terminal" inert>
         <div class="term__bar">
           <span class="term__handle" aria-hidden="true"></span>
-          <span class="term__title">dexedrne@vyvanse <span class="term__cwd">~</span></span>
-          <span class="term__keys only-wide" aria-hidden="true"><kbd>/</kbd> to type</span>
-          <button class="term__toggle only-narrow" type="button" aria-expanded="false" aria-controls="term-body">
-            <svg class="i" aria-hidden="true"><use href="#i-up" /></svg><span class="vh">Terminal</span>
+          <span class="term__title"><span class="term__os">radbro os</span> <span class="term__who">dexedrne@vyvanse <span class="term__cwd">~</span></span></span>
+          <span class="term__keys only-wide" aria-hidden="true"><kbd>esc</kbd> to close</span>
+          <button class="term__close" type="button" aria-controls="term" aria-label="Close terminal">
+            <svg class="i" aria-hidden="true"><use href="#i-close" /></svg>
           </button>
         </div>
         <div class="term__chips" role="group" aria-label="Quick commands">
           <button type="button" data-cmd="help">help</button>
           <button type="button" data-cmd="ls">ls</button>
+          <button type="button" data-cmd="neofetch">neofetch</button>
           <button type="button" data-cmd="open rugrun">open rugrun</button>
           <button type="button" data-cmd="crew">crew</button>
           <button type="button" data-cmd="whoami">whoami</button>
@@ -99,6 +100,10 @@
         </div>
       </aside>
     </div>
+
+    <button class="launcher js-only" id="launcher" type="button" aria-controls="term" aria-expanded="false" aria-keyshortcuts="/ `">
+      <span class="launcher__glyph" aria-hidden="true">&gt;_</span><span class="launcher__label">radbro os</span><span class="vh"> terminal</span>
+    </button>
 
     <div class="wm" id="wm"></div>
     <nav class="dock" id="dock" aria-label="Open windows" hidden><ul role="list"></ul></nav>

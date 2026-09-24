@@ -3,8 +3,10 @@
 Projects by dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com/dexedrne).
 Live at https://vyvanse.beer.
 
-A plain landing page with a terminal beside it. Both read the same data, so clicking a
-project types `open <name>` into the terminal, and typing commands moves the page. Projects
+A plain landing page with a terminal, Radbro OS, one click away. It starts hidden: the
+`>_ radbro os` button (or `/`) opens it, docked beside the page on desktop and as a bottom
+sheet on phones, and the first open in a session greets you with `neofetch`. Both read the
+same data, so clicking a project runs `open <name>`, and typing commands moves the page. Projects
 that allow framing open in draggable in-page windows (full-screen sheets on phones). The rest
 open in a new tab.
 
@@ -15,7 +17,7 @@ npm run build    # -> dist/
 ```
 
 The landing is rendered into `index.html` at build time, so every project and link is in the
-HTML without JS. The terminal and windows (`src/main.js`, about 12 KB gzipped) are layered on top.
+HTML without JS. The terminal and windows (`src/main.js`, about 13 KB gzipped) are layered on top.
 The 3D viewer for the hero is a separate chunk (about 290 KB gzipped) that only loads once the
 hero is on screen.
 
@@ -57,8 +59,9 @@ completion, and `hidden: true` leaves it out of `help`. To add a quick-command c
 
 ## Keys
 
-`/` or `` ` `` focuses the terminal, Tab completes, ↑ and ↓ walk history, Ctrl+L clears,
-Esc puts the sheet away (and minimises a focused window).
+`/` or `` ` `` opens the terminal at the prompt, Tab completes, ↑ and ↓ walk history, Ctrl+L
+clears, Esc closes it (and minimises a focused window). Open or closed is remembered for the
+tab session only, so new visits always start on the plain landing.
 
 ## Look
 

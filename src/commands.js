@@ -3,6 +3,7 @@
 
 import { h } from './dom.js';
 import { shortUrl } from './projects.js';
+import { neofetch } from './fetch.js';
 
 const norm = (s) => s.toLowerCase().replace(/^[#$]+/, '').trim();
 
@@ -123,7 +124,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         }
         term.print(line(strong('commands')));
         term.print(grid(...rows));
-        term.print(line(muted('tab completes, ↑ and ↓ walk history, / jumps here from anywhere.')));
+        term.print(line(muted('tab completes, ↑ and ↓ walk history, / or ` opens radbro os from anywhere, esc closes it.')));
       },
     },
     ls: {
@@ -246,6 +247,12 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         term.print(grid(...site.links.flatMap((l) => [muted(l.label.toLowerCase()), link(l.href, shortUrl(l.href), 'me noopener')])));
       },
     },
+    neofetch: {
+      desc: 'radbro os system info',
+      run() {
+        term.print(neofetch({ site, projects, crew }));
+      },
+    },
     links: {
       desc: 'GitHub and X',
       run() {
@@ -316,11 +323,13 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
     exit: {
       hidden: true,
       run() {
-        term.print(line(muted("there's no leaving. you can close the tab though.")));
-        page.collapse();
+        term.print(line(muted('logging out of radbro os. / brings it back.')));
+        setTimeout(() => page.collapse(), 450);
       },
     },
     radbros: { hidden: true, run: (a, c) => table.crew.run(a, c) },
+    radbrofetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
+    fetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
     ps: { hidden: true, run: (a, c) => table.windows.run(a, c) },
     man: { hidden: true, run: (a, c) => table.help.run(a, c) },
 

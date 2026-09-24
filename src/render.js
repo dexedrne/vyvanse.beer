@@ -30,7 +30,7 @@ export function renderHero(site, mascot) {
   <h1 class="hero__title">${esc(site.name)}</h1>
   <p class="hero__tag">${esc(site.tagline)}</p>
   <ul class="hero__links" role="list">${links}</ul>
-  <p class="hero__hint js-only"><span class="only-wide">Click a project to open it right here, or press <kbd>/</kbd> and type <code>help</code>.</span><span class="only-narrow">Tap any project to open it right here.</span></p>
+  <p class="hero__hint js-only"><span class="only-wide">Click a project to open it right here, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it right here.</span></p>
   <figure class="hero__bro">
     ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
   </figure>

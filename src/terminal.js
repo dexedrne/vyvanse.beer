@@ -147,12 +147,16 @@ export function createTerminal(root, { exec, complete, onInputFocus }) {
       root.classList.add('is-rugged');
       setTimeout(() => root.classList.remove('is-rugged'), 1000);
     },
-    // Boot: a few lines, one at a time.
-    async boot(lines) {
-      for (const l of lines) {
-        print(l);
-        if (!media.reduced.matches) await sleep(90);
-      }
+    // Boot: a few lines, one at a time. Queued like typed commands, so anything clicked
+    // while it's booting runs after it.
+    boot(lines, { instant = false } = {}) {
+      queue = queue.then(async () => {
+        for (const l of lines) {
+          print(l);
+          if (!instant && !media.reduced.matches) await sleep(90);
+        }
+      });
+      return queue;
     },
   };
 }

@@ -1,4 +1,4 @@
-/* vyvanse.beer: a quiet midnight-purple page with a terminal beside it.
+/* vyvanse.beer: a quiet midnight-purple page, with a terminal (Radbro OS) one click away.
    One type family in two cuts: Spline Sans for the page, Spline Sans Mono for the terminal. */
 
 @font-face {
@@ -41,7 +41,6 @@
   --mono: 'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   --term-w: clamp(400px, 34vw, 540px);
-  --peek: 96px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
@@ -170,11 +169,17 @@ html:not(.js) .js-only {
   margin-inline: auto;
 }
 
+/* the terminal only takes a column while it's open */
 @media (min-width: 1100px) {
-  .js .shell {
+  .js.term-open .shell {
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--term-w);
   }
+}
+
+/* room under the footer for the launcher */
+.js .page {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom));
 }
 
 /* ---------- buttons ---------- */
@@ -835,8 +840,19 @@ a.cmd-hint:hover {
   margin-right: 4px;
 }
 
-.term__toggle {
+.term__os {
+  color: var(--lilac);
+  font-weight: 600;
+}
+
+.term__who {
+  margin-left: 1ch;
+  color: var(--muted);
+}
+
+.term__close {
   display: grid;
+  flex: none;
   place-items: center;
   width: 36px;
   height: 36px;
@@ -845,17 +861,17 @@ a.cmd-hint:hover {
   border: 0;
   border-radius: 10px;
   background: none;
-  color: var(--text);
-  font-size: 18px;
+  color: var(--muted);
+  font-size: 16px;
   cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 
-.term__toggle .i {
-  transition: rotate 0.25s var(--ease);
-}
-
-.term.is-open .term__toggle .i {
-  rotate: 180deg;
+.term__close:hover {
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .term__chips {
@@ -1102,7 +1118,7 @@ a.cmd-hint:hover {
   }
 }
 
-/* desktop: docked beside the page */
+/* desktop: docked beside the page while open, gone while closed */
 @media (min-width: 1100px) {
   .js .term {
     position: sticky;
@@ -1112,13 +1128,32 @@ a.cmd-hint:hover {
     border-left: 1px solid var(--line);
   }
 
+  .js:not(.term-open) .term {
+    display: none;
+  }
+
+  .term-open .term {
+    animation: term-in 0.28s var(--ease) both;
+  }
+
+  .term__close {
+    margin-left: 6px;
+  }
+
   .term__chips {
     order: 3;
     flex-wrap: wrap;
   }
 }
 
-/* phone and tablet: a bottom sheet with the chips in the peek */
+@keyframes term-in {
+  from {
+    opacity: 0;
+    translate: 28px 0;
+  }
+}
+
+/* phone and tablet: a bottom sheet, fully out of sight while closed */
 @media (max-width: 1099.98px) {
   .js .term {
     position: fixed;
@@ -1133,12 +1168,17 @@ a.cmd-hint:hover {
     border-bottom: 0;
     border-radius: 18px 18px 0 0;
     box-shadow: 0 -18px 50px rgb(4 0 12 / 0.55);
-    transform: translateY(calc(100% - var(--peek)));
-    transition: transform 0.32s var(--ease);
+    visibility: hidden;
+    transform: translateY(calc(100% + 24px));
+    transition:
+      transform 0.32s var(--ease),
+      visibility 0s linear 0.32s;
   }
 
-  .js .term.is-open {
+  .term-open .term {
+    visibility: visible;
     transform: none;
+    transition: transform 0.32s var(--ease);
   }
 
   .js .term.is-dragging {
@@ -1185,10 +1225,6 @@ a.cmd-hint:hover {
 
   .term__line {
     padding: 10px 16px calc(14px + env(safe-area-inset-bottom));
-  }
-
-  .js .page {
-    padding-bottom: var(--peek);
   }
 
   .scrim {
@@ -1476,7 +1512,7 @@ a.cmd-hint:hover {
   z-index: 1000;
   left: 16px;
   bottom: 16px;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100vw - 200px);
   padding: 5px;
   overflow-x: auto;
   border: 1px solid var(--line-2);
@@ -1565,9 +1601,9 @@ a.cmd-hint:hover {
 
 @media (max-width: 1099.98px) {
   .dock {
-    bottom: calc(var(--peek) + 10px);
+    bottom: calc(12px + env(safe-area-inset-bottom));
     left: 12px;
-    max-width: calc(100vw - 24px);
+    max-width: calc(100vw - 180px);
   }
 
   .sheet-open .dock {
@@ -1579,6 +1615,122 @@ a.cmd-hint:hover {
   .wm-visible .dock {
     display: none;
   }
+}
+
+/* ---------- launcher: the one way in while the terminal is hidden ---------- */
+
+.launcher {
+  position: fixed;
+  z-index: 1000;
+  right: calc(16px + env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 17px 0 15px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: rgb(26 19 48 / 0.92);
+  box-shadow: 0 16px 40px -12px rgb(4 0 12 / 0.7);
+  backdrop-filter: blur(12px);
+  color: var(--text);
+  font: 500 0.8125rem/1 var(--mono);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.launcher:hover {
+  border-color: var(--lilac);
+}
+
+.launcher__glyph {
+  color: var(--lilac);
+  font-weight: 700;
+}
+
+.launcher[aria-expanded='true'] {
+  border-color: var(--lilac);
+  background: var(--surface-2);
+}
+
+@media (min-width: 1100px) {
+  .term-open .launcher {
+    right: calc(var(--term-w) + 16px);
+  }
+}
+
+@media (max-width: 1099.98px) {
+  .sheet-open .launcher {
+    display: none;
+  }
+}
+
+@media (max-width: 759.98px) {
+  .wm-visible .launcher {
+    display: none;
+  }
+}
+
+/* ---------- neofetch ---------- */
+
+.t-fetch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 3ch;
+  margin: 6px 0 8px;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.t-fetch__art {
+  flex: none;
+  margin: 0;
+  color: var(--lilac);
+  font: inherit;
+  line-height: 1.22;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .t-fetch__art {
+    background: linear-gradient(180deg, var(--lilac-hi) 10%, var(--amethyst) 92%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.t-fetch__info {
+  flex: 1 1 34ch;
+  min-width: 0;
+}
+
+.t-fetch__row {
+  padding-left: 2ch;
+  text-indent: -2ch;
+  overflow-wrap: anywhere;
+}
+
+.t-fetch__k {
+  color: var(--lilac);
+  font-weight: 600;
+}
+
+.t-fetch__swatches {
+  display: grid;
+  margin-top: 10px;
+}
+
+.t-fetch__swatches div {
+  display: flex;
+}
+
+.t-fetch__swatches span {
+  width: 3ch;
+  height: 1.3em;
 }
 
 /* ---------- motion ---------- */

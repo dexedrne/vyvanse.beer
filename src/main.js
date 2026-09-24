@@ -8,69 +8,148 @@ import { createTerminal } from './terminal.js';
 import { createCommands } from './commands.js';
 import { createBro } from './bro.js';
 
+const root = document.documentElement;
 const termEl = document.getElementById('term');
 const scrim = document.getElementById('scrim');
-const toggle = termEl.querySelector('.term__toggle');
+const launcher = document.getElementById('launcher');
+const closeBtn = termEl.querySelector('.term__close');
 const bar = termEl.querySelector('.term__bar');
-const chips = termEl.querySelector('.term__chips');
+const coarse = matchMedia('(pointer: coarse)');
 
-// ---- bottom sheet (below 1100px the terminal lives in a sheet you pull up) ----
+// Open/closed and "has seen the neofetch" last for the tab session only, so every new visit
+// starts on the plain landing. Blocked storage just means nothing is remembered.
+const OPEN_KEY = 'vyv-term-open';
+const FETCHED_KEY = 'vyv-fetched';
+const session = {
+  get(k) {
+    try {
+      return sessionStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set(k, v) {
+    try {
+      sessionStorage.setItem(k, v);
+    } catch {
+      /* private mode or blocked storage */
+    }
+  },
+};
 
-const sheet = (() => {
+let term;
+
+// ---- Radbro OS: hidden until asked for ----
+// The launcher, / or `, or clicking something on the page that prints output opens it. From
+// 1100px up it docks beside the page; below that it's a bottom sheet over a scrim.
+
+const panel = (() => {
   let open = false;
-  const set = (v) => {
-    if (media.wide.matches) v = false;
-    open = v;
-    termEl.classList.toggle('is-open', v);
-    toggle.setAttribute('aria-expanded', String(v));
-    scrim.hidden = !v;
-    document.documentElement.classList.toggle('sheet-open', v);
-  };
-  const peek = () => {
-    const px = bar.offsetHeight + chips.offsetHeight;
-    document.documentElement.style.setProperty('--peek', `${px}px`);
-  };
+  let greeted = false;
+  let back = null; // where focus goes back to when it closes
 
-  toggle.addEventListener('click', () => set(!open));
+  function layout() {
+    const sheet = open && !media.wide.matches;
+    root.classList.toggle('term-open', open);
+    root.classList.toggle('sheet-open', sheet);
+    scrim.hidden = !sheet;
+  }
+
+  // Keyboard openings go to the prompt. A tap on a phone lands on the close button instead, so
+  // the on-screen keyboard doesn't jump up over the output.
+  function focusIn(where) {
+    if (where === 'input' || !coarse.matches) term.focus();
+    else closeBtn.focus({ preventScroll: true });
+  }
+
+  function set(v, { focus } = {}) {
+    if (v !== open) {
+      open = v;
+      termEl.inert = !v;
+      launcher.setAttribute('aria-expanded', String(v));
+      layout();
+      session.set(OPEN_KEY, v ? '1' : '0');
+      if (v) {
+        back = document.activeElement;
+        greet();
+      } else if (termEl.contains(document.activeElement)) {
+        const to = back && back !== document.body && back.isConnected && !termEl.contains(back) ? back : launcher;
+        to.focus({ preventScroll: true });
+      }
+    }
+    if (v && focus) focusIn(focus);
+  }
+
+  // First time it's needed: boot lines, then neofetch on the first open of the session (a plain
+  // `ls` after that). While it's still closed (a click on the page ran something) it all prints
+  // at once, so nothing waits on it.
+  function greet() {
+    if (greeted) return;
+    greeted = true;
+    const quiet = !open || !media.wide.matches;
+    const fetched = session.get(FETCHED_KEY);
+    session.set(FETCHED_KEY, '1');
+    const muted = (t) => h('span', { class: 't-muted' }, t);
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    term.boot(
+      [
+        h(
+          'div',
+          { class: 't-line' },
+          h('span', { class: 't-strong' }, 'Radbro OS v4.7.64'),
+          muted(' (midnight ube)'),
+          ' — type ',
+          h('button', { class: 't-cmd', type: 'button', 'data-cmd': 'help' }, 'help'),
+        ),
+        h('div', { class: 't-line' }, muted(`last login ${today.toLowerCase()} from the internet. click anything on the page, too.`)),
+      ],
+      { instant: quiet },
+    );
+    term.type(fetched ? 'ls' : 'neofetch', { instant: quiet }).then(() => {
+      // Show the greeting from its first line: on a phone the neofetch is taller than the sheet.
+      if (!fetched) termEl.querySelector('.term__out').scrollTop = 0;
+    });
+  }
+
+  launcher.addEventListener('click', () => set(!open, { focus: 'auto' }));
+  closeBtn.addEventListener('click', () => set(false));
   scrim.addEventListener('click', () => set(false));
+  media.wide.addEventListener('change', layout);
 
-  // Drag the bar to pull the sheet up or push it down; a tap toggles it.
+  // Below 1100px: drag the bar down to put the sheet away.
   let drag = null;
   bar.addEventListener('pointerdown', (e) => {
-    if (media.wide.matches || e.button !== 0) return;
-    const closedY = termEl.offsetHeight - bar.offsetHeight - chips.offsetHeight;
-    drag = { y: e.clientY, from: open ? 0 : closedY, closedY, moved: 0, onButton: !!e.target.closest('button') };
+    if (!open || media.wide.matches || e.button !== 0 || e.target.closest('button')) return;
+    drag = { y: e.clientY, dy: 0 };
   });
   bar.addEventListener('pointermove', (e) => {
     if (!drag) return;
-    const dy = e.clientY - drag.y;
-    drag.moved = Math.max(drag.moved, Math.abs(dy));
-    if (drag.moved < 6) return;
-    // Capture only once it's really a drag, so a plain tap still clicks the toggle button.
+    drag.dy = Math.max(0, e.clientY - drag.y);
+    if (drag.dy < 6) return;
     if (!bar.hasPointerCapture(e.pointerId)) bar.setPointerCapture(e.pointerId);
     termEl.classList.add('is-dragging');
-    const y = Math.min(drag.closedY, Math.max(0, drag.from + dy));
-    termEl.style.transform = `translateY(${y}px)`;
-    drag.dy = dy;
+    termEl.style.transform = `translateY(${drag.dy}px)`;
   });
   const end = () => {
     if (!drag) return;
-    const d = drag;
+    const { dy } = drag;
     drag = null;
     termEl.classList.remove('is-dragging');
     termEl.style.transform = '';
-    if (d.moved >= 6) set(d.dy < 0 ? d.dy < -40 || open : !(d.dy > 40) && open);
-    else if (!d.onButton) set(!open);
+    if (dy > 60) set(false);
   };
   bar.addEventListener('pointerup', end);
   bar.addEventListener('pointercancel', end);
 
-  media.wide.addEventListener('change', () => set(false));
-  addEventListener('resize', peek);
-  peek();
-  document.fonts?.ready.then(peek);
-
-  return { open: () => set(true), close: () => set(false), isOpen: () => open, peek };
+  return {
+    open: (opts) => set(true, opts),
+    close: () => set(false),
+    isOpen: () => open,
+    greet,
+    restore() {
+      if (session.get(OPEN_KEY) === '1') set(true);
+    },
+  };
 })();
 
 // ---- the page side: scroll to things, flash them, mark open projects ----
@@ -87,7 +166,7 @@ const behavior = () => (media.reduced.matches ? 'auto' : 'smooth');
 const page = {
   // `cd`: move the page. Below 1100px the sheet gets out of the way first.
   go(id) {
-    if (!media.wide.matches) sheet.close();
+    if (!media.wide.matches) panel.close();
     if (!id) return scrollTo({ top: 0, behavior: behavior() });
     const el = document.getElementById(id);
     if (!el) return;
@@ -96,17 +175,17 @@ const page = {
   },
   // `info` and friends: point at the thing on the page, only when the page is beside the terminal.
   show(id) {
-    if (!media.wide.matches) return;
+    if (!media.wide.matches || !panel.isOpen()) return;
     const el = document.getElementById(id);
     if (!el) return;
     const r = el.getBoundingClientRect();
     if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: behavior(), block: 'center' });
     flash(el.matches('.bro') ? el.querySelector('.bro__link') : el.querySelector('.sec__head') || el);
   },
-  collapse: () => sheet.close(),
+  collapse: () => panel.close(),
   // `spin`: bring the hero into view so the spin can be seen.
   hero() {
-    if (!media.wide.matches) sheet.close();
+    if (!media.wide.matches) panel.close();
     const el = bro.el;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -130,10 +209,10 @@ const wm = createWindows({
 });
 
 let commands;
-const term = createTerminal(termEl, {
+term = createTerminal(termEl, {
   exec: (cmd, ctx) => commands.run(cmd, ctx),
   complete: (value) => commands.complete(value),
-  onInputFocus: () => sheet.open(),
+  onInputFocus: () => panel.open(),
 });
 commands = createCommands({ site, groups, projects, crew, wm, term, page, bro });
 
@@ -145,7 +224,7 @@ document.addEventListener('click', (e) => {
 
   if (el.dataset.fill != null) {
     e.preventDefault();
-    sheet.open();
+    panel.open();
     term.fill(el.dataset.fill);
     return;
   }
@@ -158,46 +237,29 @@ document.addEventListener('click', (e) => {
   if (p && !p.frame && el.tagName === 'A') ctx.alreadyOpened = true; // the link opens the tab itself
   else e.preventDefault();
 
-  if (!fromTerminal && !media.wide.matches) {
-    // Below 1100px the terminal is tucked away: windows and new tabs just happen, anything
-    // that prints output pulls the sheet up so it can be read.
+  if (!fromTerminal && (!panel.isOpen() || !media.wide.matches)) {
+    // The terminal is out of sight: windows and new tabs just happen (the command still lands
+    // in its log), and anything that prints output opens it so it can be read.
     if (p) ctx.instant = true;
-    else sheet.open();
+    else panel.open();
   }
-  if (fromTerminal && el.closest('.term__chips')) sheet.open();
+  panel.greet();
   term.type(cmd, ctx);
 });
 
-// ---- keyboard: / or ` jumps to the terminal, Esc puts the sheet away ----
+// ---- keyboard: / or ` opens Radbro OS at the prompt, Esc puts it away ----
 
 const editable = (el) => el?.closest?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]');
 
 document.addEventListener('keydown', (e) => {
   if ((e.key === '/' || e.key === '`') && !e.ctrlKey && !e.metaKey && !e.altKey && !editable(e.target)) {
     e.preventDefault();
-    sheet.open();
-    term.focus();
-  } else if (e.key === 'Escape' && sheet.isOpen()) {
-    sheet.close();
-    if (termEl.contains(document.activeElement)) document.activeElement.blur();
+    panel.open({ focus: 'input' });
+  } else if (e.key === 'Escape' && panel.isOpen()) {
+    panel.close();
   }
 });
 
-// ---- boot ----
+// ---- boot: closed, unless it was left open earlier in this tab ----
 
-const muted = (t) => h('span', { class: 't-muted' }, t);
-const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-
-term
-  .boot([
-    h('div', { class: 't-line' }, h('span', { class: 't-strong' }, 'vyvanse.beer'), muted(' tty1')),
-    h('div', { class: 't-line' }, muted(`last login ${today.toLowerCase()} from the internet`)),
-    h(
-      'div',
-      { class: 't-line' },
-      'click anything on the page, or type ',
-      h('button', { class: 't-cmd', type: 'button', 'data-cmd': 'help' }, 'help'),
-      '.',
-    ),
-  ])
-  .then(() => term.type('ls', { instant: !media.wide.matches }));
+panel.restore();
