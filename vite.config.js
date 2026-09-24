@@ -1,19 +1,21 @@
 import { defineConfig } from 'vite';
-import { sections } from './src/projects.js';
-import { renderSections, renderMenu, renderBubbles } from './src/render.js';
+import { site, groups, projects, crew, mascot } from './src/projects.js';
+import { renderHero, renderContent, renderFooter } from './src/render.js';
 
-const tapList = {
-  name: 'tap-list',
+// Renders the landing from src/projects.js into index.html, so the shipped HTML already
+// holds every project and link before any JS runs.
+const landing = {
+  name: 'landing',
   transformIndexHtml(html) {
     return html
-      .replace('<!-- menu -->', renderMenu(sections))
-      .replace('<!-- sections -->', renderSections(sections))
-      .replace('<!-- bubbles -->', renderBubbles());
+      .replace('<!-- hero -->', renderHero(site, mascot))
+      .replace('<!-- content -->', renderContent({ groups, projects, crew }))
+      .replace('<!-- footer -->', renderFooter(site));
   },
 };
 
 export default defineConfig({
-  plugins: [tapList],
+  plugins: [landing],
   build: {
     outDir: 'dist',
     assetsInlineLimit: 0,

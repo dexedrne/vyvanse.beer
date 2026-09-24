@@ -1,5 +1,9 @@
-// Renders the menu, the sections and the bubbles into index.html at build time,
-// so the shipped page is plain HTML with no client-side JS.
+// Build-time HTML for the landing. Everything a crawler or a no-JS visitor needs (every
+// project, every link) is plain HTML; the terminal and windows layer on top in src/main.js.
+//
+// `data-cmd` marks anything that runs a terminal command when clicked with JS on.
+
+import { shortUrl } from './projects.js';
 
 const esc = (s) =>
   String(s).replace(
@@ -7,131 +11,127 @@ const esc = (s) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
   );
 
-// Shown under each bottle: the site's host without "www.", allowed to wrap after a dot.
-const host = (href) => new URL(href).host.replace(/^www\./, '');
+const ext = (href) => `href="${esc(href)}" target="_blank" rel="noopener"`;
+const icon = (id) => `<svg class="i" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+const newTab = `<span class="vh"> (opens in a new tab)</span>`;
 
-function capsule(p) {
-  const halves = p.links
+function img(image, { eager = false, cls = '' } = {}) {
+  return `<img${cls ? ` class="${cls}"` : ''} src="${esc(image.src)}" width="${image.width}" height="${image.height}" alt="${esc(image.alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+}
+
+export function renderHero(site, mascot) {
+  const links = site.links
     .map(
       (l) =>
-        `<a class="capsule__half" href="${esc(l.href)}" rel="noopener">${esc(l.label)}</a>`,
+        `<li><a class="btn btn--ghost" ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${icon(l.cmd)}<span>${esc(l.label)}</span>${newTab}</a></li>`,
     )
     .join('');
-  return `<div class="capsule" role="group" aria-label="${esc(p.name)} links">${halves}</div>`;
+  return `<header class="hero">
+  <h1 class="hero__title">${esc(site.name)}</h1>
+  <p class="hero__tag">${esc(site.tagline)}</p>
+  <ul class="hero__links" role="list">${links}</ul>
+  <p class="hero__hint js-only"><span class="only-wide">Click a project to open it right here, or press <kbd>/</kbd> and type <code>help</code>.</span><span class="only-narrow">Tap any project to open it right here.</span></p>
+  <figure class="hero__bro">
+    ${img(mascot, { eager: true })}
+  </figure>
+</header>`;
 }
 
-function img(image, eager) {
-  return `<img src="${esc(image.src)}" width="${image.width}" height="${image.height}" alt="${esc(image.alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
-}
-
-function tap(p, i) {
-  const classes = ['tap', p.featured && 'tap--featured', p.image && 'tap--has-label']
-    .filter(Boolean)
-    .join(' ');
-
-  // Only the first card of the page is above the fold.
-  const label = p.image ? `<figure class="tap__label">${img(p.image, i === 0)}</figure>` : '';
-
-  const notes = (p.notes || []).map((n) => `<p class="tap__note">${n}</p>`).join('');
-
-  return `<article class="${classes}" id="${esc(p.slug)}">
-  ${label}
-  <div class="tap__head">
-    <h3 class="tap__name">${esc(p.name)}</h3>
-    <p class="tap__style">${esc(p.style)}</p>
-  </div>
-  <div class="tap__body">
-    <p class="tap__blurb">${esc(p.blurb)}</p>
-    ${capsule(p)}
-    ${notes}
+function gameRow(p, i) {
+  const [main, ...rest] = p.links;
+  const shot = p.image
+    ? `<div class="game__shot">${img(p.image, { eager: i === 0 })}</div>`
+    : '';
+  const more = rest
+    .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
+    .join('');
+  const credit = p.credit
+    ? `<p class="game__note">${esc(p.credit.before)} <a ${ext(p.credit.href)}>${esc(p.credit.label)}</a> ${esc(p.credit.after)}</p>`
+    : '';
+  const note = p.note ? `<p class="game__note">${esc(p.note)}</p>` : '';
+  return `<article class="game" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
+  ${shot}
+  <div class="game__text">
+    <h3 class="game__name">${esc(p.name)}</h3>
+    <p class="game__kind">${esc(p.kind)}</p>
+    <p class="game__blurb">${esc(p.blurb)}</p>
+    <div class="game__actions">
+      <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
+      ${more}
+      <code class="cmd-hint js-only" aria-hidden="true">open ${esc(p.cmd)}</code>
+    </div>
+    ${credit}${note}
   </div>
 </article>`;
 }
 
-function bottle(p) {
-  return `<li class="bottle" id="${esc(p.slug)}">
-  <a class="bottle__link" href="${esc(p.href)}" rel="noopener">
-    ${img(p.image, false)}
-    <h3 class="bottle__name">${esc(p.name)}</h3>
-    <p class="bottle__line">${esc(p.line)}</p>
-    <span class="bottle__host">${esc(host(p.href)).replaceAll('.', '.<wbr>')}&nbsp;<span aria-hidden="true">↗</span></span>
+function olderRow(p) {
+  return `<li class="older__item" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
+  <a class="older__link" ${ext(p.url)} data-cmd="open ${esc(p.cmd)}">
+    <span class="older__name">${esc(p.name)}</span>
+    <span class="older__kind">${esc(p.kind)}</span>
+    <span class="older__host">${esc(shortUrl(p.url))}${icon('ext')}</span>${newTab}
   </a>
 </li>`;
 }
 
-function bro(b) {
-  return `<li class="bro" id="${esc(b.slug)}">
-  <figure class="bro__card">
-    ${img(b.image, false)}
-    <figcaption>
+function sectionHead(id, title, line) {
+  return `<header class="sec__head">
+    <h2 class="sec__title" id="${esc(id)}-title">${esc(title)}</h2>
+    <a class="cmd-hint js-only" href="#${esc(id)}" data-cmd="ls ${esc(id)}" aria-label="Run ls ${esc(id)} in the terminal">ls ${esc(id)}</a>
+    <p class="sec__line">${esc(line)}</p>
+  </header>`;
+}
+
+function crewSection(crew, projects) {
+  const play = projects.find((p) => p.cmd === crew.playIn);
+  const bros = crew.members
+    .map(
+      (b) => `<li class="bro${b.featured ? ' bro--featured' : ''}" id="${esc(b.slug)}">
+    <a class="bro__link" href="#${esc(b.slug)}" data-cmd="info ${esc(b.num)}">
+      <span class="bro__stage">${img(b.image)}</span>
       <span class="bro__name">${esc(b.name)}</span>
       <span class="bro__line">${esc(b.line)}</span>
-    </figcaption>
-  </figure>
-</li>`;
-}
-
-function crew(s) {
-  const cta = s.cta
-    ? `<p class="crew__cta"><span class="capsule"><a class="capsule__half" href="${esc(s.cta.href)}" rel="noopener">${esc(s.cta.label)}</a></span></p>`
+    </a>
+  </li>`,
+    )
+    .join('\n');
+  const cta = play
+    ? `<p class="crew__cta"><a class="btn btn--ghost" ${ext(play.url)} data-cmd="open ${esc(play.cmd)}">Play them in ${esc(play.name)}${newTab}</a></p>`
     : '';
-  return `<ul class="crew" role="list">\n${s.items.map(bro).join('\n')}\n</ul>\n  ${cta}`;
-}
-
-function section(s, first) {
-  const body =
-    s.kind === 'bottles'
-      ? `<ul class="shelf" role="list">\n${s.items.map(bottle).join('\n')}\n</ul>`
-      : s.kind === 'crew'
-        ? crew(s)
-        : s.items.map((p, i) => tap(p, first ? i : -1)).join('\n');
-
-  return `<section class="wrap menu-section menu-section--${esc(s.kind)}" id="${esc(s.id)}" aria-labelledby="${esc(s.id)}-title">
-  <header class="menu-section__head">
-    <h2 class="menu-section__title" id="${esc(s.id)}-title">${esc(s.title)}</h2>
-    <p class="menu-section__kicker">${esc(s.kicker)}</p>
-  </header>
-  ${body}
+  return `<section class="sec sec--crew" id="crew" aria-labelledby="crew-title">
+  ${sectionHead('crew', crew.title, crew.line)}
+  <ul class="crew" role="list">
+  ${bros}
+  </ul>
+  ${cta}
 </section>`;
 }
 
-export function renderSections(list) {
-  return list.map((s, i) => section(s, i === 0)).join('\n');
-}
-
-// Jump links in the foam head, one per section.
-export function renderMenu(list) {
-  return list
-    .map(
-      (s) =>
-        `<a href="#${esc(s.id)}">${esc(s.title)} <span class="jump__count">${s.items.length}</span></a>`,
-    )
-    .join('');
-}
-
-// Deterministic "random" bubbles so every build is identical. Each bubble rides a track as
-// tall as the whole beer, so a longer page wants more bubbles and slower rides.
-function mulberry32(seed) {
-  return () => {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-export function renderBubbles(count = 40, seed = 7) {
-  const rand = mulberry32(seed);
+export function renderContent({ groups, projects, crew }) {
   const out = [];
-  for (let i = 0; i < count; i++) {
-    const x = (2 + rand() * 96).toFixed(1);
-    const s = (4 + rand() * 10).toFixed(1);
-    const d = (30 + rand() * 30).toFixed(1);
-    const delay = (-rand() * d).toFixed(1);
-    out.push(
-      `<span class="bubble" style="--x:${x}%;--s:${s}px;--d:${d}s;--delay:${delay}s"></span>`,
-    );
+  for (const g of groups) {
+    const items = projects.filter((p) => p.group === g.id);
+    const body =
+      g.id === 'games'
+        ? `<div class="games">${items.map(gameRow).join('\n')}</div>`
+        : `<ul class="older" role="list">${items.map(olderRow).join('\n')}</ul>`;
+    out.push(`<section class="sec sec--${esc(g.id)}" id="${esc(g.id)}" aria-labelledby="${esc(g.id)}-title">
+  ${sectionHead(g.id, g.title, g.line)}
+  ${body}
+</section>`);
+    // The crew sits between the games and the older things.
+    if (g.id === 'games') out.push(crewSection(crew, projects));
   }
-  return out.join('');
+  return out.join('\n');
+}
+
+export function renderFooter(site) {
+  const links = site.links
+    .map((l) => `<a ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${esc(shortUrl(l.href))}${newTab}</a>`)
+    .join(' and ');
+  return `<footer class="foot">
+  <p>Made by ${esc(site.handle)}. Find me at ${links}.</p>
+  <p class="foot__small">Not a pharmacy. Not a brewery.</p>
+</footer>`;
 }
