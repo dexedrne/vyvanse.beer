@@ -42,7 +42,7 @@ function openTab(url) {
   return !!w;
 }
 
-export function createCommands({ site, groups, projects, crew, wm, term, page }) {
+export function createCommands({ site, groups, projects, crew, wm, term, page, bro }) {
   const byName = new Map();
   for (const p of projects) for (const n of [p.cmd, ...(p.aliases || [])]) byName.set(n, p);
   const findProject = (args) => byName.get(norm(args.join('-')));
@@ -213,6 +213,17 @@ export function createCommands({ site, groups, projects, crew, wm, term, page })
         );
         if (playIn) term.print(line('play them: ', run(`open ${playIn.cmd}`)));
         page.show('crew');
+      },
+    },
+    spin: {
+      desc: 'spin #4764 round',
+      run() {
+        page.hero();
+        const how = bro?.spin() ?? 'missing';
+        if (how === 'ok') term.print(line('wheee. ', muted('drag him to spin him yourself.')));
+        else if (how === 'spinning') term.print(line(muted("he's already spinning.")));
+        else if (how === 'loading') term.print(line(muted('warming him up. he spins as soon as he loads.')));
+        else term.print(line(muted("he's a picture right now (no 3d in this browser), so he can't spin.")));
       },
     },
     cd: {

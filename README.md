@@ -15,7 +15,9 @@ npm run build    # -> dist/
 ```
 
 The landing is rendered into `index.html` at build time, so every project and link is in the
-HTML without JS. The terminal and windows (`src/main.js`, about 10 KB gzipped) are layered on top.
+HTML without JS. The terminal and windows (`src/main.js`, about 12 KB gzipped) are layered on top.
+The 3D viewer for the hero is a separate chunk (about 290 KB gzipped) that only loads once the
+hero is on screen.
 
 ## Add a project
 
@@ -78,3 +80,20 @@ Open the card pages after `npm install` so the fonts resolve.
 `public/img/radbros/` holds flat renders of the rigged Radbro models on transparent
 backgrounds: `radbro-4764-hero.webp` (719×1100, waving) for the hero, and 500px-tall crew
 figures.
+
+## #4764 in 3D
+
+The hero is a [`<model-viewer>`](https://modelviewer.dev) you can drag around (`src/bro.js`).
+The render above is its poster, so the first paint is the same picture, and without JS it's
+just that image. He idles, waves every 8 to 12 seconds (or when you tap him), and turns slowly
+after 4 seconds on his own. With reduced motion on, he doesn't turn or wave by himself. In the
+terminal, `spin` spins him round.
+
+- `public/models/radbro4764-hero.glb` (about 730 KB) is a web cut of the rigged model: the
+  mesh plus two clips, `Idle` and `Big_Wave_Hello`, with both turned to face the camera. It
+  was made with [glTF-Transform](https://gltf-transform.dev): unlit, texture resized to 1024
+  and converted to WebP at quality 90, animations resampled, then Draco.
+- `public/draco/` is the Draco decoder from `three/examples/jsm/libs/draco/gltf/`, served from
+  this site instead of Google's CDN. Copy those two files again if you update `three`.
+- `@google/model-viewer` and `three` are pinned to exact versions. model-viewer 4.3.1 never
+  fires `finished`, so `src/bro.js` watches the wave's clock instead.

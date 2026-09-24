@@ -212,12 +212,14 @@ export const crew = {
   ],
 };
 
-// The big #4764 in the hero.
+// The big #4764 in the hero. The render is the poster (and what no-JS visitors and crawlers
+// get); `model` is the small web GLB <model-viewer> swaps in so you can drag him around.
 export const mascot = {
   src: '/img/radbros/radbro-4764-hero.webp',
   width: 719,
   height: 1100,
   alt: 'Radbro #4764 in 3D, waving hello: bright blue hair, black sunglasses with skull lenses, a white hoodie covered in blue scribbles, black trousers, and a katana strapped across his back.',
+  model: '/models/radbro4764-hero.glb',
 };
 
 // Host shown in lists and window title bars: "rugrun.vyvanse.beer", "bulked.lol/os".

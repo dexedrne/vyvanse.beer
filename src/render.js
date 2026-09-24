@@ -32,10 +32,62 @@ export function renderHero(site, mascot) {
   <ul class="hero__links" role="list">${links}</ul>
   <p class="hero__hint js-only"><span class="only-wide">Click a project to open it right here, or press <kbd>/</kbd> and type <code>help</code>.</span><span class="only-narrow">Tap any project to open it right here.</span></p>
   <figure class="hero__bro">
-    ${img(mascot, { eager: true })}
+    ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
   </figure>
 </header>`;
 }
+
+// #4764 as a <model-viewer> you can drag around. The render sits inside as the poster, so the
+// first paint is the same picture, and without JS (or before the viewer loads) it's just the
+// <img>. src/bro.js loads the viewer, and sets auto-rotate and the waves.
+function bro3d(m) {
+  const attrs = {
+    class: 'bro3d',
+    src: m.model,
+    alt: m.alt,
+    loading: 'lazy',
+    reveal: 'auto',
+    'camera-controls': '',
+    'disable-zoom': '',
+    'disable-pan': '',
+    'disable-tap': '',
+    'touch-action': 'pan-y',
+    'interaction-prompt': 'none',
+    'camera-orbit': BRO_CAMERA.orbit,
+    'min-camera-orbit': BRO_CAMERA.min,
+    'max-camera-orbit': BRO_CAMERA.max,
+    'camera-target': BRO_CAMERA.target,
+    'field-of-view': BRO_CAMERA.fov,
+    'min-field-of-view': BRO_CAMERA.fov,
+    'max-field-of-view': BRO_CAMERA.fov,
+    'orbit-sensitivity': '0.7',
+    'interpolation-decay': '120',
+    'auto-rotate-delay': '4000',
+    'rotation-per-second': '16deg',
+    'animation-name': 'Idle',
+    autoplay: '',
+    'animation-crossfade-duration': '400',
+    'tone-mapping': 'none',
+    exposure: '1',
+    'shadow-intensity': '0',
+  };
+  const a = Object.entries(attrs)
+    .map(([k, v]) => (v === '' ? k : `${k}="${esc(v)}"`))
+    .join(' ');
+  return `<model-viewer ${a}>
+      ${img(m, { eager: true }).replace('<img ', '<img slot="poster" ')}
+    </model-viewer>`;
+}
+
+// Framing for the 719x1100 box: he fills it about the way he fills the render. Drag spins him
+// all the way round; the tilt stays between a little below and a little above eye level.
+const BRO_CAMERA = {
+  orbit: '0deg 82deg 6.2m',
+  min: '-Infinity 66deg 6.2m',
+  max: 'Infinity 96deg 6.2m',
+  target: '0m 0.86m 0m',
+  fov: '17deg',
+};
 
 function gameRow(p, i) {
   const [main, ...rest] = p.links;

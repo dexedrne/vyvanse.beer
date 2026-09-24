@@ -6,6 +6,7 @@ import { h, media } from './dom.js';
 import { createWindows } from './windows.js';
 import { createTerminal } from './terminal.js';
 import { createCommands } from './commands.js';
+import { createBro } from './bro.js';
 
 const termEl = document.getElementById('term');
 const scrim = document.getElementById('scrim');
@@ -103,7 +104,18 @@ const page = {
     flash(el.matches('.bro') ? el.querySelector('.bro__link') : el.querySelector('.sec__head') || el);
   },
   collapse: () => sheet.close(),
+  // `spin`: bring the hero into view so the spin can be seen.
+  hero() {
+    if (!media.wide.matches) sheet.close();
+    const el = bro.el;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: behavior(), block: 'center' });
+  },
 };
+
+// #4764 in the hero: loads the 3D viewer once he's on screen (see src/bro.js).
+const bro = createBro(document.querySelector('.hero__bro model-viewer'));
 
 const wm = createWindows({
   layer: document.getElementById('wm'),
@@ -123,7 +135,7 @@ const term = createTerminal(termEl, {
   complete: (value) => commands.complete(value),
   onInputFocus: () => sheet.open(),
 });
-commands = createCommands({ site, groups, projects, crew, wm, term, page });
+commands = createCommands({ site, groups, projects, crew, wm, term, page, bro });
 
 // ---- clicks anywhere with data-cmd run that command in the terminal ----
 

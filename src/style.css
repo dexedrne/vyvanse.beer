@@ -291,6 +291,7 @@ a.cmd-hint:hover {
 }
 
 .hero__bro {
+  --bro-h: clamp(250px, 44cqi, 400px);
   grid-area: bro;
   align-self: end;
   position: relative;
@@ -313,7 +314,74 @@ a.cmd-hint:hover {
   position: relative;
   display: block;
   width: auto;
-  height: clamp(250px, 44cqi, 400px);
+  height: var(--bro-h);
+}
+
+/* #4764 in 3D (src/bro.js). Same box as the render, which is the poster inside it, so nothing
+   moves when the model takes over. Before the viewer loads it's just that <img>. */
+.bro3d {
+  position: relative;
+  display: block;
+  width: calc(var(--bro-h) * 719 / 1100);
+  height: var(--bro-h);
+  background: transparent;
+  --poster-color: transparent;
+  outline: none;
+}
+
+.hero__bro .bro3d img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.is-live .bro3d {
+  cursor: grab;
+}
+
+.is-live .bro3d:active {
+  cursor: grabbing;
+}
+
+.bro3d:focus-visible {
+  outline: 2px solid var(--lilac);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.bro3d__hint {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  translate: -50% 4px;
+  padding: 3px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font: 400 0.75rem/1.4 var(--mono);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.5s var(--ease),
+    translate 0.5s var(--ease);
+}
+
+.bro3d__hint::before {
+  content: '\2194\FE0E  ';
+  color: var(--faint);
+}
+
+.bro3d__hint.is-on {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bro3d__hint {
+    transition: none;
+  }
 }
 
 @media (max-width: 599.98px) {
@@ -346,8 +414,12 @@ a.cmd-hint:hover {
     font-size: 1.125rem;
   }
 
-  .hero__bro img {
-    height: clamp(180px, 56cqi, 250px);
+  .hero__bro {
+    --bro-h: clamp(180px, 56cqi, 250px);
+  }
+
+  .hero__bro > img,
+  .bro3d {
     margin-top: 4px;
   }
 

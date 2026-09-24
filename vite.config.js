@@ -19,5 +19,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsInlineLimit: 0,
+    // model-viewer (three.js inside) is one ~1 MB chunk, loaded on its own once the hero is on
+    // screen (src/bro.js), never in the way of the page. Only warn above that.
+    chunkSizeWarningLimit: 1100,
   },
 });
