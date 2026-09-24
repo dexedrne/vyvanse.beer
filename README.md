@@ -21,7 +21,6 @@ npm run build    # -> dist/
   ([play](https://play.solscape.fun))
 - [Robinscape](https://robinscape.quest), dark forest castle roguelite
 - [BITCORN](https://bitcorn.lol), website with Cornelius's 3D corn maze and a pixel farm
-- [$SANIC](https://www.sanic.fun), playable WebGL ring runner
 
 **Bottle shop**, coin and meme sites:
 
@@ -30,8 +29,10 @@ npm run build    # -> dist/
 - [Cucked Peter](https://cuckedpeter.vercel.app)
 - [CHUDBOB](https://chudbob-phi.vercel.app)
 
-**From the cellar**, code:
+**From the cellar**, older pours and code:
 
+- [BULK OS](https://www.bulked.lol/os), an old web desktop full of early games and hand-edited sprites
+- [$SANIC](https://www.sanic.fun), playable WebGL ring runner
 - [KH:CoM decomp](https://github.com/dexedrne/khcom), byte-identical GBA decompilation
 
 ## Add a project

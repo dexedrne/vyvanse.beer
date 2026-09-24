@@ -49,7 +49,6 @@ export const sections = [
           { label: 'Source', href: 'https://github.com/dexedrne/rug-run' },
         ],
         notes: [
-          'Play link not loading yet? Use <a href="https://radbro-rug-run.vercel.app" rel="noopener">radbro-rug-run.vercel.app</a> for now.',
           'Built on <a href="https://prnth.com/react-three-game/" rel="noopener">react-three-game</a> by prnth.',
         ],
       },
@@ -107,21 +106,6 @@ export const sections = [
           { label: 'Run the maze', href: 'https://bitcorn.lol/maze' },
           { label: 'Site', href: 'https://bitcorn.lol' },
         ],
-      },
-      {
-        slug: 'sanic',
-        name: '$SANIC',
-        style: 'Playable WebGL ring runner',
-        blurb:
-          'Run the trenches, stack rings, and go irresponsibly fast. The runner plays right on the landing page.',
-        featured: true,
-        image: {
-          src: '/img/sanic.webp',
-          width: 800,
-          height: 420,
-          alt: '$SANIC key art: a very muscular blue Sanic sprinting down a forest trail full of gold rings.',
-        },
-        links: [{ label: 'Play', href: 'https://www.sanic.fun' }],
       },
     ],
   },
@@ -184,9 +168,28 @@ export const sections = [
   {
     id: 'cellar',
     title: 'From the cellar',
-    kicker: 'Code, aged slowly.',
+    kicker: 'Older pours and code, aged slowly.',
     kind: 'taps',
     items: [
+      {
+        slug: 'bulk-os',
+        name: 'BULK OS',
+        style: 'An old web desktop full of early games',
+        blurb:
+          'The early stuff: a web “OS” packed with old games and toys, from back when every asset was made separately and hand-edited into sprites in GIMP.',
+        links: [
+          { label: 'Open', href: 'https://www.bulked.lol/os' },
+          { label: 'Site', href: 'https://www.bulked.lol' },
+        ],
+      },
+      {
+        slug: 'sanic',
+        name: '$SANIC',
+        style: 'Playable WebGL ring runner',
+        blurb:
+          'Run the trenches, stack rings, and go irresponsibly fast. The runner plays right on the landing page.',
+        links: [{ label: 'Play', href: 'https://www.sanic.fun' }],
+      },
       {
         slug: 'khcom',
         name: 'KH:CoM decomp',
