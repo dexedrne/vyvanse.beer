@@ -1,0 +1,97 @@
+<!doctype html>
+<!-- Share card source. public/og.png is a 1200x630 screenshot of this page (fonts resolve after npm install). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>og card</title>
+    <style>
+      @font-face {
+        font-family: 'Shrikhand';
+        src: url('../node_modules/@fontsource/shrikhand/files/shrikhand-latin-400-normal.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Schibsted Grotesk';
+        font-weight: 400 900;
+        src: url('../node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2') format('woff2');
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        font-family: 'Schibsted Grotesk', sans-serif;
+        background: linear-gradient(to bottom, #f8cd4e, #eba420 55%, #c9760a);
+        color: #3b1c04;
+      }
+      .head {
+        position: relative;
+        z-index: 2;
+        height: 360px;
+        padding: 0 72px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding-bottom: 34px;
+        background-color: #fff8e6;
+        background-image:
+          radial-gradient(circle at 20% 30%, transparent 0 4px, #f4e7c6 4px 5.5px, transparent 6px),
+          radial-gradient(circle at 70% 60%, transparent 0 7px, #f4e7c6 7px 8.5px, transparent 9px),
+          radial-gradient(circle at 40% 80%, transparent 0 2.5px, #f4e7c6 2.5px 3.5px, transparent 4px);
+        background-size: 41px 37px, 83px 71px, 29px 31px;
+      }
+      .head::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% - 1px);
+        height: 40px;
+        background:
+          radial-gradient(circle at 50% 0, #fff8e6 0 24px, transparent 24.5px) 0 0 / 62px 40px repeat-x,
+          radial-gradient(circle at 50% 0, #fff8e6 0 15px, transparent 15.5px) 19px 0 / 41px 40px repeat-x,
+          radial-gradient(circle at 50% 0, #fff8e6 0 32px, transparent 32.5px) 44px 0 / 137px 40px repeat-x;
+      }
+      h1 {
+        margin: 0;
+        font-family: 'Shrikhand', serif;
+        font-weight: 400;
+        font-size: 150px;
+        line-height: 1;
+        letter-spacing: -0.01em;
+        text-shadow: 0 6px 0 #f4e7c6;
+      }
+      p {
+        position: absolute;
+        z-index: 1;
+        left: 72px;
+        bottom: 64px;
+        margin: 0;
+        font-size: 46px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+      .b {
+        position: absolute;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 250, 235, 0.8);
+        background: radial-gradient(circle at 35% 35%, rgba(255, 250, 235, 0.8), transparent 70%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="head"><h1>vyvanse.beer</h1></div>
+    <p>projects by dexedrne</p>
+    <span class="b" style="left: 820px; top: 430px; width: 22px; height: 22px"></span>
+    <span class="b" style="left: 880px; top: 520px; width: 12px; height: 12px"></span>
+    <span class="b" style="left: 955px; top: 470px; width: 30px; height: 30px"></span>
+    <span class="b" style="left: 1040px; top: 560px; width: 16px; height: 16px"></span>
+    <span class="b" style="left: 1090px; top: 425px; width: 10px; height: 10px"></span>
+    <span class="b" style="left: 1010px; top: 590px; width: 8px; height: 8px"></span>
+    <span class="b" style="left: 760px; top: 575px; width: 9px; height: 9px"></span>
+  </body>
+</html>
