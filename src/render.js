@@ -92,7 +92,8 @@ function crewSection(crew, projects) {
       <span class="bro__stage">${img(b.image)}</span>
       <span class="bro__name">${esc(b.name)}</span>
       <span class="bro__line">${esc(b.line)}</span>
-    </a>
+    </a>${b.download ? `
+    <a class="bro__dl" href="${esc(b.download.href)}" download rel="noopener">↓ ${esc(b.download.label)} <span class="bro__dl-size">${esc(b.download.size)}</span></a>` : ''}
   </li>`,
     )
     .join('\n');

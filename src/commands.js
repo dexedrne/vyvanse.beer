@@ -104,6 +104,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page })
           line(strong(b.name), b.featured ? muted('  the mascot') : null),
           line(muted(b.line)),
           playIn ? line(b.soon ? 'coming soon to ' : 'playable in ', run(`open ${playIn.cmd}`)) : null,
+          b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
         ),
       ),
     );

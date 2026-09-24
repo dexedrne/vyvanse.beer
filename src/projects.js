@@ -207,6 +207,7 @@ export const crew = {
       slug: 'radbro-2564',
       name: 'Radbro #2564',
       line: 'The ghost. Foil hat, aviators, RAD RESPONSE vest.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro2564-3d-model.zip', label: '3D model .zip', size: '20 MB' },
       image: {
         src: '/img/radbros/radbro-2564.webp',
         width: 265,
@@ -219,6 +220,7 @@ export const crew = {
       slug: 'radbro-723',
       name: 'Radbro #723',
       line: 'The new guy. Cowboy hat, a wink, HOT TOPIC BRO vest.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro723-3d-model.zip', label: '3D model .zip', size: '21 MB' },
       image: {
         src: '/img/radbros/radbro-723.webp',
         width: 336,
