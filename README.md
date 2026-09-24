@@ -26,8 +26,6 @@ npm run build    # -> dist/
 
 - [HOG on Solana](https://www.crankmyhog.lol)
 - [Dood](https://doodpfp.lol)
-- [Cucked Peter](https://cuckedpeter.vercel.app)
-- [CHUDBOB](https://chudbob-phi.vercel.app)
 
 **From the cellar**, older pours and code:
 

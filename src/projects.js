@@ -139,30 +139,6 @@ export const sections = [
           alt: 'Dood site: a cartoon dood with tiny angel wings sitting on a cloud above the yellow “dood” logo.',
         },
       },
-      {
-        slug: 'cucked-peter',
-        name: 'Cucked Peter',
-        line: 'Launch page for $CP on Solana, with a webgame in development.',
-        href: 'https://cuckedpeter.vercel.app',
-        image: {
-          src: '/img/cuckedpeter.webp',
-          width: 800,
-          height: 500,
-          alt: 'Cucked Peter site: a gold $CP title on a dark, moody backdrop.',
-        },
-      },
-      {
-        slug: 'chudbob',
-        name: 'CHUDBOB',
-        line: 'Chudjak SpongeBob on Solana. Tap to cluck, for the culture.',
-        href: 'https://chudbob-phi.vercel.app',
-        image: {
-          src: '/img/chudbob.webp',
-          width: 800,
-          height: 500,
-          alt: 'CHUDBOB site: a chudjak-faced SpongeBob glowing under a cluck counter.',
-        },
-      },
     ],
   },
   {
