@@ -59,7 +59,7 @@ export const projects = [
       src: '/img/radrun.jpg',
       width: 1200,
       height: 630,
-      alt: 'RadRun: a Radbro swings on a rope between city rooftops, chasing the thief who took the bag.',
+      alt: 'RadRun: Radbro #4764 swings on a web line from a skyscraper at sunset, chasing #652 and the bag across the rooftops, with George the cat.',
     },
     credit: {
       before: 'Built on',
