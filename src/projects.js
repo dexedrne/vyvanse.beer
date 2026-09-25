@@ -132,6 +132,24 @@ export const projects = [
     },
   },
   {
+    cmd: 'bulkagachi',
+    aliases: ['bulk-pet'],
+    slug: 'bulkagachi',
+    group: 'sites',
+    name: 'bulkagachi',
+    kind: 'Pixel virtual pet for the BULK project',
+    blurb: 'Hatch your Bulk, then feed it, play with it, clean it and put it to bed by the fire.',
+    url: 'https://www.bulked.lol/games/bulkagachi',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://www.bulked.lol/games/bulkagachi' }],
+    image: {
+      src: '/img/bulkagachi.webp',
+      width: 800,
+      height: 420,
+      alt: 'Bulkagachi: a purple egg on a rug in a pixel-art log cabin with a stone fireplace, a sleeping cat and toys, under the Bulkagachi title bar.',
+    },
+  },
+  {
     cmd: 'sanic',
     slug: 'sanic',
     group: 'sites',
@@ -151,19 +169,20 @@ export const projects = [
   },
   {
     cmd: 'hog',
+    aliases: ['hogrider', 'hog-rider'],
     slug: 'hog',
     group: 'sites',
-    name: 'hog',
-    kind: 'Project site with a 2D motorcycle sim',
-    blurb: 'Rev the engine, hold the RPM, don’t stall.',
-    url: 'https://www.crankmyhog.lol',
+    name: 'hog rider 3d',
+    kind: 'Handlebar-view highway runner for the HOG project',
+    blurb: 'Weave through traffic on a sunset highway, dodge left and right, boost with space.',
+    url: 'https://www.crankmyhog.lol/assets/hog-rider-3d/index.html',
     frame: true,
-    links: [{ label: 'Ride', href: 'https://www.crankmyhog.lol' }],
+    links: [{ label: 'Ride', href: 'https://www.crankmyhog.lol/assets/hog-rider-3d/index.html' }],
     image: {
       src: '/img/hog.webp',
       width: 800,
       height: 420,
-      alt: 'The hog home page: a glowing hero image of a smiling robed figure holding out a chrome motorcycle, the title “YOUR HOG, KING”, a red “Play Hog Rider 3D” button and a small preview of the handlebar-view road game, on a red pixel-art sunset.',
+      alt: 'Hog rider 3d mid-ride: the view over chrome motorcycle handlebars down a highway, a purple car ahead, pine trees, low-poly mountains and a blue sky, with the score and hearts at the top.',
     },
   },
 ];
@@ -246,6 +265,8 @@ export const mascot = {
 // Host shown in lists and window title bars: "radrun.vyvanse.beer", "bulked.lol/os".
 export function shortUrl(href) {
   const u = new URL(href);
-  const path = u.pathname === '/' ? '' : u.pathname.replace(/\/$/, '');
+  const parts = u.pathname.replace(/\/index\.html?$/, '').split('/').filter(Boolean);
+  // Deep links read as host/…/last-segment so the card line stays short.
+  const path = parts.length > 2 ? `/…/${parts[parts.length - 1]}` : parts.map((p) => `/${p}`).join('');
   return u.host.replace(/^www\./, '') + path;
 }
