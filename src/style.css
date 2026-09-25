@@ -572,8 +572,7 @@ a.cmd-hint:hover {
 }
 
 /* The opt-in "In a window" buttons: quieter than the links beside them. */
-.game__win,
-.older__win {
+.game__win {
   padding: 0;
   border: 0;
   background: none;
@@ -583,8 +582,7 @@ a.cmd-hint:hover {
   cursor: pointer;
 }
 
-.game__win:hover,
-.older__win:hover {
+.game__win:hover {
   color: var(--lilac-hi);
 }
 
@@ -615,6 +613,68 @@ a.cmd-hint:hover {
 
   .game .cmd-hint {
     display: none;
+  }
+}
+
+/* ---------- sites: the same parts as a game, as picture cards two to a row ---------- */
+
+.games--grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-block: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game--card {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 14px;
+}
+
+.game--card .game__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.game--card .game__name {
+  font-size: 1.25rem;
+}
+
+.game__host {
+  margin: 2px 0 0;
+  color: var(--faint);
+  font: 400 0.8125rem/1.4 var(--mono);
+}
+
+.game:hover .game__host {
+  color: var(--muted);
+}
+
+.game--card .game__kind {
+  margin: 6px 0 16px;
+}
+
+.game--card .game__actions {
+  margin-top: auto;
+}
+
+/* A site with no screenshot yet: a quiet tile with its host on it. */
+.game__shot--none {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 40 / 21;
+  border-radius: 10px;
+  background:
+    radial-gradient(70% 60% at 50% 100%, rgb(142 109 224 / 0.18), transparent 70%),
+    var(--surface-2);
+  box-shadow: 0 0 0 1px rgb(236 230 248 / 0.08);
+  color: var(--lilac);
+  font: 500 1rem/1.4 var(--mono);
+}
+
+@container (max-width: 599.98px) {
+  .games--grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -693,110 +753,6 @@ a.cmd-hint:hover {
 
   .bro__line {
     font-size: 0.8125rem;
-  }
-}
-
-/* ---------- older things ---------- */
-
-.older {
-  margin: 0 -12px;
-  padding: 0;
-  list-style: none;
-}
-
-.older__item + .older__item {
-  border-top: 1px solid var(--line);
-}
-
-.older__item {
-  display: flex;
-  align-items: center;
-}
-
-.older__side {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 40px;
-}
-
-.older__win {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-}
-
-.older__win:hover {
-  background: var(--surface);
-}
-
-.older__win .i {
-  width: 15px;
-  height: 15px;
-}
-
-.older__link {
-  flex: 1;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 9.5rem minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 2px 20px;
-  padding: 14px 12px;
-  border-radius: 10px;
-  color: inherit;
-  text-decoration: none;
-  transition: background-color 0.2s;
-}
-
-.older__link:hover {
-  background: var(--surface);
-  color: inherit;
-}
-
-.older__name {
-  font-weight: 600;
-}
-
-.older__kind {
-  color: var(--muted);
-}
-
-.older__host {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--lilac);
-  font: 400 0.8125rem/1.4 var(--mono);
-}
-
-.older__host .i {
-  width: 13px;
-  height: 13px;
-}
-
-.older__item[data-open] .older__name::after {
-  content: 'open';
-  margin-left: 8px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: rgb(198 179 247 / 0.14);
-  color: var(--lilac);
-  font: 500 0.6875rem/1.6 var(--mono);
-  vertical-align: 2px;
-}
-
-@media (max-width: 599.98px) {
-  .older__link {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .older__kind {
-    grid-row: 2;
-    grid-column: 1 / -1;
-    font-size: 0.9375rem;
   }
 }
 

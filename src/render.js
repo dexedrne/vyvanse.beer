@@ -91,10 +91,9 @@ const BRO_CAMERA = {
 
 // Projects open in a new tab. The ones that allow framing also get this small opt-in: run it
 // in an in-page window instead (`win <cmd>`). JS only, like the windows themselves.
-function winButton(p, cls, { iconOnly = false } = {}) {
+function winButton(p, cls) {
   if (!p.frame) return '';
-  const label = `Open ${esc(p.name)} in a window on this page`;
-  return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="${label}" title="${iconOnly ? label : 'Open in a window on this page'}">${icon('max')}${iconOnly ? '' : '<span>In a window</span>'}</button>`;
+  return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="Open ${esc(p.name)} in a window on this page" title="Open in a window on this page">${icon('max')}<span>In a window</span></button>`;
 }
 
 function gameRow(p, i) {
@@ -125,14 +124,28 @@ function gameRow(p, i) {
 </article>`;
 }
 
-function olderRow(p) {
-  return `<li class="older__item" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
-  <a class="older__link" ${ext(p.url)} data-cmd="open ${esc(p.cmd)}">
-    <span class="older__name">${esc(p.name)}</span>
-    <span class="older__kind">${esc(p.kind)}</span>
-    <span class="older__host">${esc(shortUrl(p.url))}${icon('ext')}</span>${newTab}
-  </a>
-  <span class="older__side js-only">${winButton(p, 'older__win', { iconOnly: true })}</span>
+// Sites get a picture card: screenshot on top, then name, host, kind and links. Same parts
+// as a game row, stacked, two to a row. No screenshot = a plain tile with the host on it.
+function siteCard(p) {
+  const [main, ...rest] = p.links;
+  const host = shortUrl(p.url);
+  const shot = p.image
+    ? `<div class="game__shot">${img(p.image)}</div>`
+    : `<div class="game__shot game__shot--none" aria-hidden="true"><span>${esc(host)}</span></div>`;
+  const more = rest
+    .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
+    .join('');
+  return `<li class="game game--card" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
+  ${shot}
+  <div class="game__text">
+    <h3 class="game__name">${esc(p.name)}</h3>
+    <p class="game__host">${esc(host)}</p>
+    <p class="game__kind">${esc(p.kind)}</p>
+    <div class="game__actions">
+      <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
+      ${more}${winButton(p, 'game__more game__win js-only')}
+    </div>
+  </div>
 </li>`;
 }
 
@@ -180,7 +193,7 @@ export function renderContent({ groups, projects, crew }) {
     const body =
       g.id === 'games'
         ? `<div class="games">${items.map(gameRow).join('\n')}</div>`
-        : `<ul class="older" role="list">${items.map(olderRow).join('\n')}</ul>`;
+        : `<ul class="games games--grid" role="list">${items.map(siteCard).join('\n')}</ul>`;
     out.push(`<section class="sec sec--${esc(g.id)}" id="${esc(g.id)}" aria-labelledby="${esc(g.id)}-title">
   ${sectionHead(g.id, g.title, g.line)}
   ${body}

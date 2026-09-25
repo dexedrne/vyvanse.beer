@@ -19,7 +19,8 @@
 //             X-Frame-Options / frame-ancestors, so it's only ever a new tab.
 //             Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
 //   links     [{ label, href }]; the first one is the main action and should match `url`
-//   image     optional { src, width, height, alt } in public/img/ (800px wide, ~1.9:1)
+//   image     optional { src, width, height, alt } in public/img/ (800x420 webp); games and
+//             sites both show it on their card, and a card without one still works
 //   credit    optional { before, label, href, after } rendered as one line
 //   note      optional plain-text line
 
@@ -92,7 +93,7 @@ export const projects = [
     cmd: 'bitcorn',
     slug: 'bitcorn',
     group: 'sites',
-    name: 'BITCORN',
+    name: 'bitcorn',
     kind: 'Project site with a 3D corn maze and a pixel farm',
     blurb: 'Run Cornelius’s 3D corn maze, find Husk, chat by the fence, and grow a pixel farm.',
     url: 'https://bitcorn.lol/maze',
@@ -105,7 +106,7 @@ export const projects = [
       src: '/img/bitcorn.webp',
       width: 800,
       height: 420,
-      alt: 'BITCORN home page: “Welcome to corn country” over a pixel-art cornfield with a red barn.',
+      alt: 'The bitcorn home page: “Welcome to corn country” over a pixel-art cornfield with a red barn.',
     },
   },
   {
@@ -113,7 +114,7 @@ export const projects = [
     aliases: ['bulk', 'bulk-os'],
     slug: 'bulk-os',
     group: 'sites',
-    name: 'BULK OS + bulk games',
+    name: 'bulk',
     kind: 'Project site, web desktop and sprite games',
     blurb:
       'A web “OS” packed with games and toys, from back when every asset was made separately and hand-edited into sprites in GIMP.',
@@ -123,29 +124,47 @@ export const projects = [
       { label: 'Open', href: 'https://www.bulked.lol/os' },
       { label: 'Site', href: 'https://www.bulked.lol' },
     ],
+    image: {
+      src: '/img/bulk.webp',
+      width: 800,
+      height: 420,
+      alt: 'The Bulk OS web desktop at night: a column of app icons, a big moon over a city skyline, and an open Games window with purple pixel-art cards for Bulk Runner, Super Bulk Bros, Flappy Bulk, Bulk Climb and Bulkagachi.',
+    },
   },
   {
     cmd: 'sanic',
     slug: 'sanic',
     group: 'sites',
-    name: '$SANIC',
+    name: 'sanic',
     kind: 'Project site with a playable WebGL ring runner',
     blurb:
       'Run the trenches, stack rings, and go irresponsibly fast. The runner plays right on the landing page.',
     url: 'https://www.sanic.fun',
     frame: false,
     links: [{ label: 'Play', href: 'https://www.sanic.fun' }],
+    image: {
+      src: '/img/sanic.webp',
+      width: 800,
+      height: 420,
+      alt: 'The $SANIC Ring Runner landing page, with its retro blue title panel and yellow Press Start button on the left, and the 3D WebGL runner on the right: a blue hedgehog running down a dirt road through low-poly trees with gold rings floating ahead.',
+    },
   },
   {
     cmd: 'hog',
     slug: 'hog',
     group: 'sites',
-    name: 'HOG on Solana',
+    name: 'hog',
     kind: 'Project site with a 2D motorcycle sim',
     blurb: 'Rev the engine, hold the RPM, don’t stall.',
     url: 'https://www.crankmyhog.lol',
     frame: true,
     links: [{ label: 'Ride', href: 'https://www.crankmyhog.lol' }],
+    image: {
+      src: '/img/hog.webp',
+      width: 800,
+      height: 420,
+      alt: 'The HOG meme site’s home page: a glowing hero image of a smiling robed figure holding out a chrome motorcycle, the title “YOUR HOG, KING”, a red “Play Hog Rider 3D” button and a small preview of the handlebar-view road game, on a red pixel-art sunset.',
+    },
   },
 ];
 

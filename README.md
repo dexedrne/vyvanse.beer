@@ -10,7 +10,7 @@ same data, so clicking a project runs `open <name>`, and typing commands moves t
 
 Projects open in a new tab. Projects that allow framing can also run in draggable in-page
 windows (full-screen sheets on phones), but only when asked: the small "In a window" button on
-their card or row, `win <name>` (or `open <name> --window`) in the terminal, or `set windows on`
+their card, `win <name>` (or `open <name> --window`) in the terminal, or `set windows on`
 to make windows the default. That setting is remembered in `localStorage`; `set windows off`
 goes back to tabs, and `open <name> --tab` always uses a tab.
 
@@ -29,7 +29,7 @@ hero is on screen.
 
 Add an entry to `projects` in [`src/projects.js`](src/projects.js). The fields are documented
 at the top of that file. `group: 'games'` gets a row with a screenshot, `group: 'sites'` gets
-a compact line. The `cmd` name is what the terminal takes (`open <cmd>`, `info <cmd>`), and it
+a picture card in a two-column grid (one column on phones). The `cmd` name is what the terminal takes (`open <cmd>`, `info <cmd>`), and it
 tab-completes automatically.
 
 Set `frame: true` only if the site allows being shown in an iframe:
@@ -41,7 +41,8 @@ curl -sI https://example.com | grep -iE 'x-frame-options|frame-ancestors'
 No output means `frame: true` is fine, and the project gets the opt-in window controls. If
 the site sends either header, use `frame: false` and it only ever opens in a new tab.
 
-Screenshots go in `public/img/`: 800px-wide webp at about 1.9:1, under 80 KB.
+Screenshots go in `public/img/`: 800×420 webp, under 80 KB. A project without one still gets
+a card, just with a plain tile where the picture would be.
 
 ## Add a command
 
