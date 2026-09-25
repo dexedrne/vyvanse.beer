@@ -69,6 +69,34 @@ export const projects = [
     },
   },
   {
+    cmd: 'radpayne',
+    aliases: ['rad-payne', 'payne'],
+    slug: 'radpayne',
+    group: 'games',
+    name: 'RadPayne',
+    kind: 'Bullet-time noir shooter, chapter 1 (early)',
+    blurb:
+      'They took the bag. A rainy Manhattan night outside the Milady rave, two pistols, and time slowed down. Desktop, keyboard and mouse.',
+    url: 'https://radpayne.vyvanse.beer',
+    frame: true,
+    links: [
+      { label: 'Play', href: 'https://radpayne.vyvanse.beer' },
+      { label: 'Source', href: 'https://github.com/dexedrne/radpayne' },
+    ],
+    image: {
+      src: '/img/radpayne.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'RadPayne: Radbro #4764 dives through the rain in bullet time, firing two pistols outside the CLUB MILADY neon while Pockit Miladys scatter.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth. Pockit Miladys by prnth.',
+    },
+  },
+  {
     cmd: 'solscape',
     slug: 'solscape',
     group: 'games',
