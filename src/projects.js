@@ -8,7 +8,7 @@
 //   cmd       terminal name: `open <cmd>`, `info <cmd>`. Lowercase, no spaces.
 //   aliases   optional extra names the terminal accepts
 //   slug      anchor id on the page (vyvanse.beer/#slug)
-//   group     'games' or 'older' (see `groups`)
+//   group     'games' or 'sites' (see `groups`)
 //   name      display name
 //   kind      one line saying what it is
 //   blurb     plain-text description
@@ -26,7 +26,7 @@
 export const site = {
   name: 'vyvanse.beer',
   handle: 'dexedrne',
-  tagline: 'Browser games, meme sites and small worlds by dexedrne.',
+  tagline: 'Games, 3D Radbros and websites by dexedrne.',
   links: [
     { cmd: 'github', label: 'GitHub', href: 'https://github.com/dexedrne' },
     { cmd: 'x', label: 'X', href: 'https://x.com/dexedrne' },
@@ -34,31 +34,31 @@ export const site = {
 };
 
 export const groups = [
-  { id: 'games', title: 'Games', line: 'Games and worlds that run in a browser tab.' },
-  { id: 'older', title: 'Older things', line: 'Earlier sites and toys, still online.' },
+  { id: 'games', title: 'Games', line: 'Games I make. They run in a browser tab.' },
+  { id: 'sites', title: 'Sites I built', line: 'Websites I made for other people’s projects.' },
 ];
 
 export const projects = [
   {
-    cmd: 'rugrun',
-    aliases: ['rug-run'],
-    slug: 'rug-run',
+    cmd: 'radrun',
+    aliases: ['rug-run', 'rugrun'],
+    slug: 'radrun',
     group: 'games',
-    name: 'Rug Run',
+    name: 'RadRun',
     kind: 'Radbro rooftop chase, free-swing 3D browser game',
     blurb:
       'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back. Runs in the browser, nothing to install.',
-    url: 'https://rugrun.vyvanse.beer',
+    url: 'https://radrun.vyvanse.beer',
     frame: true,
     links: [
-      { label: 'Play', href: 'https://rugrun.vyvanse.beer' },
-      { label: 'Source', href: 'https://github.com/dexedrne/rug-run' },
+      { label: 'Play', href: 'https://radrun.vyvanse.beer' },
+      { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
     image: {
       src: '/img/rug-run.jpg',
       width: 1200,
       height: 630,
-      alt: 'Rug Run: a Radbro swings on a rope between city rooftops, chasing the thief who took the bag.',
+      alt: 'RadRun: a Radbro swings on a rope between city rooftops, chasing the thief who took the bag.',
     },
     credit: {
       before: 'Built on',
@@ -72,9 +72,9 @@ export const projects = [
     slug: 'solscape',
     group: 'games',
     name: 'Solscape',
-    kind: 'Original multiplayer browser world, open beta',
+    kind: 'My open-source, copyright-free rev254 private server, on Solana',
     blurb:
-      'Create an account, train skills, take on quests and explore a living fantasy world with other players.',
+      'An open-source, copyright-free rev254 private server with a Solana twist. Create an account, train skills, take on quests and explore with other players.',
     url: 'https://play.solscape.fun',
     frame: true,
     links: [
@@ -91,9 +91,9 @@ export const projects = [
   {
     cmd: 'bitcorn',
     slug: 'bitcorn',
-    group: 'games',
+    group: 'sites',
     name: 'BITCORN',
-    kind: 'A 3D corn maze and a pixel farm',
+    kind: 'Project site with a 3D corn maze and a pixel farm',
     blurb: 'Run Cornelius’s 3D corn maze, find Husk, chat by the fence, and grow a pixel farm.',
     url: 'https://bitcorn.lol/maze',
     frame: false,
@@ -112,11 +112,11 @@ export const projects = [
     cmd: 'bulkos',
     aliases: ['bulk', 'bulk-os'],
     slug: 'bulk-os',
-    group: 'older',
-    name: 'BULK OS',
-    kind: 'An old web desktop full of early games',
+    group: 'sites',
+    name: 'BULK OS + bulk games',
+    kind: 'Project site, web desktop and sprite games',
     blurb:
-      'The early stuff: a web “OS” packed with old games and toys, from back when every asset was made separately and hand-edited into sprites in GIMP.',
+      'A web “OS” packed with games and toys, from back when every asset was made separately and hand-edited into sprites in GIMP.',
     url: 'https://www.bulked.lol/os',
     frame: true,
     links: [
@@ -127,9 +127,9 @@ export const projects = [
   {
     cmd: 'sanic',
     slug: 'sanic',
-    group: 'older',
+    group: 'sites',
     name: '$SANIC',
-    kind: 'Playable WebGL ring runner',
+    kind: 'Project site with a playable WebGL ring runner',
     blurb:
       'Run the trenches, stack rings, and go irresponsibly fast. The runner plays right on the landing page.',
     url: 'https://www.sanic.fun',
@@ -139,9 +139,9 @@ export const projects = [
   {
     cmd: 'hog',
     slug: 'hog',
-    group: 'older',
+    group: 'sites',
     name: 'HOG on Solana',
-    kind: 'A 2D motorcycle sim on a meme site',
+    kind: 'Project site with a 2D motorcycle sim',
     blurb: 'Rev the engine, hold the RPM, don’t stall.',
     url: 'https://www.crankmyhog.lol',
     frame: true,
@@ -151,11 +151,11 @@ export const projects = [
 
 // The Radbros, rendered in 3D with transparent backgrounds.
 // `num` is what the terminal takes (`info 4764`). `featured` = the site mascot.
-// `soon` = built for Rug Run but not playable there yet; drop it once he is.
+// `soon` = built for RadRun but not playable there yet; drop it once he is.
 export const crew = {
   title: 'The crew',
-  line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in Rug Run.',
-  playIn: 'rugrun',
+  line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in RadRun.',
+  playIn: 'radrun',
   downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '78 MB' },
   members: [
     {
@@ -224,7 +224,7 @@ export const mascot = {
   model: '/models/radbro4764-hero.glb',
 };
 
-// Host shown in lists and window title bars: "rugrun.vyvanse.beer", "bulked.lol/os".
+// Host shown in lists and window title bars: "radrun.vyvanse.beer", "bulked.lol/os".
 export function shortUrl(href) {
   const u = new URL(href);
   const path = u.pathname === '/' ? '' : u.pathname.replace(/\/$/, '');

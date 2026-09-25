@@ -204,7 +204,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
     },
     ls: {
       usage: 'ls [section]',
-      desc: 'list games, crew or older',
+      desc: 'list games, crew or sites',
       args: () => sections,
       run(args) {
         const want = args[0] ? norm(args[0]).replace(/\/$/, '') : null;
@@ -246,7 +246,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         const social = site.links.find((l) => l.cmd === norm(args[0]));
         if (social) return table[social.cmd].run([], ctx);
         if (findBro(args)) {
-          term.print(line("radbros aren't websites, but they're playable in ", run('open rugrun'), '.'));
+          term.print(line("radbros aren't websites, but they're playable in ", run('open radrun'), '.'));
           return;
         }
         const guess = closest(norm(args.join('')), [...byName.keys()]);
@@ -332,7 +332,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       desc: 'who makes this',
       run() {
         term.print(line(strong(site.handle)));
-        term.print(line('makes browser games, meme sites and small worlds.'));
+        term.print(line('makes browser games and 3D radbros, and builds websites for other people’s projects.'));
         term.print(grid(...site.links.flatMap((l) => [muted(l.label.toLowerCase()), link(l.href, shortUrl(l.href), 'me noopener')])));
       },
     },
@@ -364,7 +364,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       desc: 'list open windows',
       run() {
         const list = wm.list();
-        if (!list.length) return term.print(line(muted('no windows open. projects open in a new tab; to run one here, try '), run('win rugrun')));
+        if (!list.length) return term.print(line(muted('no windows open. projects open in a new tab; to run one here, try '), run('win radrun')));
         term.print(
           grid(
             ...list.flatMap((w) => [
@@ -407,7 +407,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         if (!on && !['off', 'no', 'false', '0'].includes(v)) return term.print(err('set: windows is on or off'));
         prefs.windows = on;
         if (on) term.print(line('windows on. ', muted('projects that allow it now open in a window here. '), run('set windows off', 'undo')));
-        else term.print(line('windows off. ', muted('projects open in a new tab. for a one-off window: '), run('win rugrun')));
+        else term.print(line('windows off. ', muted('projects open in a new tab. for a one-off window: '), run('win radrun')));
         if (!prefs.saved()) term.print(line(muted("this browser won't let the page remember it, so it lasts until you leave.")));
       },
     },
@@ -468,7 +468,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       run() {
         term.rug();
         term.print(line('the rug has been pulled. your bag is somewhere on the rooftops.'));
-        term.print(line('go get it: ', run('open rugrun')));
+        term.print(line('go get it: ', run('open radrun')));
       },
     },
   };

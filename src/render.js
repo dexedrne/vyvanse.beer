@@ -185,7 +185,7 @@ export function renderContent({ groups, projects, crew }) {
   ${sectionHead(g.id, g.title, g.line)}
   ${body}
 </section>`);
-    // The crew sits between the games and the older things.
+    // The crew sits between the games and the sites.
     if (g.id === 'games') out.push(crewSection(crew, projects));
   }
   return out.join('\n');

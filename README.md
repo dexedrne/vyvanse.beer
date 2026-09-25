@@ -28,7 +28,7 @@ hero is on screen.
 ## Add a project
 
 Add an entry to `projects` in [`src/projects.js`](src/projects.js). The fields are documented
-at the top of that file. `group: 'games'` gets a row with a screenshot, `group: 'older'` gets
+at the top of that file. `group: 'games'` gets a row with a screenshot, `group: 'sites'` gets
 a compact line. The `cmd` name is what the terminal takes (`open <cmd>`, `info <cmd>`), and it
 tab-completes automatically.
 
