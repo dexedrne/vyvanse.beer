@@ -55,7 +55,7 @@ export const projects = [
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
     image: {
-      src: '/img/rug-run.jpg',
+      src: '/img/radrun.jpg',
       width: 1200,
       height: 630,
       alt: 'RadRun: a Radbro swings on a rope between city rooftops, chasing the thief who took the bag.',
