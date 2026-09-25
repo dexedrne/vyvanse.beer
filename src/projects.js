@@ -213,14 +213,14 @@ export const crew = {
       num: '4764',
       slug: 'radbro-4764',
       name: 'Radbro #4764',
-      line: 'Skull shades, scribble hoodie, katana at his hip.',
+      line: 'Skull shades, scribble hoodie, katana at his left hip.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v3.zip', label: '3D model .zip', size: '19 MB' },
       featured: true,
       image: {
         src: '/img/radbros/radbro-4764.webp',
-        width: 185,
+        width: 285,
         height: 500,
-        alt: 'Radbro #4764 in 3D: violet bob, black sunglasses with skull-print lenses, a nosebleed, a white hoodie covered in blue graffiti scribbles, black jeans and sneakers, and a katana sheathed at his hip.',
+        alt: 'Radbro #4764 in 3D: violet bob, black sunglasses with skull-print lenses, a nosebleed, a white hoodie covered in blue graffiti scribbles, black jeans and sneakers, and a long katana sheathed at his left hip.',
       },
     },
     {
@@ -258,7 +258,7 @@ export const mascot = {
   src: '/img/radbros/radbro-4764-hero.webp',
   width: 719,
   height: 1100,
-  alt: 'Radbro #4764 in 3D, waving hello: violet bob, black sunglasses with skull-print lenses, a white hoodie covered in blue graffiti scribbles, black jeans, and a katana sheathed at his hip.',
+  alt: 'Radbro #4764 in 3D, waving hello: violet bob, black sunglasses with skull-print lenses, a white hoodie covered in blue graffiti scribbles, black jeans, and a long katana sheathed at his left hip.',
   model: '/models/radbro4764-hero.glb',
 };
 
