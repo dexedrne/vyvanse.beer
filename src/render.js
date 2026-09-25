@@ -79,12 +79,13 @@ function bro3d(m) {
     </model-viewer>`;
 }
 
-// Framing for the 719x1100 box: he fills it about the way he fills the render. Drag spins him
-// all the way round; the tilt stays between a little below and a little above eye level.
+// Framing for the 719x1100 box: wide enough that his katana's scabbard tip (0.74 m out) stays in
+// frame at every angle while he spins. Drag spins him all the way round; the tilt stays between
+// a little below and a little above eye level.
 const BRO_CAMERA = {
-  orbit: '0deg 82deg 6.2m',
-  min: '-Infinity 66deg 6.2m',
-  max: 'Infinity 96deg 6.2m',
+  orbit: '0deg 82deg 7.8m',
+  min: '-Infinity 66deg 7.8m',
+  max: 'Infinity 96deg 7.8m',
   target: '0m 0.86m 0m',
   fov: '17deg',
 };
