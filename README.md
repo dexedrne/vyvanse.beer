@@ -6,9 +6,13 @@ Live at https://vyvanse.beer.
 A plain landing page with a terminal, Radbro OS, one click away. It starts hidden: the
 `>_ radbro os` button (or `/`) opens it, docked beside the page on desktop and as a bottom
 sheet on phones, and the first open in a session greets you with `neofetch`. Both read the
-same data, so clicking a project runs `open <name>`, and typing commands moves the page. Projects
-that allow framing open in draggable in-page windows (full-screen sheets on phones). The rest
-open in a new tab.
+same data, so clicking a project runs `open <name>`, and typing commands moves the page.
+
+Projects open in a new tab. Projects that allow framing can also run in draggable in-page
+windows (full-screen sheets on phones), but only when asked: the small "In a window" button on
+their card or row, `win <name>` (or `open <name> --window`) in the terminal, or `set windows on`
+to make windows the default. That setting is remembered in `localStorage`; `set windows off`
+goes back to tabs, and `open <name> --tab` always uses a tab.
 
 ```sh
 npm install
@@ -17,7 +21,7 @@ npm run build    # -> dist/
 ```
 
 The landing is rendered into `index.html` at build time, so every project and link is in the
-HTML without JS. The terminal and windows (`src/main.js`, about 13 KB gzipped) are layered on top.
+HTML without JS. The terminal and windows (`src/main.js`, about 14 KB gzipped) are layered on top.
 The 3D viewer for the hero is a separate chunk (about 290 KB gzipped) that only loads once the
 hero is on screen.
 
@@ -34,8 +38,8 @@ Set `frame: true` only if the site allows being shown in an iframe:
 curl -sI https://example.com | grep -iE 'x-frame-options|frame-ancestors'
 ```
 
-No output means `frame: true` is fine. If the site sends either header, use `frame: false`
-and `open` uses a new tab instead.
+No output means `frame: true` is fine, and the project gets the opt-in window controls. If
+the site sends either header, use `frame: false` and it only ever opens in a new tab.
 
 Screenshots go in `public/img/`: 800px-wide webp at about 1.9:1, under 80 KB.
 
@@ -52,8 +56,9 @@ hello: {
 },
 ```
 
-`usage: 'hello <name>'` changes how it shows in `help`, `args: () => [...]` gives it tab
-completion, and `hidden: true` leaves it out of `help`. To add a quick-command chip, add a
+`usage: 'hello <name>'` changes how it shows in `help`, `args: (words) => [...]` gives it tab
+completion (`words` is what's typed so far, split on spaces), and `hidden: true` leaves it out
+of `help`. To add a quick-command chip, add a
 `<button data-cmd="...">` to `.term__chips` in `index.html`. Anything on the page with
 `data-cmd` runs that command when clicked.
 
@@ -61,7 +66,8 @@ completion, and `hidden: true` leaves it out of `help`. To add a quick-command c
 
 `/` or `` ` `` opens the terminal at the prompt, Tab completes, ↑ and ↓ walk history, Ctrl+L
 clears, Esc closes it (and minimises a focused window). Open or closed is remembered for the
-tab session only, so new visits always start on the plain landing.
+tab session only, so new visits always start on the plain landing. `set windows on|off` is the
+one setting that sticks between visits.
 
 ## Look
 

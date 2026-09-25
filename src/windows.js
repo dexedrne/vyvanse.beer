@@ -1,5 +1,7 @@
-// In-page windows for projects that allow framing. Desktop and tablet: draggable, resizable,
-// stackable windows with a dock. Phones: each window is a full-screen sheet.
+// In-page windows for projects that allow framing, opt-in (projects open in a new tab unless a
+// window is asked for: `win <cmd>`, `open <cmd> --window`, or `set windows on`). Desktop and
+// tablet: draggable, resizable, stackable windows with a dock. Phones: each window is a
+// full-screen sheet.
 // The iframe is only created when a window opens, and dropped when it closes.
 
 import { h, icon, media } from './dom.js';

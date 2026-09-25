@@ -571,6 +571,23 @@ a.cmd-hint:hover {
   height: 14px;
 }
 
+/* The opt-in "In a window" buttons: quieter than the links beside them. */
+.game__win,
+.older__win {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-family: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+.game__win:hover,
+.older__win:hover {
+  color: var(--lilac-hi);
+}
+
 .game .cmd-hint {
   margin-left: auto;
 }
@@ -691,7 +708,38 @@ a.cmd-hint:hover {
   border-top: 1px solid var(--line);
 }
 
+.older__item {
+  display: flex;
+  align-items: center;
+}
+
+.older__side {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+}
+
+.older__win {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.older__win:hover {
+  background: var(--surface);
+}
+
+.older__win .i {
+  width: 15px;
+  height: 15px;
+}
+
 .older__link {
+  flex: 1;
+  min-width: 0;
   display: grid;
   grid-template-columns: 9.5rem minmax(0, 1fr) auto;
   align-items: baseline;

@@ -30,7 +30,7 @@ export function renderHero(site, mascot) {
   <h1 class="hero__title">${esc(site.name)}</h1>
   <p class="hero__tag">${esc(site.tagline)}</p>
   <ul class="hero__links" role="list">${links}</ul>
-  <p class="hero__hint js-only"><span class="only-wide">Click a project to open it right here, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it right here.</span></p>
+  <p class="hero__hint js-only"><span class="only-wide">Click a project to open it in a new tab, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it in a new tab.</span></p>
   <figure class="hero__bro">
     ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
   </figure>
@@ -89,6 +89,14 @@ const BRO_CAMERA = {
   fov: '17deg',
 };
 
+// Projects open in a new tab. The ones that allow framing also get this small opt-in: run it
+// in an in-page window instead (`win <cmd>`). JS only, like the windows themselves.
+function winButton(p, cls, { iconOnly = false } = {}) {
+  if (!p.frame) return '';
+  const label = `Open ${esc(p.name)} in a window on this page`;
+  return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="${label}" title="${iconOnly ? label : 'Open in a window on this page'}">${icon('max')}${iconOnly ? '' : '<span>In a window</span>'}</button>`;
+}
+
 function gameRow(p, i) {
   const [main, ...rest] = p.links;
   const shot = p.image
@@ -109,7 +117,7 @@ function gameRow(p, i) {
     <p class="game__blurb">${esc(p.blurb)}</p>
     <div class="game__actions">
       <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
-      ${more}
+      ${more}${winButton(p, 'game__more game__win js-only')}
       <code class="cmd-hint js-only" aria-hidden="true">open ${esc(p.cmd)}</code>
     </div>
     ${credit}${note}
@@ -124,6 +132,7 @@ function olderRow(p) {
     <span class="older__kind">${esc(p.kind)}</span>
     <span class="older__host">${esc(shortUrl(p.url))}${icon('ext')}</span>${newTab}
   </a>
+  <span class="older__side js-only">${winButton(p, 'older__win', { iconOnly: true })}</span>
 </li>`;
 }
 

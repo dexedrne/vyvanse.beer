@@ -5,7 +5,7 @@ import { site, groups, projects, crew } from './projects.js';
 import { h, media } from './dom.js';
 import { createWindows } from './windows.js';
 import { createTerminal } from './terminal.js';
-import { createCommands } from './commands.js';
+import { createCommands, openTab } from './commands.js';
 import { createBro } from './bro.js';
 
 const root = document.documentElement;
@@ -231,11 +231,23 @@ document.addEventListener('click', (e) => {
 
   const cmd = el.dataset.cmd;
   const fromTerminal = termEl.contains(el);
-  const p = commands.project(cmd);
+  const t = commands.target(cmd);
+  const p = t?.p;
   const ctx = { source: fromTerminal ? 'terminal' : 'page' };
 
-  if (p && !p.frame && el.tagName === 'A') ctx.alreadyOpened = true; // the link opens the tab itself
-  else e.preventDefault();
+  // Projects open in a new tab, right here inside the click, so no popup blocker gets a say:
+  // a link opens it itself, a button opens it now. The command still runs (and shows) after.
+  if (t?.how === 'tab') {
+    ctx.how = 'tab';
+    if (el.tagName === 'A' && el.href === new URL(p.url, location.href).href) ctx.opened = true;
+    else {
+      e.preventDefault();
+      ctx.opened = openTab(p.url);
+    }
+  } else {
+    if (t) ctx.how = 'window';
+    e.preventDefault();
+  }
 
   if (!fromTerminal && (!panel.isOpen() || !media.wide.matches)) {
     // The terminal is out of sight: windows and new tabs just happen (the command still lands

@@ -13,9 +13,11 @@
 //   kind      one line saying what it is
 //   blurb     plain-text description
 //   url       what `open` launches (also the card's main link)
-//   frame     true if the site allows being shown in an iframe, so `open` uses an in-page
-//             window. false = it sends X-Frame-Options / frame-ancestors, so `open` uses a new
-//             tab. Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
+//   frame     true if the site allows being shown in an iframe. Everything opens in a new tab;
+//             frame: true also lets it run in an in-page window when asked (`win <cmd>`, the
+//             card's "In a window" button, or `set windows on`). false = it sends
+//             X-Frame-Options / frame-ancestors, so it's only ever a new tab.
+//             Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
 //   links     [{ label, href }]; the first one is the main action and should match `url`
 //   image     optional { src, width, height, alt } in public/img/ (800px wide, ~1.9:1)
 //   credit    optional { before, label, href, after } rendered as one line

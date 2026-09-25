@@ -37,11 +37,56 @@ const link = (href, label = shortUrl(href), rel = 'noopener') =>
   h('a', { href, target: '_blank', rel }, label, h('span', { class: 'vh' }, ' (opens in a new tab)'));
 const grid = (...cells) => h('div', { class: 't-grid' }, ...cells);
 
-function openTab(url) {
+export function openTab(url) {
   const w = window.open(url, '_blank');
   if (w) w.opener = null;
   return !!w;
 }
+
+// `set windows on|off`: whether projects that allow framing open in an in-page window instead
+// of a new tab. Off by default, remembered in localStorage. Blocked storage means it lasts until
+// the page is closed.
+const WINDOWS_KEY = 'vyv-windows';
+let windowsMem = null;
+export const prefs = {
+  get windows() {
+    if (windowsMem != null) return windowsMem;
+    try {
+      return localStorage.getItem(WINDOWS_KEY) === 'on';
+    } catch {
+      return false;
+    }
+  },
+  set windows(on) {
+    windowsMem = on;
+    try {
+      if (on) localStorage.setItem(WINDOWS_KEY, 'on');
+      else localStorage.removeItem(WINDOWS_KEY);
+      windowsMem = null;
+    } catch {
+      /* private mode or blocked storage: keep it in memory */
+    }
+  },
+  saved: () => windowsMem == null,
+};
+
+// `open` flags: --window / -w for an in-page window, --tab / -t for a new tab.
+const WINDOW_FLAGS = ['--window', '-w', '--win'];
+const TAB_FLAGS = ['--tab', '-t'];
+function parseOpen(args, want = null) {
+  const names = [];
+  for (const a of args) {
+    const f = a.toLowerCase();
+    if (WINDOW_FLAGS.includes(f)) want = 'window';
+    else if (TAB_FLAGS.includes(f)) want = 'tab';
+    else names.push(a);
+  }
+  return { names, want };
+}
+
+// Where a project opens: a new tab, unless it allows framing and a window was asked for (or
+// `set windows on`, and a tab wasn't asked for).
+const howFor = (p, want) => (p.frame && (want === 'window' || (want !== 'tab' && prefs.windows)) ? 'window' : 'tab');
 
 export function createCommands({ site, groups, projects, crew, wm, term, page, bro }) {
   const byName = new Map();
@@ -54,8 +99,10 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
   const sections = [...groups.map((g) => g.id), 'crew'];
   const playIn = projects.find((p) => p.cmd === crew.playIn);
 
-  function launch(p, ctx) {
-    if (p.frame) {
+  // ctx.how / ctx.opened: a click on the page already decided, and opened the tab itself inside
+  // the click, so no popup blocker gets a say.
+  function launch(p, ctx, want = null) {
+    if ((ctx.how || howFor(p, want)) === 'window') {
       const how = wm.open(p, { focusFrame: ctx.source === 'page' });
       term.print(
         line(
@@ -67,12 +114,38 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       );
       return;
     }
-    const ok = ctx.alreadyOpened || openTab(p.url);
-    if (ok) {
-      term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding.`));
-    } else {
+    const ok = ctx.opened ?? openTab(p.url);
+    if (!ok) {
       term.print(line('your browser blocked the new tab. open it here: ', link(p.url)));
+    } else if (want === 'window') {
+      term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't run in a window here.`));
+    } else {
+      term.print(
+        line(
+          'opened ',
+          strong(p.name),
+          ' in a new tab ',
+          muted(`(${shortUrl(p.url)})`),
+          p.frame ? [muted('. to run it in a window here: '), run(`win ${p.cmd}`)] : null,
+        ),
+      );
     }
+  }
+
+  function showWindowsPref() {
+    const on = prefs.windows;
+    term.print(
+      grid(
+        muted('windows'),
+        h(
+          'span',
+          {},
+          on ? 'on  ' : 'off  ',
+          muted(on ? 'projects that allow it open in a window here.  ' : 'projects open in a new tab.  '),
+          run(`set windows ${on ? 'off' : 'on'}`, on ? 'turn off' : 'turn on'),
+        ),
+      ),
+    );
   }
 
   function describe(p) {
@@ -87,7 +160,9 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         grid(...rows),
         p.credit ? line(muted(`${p.credit.before} `), link(p.credit.href, p.credit.label), muted(` ${p.credit.after}`)) : null,
         p.note ? line(muted(p.note)) : null,
-        line(run(`open ${p.cmd}`), muted(p.frame ? '  opens in a window' : '  opens in a new tab')),
+        p.frame
+          ? grid(run(`open ${p.cmd}`), muted('in a new tab'), run(`win ${p.cmd}`), muted('in a window here'))
+          : line(run(`open ${p.cmd}`), muted('  opens in a new tab')),
       ),
     );
     page.show(p.slug);
@@ -158,15 +233,16 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
     },
     open: {
       usage: 'open <name>',
-      desc: 'open a project',
-      args: () => projects.map((p) => p.cmd),
-      run(args, ctx) {
+      desc: 'open a project in a new tab',
+      args: (parts) => (parts.length > 2 ? ['--window', '--tab'] : projects.map((p) => p.cmd)),
+      run(rawArgs, ctx) {
+        const { names: args, want } = parseOpen(rawArgs, ctx.want);
         if (!args.length) {
-          term.print(line('usage: open <name>. try ', run('ls'), ' to see names.'));
+          term.print(line('usage: open <name> [--window]. try ', run('ls'), ' to see names.'));
           return;
         }
         const p = findProject(args);
-        if (p) return launch(p, ctx);
+        if (p) return launch(p, ctx, want);
         const social = site.links.find((l) => l.cmd === norm(args[0]));
         if (social) return table[social.cmd].run([], ctx);
         if (findBro(args)) {
@@ -176,6 +252,19 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         const guess = closest(norm(args.join('')), [...byName.keys()]);
         term.print(err(`open: no such project: ${args.join(' ')}`));
         term.print(line(guess ? ['did you mean ', run(`open ${byName.get(guess).cmd}`), '? '] : '', 'try ', run('ls'), '.'));
+      },
+    },
+    win: {
+      usage: 'win <name>',
+      desc: 'open a project in a window here',
+      args: () => projects.filter((p) => p.frame).map((p) => p.cmd),
+      run(args, ctx) {
+        if (!parseOpen(args).names.length) {
+          const can = projects.filter((p) => p.frame);
+          term.print(line('usage: win <name>. these can run in a window: ', ...can.flatMap((p, i) => [i ? ' ' : '', run(`win ${p.cmd}`, p.cmd)])));
+          return;
+        }
+        table.open.run(args, { ...ctx, want: 'window' });
       },
     },
     info: {
@@ -275,7 +364,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       desc: 'list open windows',
       run() {
         const list = wm.list();
-        if (!list.length) return term.print(line(muted('no windows open. try '), run('open rugrun')));
+        if (!list.length) return term.print(line(muted('no windows open. projects open in a new tab; to run one here, try '), run('win rugrun')));
         term.print(
           grid(
             ...list.flatMap((w) => [
@@ -300,6 +389,26 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         const p = findProject([want]);
         if (p && wm.close(p.cmd)) return term.print(line(muted(`closed ${p.name}`)));
         term.print(err(`close: no open window called ${args[0] || want}`));
+      },
+    },
+    set: {
+      usage: 'set windows on|off',
+      desc: 'open projects in windows here by default',
+      args: (parts) => (parts.length > 2 ? ['on', 'off'] : ['windows']),
+      run(args) {
+        if (!args.length) return showWindowsPref();
+        if (!['windows', 'window', 'win'].includes(norm(args[0]))) {
+          term.print(err(`set: no such setting: ${args[0]}`));
+          return showWindowsPref();
+        }
+        const v = args[1]?.toLowerCase();
+        if (!v) return showWindowsPref();
+        const on = ['on', 'yes', 'true', '1'].includes(v);
+        if (!on && !['off', 'no', 'false', '0'].includes(v)) return term.print(err('set: windows is on or off'));
+        prefs.windows = on;
+        if (on) term.print(line('windows on. ', muted('projects that allow it now open in a window here. '), run('set windows off', 'undo')));
+        else term.print(line('windows off. ', muted('projects open in a new tab. for a one-off window: '), run('win rugrun')));
+        if (!prefs.saved()) term.print(line(muted("this browser won't let the page remember it, so it lasts until you leave.")));
       },
     },
     history: {
@@ -375,9 +484,14 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
 
   return {
     names,
-    project: (cmd) => {
+    // For clicks on the page: `open <name>` / `win <name>` -> { p, how: 'tab' | 'window' }.
+    target(cmd) {
       const [verb, ...rest] = cmd.trim().split(/\s+/);
-      return verb === 'open' ? findProject(rest) : null;
+      const v = verb.toLowerCase();
+      if (v !== 'open' && v !== 'win') return null;
+      const { names: args, want } = parseOpen(rest, v === 'win' ? 'window' : null);
+      const p = findProject(args);
+      return p ? { p, how: howFor(p, want) } : null;
     },
     run(raw, ctx = {}) {
       const [first, ...args] = raw.trim().split(/\s+/);
@@ -386,8 +500,9 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       const c = table[name];
       if (c) return c.run(args, ctx);
       // A bare project name opens it.
-      const p = findProject([first, ...args]);
-      if (p) return launch(p, ctx);
+      const { names: bare, want } = parseOpen([first, ...args]);
+      const p = bare.length ? findProject(bare) : null;
+      if (p) return launch(p, ctx, want);
       const guess = closest(name, names.filter((n) => !table[n].hidden));
       term.print(err(`command not found: ${first}`));
       term.print(line(guess ? ['did you mean ', run(guess), '? '] : '', 'type ', run('help'), ' for commands.'));
@@ -397,7 +512,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
       const parts = value.replace(/^\s+/, '').split(/\s+/);
       let pool;
       if (parts.length <= 1) pool = [...names.filter((n) => !table[n].hidden), ...projects.map((p) => p.cmd)];
-      else pool = table[parts[0].toLowerCase()]?.args?.() || [];
+      else pool = table[parts[0].toLowerCase()]?.args?.(parts) || [];
       const word = parts[parts.length - 1].toLowerCase();
       const hits = [...new Set(pool)].filter((o) => o.startsWith(word)).sort();
       if (!hits.length) return { value, options: [] };
