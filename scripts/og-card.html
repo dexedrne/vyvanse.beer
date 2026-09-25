@@ -28,85 +28,157 @@
         color: #ece6f8;
         font-family: 'Spline Sans', sans-serif;
       }
-      /* darken the left side so the text holds up at thumbnail size */
+      /* keep the text side dark enough to read at thumbnail size */
       .veil {
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, rgb(12 8 22 / 0.72) 0%, rgb(12 8 22 / 0.45) 48%, rgb(12 8 22 / 0) 72%);
+        background:
+          linear-gradient(90deg, rgb(12 8 22 / 0.78) 0%, rgb(12 8 22 / 0.5) 42%, rgb(12 8 22 / 0) 62%),
+          linear-gradient(180deg, rgb(12 8 22 / 0.35) 0%, rgb(12 8 22 / 0) 30%);
       }
       .copy {
         position: absolute;
-        left: 76px;
-        top: 150px;
-        width: 700px;
+        left: 64px;
+        top: 70px;
+        width: 740px;
       }
       h1 {
         margin: 0;
         font-weight: 700;
-        font-size: 104px;
+        font-size: 92px;
         line-height: 1;
         letter-spacing: -0.035em;
-        color: #f3eefc;
-        text-shadow: 0 2px 24px rgb(10 4 22 / 0.6);
       }
-      h1 span {
-        color: #c6b3f7;
+      h1 .dot {
+        color: #b79cf6;
       }
-      p {
-        margin: 26px 0 0;
-        font-size: 38px;
-        font-weight: 500;
-        line-height: 1.2;
-        letter-spacing: -0.01em;
-        color: #dacdfb;
-      }
-      .prompt {
-        position: absolute;
-        left: 76px;
-        bottom: 88px;
-        display: inline-flex;
-        align-items: center;
-        padding: 16px 24px;
-        border-radius: 12px;
-        background: rgb(12 8 22 / 0.8);
-        border: 1.5px solid rgb(198 179 247 / 0.32);
-        box-shadow: 0 10px 40px rgb(4 0 12 / 0.5);
-        font-family: 'Spline Sans Mono', monospace;
+      .tag {
+        margin: 18px 0 0;
         font-size: 30px;
+        line-height: 1.25;
+        color: #cdbdf5;
         font-weight: 500;
+      }
+      .term {
+        position: absolute;
+        left: 64px;
+        top: 318px;
+        width: 468px;
+        border: 1px solid rgb(198 179 247 / 0.35);
+        border-radius: 14px;
+        background: rgb(16 10 30 / 0.82);
+        box-shadow: 0 18px 50px rgb(0 0 0 / 0.45);
+        font-family: 'Spline Sans Mono', monospace;
+        font-size: 19px;
+        line-height: 1.55;
+        overflow: hidden;
+      }
+      .term__bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 16px;
+        border-bottom: 1px solid rgb(198 179 247 / 0.2);
+        color: #a898d6;
+        font-size: 15px;
+      }
+      .term__bar i {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #3a2c5e;
+        display: inline-block;
+      }
+      .term__bar b {
+        margin-left: 8px;
+        font-weight: 600;
+        color: #d9ccfb;
+      }
+      .term__body {
+        padding: 12px 18px 16px;
+      }
+      .p {
+        color: #b79cf6;
+      }
+      .k {
+        color: #c6b3f7;
+        font-weight: 600;
+      }
+      .v {
         color: #ece6f8;
       }
-      .u {
-        color: #c6b3f7;
-      }
-      .d {
-        color: #a99dc6;
-      }
-      .cursor {
+      .cur {
         display: inline-block;
-        width: 16px;
-        height: 32px;
-        margin-left: 10px;
-        border-radius: 2px;
+        width: 11px;
+        height: 21px;
+        vertical-align: -4px;
         background: #c6b3f7;
-        box-shadow: 0 0 14px rgb(198 179 247 / 0.7);
+        margin-left: 4px;
+      }
+      /* the crew, standing on the rooftop ledge */
+      .crew {
+        position: absolute;
+        inset: 0;
       }
       .bro {
         position: absolute;
-        right: 56px;
-        bottom: 0;
-        height: 585px;
-        filter: drop-shadow(0 18px 26px rgb(4 0 12 / 0.65)) drop-shadow(0 0 40px rgb(142 109 224 / 0.2));
+        bottom: 88px;
+        filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.55));
+      }
+      .shadow {
+        position: absolute;
+        bottom: 80px;
+        height: 18px;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0));
+      }
+      .num {
+        position: absolute;
+        bottom: 52px;
+        font-family: 'Spline Sans Mono', monospace;
+        font-size: 16px;
+        font-weight: 600;
+        color: #d9ccfb;
+        background: rgb(16 10 30 / 0.7);
+        border: 1px solid rgb(198 179 247 / 0.3);
+        border-radius: 999px;
+        padding: 2px 10px;
+        transform: translateX(-50%);
       }
     </style>
   </head>
   <body>
     <div class="veil"></div>
-    <div class="copy">
-      <h1>vyvanse<span>.</span>beer</h1>
-      <p>things dexedrne makes<br />for the internet</p>
+
+    <div class="crew" aria-hidden="true">
+      <div class="shadow" style="left: 628px; width: 150px"></div>
+      <img class="bro" src="../public/img/radbros/radbro-652.webp" style="left: 616px; height: 290px" alt="" />
+      <div class="shadow" style="left: 1030px; width: 150px"></div>
+      <img class="bro" src="../public/img/radbros/radbro-723.webp" style="left: 1008px; height: 300px" alt="" />
+      <div class="shadow" style="left: 742px; width: 150px"></div>
+      <img class="bro" src="../public/img/radbros/radbro-2564.webp" style="left: 730px; height: 296px" alt="" />
+      <div class="shadow" style="left: 850px; width: 210px"></div>
+      <img class="bro" src="../public/img/radbros/radbro-4764-hero.webp" style="left: 818px; height: 420px" alt="" />
+      <span class="num" style="left: 690px">#652</span>
+      <span class="num" style="left: 800px">#2564</span>
+      <span class="num" style="left: 950px">#4764</span>
+      <span class="num" style="left: 1092px">#723</span>
     </div>
-    <div class="prompt"><span class="u">dexedrne@vyvanse</span><span class="d">:</span><span class="u">~</span><span class="d">$</span>&nbsp;ls<span class="cursor"></span></div>
-    <img class="bro" src="../public/img/radbros/radbro-4764-hero.webp" alt="" />
+
+    <div class="copy">
+      <h1>vyvanse<span class="dot">.</span>beer</h1>
+      <p class="tag">games, meme sites &amp; small worlds by dexedrne</p>
+    </div>
+
+    <div class="term">
+      <div class="term__bar"><i></i><i></i><i></i><b>radbro os</b></div>
+      <div class="term__body">
+        <div><span class="p">dexedrne@vyvanse:~$</span> <span class="v">neofetch</span></div>
+        <div><span class="k">OS:</span> <span class="v">Radbro OS 4764 (midnight ube)</span></div>
+        <div><span class="k">WM:</span> <span class="v">yoinkwm</span>&nbsp;&nbsp;<span class="k">Shell:</span> <span class="v">rugsh</span></div>
+        <div><span class="k">Crew:</span> <span class="v">#652 #2564 #4764 #723</span></div>
+        <div><span class="p">dexedrne@vyvanse:~$</span><span class="cur"></span></div>
+      </div>
+    </div>
   </body>
 </html>
