@@ -156,33 +156,33 @@ export const crew = {
   title: 'The crew',
   line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in RadRun.',
   playIn: 'radrun',
-  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '78 MB' },
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '81 MB' },
   members: [
     {
       num: '652',
       slug: 'radbro-652',
       name: 'Radbro #652',
       line: 'Brown mop, big blue eyes, the Nobody sweatshirt.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v2.zip', label: '3D model .zip', size: '17 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v3.zip', label: '3D model .zip', size: '17 MB' },
       image: {
         src: '/img/radbros/radbro-652.webp',
-        width: 280,
+        width: 267,
         height: 500,
-        alt: 'Radbro #652 in 3D: shaggy brown hair, big blue anime eyes, a black Nobody sweatshirt and brown trousers, one fist raised in a cheer.',
+        alt: 'Radbro #652 in 3D: shaggy brown hair, big blue anime eyes under thick angled brows, a black Nobody sweatshirt, brown trousers and boots, one arm raised in a cheer.',
       },
     },
     {
       num: '4764',
       slug: 'radbro-4764',
       name: 'Radbro #4764',
-      line: 'Skull shades, scribble hoodie, katana on his back.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v2.zip', label: '3D model .zip', size: '18 MB' },
+      line: 'Skull shades, scribble hoodie, katana at his hip.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v3.zip', label: '3D model .zip', size: '19 MB' },
       featured: true,
       image: {
         src: '/img/radbros/radbro-4764.webp',
-        width: 263,
+        width: 185,
         height: 500,
-        alt: 'Radbro #4764 in 3D: bright blue hair, black sunglasses with skull lenses, a white hoodie covered in blue scribbles and a katana strapped across his back, mid-stride.',
+        alt: 'Radbro #4764 in 3D: violet bob, black sunglasses with skull-print lenses, a nosebleed, a white hoodie covered in blue graffiti scribbles, black jeans and sneakers, and a katana sheathed at his hip.',
       },
     },
     {
@@ -220,7 +220,7 @@ export const mascot = {
   src: '/img/radbros/radbro-4764-hero.webp',
   width: 719,
   height: 1100,
-  alt: 'Radbro #4764 in 3D, waving hello: bright blue hair, black sunglasses with skull lenses, a white hoodie covered in blue scribbles, black trousers, and a katana strapped across his back.',
+  alt: 'Radbro #4764 in 3D, waving hello: violet bob, black sunglasses with skull-print lenses, a white hoodie covered in blue graffiti scribbles, black jeans, and a katana sheathed at his hip.',
   model: '/models/radbro4764-hero.glb',
 };
 
