@@ -1,7 +1,7 @@
 // Wires the landing, the terminal and the windows together. The landing works without any
 // of this; everything here is progressive enhancement.
 
-import { site, groups, projects, crew } from './projects.js';
+import { site, groups, projects, crew, contact } from './projects.js';
 import { h, media } from './dom.js';
 import { createWindows } from './windows.js';
 import { createTerminal } from './terminal.js';
@@ -214,7 +214,7 @@ term = createTerminal(termEl, {
   complete: (value) => commands.complete(value),
   onInputFocus: () => panel.open(),
 });
-commands = createCommands({ site, groups, projects, crew, wm, term, page, bro });
+commands = createCommands({ site, groups, projects, crew, contact, wm, term, page, bro });
 
 // ---- clicks anywhere with data-cmd run that command in the terminal ----
 

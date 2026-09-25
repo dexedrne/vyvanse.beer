@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { site, groups, projects, crew, mascot } from './src/projects.js';
+import { site, groups, projects, crew, contact, mascot } from './src/projects.js';
 import { renderHero, renderContent, renderFooter } from './src/render.js';
 
 // Renders the landing from src/projects.js into index.html, so the shipped HTML already
@@ -9,7 +9,7 @@ const landing = {
   transformIndexHtml(html) {
     return html
       .replace('<!-- hero -->', renderHero(site, mascot))
-      .replace('<!-- content -->', renderContent({ groups, projects, crew }))
+      .replace('<!-- content -->', renderContent({ groups, projects, crew, contact }))
       .replace('<!-- footer -->', renderFooter(site));
   },
 };

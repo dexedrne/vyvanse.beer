@@ -1,6 +1,6 @@
 // Single source of truth for the page and the terminal.
 //
-// The landing (hero, project lists, crew, footer) is rendered into index.html at build time
+// The landing (hero, project lists, crew, contact, footer) is rendered into index.html at build time
 // from this file (see src/render.js), and the terminal (src/commands.js) reads the same data
 // at runtime, so a project added here shows up in both.
 //
@@ -195,6 +195,13 @@ export const crew = {
   line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in RadRun.',
   playIn: 'radrun',
   downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '81 MB' },
+  // Where the models live for anyone to use. `license` is the one line shown with it.
+  repo: {
+    href: 'https://github.com/dexedrne/radbros-3d',
+    label: 'Free to use: models on GitHub',
+    license: { label: 'Viral Public License', href: 'https://viralpubliclicense.org/VPL.txt' },
+    line: 'Rigged and animated. Use them, remix them, put them in your game.',
+  },
   members: [
     {
       num: '652',
@@ -250,6 +257,14 @@ export const crew = {
       },
     },
   ],
+};
+
+// The Contact section at the end of the page, and `contact` / `dm` in the terminal.
+export const contact = {
+  title: 'Contact',
+  line: 'DMs are open on X. Questions about the models, a site for your project, or anything else.',
+  dm: { label: 'DM me on X', href: 'https://x.com/dexedrne', handle: '@dexedrne' },
+  code: { label: 'GitHub', href: 'https://github.com/dexedrne' },
 };
 
 // The big #4764 in the hero. The render is the poster (and what no-JS visitors and crawlers

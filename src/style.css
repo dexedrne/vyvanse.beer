@@ -756,6 +756,89 @@ a.cmd-hint:hover {
   }
 }
 
+/* Free to use: the models on GitHub, and their license. */
+.crew__free {
+  margin-top: 16px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.crew__free p {
+  margin: 0;
+}
+
+.crew__repo {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.crew__repo .i {
+  margin-right: 6px;
+  vertical-align: -0.125em;
+}
+
+.crew__sep {
+  margin-inline: 8px;
+  color: var(--faint);
+}
+
+.crew__lic {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.crew__use {
+  margin-top: 2px;
+  color: var(--muted);
+}
+
+/* phones: the license gets its own line instead of wrapping after the dot */
+@media (max-width: 479.98px) {
+  .crew__sep {
+    display: none;
+  }
+
+  .crew__lic {
+    display: table;
+    margin-top: 2px;
+  }
+}
+
+/* ---------- contact ---------- */
+
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+}
+
+.contact__dm {
+  min-height: 44px;
+  padding-inline: 20px;
+}
+
+.contact__handle {
+  color: var(--muted);
+  font: 400 0.9375rem/1 var(--mono);
+}
+
+.contact__gh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line-2);
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.contact__gh:hover {
+  color: var(--lilac-hi);
+}
+
 /* ---------- footer ---------- */
 
 .foot {

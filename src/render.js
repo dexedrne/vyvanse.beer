@@ -150,10 +150,10 @@ function siteCard(p) {
 </li>`;
 }
 
-function sectionHead(id, title, line) {
+function sectionHead(id, title, line, cmd = `ls ${id}`) {
   return `<header class="sec__head">
     <h2 class="sec__title" id="${esc(id)}-title">${esc(title)}</h2>
-    <a class="cmd-hint js-only" href="#${esc(id)}" data-cmd="ls ${esc(id)}" aria-label="Run ls ${esc(id)} in the terminal">ls ${esc(id)}</a>
+    <a class="cmd-hint js-only" href="#${esc(id)}" data-cmd="${esc(cmd)}" aria-label="Run ${esc(cmd)} in the terminal">${esc(cmd)}</a>
     <p class="sec__line">${esc(line)}</p>
   </header>`;
 }
@@ -178,16 +178,38 @@ function crewSection(crew, projects) {
   const cta = play
     ? `<p class="crew__cta"><a class="btn btn--ghost" ${ext(play.url)} data-cmd="open ${esc(play.cmd)}">Play them in ${esc(play.name)}${newTab}</a>${all}</p>`
     : '';
+  const r = crew.repo;
+  const repo = r
+    ? `<div class="crew__free">
+    <p><a class="crew__repo" ${ext(r.href)}>${icon('github')}${esc(r.label)}${newTab}</a><span class="crew__sep" aria-hidden="true">·</span><a class="crew__lic" ${ext(r.license.href)}>${esc(r.license.label)}${newTab}</a></p>
+    <p class="crew__use">${esc(r.line)}</p>
+  </div>`
+    : '';
   return `<section class="sec sec--crew" id="crew" aria-labelledby="crew-title">
   ${sectionHead('crew', crew.title, crew.line)}
   <ul class="crew" role="list">
   ${bros}
   </ul>
   ${cta}
+  ${repo}
 </section>`;
 }
 
-export function renderContent({ groups, projects, crew }) {
+// The last section: one clear way to reach me (a DM on X), and GitHub beside it.
+function contactSection(c) {
+  const rel = ext(c.dm.href).replace('rel="noopener"', 'rel="me noopener"');
+  const gh = ext(c.code.href).replace('rel="noopener"', 'rel="me noopener"');
+  return `<section class="sec sec--contact" id="contact" aria-labelledby="contact-title">
+  ${sectionHead('contact', c.title, c.line, 'contact')}
+  <div class="contact">
+    <a class="btn btn--primary contact__dm" ${rel}>${icon('x')}<span>${esc(c.dm.label)}</span>${newTab}</a>
+    <span class="contact__handle">${esc(c.dm.handle)}</span>
+    <a class="contact__gh" ${gh}>${icon('github')}<span>${esc(c.code.label)}</span>${newTab}</a>
+  </div>
+</section>`;
+}
+
+export function renderContent({ groups, projects, crew, contact }) {
   const out = [];
   for (const g of groups) {
     const items = projects.filter((p) => p.group === g.id);
@@ -202,15 +224,17 @@ export function renderContent({ groups, projects, crew }) {
     // The crew sits between the games and the sites.
     if (g.id === 'games') out.push(crewSection(crew, projects));
   }
+  if (contact) out.push(contactSection(contact));
   return out.join('\n');
 }
 
 export function renderFooter(site) {
-  const links = site.links
-    .map((l) => `<a ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${esc(shortUrl(l.href))}${newTab}</a>`)
-    .join(' and ');
+  const to = (cmd) => {
+    const l = site.links.find((x) => x.cmd === cmd);
+    return `<a ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${esc(shortUrl(l.href))}${newTab}</a>`;
+  };
   return `<footer class="foot">
-  <p>Made by ${esc(site.handle)}. Find me at ${links}.</p>
-  <p class="foot__small">Not a pharmacy. Not a brewery.</p>
+  <p>Made by ${esc(site.handle)}. DMs open at ${to('x')}, code at ${to('github')}.</p>
+  <p class="foot__small">Site code MIT, Radbro models VPL. Not a pharmacy. Not a brewery.</p>
 </footer>`;
 }

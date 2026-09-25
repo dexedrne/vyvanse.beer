@@ -1,7 +1,7 @@
 # vyvanse.beer
 
 Projects by dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com/dexedrne).
-Live at https://vyvanse.beer.
+Live at https://vyvanse.beer. To get in touch, DM [@dexedrne on X](https://x.com/dexedrne).
 
 A plain landing page with a terminal, Radbro OS, one click away. It starts hidden: the
 `>_ radbro os` button (or `/`) opens it, docked beside the page on desktop and as a bottom
@@ -107,3 +107,15 @@ terminal, `spin` spins him round.
   this site instead of Google's CDN. Copy those two files again if you update `three`.
 - `@google/model-viewer` and `three` are pinned to exact versions. model-viewer 4.3.1 never
   fires `finished`, so `src/bro.js` watches the wave's clock instead.
+
+## License
+
+- The site code is MIT: [`LICENSE`](LICENSE).
+- The Radbro renders and 3D models (`public/img/radbros/`, `public/models/`,
+  `public/img/radrun.jpg`, `public/og.png`) and the `radbros-3d` release downloads are under
+  the [Viral Public License](https://viralpubliclicense.org/VPL.txt):
+  [`LICENSE-ASSETS`](LICENSE-ASSETS). Use them, remix them, rig them, sell them or put them in
+  a game. Anything made from them keeps the same license. The source models are also at
+  [dexedrne/radbros-3d](https://github.com/dexedrne/radbros-3d).
+- `public/draco/` is the Draco decoder that ships with three.js (Apache-2.0).
+- The screenshots of other people's projects in `public/img/` belong to those projects.

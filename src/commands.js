@@ -88,7 +88,7 @@ function parseOpen(args, want = null) {
 // `set windows on`, and a tab wasn't asked for).
 const howFor = (p, want) => (p.frame && (want === 'window' || (want !== 'tab' && prefs.windows)) ? 'window' : 'tab');
 
-export function createCommands({ site, groups, projects, crew, wm, term, page, bro }) {
+export function createCommands({ site, groups, projects, crew, contact, wm, term, page, bro }) {
   const byName = new Map();
   for (const p of projects) for (const n of [p.cmd, ...(p.aliases || [])]) byName.set(n, p);
   const findProject = (args) => byName.get(norm(args.join('-')));
@@ -97,6 +97,8 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
     return crew.members.find((b) => b.num === n);
   };
   const sections = [...groups.map((g) => g.id), 'crew'];
+  // `cd` also goes to the contact section, which `ls` has nothing to list in.
+  const places = contact ? [...sections, 'contact'] : sections;
   const playIn = projects.find((p) => p.cmd === crew.playIn);
 
   // ctx.how / ctx.opened: a click on the page already decided, and opened the tab itself inside
@@ -181,6 +183,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
           line(muted(b.line)),
           playIn ? line(b.soon ? 'coming soon to ' : 'playable in ', run(`open ${playIn.cmd}`)) : null,
           b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
+          crew.repo ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
         ),
       ),
     );
@@ -302,6 +305,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
           ),
         );
         if (playIn) term.print(line('play them: ', run(`open ${playIn.cmd}`)));
+        if (crew.repo) term.print(line('free to use: ', link(crew.repo.href), muted(` (${crew.repo.license.label})`)));
         page.show('crew');
       },
     },
@@ -319,12 +323,12 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
     cd: {
       usage: 'cd <section>',
       desc: 'scroll the page to a section',
-      args: () => sections,
+      args: () => places,
       run(args) {
         const to = args[0] ? norm(args[0]).replace(/\/$/, '') : '~';
         if (to === '~' || to === '/' || to === '') return page.go(null);
         if (to === '..') return term.print(line(muted("you're already at the top. there's nothing above vyvanse.beer.")));
-        if (!sections.includes(to)) return term.print(err(`cd: no such section: ${args[0]}`));
+        if (!places.includes(to)) return term.print(err(`cd: no such section: ${args[0]}`));
         page.go(to);
       },
     },
@@ -334,6 +338,14 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
         term.print(line(strong(site.handle)));
         term.print(line('makes browser games and 3D radbros, and builds websites for other people’s projects.'));
         term.print(grid(...site.links.flatMap((l) => [muted(l.label.toLowerCase()), link(l.href, shortUrl(l.href), 'me noopener')])));
+      },
+    },
+    contact: {
+      desc: 'how to reach me',
+      run() {
+        term.print(line('dms are open on x: ', link(contact.dm.href, shortUrl(contact.dm.href), 'me noopener'), muted(`  ${contact.dm.handle}`)));
+        term.print(line(muted('code and models: '), link(contact.code.href, shortUrl(contact.code.href), 'me noopener')));
+        page.show('contact');
       },
     },
     neofetch: {
@@ -440,6 +452,7 @@ export function createCommands({ site, groups, projects, crew, wm, term, page, b
     radbrofetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
     fetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
     ps: { hidden: true, run: (a, c) => table.windows.run(a, c) },
+    dm: { hidden: true, run: (a, c) => table.contact.run(a, c) },
     man: { hidden: true, run: (a, c) => table.help.run(a, c) },
 
     // Easter eggs.
