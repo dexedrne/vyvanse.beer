@@ -29,8 +29,8 @@ hero is on screen.
 
 Add an entry to `projects` in [`src/projects.js`](src/projects.js). The fields are documented
 at the top of that file. `group: 'games'` gets a row with a screenshot, `group: 'sites'` gets
-a picture card in a two-column grid (one column on phones). The `cmd` name is what the terminal takes (`open <cmd>`, `info <cmd>`), and it
-tab-completes automatically.
+a picture card in a two-column grid (one column on phones). The `cmd` name is what the
+terminal takes (`open <cmd>`, `info <cmd>`), and it tab-completes automatically.
 
 Set `frame: true` only if the site allows being shown in an iframe:
 

@@ -110,8 +110,8 @@ export const projects = [
     },
   },
   {
-    cmd: 'bulkos',
-    aliases: ['bulk', 'bulk-os'],
+    cmd: 'bulk',
+    aliases: ['bulkos', 'bulk-os'],
     slug: 'bulk-os',
     group: 'sites',
     name: 'bulk',
@@ -128,7 +128,7 @@ export const projects = [
       src: '/img/bulk.webp',
       width: 800,
       height: 420,
-      alt: 'The Bulk OS web desktop at night: a column of app icons, a big moon over a city skyline, and an open Games window with purple pixel-art cards for Bulk Runner, Super Bulk Bros, Flappy Bulk, Bulk Climb and Bulkagachi.',
+      alt: 'The bulk web desktop at night: a column of app icons, a big moon over a city skyline, and an open Games window with purple pixel-art cards for Bulk Runner, Super Bulk Bros, Flappy Bulk, Bulk Climb and Bulkagachi.',
     },
   },
   {
@@ -146,7 +146,7 @@ export const projects = [
       src: '/img/sanic.webp',
       width: 800,
       height: 420,
-      alt: 'The $SANIC Ring Runner landing page, with its retro blue title panel and yellow Press Start button on the left, and the 3D WebGL runner on the right: a blue hedgehog running down a dirt road through low-poly trees with gold rings floating ahead.',
+      alt: 'The sanic ring runner landing page, with its retro blue title panel and yellow Press Start button on the left, and the 3D WebGL runner on the right: a blue hedgehog running down a dirt road through low-poly trees with gold rings floating ahead.',
     },
   },
   {
@@ -163,7 +163,7 @@ export const projects = [
       src: '/img/hog.webp',
       width: 800,
       height: 420,
-      alt: 'The HOG meme site’s home page: a glowing hero image of a smiling robed figure holding out a chrome motorcycle, the title “YOUR HOG, KING”, a red “Play Hog Rider 3D” button and a small preview of the handlebar-view road game, on a red pixel-art sunset.',
+      alt: 'The hog home page: a glowing hero image of a smiling robed figure holding out a chrome motorcycle, the title “YOUR HOG, KING”, a red “Play Hog Rider 3D” button and a small preview of the handlebar-view road game, on a red pixel-art sunset.',
     },
   },
 ];
