@@ -74,9 +74,9 @@ export const projects = [
     slug: 'radpayne',
     group: 'games',
     name: 'RadPayne',
-    kind: 'Bullet-time noir shooter, chapter 1 (early)',
+    kind: 'Bullet-time noir shooter, chapter 1: rooms 1-3',
     blurb:
-      'They took the bag. A rainy Manhattan night outside the Milady rave, two pistols, and time slowed down. Desktop, keyboard and mouse.',
+      'They took the bag. A rainy Manhattan night, then inside the Milady rave and through the back of the house. Two pistols, a shotgun, twin SMGs, and time slowed down. Desktop, keyboard and mouse.',
     url: 'https://radpayne.vyvanse.beer',
     frame: true,
     links: [
