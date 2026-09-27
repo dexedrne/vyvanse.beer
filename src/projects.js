@@ -48,7 +48,7 @@ export const projects = [
     name: 'RadRun',
     kind: 'Radbro rooftop chase, free-swing 3D browser game',
     blurb:
-      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back. Or play SPIDER-TAG against bots or a friend online. Runs in the browser, keyboard or controller, nothing to install.',
+      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back, to a chill lo-fi soundtrack. Or play SPIDER-TAG against bots or a friend online. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://radrun.vyvanse.beer',
     frame: true,
     links: [
@@ -76,7 +76,7 @@ export const projects = [
     name: 'RadPayne',
     kind: 'Bullet-time noir shooter',
     blurb:
-      'They took the bag. A rainy Manhattan night, the Milady rave, the back of the house, an elevator ride up and Madame Pockit in her penthouse. Dual pistols, shotguns, a sniper, a katana, grenades, a kill cam, and time slowed down. Keyboard and mouse or a controller.',
+      "They took the bag. A rainy Manhattan night, the Milady rave, the back of the house, an elevator ride up and Madame Pockit in her penthouse, told in rhyming noir comic panels. Dual pistols, shotguns, a sniper, grenades, a kill cam, time slowed down, and #4764's katana that blocks bullets and sends them back. Keyboard and mouse or a controller.",
     url: 'https://radpayne.vyvanse.beer',
     frame: true,
     links: [
