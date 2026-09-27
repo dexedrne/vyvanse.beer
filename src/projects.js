@@ -48,7 +48,7 @@ export const projects = [
     name: 'RadRun',
     kind: 'Radbro rooftop chase, free-swing 3D browser game',
     blurb:
-      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back. Runs in the browser, nothing to install.',
+      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back. Or play SPIDER-TAG against bots or a friend online. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://radrun.vyvanse.beer',
     frame: true,
     links: [
@@ -74,9 +74,9 @@ export const projects = [
     slug: 'radpayne',
     group: 'games',
     name: 'RadPayne',
-    kind: 'Bullet-time noir shooter, chapter 1: rooms 1-3',
+    kind: 'Bullet-time noir shooter',
     blurb:
-      'They took the bag. A rainy Manhattan night, then inside the Milady rave and through the back of the house. Two pistols, a shotgun, twin SMGs, and time slowed down. Desktop, keyboard and mouse.',
+      'They took the bag. A rainy Manhattan night, the Milady rave, the back of the house, an elevator ride up and Madame Pockit in her penthouse. Dual pistols, shotguns, a sniper, a katana, grenades, a kill cam, and time slowed down. Keyboard and mouse or a controller.',
     url: 'https://radpayne.vyvanse.beer',
     frame: true,
     links: [
@@ -87,7 +87,7 @@ export const projects = [
       src: '/img/radpayne.jpg',
       width: 1200,
       height: 630,
-      alt: 'RadPayne: Radbro #4764 dives through the rain in bullet time, firing two pistols outside the CLUB MILADY neon while Pockit Miladys scatter.',
+      alt: 'RadPayne, bullet-time noir: Radbro #4764 dives through the rain in bullet time, firing two pistols outside the CLUB MILADY neon while Pockit Miladys scatter.',
     },
     credit: {
       before: 'Built on',
