@@ -74,8 +74,9 @@ one setting that sticks between visits.
 
 Midnight purple. The colour tokens are at the top of [`src/style.css`](src/style.css), and every
 text pair meets WCAG AA. Type is [Spline Sans](https://fonts.google.com/specimen/Spline+Sans)
-for the page and [Spline Sans Mono](https://fonts.google.com/specimen/Spline+Sans+Mono) for
-the terminal. Both are SIL Open Font License and bundled from Fontsource.
+for the page, [Spline Sans Mono](https://fonts.google.com/specimen/Spline+Sans+Mono) for small
+code bits, and the bitmap terminal face [VT323](https://fonts.google.com/specimen/VT323) for
+Radbro OS and the hero's boot log. All three are SIL Open Font License and bundled from Fontsource.
 
 ## Share card and icons
 

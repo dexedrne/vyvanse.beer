@@ -42,6 +42,7 @@ export const groups = [
 export const projects = [
   {
     cmd: 'radrun',
+    boot: 'rooftop web-swing chase + SPIDER-TAG', // the hero's boot log line
     aliases: ['rug-run', 'rugrun'],
     slug: 'radrun',
     group: 'games',
@@ -70,6 +71,7 @@ export const projects = [
   },
   {
     cmd: 'radpayne',
+    boot: 'bullet-time noir shooter', // the hero's boot log line
     aliases: ['rad-payne', 'payne'],
     slug: 'radpayne',
     group: 'games',
@@ -98,6 +100,7 @@ export const projects = [
   },
   {
     cmd: 'solscape',
+    boot: 'rev254 server on Solana', // the hero's boot log line
     slug: 'solscape',
     group: 'games',
     name: 'Solscape',

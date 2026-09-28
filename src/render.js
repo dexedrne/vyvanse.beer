@@ -3,7 +3,7 @@
 //
 // `data-cmd` marks anything that runs a terminal command when clicked with JS on.
 
-import { shortUrl } from './projects.js';
+import { projects, shortUrl } from './projects.js';
 
 const esc = (s) =>
   String(s).replace(
@@ -26,12 +26,26 @@ export function renderHero(site, mascot) {
         `<li><a class="btn btn--ghost" ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${icon(l.cmd)}<span>${esc(l.label)}</span>${newTab}</a></li>`,
     )
     .join('');
+  const [host, ...tld] = site.name.split('.');
+  const games = projects.filter((p) => p.group === 'games' && p.boot);
+  const boot = games
+    .map(
+      (p, i) =>
+        `<li style="--i:${i}"><a ${ext(p.url)}><span class="boot__caret" aria-hidden="true">&gt;</span><span class="boot__exe">${esc(p.cmd)}.exe</span><span class="boot__status">[ OK ]</span><span class="boot__what">${esc(p.boot)}</span>${newTab}</a></li>`,
+    )
+    .join('');
   return `<header class="hero">
-  <h1 class="hero__title">${esc(site.name)}</h1>
+  <p class="hero__prompt" aria-hidden="true"><span class="hero__ps1">${esc(site.handle)}@vyvanse:~$</span> <span class="hero__cmd">./hello</span><span class="hero__cursor"></span></p>
+  <h1 class="hero__title">${esc(host)}${tld.length ? `<span class="hero__tld">.${esc(tld.join('.'))}</span>` : ''}</h1>
   <p class="hero__tag">${esc(site.tagline)}</p>
   <ul class="hero__links" role="list">${links}</ul>
   <p class="hero__hint js-only"><span class="only-wide">Click a project to open it in a new tab, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it in a new tab.</span></p>
+  <div class="hero__boot" role="group" aria-label="Games online">
+    <p class="boot__head"><span class="boot__os">radbro os</span> <span aria-hidden="true">//</span> <span class="boot__ok">${games.length} games online</span></p>
+    <ul class="boot__list" role="list">${boot}</ul>
+  </div>
   <figure class="hero__bro">
+    <span class="hero__bubble" aria-hidden="true">gm</span>
     ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
   </figure>
 </header>`;
