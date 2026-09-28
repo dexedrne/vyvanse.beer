@@ -126,6 +126,7 @@ function gameRow(p, i) {
   return `<article class="game" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
   ${shot}
   <div class="game__text">
+    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
     <h3 class="game__name">${esc(p.name)}</h3>
     <p class="game__kind">${esc(p.kind)}</p>
     <p class="game__blurb">${esc(p.blurb)}</p>
@@ -153,6 +154,7 @@ function siteCard(p) {
   return `<li class="game game--card" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
   ${shot}
   <div class="game__text">
+    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
     <h3 class="game__name">${esc(p.name)}</h3>
     <p class="game__host">${esc(host)}</p>
     <p class="game__kind">${esc(p.kind)}</p>
@@ -166,6 +168,7 @@ function siteCard(p) {
 
 function sectionHead(id, title, line, cmd = `ls ${id}`) {
   return `<header class="sec__head">
+    <p class="sec__prompt" aria-hidden="true"><span>~/${esc(id)} $</span> ${esc(cmd)}</p>
     <h2 class="sec__title" id="${esc(id)}-title">${esc(title)}</h2>
     <a class="cmd-hint js-only" href="#${esc(id)}" data-cmd="${esc(cmd)}" aria-label="Run ${esc(cmd)} in the terminal">${esc(cmd)}</a>
     <p class="sec__line">${esc(line)}</p>
@@ -177,6 +180,7 @@ function crewSection(crew, projects) {
   const bros = crew.members
     .map(
       (b) => `<li class="bro${b.featured ? ' bro--featured' : ''}" id="${esc(b.slug)}">
+    <span class="bro__status" aria-hidden="true"><span>[ OK ]</span> #${esc(b.num)}</span>
     <a class="bro__link" href="#${esc(b.slug)}" data-cmd="info ${esc(b.num)}">
       <span class="bro__stage">${img(b.image)}</span>
       <span class="bro__name">${esc(b.name)}</span>
@@ -216,6 +220,7 @@ function contactSection(c) {
   return `<section class="sec sec--contact" id="contact" aria-labelledby="contact-title">
   ${sectionHead('contact', c.title, c.line, 'contact')}
   <div class="contact">
+    <p class="contact__status"><span>[ OK ]</span> connection ready</p>
     <a class="btn btn--primary contact__dm" ${rel}>${icon('x')}<span>${esc(c.dm.label)}</span>${newTab}</a>
     <span class="contact__handle">${esc(c.dm.handle)}</span>
     <a class="contact__gh" ${gh}>${icon('github')}<span>${esc(c.code.label)}</span>${newTab}</a>
@@ -248,6 +253,7 @@ export function renderFooter(site) {
     return `<a ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${esc(shortUrl(l.href))}${newTab}</a>`;
   };
   return `<footer class="foot">
+  <p class="foot__status">radbro os <span>//</span> <strong>online</strong> <span>//</span> © ${esc(site.handle)}</p>
   <p>Made by ${esc(site.handle)}. DMs open at ${to('x')}, code at ${to('github')}.</p>
   <p class="foot__small">Site code MIT, Radbro models VPL. Not a pharmacy. Not a brewery.</p>
 </footer>`;

@@ -233,19 +233,25 @@ html:not(.js) .js-only {
 
 .cmd-hint {
   display: inline-block;
-  padding: 3px 8px;
-  border: 1px dashed var(--line-2);
-  border-radius: 6px;
-  color: var(--faint);
-  font: 400 0.8125rem/1.4 var(--mono);
+  padding: 3px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--lilac);
+  font: 400 1.25rem/1 var(--pixel);
   text-decoration: none;
   white-space: nowrap;
 }
 
+.cmd-hint::before {
+  content: '> ';
+  color: var(--faint);
+}
+
 a.cmd-hint:hover {
-  border-style: solid;
   border-color: var(--lilac);
-  color: var(--lilac);
+  background: var(--surface);
+  color: var(--lilac-hi);
 }
 
 /* ---------- hero ---------- */
@@ -700,8 +706,23 @@ a.cmd-hint:hover {
 /* ---------- sections ---------- */
 
 .sec {
+  position: relative;
+  isolation: isolate;
   padding-top: clamp(64px, 10vh, 104px);
   scroll-margin-top: 8px;
+}
+
+.sec::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 28px -5vw -24px;
+  pointer-events: none;
+  background:
+    radial-gradient(45% 35% at 80% 48%, rgb(142 109 224 / 0.08), transparent 75%),
+    repeating-linear-gradient(0deg, rgb(198 179 247 / 0.022) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, rgb(198 179 247 / 0.022) 0 1px, transparent 1px 24px);
+  mask-image: linear-gradient(transparent, #000 18% 82%, transparent);
 }
 
 .sec__head {
@@ -709,16 +730,28 @@ a.cmd-hint:hover {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   gap: 4px 16px;
-  margin: 0 0 20px;
-  padding: 0 0 14px;
-  border-bottom: 1px solid var(--line);
+  margin: 0 0 22px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.sec__prompt {
+  grid-column: 1 / -1;
+  margin: 0 0 8px;
+  color: var(--text);
+  font: 400 1.375rem/1 var(--pixel);
+}
+
+.sec__prompt span {
+  color: var(--lilac);
 }
 
 .sec__title {
   margin: 0;
-  font-size: 1.625rem;
+  font-size: clamp(1.75rem, 1.5rem + 0.8vw, 2.125rem);
   font-weight: 600;
   letter-spacing: -0.025em;
+  text-shadow: 0 0 32px rgb(142 109 224 / 0.3);
 }
 
 .sec__line {
@@ -731,8 +764,7 @@ a.cmd-hint:hover {
 
 .games {
   display: grid;
-  gap: 8px;
-  margin-inline: -14px;
+  gap: 14px;
 }
 
 .game {
@@ -740,13 +772,32 @@ a.cmd-hint:hover {
   display: grid;
   grid-template-columns: min(17.5rem, 40%) minmax(0, 1fr);
   gap: clamp(16px, 3cqi, 24px);
-  padding: 14px;
-  border-radius: 16px;
-  transition: background-color 0.2s;
+  padding: 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.game:hover {
-  background: var(--surface);
+.game:hover,
+.game:focus-within {
+  border-color: #6b559e;
+  box-shadow: 0 20px 48px -28px rgb(142 109 224 / 0.7);
+}
+
+.game::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 3px);
+}
+
+.game:hover::before,
+.game:focus-within::before {
+  opacity: 1;
 }
 
 .game__shot img {
@@ -755,12 +806,27 @@ a.cmd-hint:hover {
   height: auto;
   aspect-ratio: 40 / 21;
   object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 0 0 1px rgb(236 230 248 / 0.08);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--line-2);
 }
 
 .game__text {
   min-width: 0;
+}
+
+.game__status,
+.bro__status,
+.contact__status {
+  margin: 0 0 9px;
+  color: var(--lilac-hi);
+  font: 400 1.25rem/1 var(--pixel);
+}
+
+.game__status span,
+.bro__status span,
+.contact__status span {
+  color: var(--phosphor);
+  text-shadow: 0 0 10px rgb(157 255 200 / 0.35);
 }
 
 .game__name {
@@ -812,7 +878,7 @@ a.cmd-hint:hover {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: 10px;
 }
 
 .game__more,
@@ -860,7 +926,7 @@ a.cmd-hint:hover {
 
 .game__note {
   margin: 14px 0 0;
-  color: var(--faint);
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -905,7 +971,7 @@ a.cmd-hint:hover {
 
 .game__host {
   margin: 2px 0 0;
-  color: var(--faint);
+  color: var(--muted);
   font: 400 0.8125rem/1.4 var(--mono);
 }
 
@@ -926,7 +992,7 @@ a.cmd-hint:hover {
   display: grid;
   place-items: center;
   aspect-ratio: 40 / 21;
-  border-radius: 10px;
+  border-radius: 4px;
   background:
     radial-gradient(70% 60% at 50% 100%, rgb(142 109 224 / 0.18), transparent 70%),
     var(--surface-2);
@@ -946,22 +1012,37 @@ a.cmd-hint:hover {
 .crew {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
   margin: 0;
-  padding: 28px 12px 16px;
+  padding: 0;
   list-style: none;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background:
-    radial-gradient(70% 40% at 50% 100%, rgb(142 109 224 / 0.16), transparent 70%),
-    var(--surface);
+}
+
+.bro {
+  min-width: 0;
+  padding: 12px 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bro:hover,
+.bro:focus-within {
+  border-color: #6b559e;
+  box-shadow: 0 20px 40px -26px rgb(142 109 224 / 0.7);
+}
+
+.bro__status {
+  display: block;
+  margin: 0 0 4px 4px;
 }
 
 .bro__link {
   display: grid;
   justify-items: center;
-  padding: 8px 6px 12px;
-  border-radius: 12px;
+  padding: 8px 3px 12px;
+  border-radius: 4px;
   color: inherit;
   text-align: center;
   text-decoration: none;
@@ -1002,8 +1083,7 @@ a.cmd-hint:hover {
 @media (max-width: 479.98px) {
   .crew {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 20px 4px 10px;
-    gap: 8px 0;
+    gap: 10px;
   }
 
   .bro__link {
@@ -1074,6 +1154,16 @@ a.cmd-hint:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 14px;
+  padding: 22px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--ink);
+  box-shadow: 0 22px 60px -36px rgb(142 109 224 / 0.5);
+}
+
+.contact__status {
+  flex-basis: 100%;
+  margin-bottom: 2px;
 }
 
 .contact__dm {
@@ -1106,14 +1196,35 @@ a.cmd-hint:hover {
 
 .foot {
   margin-top: clamp(72px, 12vh, 120px);
-  padding: 24px 0 48px;
-  border-top: 1px solid var(--line);
+  padding: 0 0 48px;
   color: var(--muted);
   font-size: 0.9375rem;
 }
 
+.foot__status {
+  padding: 8px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--lilac);
+  font: 400 1.25rem/1.2 var(--pixel);
+}
+
+.foot__status span {
+  color: var(--faint);
+}
+
+.foot__status strong {
+  color: var(--phosphor);
+  font-weight: 400;
+}
+
 .foot p {
   margin: 0 0 6px;
+}
+
+.foot__status + p {
+  margin-top: 14px;
 }
 
 .foot__small {
@@ -1242,7 +1353,7 @@ a.cmd-hint:hover {
   flex: none;
   padding: 5px 11px;
   border: 1px solid var(--line-2);
-  border-radius: 999px;
+  border-radius: 4px;
   background: transparent;
   color: var(--muted);
   font: inherit;
@@ -1623,7 +1734,7 @@ a.cmd-hint:hover {
   overflow: hidden;
   border: 1px solid var(--line-2);
   border-radius: 12px;
-  background: var(--surface);
+  background: var(--ink);
   box-shadow:
     0 40px 90px -24px rgb(4 0 12 / 0.8),
     0 0 0 1px rgb(4 0 12 / 0.4);
@@ -1659,7 +1770,8 @@ a.cmd-hint:hover {
   gap: 2px;
   height: 42px;
   padding: 0 6px 0 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-2);
+  font: 400 1.25rem/1 var(--pixel);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -1674,8 +1786,7 @@ a.cmd-hint:hover {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font: 400 1.25rem/1 var(--pixel);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1981,12 +2092,12 @@ a.cmd-hint:hover {
   min-height: 44px;
   padding: 0 17px 0 15px;
   border: 1px solid var(--line-2);
-  border-radius: 999px;
-  background: rgb(26 19 48 / 0.92);
+  border-radius: 6px;
+  background: rgb(12 8 22 / 0.94);
   box-shadow: 0 16px 40px -12px rgb(4 0 12 / 0.7);
   backdrop-filter: blur(12px);
   color: var(--text);
-  font: 500 0.8125rem/1 var(--mono);
+  font: 400 1.25rem/1 var(--pixel);
   cursor: pointer;
   transition:
     border-color 0.15s,
