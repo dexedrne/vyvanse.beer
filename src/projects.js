@@ -99,6 +99,32 @@ export const projects = [
     },
   },
   {
+    cmd: 'rbgo',
+    boot: 'radbros vs radbros: TDM + bomb defusal', // the hero's boot log line
+    aliases: ['rb-go'],
+    slug: 'rbgo',
+    group: 'games',
+    name: 'RBGO',
+    kind: 'Third-person team shooter, early preview',
+    blurb:
+      'Radbros vs Radbros, up to 5 a side, against bots for now. Team Deathmatch in a sun-bleached cul-de-sac, or plant and defuse the bomb in a desert bazaar. Pick a gun each life, crouch, peek, clutch. Keyboard and mouse or a controller.',
+    url: 'https://rbgo.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
+    image: {
+      src: '/img/rbgo.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'RBGO: Radbros #652 and #723 glowing magenta face #4764 and #2564 glowing cyan in a sunlit desert bazaar.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth.',
+    },
+  },
+  {
     cmd: 'solscape',
     boot: 'rev254 server on Solana', // the hero's boot log line
     slug: 'solscape',
