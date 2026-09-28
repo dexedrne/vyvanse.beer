@@ -112,6 +112,7 @@ export const projects = [
     links: [
       { label: 'Play', href: 'https://play.solscape.fun' },
       { label: 'Site', href: 'https://www.solscape.fun' },
+      { label: '$XP on pump.fun', href: 'https://pump.fun/coin/9spN3Lrz4tnFXaXfR9QzKdiMd2hE4AUbAJntui21pump' },
     ],
     image: {
       src: '/img/solscape.webp',
