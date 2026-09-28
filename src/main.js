@@ -7,6 +7,7 @@ import { createWindows } from './windows.js';
 import { createTerminal } from './terminal.js';
 import { createCommands, openTab } from './commands.js';
 import { createBro } from './bro.js';
+import { createTicker } from './ticker.js';
 
 const root = document.documentElement;
 const termEl = document.getElementById('term');
@@ -195,6 +196,9 @@ const page = {
 
 // #4764 in the hero: loads the 3D viewer once he's on screen (see src/bro.js).
 const bro = createBro(document.querySelector('.hero__bro model-viewer'));
+
+// the UTC clock and live BTC / ETH / SOL in the top-left corner (src/ticker.js)
+createTicker();
 
 const wm = createWindows({
   layer: document.getElementById('wm'),

@@ -2221,3 +2221,60 @@ a.cmd-hint:hover {
 .bro__dl:focus-visible { color: #fff; }
 .bro__dl-size { opacity: 0.7; }
 .bro__dl--all { margin-left: 1rem; }
+
+/* ---------- the top-left strip: UTC clock + BTC / ETH / SOL (src/ticker.js) ---------- */
+
+.ticker {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  left: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 5px 11px 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: rgb(12 8 22 / 0.82);
+  color: var(--faint);
+  font: 400 1.125rem/1 var(--pixel);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticker__k {
+  color: var(--faint);
+}
+
+.ticker__clock {
+  color: var(--lilac-hi);
+}
+
+.ticker__px {
+  color: var(--text);
+}
+
+.ticker__ch.is-up {
+  color: var(--phosphor);
+}
+
+.ticker__ch.is-down {
+  color: var(--rose);
+}
+
+@media (max-width: 899.98px) {
+  .ticker {
+    position: static;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    margin: 10px 16px 0;
+    overflow-x: auto;
+    gap: 10px;
+    font-size: 1rem;
+    scrollbar-width: none;
+  }
+
+  .ticker__ch {
+    display: none;
+  }
+}
