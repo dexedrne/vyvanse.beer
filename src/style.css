@@ -2230,9 +2230,10 @@ a.cmd-hint:hover {
   top: 12px;
   left: 14px;
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding: 5px 11px 4px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px 12px 7px;
   border: 1px solid var(--line-2);
   border-radius: 8px;
   background: rgb(12 8 22 / 0.82);
@@ -2242,8 +2243,20 @@ a.cmd-hint:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.ticker__item {
+  display: flex;
+  align-items: baseline;
+  gap: 1ch;
+}
+
 .ticker__k {
+  min-width: 3ch;
   color: var(--faint);
+}
+
+.ticker__ch {
+  margin-left: auto;
+  padding-left: 1ch;
 }
 
 .ticker__clock {
@@ -2262,16 +2275,25 @@ a.cmd-hint:hover {
   color: var(--rose);
 }
 
-@media (max-width: 899.98px) {
+/* narrower screens: the hero would sit under the stack, so it becomes one line at the top of the page */
+@media (max-width: 1179.98px) {
   .ticker {
     position: static;
+    flex-direction: row;
     width: max-content;
     max-width: calc(100% - 32px);
     margin: 10px 16px 0;
+    padding: 5px 11px 4px;
     overflow-x: auto;
+    gap: 12px;
+    scrollbar-width: none;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .ticker {
     gap: 10px;
     font-size: 1rem;
-    scrollbar-width: none;
   }
 
   .ticker__ch {
