@@ -8,7 +8,7 @@ import { createTerminal } from './terminal.js';
 import { createCommands, openTab } from './commands.js';
 import { createBro } from './bro.js';
 import { createTicker } from './ticker.js';
-import { createShelf } from './shelf.js';
+import { createReveal, createSheen } from './reveal.js';
 
 const root = document.documentElement;
 const termEl = document.getElementById('term');
@@ -201,8 +201,30 @@ const bro = createBro(document.querySelector('.hero__bro model-viewer'));
 // the UTC clock and live BTC / ETH / SOL / XRP in the top-left corner (src/ticker.js)
 createTicker();
 
-// the games shelf: arrows, the meter and mouse drag (src/shelf.js)
-createShelf(document.querySelector('[data-shelf]'));
+// sections surface as they scroll into view, and glass panes catch the light (src/reveal.js)
+createReveal();
+createSheen();
+
+// The rainy night behind the page (src/water.js): its own small chunk, loaded once the page has
+// painted and the neon sign has flickered on. No WebGL2, Save-Data, or a failure: the CSS night
+// stays (.water-off).
+(() => {
+  const off = () => root.classList.add('water-off');
+  if (navigator.connection?.saveData) return off();
+  const start = () =>
+    import('./water.js')
+      .then((m) => m.createWater() || off())
+      .catch(off);
+  const lit = new Promise((resolve) => {
+    const tld = document.querySelector('.hero__title .hero__tld');
+    if (!tld || media.reduced.matches || !tld.getAnimations?.().length) return resolve();
+    tld.addEventListener('animationend', resolve, { once: true });
+    setTimeout(resolve, 2400);
+  });
+  const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1200 }) : setTimeout(f, 60));
+  const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise((r) => addEventListener('load', r, { once: true }));
+  Promise.all([lit, loaded]).then(() => idle(start));
+})();
 
 const wm = createWindows({
   layer: document.getElementById('wm'),

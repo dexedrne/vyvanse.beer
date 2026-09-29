@@ -27,6 +27,7 @@ export function renderHero(site, mascot) {
     )
     .join('');
   const [host, ...tld] = site.name.split('.');
+  const dot = tld.length ? `<span class="hero__tld">.${esc(tld.join('.'))}</span>` : '';
   const games = projects.filter((p) => p.group === 'games' && p.boot);
   const boot = games
     .map(
@@ -34,20 +35,30 @@ export function renderHero(site, mascot) {
         `<li style="--i:${i}"><a ${ext(p.url)}><span class="boot__caret" aria-hidden="true">&gt;</span><span class="boot__exe">${esc(p.cmd)}.exe</span><span class="boot__status">[ OK ]</span><span class="boot__what">${esc(p.boot)}</span>${newTab}</a></li>`,
     )
     .join('');
+  // The stage is the neon sign and #4764, both standing on the waterline (its bottom edge).
+  // Below it the puddle: src/water.js draws their rippling reflection there. Without WebGL (or
+  // JS) .hero__mirror is a plain CSS reflection of the sign instead.
   return `<header class="hero">
-  <p class="hero__prompt" aria-hidden="true"><span class="hero__ps1">${esc(site.handle)}@vyvanse:~$</span> <span class="hero__cmd">./hello</span><span class="hero__cursor"></span></p>
-  <h1 class="hero__title">${esc(host)}${tld.length ? `<span class="hero__tld">.${esc(tld.join('.'))}</span>` : ''}</h1>
-  <p class="hero__tag">${esc(site.tagline)}</p>
-  <ul class="hero__links" role="list">${links}</ul>
-  <p class="hero__hint js-only"><span class="only-wide">Click a project to open it in a new tab, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it in a new tab.</span></p>
-  <div class="hero__boot" role="group" aria-label="Games online">
-    <p class="boot__head"><span class="boot__os">radbro os</span> <span aria-hidden="true">//</span> <span class="boot__ok">${games.length} games online</span></p>
-    <ul class="boot__list" role="list">${boot}</ul>
+  <div class="hero__stage">
+    <p class="hero__prompt" aria-hidden="true"><span class="hero__ps1">${esc(site.handle)}@vyvanse:~$</span> <span class="hero__cmd">./hello</span><span class="hero__cursor"></span></p>
+    <h1 class="hero__title"><span class="hero__host">${esc(host)}</span>${dot}</h1>
+    <p class="hero__mirror" aria-hidden="true"><span class="hero__host">${esc(host)}</span>${dot}</p>
+    <figure class="hero__bro">
+      <span class="hero__bubble" aria-hidden="true">gm</span>
+      ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
+    </figure>
   </div>
-  <figure class="hero__bro">
-    <span class="hero__bubble" aria-hidden="true">gm</span>
-    ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
-  </figure>
+  <div class="hero__deck">
+    <div class="hero__intro">
+      <p class="hero__tag">${esc(site.tagline)}</p>
+      <ul class="hero__links" role="list">${links}</ul>
+      <p class="hero__hint js-only"><span class="only-wide">Click a project to open it in a new tab, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it in a new tab.</span></p>
+    </div>
+    <div class="hero__boot" role="group" aria-label="Games online">
+      <p class="boot__head"><span class="boot__os">radbro os</span> <span aria-hidden="true">//</span> <span class="boot__ok">${games.length} games online</span></p>
+      <ul class="boot__list" role="list">${boot}</ul>
+    </div>
+  </div>
 </header>`;
 }
 
@@ -94,13 +105,14 @@ function bro3d(m) {
 }
 
 // Framing for the 719x1100 box: wide enough that his katana's scabbard tip (0.74 m out) stays in
-// frame at every angle while he spins. Drag spins him all the way round; the tilt stays between
-// a little below and a little above eye level.
+// frame at every angle while he spins, and aimed high enough that his feet are near the bottom
+// of the box (on the hero's waterline), with the room left over his head. Drag spins him all
+// the way round; the tilt stays between a little below and a little above eye level.
 const BRO_CAMERA = {
   orbit: '0deg 82deg 7.8m',
   min: '-Infinity 66deg 7.8m',
   max: 'Infinity 96deg 7.8m',
-  target: '0m 0.86m 0m',
+  target: '0m 1m 0m',
   fov: '17deg',
 };
 
@@ -111,13 +123,13 @@ function winButton(p, cls) {
   return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="Open ${esc(p.name)} in a window on this page" title="Open in a window on this page">${icon('max')}<span>In a window</span></button>`;
 }
 
-// Games sit on a shelf that scrolls sideways, one cover card each, in the order of
-// src/projects.js. Without JS it's a plain sideways scroller (swipe, shift+wheel, the
-// scrollbar); src/shelf.js adds the arrows, the meter and dragging with a mouse.
-function gameCard(p, i) {
+// Games are big panes stacked down the page, one per game in the order of src/projects.js:
+// the cover art on one side (standing on a thin strip of water), the words and buttons on the
+// other, swapping sides from one game to the next. Phones get the art on top.
+function gameCard(p) {
   const [main, ...rest] = p.links;
   const shot = p.image
-    ? `<div class="game__shot">${img(p.image, { eager: i === 0 })}</div>`
+    ? `<div class="game__shot">${img(p.image)}</div>`
     : `<div class="game__shot game__shot--none" aria-hidden="true"><span>${esc(shortUrl(p.url))}</span></div>`;
   const more = rest
     .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
@@ -126,35 +138,20 @@ function gameCard(p, i) {
     ? `<p class="game__note">${esc(p.credit.before)} <a ${ext(p.credit.href)}>${esc(p.credit.label)}</a> ${esc(p.credit.after)}</p>`
     : '';
   const note = p.note ? `<p class="game__note">${esc(p.note)}</p>` : '';
-  return `<li class="game game--shelf" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
+  return `<li class="game game--feature glass reveal" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
   ${shot}
   <div class="game__text">
-    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe<span class="game__slot" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span></p>
+    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
     <h3 class="game__name">${esc(p.name)}</h3>
     <p class="game__kind">${esc(p.kind)}</p>
     <p class="game__blurb">${esc(p.blurb)}</p>
-    ${credit}${note}
     <div class="game__actions">
       <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
       ${more}${winButton(p, 'game__more game__win js-only')}
     </div>
+    ${credit}${note}
   </div>
 </li>`;
-}
-
-function gameShelf(items) {
-  const btn = (step, dir) =>
-    `<button class="shelf__btn" type="button" data-step="${step}" aria-controls="games-shelf" aria-label="Scroll the games ${dir}">${icon(dir)}</button>`;
-  return `<div class="shelf" data-shelf data-start>
-  <div class="shelf__bar js-only">
-    <p class="shelf__count">[ ${items.length} games ]</p>
-    <span class="shelf__meter" aria-hidden="true"><span class="shelf__thumb"></span></span>
-    ${btn(-1, 'left')}${btn(1, 'right')}
-  </div>
-  <ul class="shelf__track" id="games-shelf" role="list" aria-label="Games">
-  ${items.map(gameCard).join('\n')}
-  </ul>
-</div>`;
 }
 
 // Sites get a picture card: screenshot on top, then name, host, kind and links. Same parts
@@ -168,7 +165,7 @@ function siteCard(p) {
   const more = rest
     .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
     .join('');
-  return `<li class="game game--card" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
+  return `<li class="game game--card glass reveal" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
   ${shot}
   <div class="game__text">
     <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
@@ -184,7 +181,8 @@ function siteCard(p) {
 }
 
 function sectionHead(id, title, line, cmd = `ls ${id}`) {
-  return `<header class="sec__head">
+  return `<header class="sec__head reveal">
+    <span class="sec__drop" aria-hidden="true"></span>
     <p class="sec__prompt" aria-hidden="true"><span>~/${esc(id)} $</span> ${esc(cmd)}</p>
     <h2 class="sec__title" id="${esc(id)}-title">${esc(title)}</h2>
     <a class="cmd-hint js-only" href="#${esc(id)}" data-cmd="${esc(cmd)}" aria-label="Run ${esc(cmd)} in the terminal">${esc(cmd)}</a>
@@ -216,13 +214,13 @@ function crewSection(crew, projects) {
   const r = crew.repo;
   const repo = r
     ? `<div class="crew__free">
-    <p><a class="crew__repo" ${ext(r.href)}>${icon('github')}${esc(r.label)}${newTab}</a><span class="crew__sep" aria-hidden="true">·</span><a class="crew__lic" ${ext(r.license.href)}>${esc(r.license.label)}${newTab}</a></p>
+    <p class="crew__links"><a class="crew__repo" ${ext(r.href)}>${icon('github')}${esc(r.label)}${newTab}</a><a class="crew__lic" ${ext(r.license.href)}>${esc(r.license.label)}${newTab}</a></p>
     <p class="crew__use">${esc(r.line)}</p>
   </div>`
     : '';
   return `<section class="sec sec--crew" id="crew" aria-labelledby="crew-title">
   ${sectionHead('crew', crew.title, crew.line)}
-  <ul class="crew" role="list">
+  <ul class="crew reveal" role="list">
   ${bros}
   </ul>
   ${cta}
@@ -236,7 +234,7 @@ function contactSection(c) {
   const gh = ext(c.code.href).replace('rel="noopener"', 'rel="me noopener"');
   return `<section class="sec sec--contact" id="contact" aria-labelledby="contact-title">
   ${sectionHead('contact', c.title, c.line, 'contact')}
-  <div class="contact">
+  <div class="contact glass reveal">
     <p class="contact__status"><span>[ OK ]</span> connection ready</p>
     <a class="btn btn--primary contact__dm" ${rel}>${icon('x')}<span>${esc(c.dm.label)}</span>${newTab}</a>
     <span class="contact__handle">${esc(c.dm.handle)}</span>
@@ -251,7 +249,7 @@ export function renderContent({ groups, projects, crew, contact }) {
     const items = projects.filter((p) => p.group === g.id);
     const body =
       g.id === 'games'
-        ? gameShelf(items)
+        ? `<ul class="games games--feature" role="list">${items.map(gameCard).join('\n')}</ul>`
         : `<ul class="games games--grid" role="list">${items.map(siteCard).join('\n')}</ul>`;
     out.push(`<section class="sec sec--${esc(g.id)}" id="${esc(g.id)}" aria-labelledby="${esc(g.id)}-title">
   ${sectionHead(g.id, g.title, g.line)}
