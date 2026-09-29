@@ -57,10 +57,10 @@ export const projects = [
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
     image: {
-      src: '/img/radrun.jpg',
+      src: '/img/radrun2.jpg',
       width: 1200,
       height: 630,
-      alt: 'RadRun: Radbro #4764 swings on a web line from a skyscraper at sunset, chasing #652 and the bag across the rooftops, with George the cat.',
+      alt: 'RadRun: Radbro #4764 glides in a wingsuit over a neon city at sunset, chasing #652 and the bag across the rooftops.',
     },
     credit: {
       before: 'Built on',
