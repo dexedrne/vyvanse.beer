@@ -1116,11 +1116,6 @@ a.cmd-hint:hover {
 }
 
 .game--shelf .game__blurb {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-  overflow: hidden;
   font-size: 0.9375rem;
 }
 
@@ -2413,15 +2408,16 @@ a.cmd-hint:hover {
 
 /* ---------- the top-left strip: UTC clock + BTC / ETH / SOL / XRP (src/ticker.js) ---------- */
 
-/* A strip at the top of the page column that wraps onto a second line rather than run off the edge. */
+/* A single scrollable strip in the page column when there is no room for the corner stack. */
 .ticker {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px 14px;
+  gap: 14px;
   width: max-content;
   max-width: 100%;
   margin: 10px 0 0;
   padding: 6px 12px 5px;
+  overflow-x: auto;
+  scrollbar-width: thin;
   border: 1px solid var(--line-2);
   border-radius: 9px;
   background: rgb(12 8 22 / 0.82);
@@ -2433,6 +2429,7 @@ a.cmd-hint:hover {
 
 .ticker__item {
   display: flex;
+  flex: none;
   align-items: baseline;
   gap: 1ch;
 }
@@ -2483,7 +2480,7 @@ a.cmd-hint:hover {
 
 @media (max-width: 599.98px) {
   .ticker {
-    gap: 4px 12px;
+    gap: 12px;
     font-size: 1.125rem;
   }
 

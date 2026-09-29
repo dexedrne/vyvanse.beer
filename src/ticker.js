@@ -83,6 +83,9 @@ export function createTicker() {
       if (Number.isFinite(p.ch)) {
         ch.textContent = ` ${p.ch >= 0 ? '▲' : '▼'}${Math.abs(p.ch).toFixed(1)}%`;
         ch.className = `ticker__ch ${p.ch >= 0 ? 'is-up' : 'is-down'}`;
+      } else {
+        ch.textContent = '';
+        ch.className = 'ticker__ch';
       }
     });
     timer = setTimeout(refresh, EVERY);
