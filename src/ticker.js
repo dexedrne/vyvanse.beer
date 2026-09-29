@@ -1,4 +1,4 @@
-// The strip in the top-left corner: the UTC clock and live BTC / ETH / SOL. Prices come from
+// The strip in the top-left corner: the UTC clock and live BTC / ETH / SOL / XRP. Prices come from
 // CoinGecko's public price API (Coinbase's spot prices if that fails), once a minute while the tab
 // is visible; the last good prices stay up when a fetch fails. JS only: without it there is no strip.
 
@@ -6,6 +6,7 @@ const COINS = [
   { id: 'bitcoin', sym: 'BTC' },
   { id: 'ethereum', sym: 'ETH' },
   { id: 'solana', sym: 'SOL' },
+  { id: 'ripple', sym: 'XRP' },
 ];
 const GECKO = `https://api.coingecko.com/api/v3/simple/price?ids=${COINS.map((c) => c.id).join(',')}&vs_currencies=usd&include_24hr_change=true`;
 const EVERY = 60_000;
@@ -54,7 +55,8 @@ export function createTicker() {
       (c) =>
         `<span class="ticker__item" data-sym="${c.sym}"><span class="ticker__k">${c.sym}</span> <span class="ticker__px">…</span><span class="ticker__ch"></span></span>`,
     ).join('');
-  document.body.prepend(el);
+  // in the page column, so the strip never sits over Radbro OS when it's docked beside the page
+  (document.querySelector('.page') || document.body).prepend(el);
 
   const clock = el.querySelector('.ticker__clock');
   const tick = () => {

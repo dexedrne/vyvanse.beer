@@ -111,11 +111,14 @@ function winButton(p, cls) {
   return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="Open ${esc(p.name)} in a window on this page" title="Open in a window on this page">${icon('max')}<span>In a window</span></button>`;
 }
 
-function gameRow(p, i) {
+// Games sit on a shelf that scrolls sideways, one cover card each, in the order of
+// src/projects.js. Without JS it's a plain sideways scroller (swipe, shift+wheel, the
+// scrollbar); src/shelf.js adds the arrows, the meter and dragging with a mouse.
+function gameCard(p, i) {
   const [main, ...rest] = p.links;
   const shot = p.image
     ? `<div class="game__shot">${img(p.image, { eager: i === 0 })}</div>`
-    : '';
+    : `<div class="game__shot game__shot--none" aria-hidden="true"><span>${esc(shortUrl(p.url))}</span></div>`;
   const more = rest
     .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
     .join('');
@@ -123,21 +126,35 @@ function gameRow(p, i) {
     ? `<p class="game__note">${esc(p.credit.before)} <a ${ext(p.credit.href)}>${esc(p.credit.label)}</a> ${esc(p.credit.after)}</p>`
     : '';
   const note = p.note ? `<p class="game__note">${esc(p.note)}</p>` : '';
-  return `<article class="game" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
+  return `<li class="game game--shelf" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
   ${shot}
   <div class="game__text">
-    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
+    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe<span class="game__slot" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span></p>
     <h3 class="game__name">${esc(p.name)}</h3>
     <p class="game__kind">${esc(p.kind)}</p>
     <p class="game__blurb">${esc(p.blurb)}</p>
+    ${credit}${note}
     <div class="game__actions">
       <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
       ${more}${winButton(p, 'game__more game__win js-only')}
-      <code class="cmd-hint js-only" aria-hidden="true">open ${esc(p.cmd)}</code>
     </div>
-    ${credit}${note}
   </div>
-</article>`;
+</li>`;
+}
+
+function gameShelf(items) {
+  const btn = (step, dir) =>
+    `<button class="shelf__btn" type="button" data-step="${step}" aria-controls="games-shelf" aria-label="Scroll the games ${dir}">${icon(dir)}</button>`;
+  return `<div class="shelf" data-shelf data-start>
+  <div class="shelf__bar js-only">
+    <p class="shelf__count">[ ${items.length} games ]</p>
+    <span class="shelf__meter" aria-hidden="true"><span class="shelf__thumb"></span></span>
+    ${btn(-1, 'left')}${btn(1, 'right')}
+  </div>
+  <ul class="shelf__track" id="games-shelf" role="list" aria-label="Games">
+  ${items.map(gameCard).join('\n')}
+  </ul>
+</div>`;
 }
 
 // Sites get a picture card: screenshot on top, then name, host, kind and links. Same parts
@@ -234,7 +251,7 @@ export function renderContent({ groups, projects, crew, contact }) {
     const items = projects.filter((p) => p.group === g.id);
     const body =
       g.id === 'games'
-        ? `<div class="games">${items.map(gameRow).join('\n')}</div>`
+        ? gameShelf(items)
         : `<ul class="games games--grid" role="list">${items.map(siteCard).join('\n')}</ul>`;
     out.push(`<section class="sec sec--${esc(g.id)}" id="${esc(g.id)}" aria-labelledby="${esc(g.id)}-title">
   ${sectionHead(g.id, g.title, g.line)}

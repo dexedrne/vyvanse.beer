@@ -760,7 +760,7 @@ a.cmd-hint:hover {
   color: var(--muted);
 }
 
-/* ---------- games ---------- */
+/* ---------- games (and the sites' grid, below) ---------- */
 
 .games {
   display: grid;
@@ -943,6 +943,195 @@ a.cmd-hint:hover {
   .game .cmd-hint {
     display: none;
   }
+}
+
+/* ---------- the games shelf: cover cards in a row that scrolls sideways (src/shelf.js) ---------- */
+
+.shelf__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.shelf__count {
+  margin: 0;
+  color: var(--lilac);
+  font: 400 1.25rem/1 var(--pixel);
+  white-space: nowrap;
+}
+
+/* where along the shelf you are: a thumb on a dotted rail */
+.shelf__meter {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(90deg, var(--line-2) 0 4px, transparent 4px 7px);
+}
+
+.shelf__thumb {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 1px;
+  background: var(--lilac);
+  box-shadow: 0 0 10px rgb(198 179 247 / 0.45);
+}
+
+.shelf[data-fits] .shelf__meter,
+.shelf[data-fits] .shelf__btn {
+  visibility: hidden;
+}
+
+.shelf__btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--lilac);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    color 0.15s,
+    opacity 0.15s;
+}
+
+.shelf__btn .i {
+  width: 18px;
+  height: 18px;
+}
+
+.shelf__btn:hover {
+  border-color: var(--lilac);
+  background: var(--surface);
+  color: var(--lilac-hi);
+}
+
+.shelf__btn[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.shelf__btn[aria-disabled='true']:hover {
+  border-color: var(--line-2);
+  background: var(--ink);
+  color: var(--lilac);
+}
+
+.shelf__track {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  /* room for the cards' hover glow and focus rings, which the scroller would clip */
+  padding: 4px 2px 22px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-2) transparent;
+}
+
+/* With JS the meter and arrows stand in for the scrollbar, and the edges fade where there's more. */
+.js .shelf__track {
+  --fade-l: 0px;
+  --fade-r: 48px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
+}
+
+.js .shelf__track::-webkit-scrollbar {
+  display: none;
+}
+
+.js .shelf:not([data-start]) .shelf__track {
+  --fade-l: 36px;
+}
+
+.js .shelf[data-end] .shelf__track {
+  --fade-r: 0px;
+}
+
+.shelf.is-dragging .shelf__track {
+  scroll-snap-type: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.shelf.is-dragging,
+.shelf.is-dragging * {
+  cursor: grabbing !important;
+}
+
+.game--shelf {
+  flex: 0 0 clamp(248px, 44cqi, 330px);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 14px;
+  scroll-snap-align: start;
+}
+
+.game--shelf .game__shot {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.game--shelf .game__shot img {
+  transition: scale 0.35s var(--ease);
+  -webkit-user-drag: none;
+}
+
+.game--shelf:hover .game__shot img {
+  scale: 1.035;
+}
+
+/* its slot on the shelf, at the end of the status line */
+.game__status .game__slot {
+  float: right;
+  color: var(--faint);
+  text-shadow: none;
+}
+
+.game--shelf .game__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.game--shelf .game__name {
+  font-size: 1.25rem;
+}
+
+.game--shelf .game__kind {
+  margin: 4px 0 8px;
+}
+
+.game--shelf .game__blurb {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+  font-size: 0.9375rem;
+}
+
+.game--shelf .game__actions {
+  margin-top: auto;
+  gap: 10px 14px;
+}
+
+.game--shelf .game__note {
+  margin: 0 0 14px;
+  font-size: 0.8125rem;
 }
 
 /* ---------- sites: the same parts as a game, as picture cards two to a row ---------- */
@@ -2222,23 +2411,22 @@ a.cmd-hint:hover {
 .bro__dl-size { opacity: 0.7; }
 .bro__dl--all { margin-left: 1rem; }
 
-/* ---------- the top-left strip: UTC clock + BTC / ETH / SOL (src/ticker.js) ---------- */
+/* ---------- the top-left strip: UTC clock + BTC / ETH / SOL / XRP (src/ticker.js) ---------- */
 
+/* A strip at the top of the page column that wraps onto a second line rather than run off the edge. */
 .ticker {
-  position: absolute;
-  z-index: 5;
-  top: 12px;
-  left: 14px;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 4px;
-  padding: 8px 12px 7px;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  width: max-content;
+  max-width: 100%;
+  margin: 10px 0 0;
+  padding: 6px 12px 5px;
   border: 1px solid var(--line-2);
-  border-radius: 8px;
+  border-radius: 9px;
   background: rgb(12 8 22 / 0.82);
   color: var(--faint);
-  font: 400 1.125rem/1 var(--pixel);
+  font: 400 1.25rem/1 var(--pixel);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -2275,25 +2463,28 @@ a.cmd-hint:hover {
   color: var(--rose);
 }
 
-/* narrower screens: the hero would sit under the stack, so it becomes one line at the top of the page */
-@media (max-width: 1179.98px) {
-  .ticker {
-    position: static;
-    flex-direction: row;
-    width: max-content;
-    max-width: calc(100% - 32px);
-    margin: 10px 16px 0;
-    padding: 5px 11px 4px;
-    overflow-x: auto;
-    gap: 12px;
-    scrollbar-width: none;
+/* Wide screens with Radbro OS closed: a stack in the top-left corner, clear of the hero. Below
+   1260px (or with the terminal docked) the hero's prompt line would sit under it. */
+@media (min-width: 1260px) {
+  :root:not(.term-open) .ticker {
+    position: absolute;
+    z-index: 5;
+    top: 12px;
+    left: 14px;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 5px;
+    margin: 0;
+    padding: 10px 14px 9px;
+    font-size: 1.3125rem;
   }
 }
 
 @media (max-width: 599.98px) {
   .ticker {
-    gap: 10px;
-    font-size: 1rem;
+    gap: 4px 12px;
+    font-size: 1.125rem;
   }
 
   .ticker__ch {
