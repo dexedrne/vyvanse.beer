@@ -199,7 +199,7 @@ vec4 stream(vec2 p) {
   float across = (p.x - x) / sqrt(1. + slope * slope) / hw;
   float ax = abs(across);
   float m = 1. - smoothstep(0.55, 1., ax);
-  m *= smoothstep(uPath[0].y - 40., uPath[0].y + 200., p.y);
+  m *= smoothstep(uPath[0].y - 60., uPath[0].y + 420., p.y);
   if (m <= 0.002) return vec4(0.);
   float sl = p.y * 0.0026 - uFlow * 0.55;
   float silk = fbm(vec2(across * 2.6 + 3., sl));
@@ -294,7 +294,8 @@ void main() {
   float r = rain(sp, 13., 2.3, 290., 0.26, 1.) * 0.5 + rain(sp, 31., 3.1, 430., 0.2, 7.);
   vec2 sc = uSignRect.xy + uSignRect.zw * 0.5;
   vec2 sd = (p - sc) / (uSignRect.zw * vec2(0.8, 2.4));
-  float lit = 1. + 2.4 * exp(-dot(sd, sd)) * uSignOn;
+  // rain catches the neon above the waterline only: below it, text sits on the water
+  float lit = 1. + 2.4 * exp(-dot(sd, sd)) * uSignOn * step(p.y, uWater);
   col += mix(LILAC, vec3(1.), 0.4) * r * uRain * 0.07 * lit;
   vec2 v = sp / uView - 0.5;
   col *= 1. - 0.5 * dot(v, v);
@@ -628,7 +629,7 @@ export function createWater() {
         const [x, y] = trail[i];
         const d = Math.hypot(x - px, y - py);
         if (d < 7) continue;
-        drop(x, y, 1.7, Math.min(0.75, 0.16 + d * 0.012));
+        drop(x, y, 2.1, Math.min(0.9, 0.2 + d * 0.014));
         px = x;
         py = y;
       }
