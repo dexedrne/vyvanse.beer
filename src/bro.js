@@ -13,6 +13,17 @@ const WAVE = 'Big_Wave_Hello';
 const WAVE_EVERY = [8000, 12000]; // ms between waves he does on his own
 const HINT_KEY = 'vyv-bro-hint';
 
+function hasWebGL() {
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
+
 export function createBro(mv) {
   const noop = { spin: () => 'missing', el: null };
   if (!mv || mv.localName !== 'model-viewer') return noop;
@@ -45,6 +56,11 @@ export function createBro(mv) {
   io.observe(mv);
 
   async function load() {
+    // Without WebGL the viewer would still load the model and hide the poster, then draw nothing.
+    if (!hasWebGL()) {
+      failed = true;
+      return;
+    }
     // The Draco decoder is self-hosted in public/draco; model-viewer would otherwise fetch it
     // from a Google CDN. This has to be set before the element upgrades.
     self.ModelViewerElement = { ...(self.ModelViewerElement || {}), dracoDecoderLocation: '/draco/' };
