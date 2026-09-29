@@ -205,25 +205,17 @@ createTicker();
 createReveal();
 createSheen();
 
-// The rainy night behind the page (src/water.js): its own small chunk, loaded once the page has
-// painted and the neon sign has flickered on. No WebGL2, Save-Data, or a failure: the CSS night
-// stays (.water-off).
+// The rainy night behind the page (src/water.js): its own small chunk, fetched straight away and
+// started right after the first paint. Until it has drawn, the CSS reflections stand in, and it
+// fades in over them. No WebGL2, Save-Data, or a failure: the CSS night stays (.water-off).
 (() => {
   const off = () => root.classList.add('water-off');
   if (navigator.connection?.saveData) return off();
-  const start = () =>
-    import('./water.js')
-      .then((m) => m.createWater() || off())
-      .catch(off);
-  const lit = new Promise((resolve) => {
-    const tld = document.querySelector('.hero__title .hero__tld');
-    if (!tld || media.reduced.matches || !tld.getAnimations?.().length) return resolve();
-    tld.addEventListener('animationend', resolve, { once: true });
-    setTimeout(resolve, 2400);
-  });
-  const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1200 }) : setTimeout(f, 60));
-  const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise((r) => addEventListener('load', r, { once: true }));
-  Promise.all([lit, loaded]).then(() => idle(start));
+  const mod = import('./water.js');
+  const painted = new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  Promise.all([mod, painted])
+    .then(([m]) => m.createWater() || off())
+    .catch(off);
 })();
 
 const wm = createWindows({

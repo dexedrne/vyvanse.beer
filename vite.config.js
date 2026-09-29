@@ -14,8 +14,19 @@ const landing = {
   },
 };
 
+// model-viewer 4.3.1 ships debug console.log calls ("[$updateSource] called!" and friends). Its
+// logs are silenced in the bundle; warnings and errors still come through.
+const quietViewer = {
+  name: 'quiet-model-viewer',
+  apply: 'build',
+  transform(code, id) {
+    if (!/[\\/]@google[\\/]model-viewer[\\/]lib[\\/]/.test(id) || !code.includes('console.log(')) return null;
+    return { code: code.replaceAll('console.log(', '(() => {})('), map: null };
+  },
+};
+
 export default defineConfig({
-  plugins: [landing],
+  plugins: [landing, quietViewer],
   build: {
     outDir: 'dist',
     assetsInlineLimit: 0,

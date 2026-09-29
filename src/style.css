@@ -201,7 +201,7 @@ html:not(.js) .js-only {
   height: 100lvh;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.8s var(--ease);
+  transition: opacity 0.9s var(--ease);
 }
 
 .water.is-on {
@@ -375,7 +375,7 @@ a.cmd-hint:hover {
   flex-direction: column;
   justify-content: center;
   min-height: min(100svh, 960px);
-  padding-block: clamp(24px, 5vh, 64px) clamp(72px, 14vh, 160px);
+  padding-block: clamp(24px, 5vh, 64px) clamp(40px, 7vh, 88px);
   container-type: inline-size;
 }
 
@@ -467,13 +467,15 @@ a.cmd-hint:hover {
     0 0 0.6em rgb(233 170 90 / 0.5);
 }
 
-/* The CSS reflection, for no JS and no WebGL: the sign flipped on its baseline, fading down. */
+/* The CSS reflection: the sign flipped on its baseline, fading down. It shows until the water
+   (src/water.js) has drawn its own, then fades out as the water fades in, and stays for good
+   without JS or WebGL. */
 .hero__mirror {
   position: relative;
   z-index: 0;
-  display: none;
   color: #f7f3ff;
   opacity: 0.5;
+  transition: opacity 0.9s var(--ease);
   filter: blur(1.2px);
   transform: scaleY(-1);
   transform-origin: 50% 0.86em;
@@ -483,18 +485,19 @@ a.cmd-hint:hover {
   mask-image: linear-gradient(to top, transparent 0.14em, rgb(0 0 0 / 0.75) 0.15em, transparent 0.95em);
 }
 
-html:not(.js) .hero__mirror,
-.water-off .hero__mirror {
-  display: block;
+.water-lit .hero__mirror {
+  opacity: 0;
 }
 
-/* the sign powers up: the name first, then .beer */
+/* the sign powers up: the name first, then .beer (and its CSS reflection with it) */
 @media (prefers-reduced-motion: no-preference) {
-  .hero__title .hero__host {
+  .hero__title .hero__host,
+  .hero__mirror .hero__host {
     animation: tube 1.2s steps(1, end) 0.15s both;
   }
 
-  .hero__title .hero__tld {
+  .hero__title .hero__tld,
+  .hero__mirror .hero__tld {
     animation: tube 1.2s steps(1, end) 0.8s both;
   }
 
@@ -554,14 +557,44 @@ html:not(.js) .hero__mirror,
   object-fit: contain;
 }
 
-/* his reflection without the WebGL water: of the render (its feet are 1.5% off its bottom
-   edge, before the scale), or of the viewer's box (his feet are 12.5% off its bottom edge) */
-html:not(.js) .hero__bro img {
-  -webkit-box-reflect: below calc(var(--bro-h) * -0.03) linear-gradient(transparent 62%, rgb(0 0 0 / 0.3));
+/* His CSS reflection, like the sign's: a copy of the render in the same box, flipped on his feet
+   (1.5% off the render's bottom edge, before the scale), fading down. On phones he stands up on
+   the sign (--lift), so his reflection sits that much further below the waterline. */
+.hero__bro-mirror {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  translate: 0 calc(var(--lift, 0px) * 2);
+  transition: opacity 0.9s var(--ease);
 }
 
-.water-off .hero__bro .bro3d {
-  -webkit-box-reflect: below calc(var(--bro-h) * -0.25) linear-gradient(transparent 62%, rgb(0 0 0 / 0.3));
+.hero__bro .hero__bro-mirror img {
+  position: static;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.55;
+  filter: blur(0.8px);
+  transform-origin: 50% 98.5%;
+  transform: translateY(-11%) scale(0.652, -0.652);
+  -webkit-mask-image: linear-gradient(to top, #000 1.5%, rgb(0 0 0 / 0.5) 18%, transparent 52%);
+  mask-image: linear-gradient(to top, #000 1.5%, rgb(0 0 0 / 0.5) 18%, transparent 52%);
+}
+
+.water-lit .hero__bro-mirror {
+  opacity: 0;
+}
+
+/* Without the water but with him live in 3D, the browser mirrors the live view where it can
+   (his feet are 12.5% off the viewer's bottom edge), so the reflection turns with him. */
+@supports (-webkit-box-reflect: below 0) {
+  .water-off .is-live .bro3d {
+    -webkit-box-reflect: below calc(var(--bro-h) * -0.25) linear-gradient(transparent 50%, rgb(0 0 0 / 0.42));
+  }
+
+  .water-off .is-live .hero__bro-mirror {
+    display: none;
+  }
 }
 
 .is-live .bro3d {
@@ -570,12 +603,6 @@ html:not(.js) .hero__bro img {
 
 .is-live .bro3d:active {
   cursor: grabbing;
-}
-
-.bro3d:focus-visible {
-  outline: 2px solid var(--lilac);
-  outline-offset: 4px;
-  border-radius: 12px;
 }
 
 .bro3d__hint {
@@ -656,7 +683,8 @@ html:not(.js) .hero__bro img {
 .hero__intro {
   grid-area: intro;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, auto) auto;
+  justify-content: start;
   grid-template-areas:
     'tag  links'
     'hint hint';
@@ -666,8 +694,9 @@ html:not(.js) .hero__bro img {
 
 .hero__tag {
   grid-area: tag;
-  max-width: 28ch;
+  max-width: 24ch;
   margin: 0;
+  text-wrap: balance;
   color: var(--text);
   font-size: clamp(1.125rem, 0.9rem + 0.9cqi, 1.5rem);
   line-height: 1.35;
@@ -843,7 +872,8 @@ html:not(.js) .hero__bro img {
   }
 }
 
-/* Tablets: the line, links and boot log stack under the sign. */
+/* Tablets: the line, links and boot log stack under the sign, and the boot log takes the whole
+   row (it sits below #4764's reflection). */
 @container (max-width: 919.98px) {
   .hero__intro {
     grid-template-columns: minmax(0, 1fr);
@@ -853,6 +883,12 @@ html:not(.js) .hero__bro img {
       'hint';
     gap: 18px;
   }
+
+  .hero__deck {
+    grid-template-areas:
+      'intro .'
+      'boot  boot';
+  }
 }
 
 /* Phones: the sign across the top, #4764 standing behind its right end, feet in the same water. */
@@ -860,15 +896,17 @@ html:not(.js) .hero__bro img {
   .hero {
     justify-content: flex-start;
     min-height: 0;
-    padding-block: 26px 88px;
+    padding-block: 26px 52px;
   }
 }
 
 @container (max-width: 639.98px) {
+  /* #4764 stands up on the sign's letters (Tilt Neon's x-height is 0.53em), clear of them */
   .hero__stage,
   .hero__deck {
     --title: min(15.6cqi, 5.25rem);
     --bro-h: clamp(250px, 80cqi, 400px);
+    --lift: calc(var(--title) * 0.56);
   }
 
   .hero__stage {
@@ -880,7 +918,7 @@ html:not(.js) .hero__bro img {
   }
 
   .hero__prompt {
-    margin-bottom: 8px;
+    margin-bottom: calc(22px + var(--lift));
     font-size: 1.1875rem;
   }
 
@@ -892,12 +930,23 @@ html:not(.js) .hero__bro img {
     grid-area: title;
     justify-self: end;
     z-index: 0;
+    translate: 0 calc(var(--lift) * -1);
   }
 
   .hero__bubble {
     top: 22%;
     left: -4%;
     font-size: 1.375rem;
+  }
+
+  /* no room for it here: a drag spins him all the same */
+  .bro3d__hint {
+    display: none;
+  }
+
+  /* his focus ring (drawn inside the viewer, src/bro.js) stops at his feet, above the sign */
+  .bro3d {
+    --bro-ring: 21% 12% 11.5%;
   }
 
   .hero__deck {
@@ -943,8 +992,9 @@ html:not(.js) .hero__bro img {
 /* ---------- sections, strung along the stream ---------- */
 
 .sec {
+  --sec-pad: clamp(72px, 12vh, 136px);
   position: relative;
-  padding-top: clamp(96px, 16vh, 184px);
+  padding-top: var(--sec-pad);
   scroll-margin-top: 8px;
 }
 
@@ -957,12 +1007,13 @@ html:not(.js) .hero__bro img {
   margin: 0 0 clamp(26px, 4vh, 44px);
 }
 
-/* Where the stream runs through: a drop of light beside the prompt. As the section surfaces a
-   ring spreads out from it, and the water gets a real drop in the same place. */
+/* Where the stream runs through: a drop of light in the middle of the margin beside the prompt,
+   or, where the margin is narrow, out in the open water above the head. As the section surfaces
+   a ring spreads out from it, and the water gets a real drop in the same place. */
 .sec__drop {
   position: absolute;
   top: 11px;
-  left: -44px;
+  left: max(-44px, calc(var(--gutter) * -0.5));
   width: 12px;
   height: 12px;
   margin: -6px 0 0 -6px;
@@ -1033,13 +1084,19 @@ html:not(.js) .hero__bro img {
   text-shadow: 0 1px 10px rgb(6 3 14 / 0.9);
 }
 
+@media (max-width: 1299.98px) {
+  .sec__drop {
+    top: calc(var(--sec-pad) * -0.48);
+    left: 30%;
+  }
+}
+
 @container (max-width: 639.98px) {
   .sec__drop {
-    left: -9px;
-    width: 9px;
-    height: 9px;
-    margin: -4.5px 0 0 -4.5px;
-    box-shadow: 0 0 14px 3px rgb(142 109 224 / 0.5);
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    box-shadow: 0 0 16px 4px rgb(142 109 224 / 0.5);
   }
 }
 
@@ -1260,17 +1317,22 @@ html:not(.js) .hero__bro img {
   }
 }
 
-/* ---------- sites: picture cards, three to a row ---------- */
+/* ---------- sites: picture cards, three to a row, a short last row centred ---------- */
 
 .games--grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(14px, 2.2cqi, 24px);
+  --g: clamp(14px, 2.2cqi, 24px);
+  --per: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--g);
 }
 
 .game--card {
   display: flex;
+  flex: 0 0 calc((100% - (var(--per) - 1) * var(--g)) / var(--per));
   flex-direction: column;
+  min-width: 0;
   padding: 10px;
   border-radius: 18px;
 }
@@ -1338,13 +1400,13 @@ html:not(.js) .hero__bro img {
 
 @container (max-width: 899.98px) {
   .games--grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    --per: 2;
   }
 }
 
 @container (max-width: 559.98px) {
   .games--grid {
-    grid-template-columns: minmax(0, 1fr);
+    --per: 1;
   }
 }
 
@@ -1390,7 +1452,7 @@ html:not(.js) .hero__bro img {
   display: block;
 }
 
-/* the little puddle under his feet */
+/* the little puddle under his feet (the CSS night's) */
 .bro__stage::after {
   content: '';
   position: absolute;
@@ -1418,9 +1480,18 @@ html:not(.js) .hero__bro img {
   }
 
   .bro__stage img {
-    -webkit-box-reflect: below calc(var(--bh) * -0.028) linear-gradient(transparent 60%, rgb(0 0 0 / 0.34));
+    -webkit-box-reflect: below calc(var(--bh) * -0.028) linear-gradient(transparent 44%, rgb(0 0 0 / 0.5));
     filter: none;
   }
+}
+
+/* the water mirrors them itself (src/water.js) */
+.crew-wet .bro__stage img {
+  -webkit-box-reflect: none;
+}
+
+.crew-wet .bro__stage::after {
+  opacity: 0;
 }
 
 .bro__link:hover .bro__stage img {
@@ -1580,7 +1651,7 @@ html:not(.js) .hero__bro img {
 /* ---------- footer ---------- */
 
 .foot {
-  margin-top: clamp(80px, 14vh, 140px);
+  margin-top: clamp(56px, 9vh, 96px);
   padding: 0 0 48px;
   color: var(--muted);
   font-size: 0.9375rem;

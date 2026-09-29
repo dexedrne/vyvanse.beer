@@ -36,8 +36,9 @@ export function renderHero(site, mascot) {
     )
     .join('');
   // The stage is the neon sign and #4764, both standing on the waterline (its bottom edge).
-  // Below it the puddle: src/water.js draws their rippling reflection there. Without WebGL (or
-  // JS) .hero__mirror is a plain CSS reflection of the sign instead.
+  // Below it the puddle: src/water.js draws their rippling reflection there. Until it does, and
+  // without WebGL (or JS), .hero__mirror and .hero__bro-mirror are a plain CSS reflection of the
+  // sign and of his render instead.
   return `<header class="hero">
   <div class="hero__stage">
     <p class="hero__prompt" aria-hidden="true"><span class="hero__ps1">${esc(site.handle)}@vyvanse:~$</span> <span class="hero__cmd">./hello</span><span class="hero__cursor"></span></p>
@@ -46,6 +47,7 @@ export function renderHero(site, mascot) {
     <figure class="hero__bro">
       <span class="hero__bubble" aria-hidden="true">gm</span>
       ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
+      <span class="hero__bro-mirror" aria-hidden="true"><img src="${esc(mascot.src)}" width="${mascot.width}" height="${mascot.height}" alt="" decoding="async"></span>
     </figure>
   </div>
   <div class="hero__deck">
@@ -120,7 +122,7 @@ const BRO_CAMERA = {
 // in an in-page window instead (`win <cmd>`). JS only, like the windows themselves.
 function winButton(p, cls) {
   if (!p.frame) return '';
-  return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="Open ${esc(p.name)} in a window on this page" title="Open in a window on this page">${icon('max')}<span>In a window</span></button>`;
+  return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="Open ${esc(p.name)} in a window on this page" title="Open in a window on this page">${icon('win')}<span>In a window</span></button>`;
 }
 
 // Games are big panes stacked down the page, one per game in the order of src/projects.js:

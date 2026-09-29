@@ -66,9 +66,22 @@ export function createBro(mv) {
     self.ModelViewerElement = { ...(self.ModelViewerElement || {}), dracoDecoderLocation: '/draco/' };
     try {
       await import('@google/model-viewer');
+      ring();
     } catch {
       failed = true;
     }
+  }
+
+  // Keyboard focus lands inside the viewer's shadow DOM, where the page's styles don't reach:
+  // give it a lilac ring around him (not the whole box, whose top is room for the katana).
+  function ring() {
+    const sr = mv.shadowRoot;
+    if (!sr || sr.querySelector('style[data-ring]')) return;
+    const s = document.createElement('style');
+    s.dataset.ring = '';
+    s.textContent = `.userInput:focus { outline: none; }
+.userInput:focus-visible::after { content: ''; position: absolute; inset: var(--bro-ring, 21% 12% 9%); border: 2px solid var(--lilac, #c6b3f7); border-radius: 18px; pointer-events: none; }`;
+    sr.append(s);
   }
 
   mv.addEventListener('error', () => {
@@ -77,6 +90,7 @@ export function createBro(mv) {
 
   mv.addEventListener('load', async () => {
     loaded = true;
+    ring();
     figure.classList.add('is-live');
     if (!mv.availableAnimations.includes(IDLE)) return;
     await settle();

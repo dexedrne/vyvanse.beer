@@ -3,11 +3,12 @@
 //
 // createReveal: section heads, game panes, site cards, the crew and contact surface as they
 // scroll into view (they rise out of a blur, like something coming up through water). As a
-// section head surfaces, a drop lands in the stream at its marker (src/water.js listens).
+// section head surfaces, a drop lands in the stream at its marker (src/water.js listens, and
+// takes the position in document px).
 //
 // createSheen: glass panes catch a soft highlight that follows the pointer.
 
-import { media } from './dom.js';
+import { media, docBox } from './dom.js';
 
 export function createReveal() {
   const els = document.querySelectorAll('.reveal');
@@ -23,8 +24,11 @@ export function createReveal() {
         el.classList.add('is-in');
         const drop = el.querySelector(':scope > .sec__drop');
         if (drop && !media.reduced.matches) {
-          const r = drop.getBoundingClientRect();
-          dispatchEvent(new CustomEvent('water:drop', { detail: { x: r.left + r.width / 2, y: r.top + r.height / 2, size: 1 } }));
+          // where the marker will be once the head has risen into place, in document px; the
+          // drop lands as the CSS ring starts
+          const b = docBox(drop);
+          const detail = { x: b.x + b.w / 2, y: b.y + b.h / 2, size: 1 };
+          setTimeout(() => dispatchEvent(new CustomEvent('water:drop', { detail })), 150);
         }
       }
     },
