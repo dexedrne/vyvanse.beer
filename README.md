@@ -23,16 +23,16 @@ npm run build    # -> dist/
 The landing is rendered into `index.html` at build time, so every project and link is in the
 HTML without JS. The terminal and windows (`src/main.js`, about 17 KB gzipped) are layered on top.
 The 3D viewer for the hero is a separate chunk (about 290 KB gzipped) that only loads once the
-hero is on screen, and the rainy night behind the page (`src/water.js`, about 8 KB gzipped) is
-another, loaded once the page has painted.
+hero is on screen, and the rainy night behind the page (`src/water.js`, about 13 KB gzipped) is
+another, fetched straight away and started right after the first paint.
 
 ## Add a project
 
 Add an entry to `projects` in [`src/projects.js`](src/projects.js). The fields are documented
 at the top of that file. `group: 'games'` gets a big pane with its screenshot on one side (the
 side swaps from one game to the next, and phones put it on top), `group: 'sites'` gets a picture
-card in a three-column grid (two on tablets, one on phones). The `cmd` name is what the
-terminal takes (`open <cmd>`, `info <cmd>`), and it tab-completes automatically.
+card, three to a row (two on tablets, one on phones), with a short last row centred. The `cmd`
+name is what the terminal takes (`open <cmd>`, `info <cmd>`), and it tab-completes automatically.
 
 Set `frame: true` only if the site allows being shown in an iframe:
 
@@ -75,25 +75,36 @@ one setting that sticks between visits.
 ## Look
 
 A rainy night in midnight purple. The neon sign (`vyvanse.beer`, the `.beer` in amber) and #4764
-stand on the waterline of a puddle that mirrors them, and a stream of light runs on down the page
-through a drop beside each section's heading. The sections surface as they scroll in, and the
-panes on the water are dark glass.
+stand on the waterline of a puddle that mirrors them (on phones he stands up on the sign's
+letters), and a stream runs on down the page. It passes a drop at each section's heading, widens
+into pools with rings from the drips, and swings out behind the glass panes. The crew stand at a
+second waterline, mirrored in their own strip of water. The sections surface as they scroll in,
+and the panes on the water are dark glass.
 
 The water is [`src/water.js`](src/water.js): one WebGL2 canvas fixed behind the page, drawn by a
 single fragment shader over a small ripple simulation.
 
-- The sign's reflection is drawn from the real `<h1>` (same font, same place), and #4764's copies
+- The sign's reflection is drawn from the real `<h1>` and flickers on with it, and #4764's copies
   his live 3D canvas every frame while the hero is on screen (his render before that).
-- Rain lands in the puddle and the stream, the pointer (or a finger) leaves a trail of ripples,
-  each section heading drops a ripple into the stream as it scrolls in, and scrolling speeds the
-  stream up. The ripples move with the page.
-- The stream stays in the margin past the headings and only swings out behind glass, so it never
-  runs under plain text. The water stays dark enough under text for every pair to meet WCAG AA.
-- It loads after the page has painted, stops while the tab is hidden, and draws fewer pixels if
-  frames run long. With reduced motion it draws still frames only: no rain, ripples or flow. The
+- The stream is night water seen from above: wavelets riding the current catch the light as
+  glints and mirror a hazy sky in moving bands, flecks of foam drift down, and the neon of the
+  section titles and of each game's and site's art shows in it, broken up by the waves.
+- Rain lands everywhere below the waterline (now and then a heavy drop that splashes), the pools
+  get drips, the pointer (or a finger) leaves a wake, each section heading drops a ripple into
+  its pool as it scrolls in, and scrolling speeds the stream up. The ripples move with the page
+  and step at a fixed 60 Hz on any display.
+- On wide screens the drops sit in the margin and the stream runs down it past the headings. On
+  narrower ones the drops sit in the open water above each heading, and the stream dips under
+  it. Under text the water is held dark enough for every pair to meet WCAG AA, and a little less
+  so under the glass.
+- It starts right after the first paint (the CSS reflections stand in until it has drawn, then
+  fade out as it fades in), draws at most 60 frames a second (30 once nothing has moved for a few
+  seconds), and stops while the tab is hidden. If frames run long for the display it draws fewer
+  pixels, and if even the fewest stay under about 24 fps in its first seconds it hands over to
+  the CSS night. With reduced motion it draws still frames only: no rain, ripples or flow. The
   sign's flicker, the reveals and the drop rings are off too.
-- Without WebGL2 (or JS) the page keeps a plain CSS night, and the sign and #4764 get a CSS
-  reflection instead.
+- Without WebGL2 (or JS) the page keeps a plain CSS night, and the sign, #4764 and the crew get a
+  CSS reflection instead.
 
 The colour tokens are at the top of [`src/style.css`](src/style.css), and every text pair meets
 WCAG AA. Type is [Tilt Neon](https://fonts.google.com/specimen/Tilt+Neon) for the sign and the
@@ -133,7 +144,9 @@ terminal, `spin` spins him round.
 - `public/draco/` is the Draco decoder from `three/examples/jsm/libs/draco/gltf/`, served from
   this site instead of Google's CDN. Copy those two files again if you update `three`.
 - `@google/model-viewer` and `three` are pinned to exact versions. model-viewer 4.3.1 never
-  fires `finished`, so `src/bro.js` watches the wave's clock instead.
+  fires `finished`, so `src/bro.js` watches the wave's clock instead, and its leftover debug
+  `console.log` calls are silenced in the build (`vite.config.js`). Keyboard focus lands inside
+  its shadow DOM, so `src/bro.js` adds the lilac focus ring there.
 
 ## License
 
