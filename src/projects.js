@@ -78,7 +78,7 @@ export const projects = [
     name: 'RadPayne',
     kind: 'Bullet-time noir shooter',
     blurb:
-      "They took the bag. A rainy Manhattan night, the Milady rave, the back of the house, an elevator ride up and Madame Pockit in her penthouse, told in rhyming noir comic panels. Dual pistols, shotguns, a sniper, grenades, a kill cam, time slowed down, and #4764's katana that blocks bullets and sends them back. Keyboard and mouse or a controller.",
+      "They took the bag. A rainy Manhattan night, the Milady rave, the back of the house, an elevator ride up and Madame Pockit in her penthouse, told in rhyming noir comic panels. Dual pistols, shotguns, a sniper, a kill cam, time slowed down, and #4764's katana that blocks bullets and sends them back. Hold the frag button to see where it lands, let go to throw. Keyboard and mouse or a controller.",
     url: 'https://radpayne.vyvanse.beer',
     frame: true,
     links: [
@@ -107,7 +107,7 @@ export const projects = [
     name: 'RBGO',
     kind: 'First-person bomb-defusal shooter, early preview',
     blurb:
-      'Radbros vs Radbros, up to 5 a side, against bots for now. Plant the bomb or defuse it in a desert bazaar, a round at a time. Pick a gun each round, crouch, peek, clutch. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, up to 5 a side, against bots for now. Plant the bomb or defuse it in a desert bazaar, a round at a time. Pick a gun each round, crouch, peek, clutch. Real gun models, your Radbro\'s own hands fitted to each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
@@ -121,7 +121,7 @@ export const projects = [
       before: 'Built on',
       label: 'react-three-game',
       href: 'https://prnth.com/react-three-game/',
-      after: 'by prnth.',
+      after: 'by prnth. Gun models by Quaternius.',
     },
   },
   {
@@ -132,7 +132,7 @@ export const projects = [
     name: 'RadOps',
     kind: 'First-person team deathmatch, early preview',
     blurb:
-      'Radbros vs Radbros, up to 5 a side, against bots for now. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, up to 5 a side, against bots for now. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Real gun models, your Radbro\'s own hands fitted to each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
@@ -146,18 +146,18 @@ export const projects = [
       before: 'Built on',
       label: 'react-three-game',
       href: 'https://prnth.com/react-three-game/',
-      after: 'by prnth.',
+      after: 'by prnth. Gun models by Quaternius.',
     },
   },
   {
     cmd: 'radzombies',
-    boot: 'radbros vs the dead, round after round', // the hero's boot log line
+    boot: 'radbros vs the dead, 2 maps, co-op', // the hero's boot log line
     slug: 'radzombies',
     group: 'games',
     name: 'RadZombies',
     kind: 'First-person zombies survival, early preview',
     blurb:
-      'Radbros vs the dead in a derelict neon picture palace: board up the windows, buy doors and guns, turn on the power, find the perks, and see how many rounds you last. A hidden song if you look around. Keyboard and mouse or a controller.',
+      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Two maps: a derelict neon picture palace (turn on the power, find the perks, a hidden song if you look around) or a sandbagged bunker on a dead air base at night. Solo, with a bot, or with a friend online or on split screen. Keyboard and mouse or a controller, or one of each on split screen.',
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
@@ -171,7 +171,7 @@ export const projects = [
       before: 'Built on',
       label: 'react-three-game',
       href: 'https://prnth.com/react-three-game/',
-      after: 'by prnth.',
+      after: 'by prnth. Gun models by Quaternius.',
     },
   },
   {
