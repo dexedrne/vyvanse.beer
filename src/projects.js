@@ -112,10 +112,10 @@ export const projects = [
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
     image: {
-      src: '/img/rbgo.jpg',
+      src: '/img/rbgo2.jpg',
       width: 1200,
       height: 630,
-      alt: 'RBGO: Radbros #652 and #723 glowing magenta face #4764 and #2564 glowing cyan in a sunlit desert bazaar.',
+      alt: 'RBGO: Radbro #4764 plants a satchel bomb in a sunlit desert bazaar while #723 and #652 cover him, under big painted A and B signs.',
     },
     credit: {
       before: 'Built on',
@@ -137,10 +137,10 @@ export const projects = [
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
     image: {
-      src: '/img/radops.jpg',
+      src: '/img/radops2.jpg',
       width: 1200,
       height: 630,
-      alt: 'RadOps: four Radbros in front of a blurred sun-bleached cul-de-sac.',
+      alt: 'RadOps: Radbro #4764 fires from behind a wrecked car in a pastel cul-de-sac, a school bus, a box truck and the RUGTOWN water tower behind.',
     },
     credit: {
       before: 'Built on',

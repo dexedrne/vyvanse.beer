@@ -115,7 +115,9 @@ hero's boot log. All four are SIL Open Font License and bundled from Fontsource.
 
 ## Share card and icons
 
-- `public/og.png` is a 1200×630 screenshot of `scripts/og-card.html`.
+- `public/og2.jpg` is the share card: a painted 1200×630 of #4764 in a rainy neon puddle under the
+  vyvanse.beer sign. The older card, `public/og.png`, is a screenshot of `scripts/og-card.html`
+  and stays so old links keep their preview.
 - `public/apple-touch-icon.png` is a 180×180 screenshot of `scripts/touch-icon.html`.
 - `public/favicon.svg` is hand-drawn SVG.
 
@@ -152,7 +154,7 @@ terminal, `spin` spins him round.
 
 - The site code is MIT: [`LICENSE`](LICENSE).
 - The Radbro renders and 3D models (`public/img/radbros/`, `public/models/`,
-  `public/img/radrun.jpg`, `public/og.png`) and the `radbros-3d` release downloads are under
+  `public/img/radrun.jpg`, `public/og.png`, `public/og2.jpg`) and the `radbros-3d` release downloads are under
   the [Viral Public License](https://viralpubliclicense.org/VPL.txt):
   [`LICENSE-ASSETS`](LICENSE-ASSETS). Use them, remix them, rig them, sell them or put them in
   a game. Anything made from them keeps the same license. The source models are also at
