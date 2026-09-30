@@ -100,14 +100,14 @@ export const projects = [
   },
   {
     cmd: 'rbgo',
-    boot: 'radbros vs radbros: TDM + bomb defusal', // the hero's boot log line
+    boot: 'plant or defuse the bomb, 5v5', // the hero's boot log line
     aliases: ['rb-go'],
     slug: 'rbgo',
     group: 'games',
     name: 'RBGO',
-    kind: 'Third-person team shooter, early preview',
+    kind: 'First-person bomb-defusal shooter, early preview',
     blurb:
-      'Radbros vs Radbros, up to 5 a side, against bots for now. Team Deathmatch in a sun-bleached cul-de-sac, or plant and defuse the bomb in a desert bazaar. Pick a gun each life, crouch, peek, clutch. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, up to 5 a side, against bots for now. Plant the bomb or defuse it in a desert bazaar, a round at a time. Pick a gun each round, crouch, peek, clutch. Keyboard and mouse or a controller.',
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
@@ -116,6 +116,56 @@ export const projects = [
       width: 1200,
       height: 630,
       alt: 'RBGO: Radbros #652 and #723 glowing magenta face #4764 and #2564 glowing cyan in a sunlit desert bazaar.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth.',
+    },
+  },
+  {
+    cmd: 'radops',
+    boot: 'team deathmatch, first to 50', // the hero's boot log line
+    slug: 'radops',
+    group: 'games',
+    name: 'RadOps',
+    kind: 'First-person team deathmatch, early preview',
+    blurb:
+      'Radbros vs Radbros, up to 5 a side, against bots for now. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Keyboard and mouse or a controller.',
+    url: 'https://radops.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
+    image: {
+      src: '/img/radops.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'RadOps: four Radbros in front of a blurred sun-bleached cul-de-sac.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth.',
+    },
+  },
+  {
+    cmd: 'radzombies',
+    boot: 'radbros vs the dead, round after round', // the hero's boot log line
+    slug: 'radzombies',
+    group: 'games',
+    name: 'RadZombies',
+    kind: 'First-person zombies survival, early preview',
+    blurb:
+      'Radbros vs the dead in a derelict neon picture palace: board up the windows, buy doors and guns, turn on the power, find the perks, and see how many rounds you last. A hidden song if you look around. Keyboard and mouse or a controller.',
+    url: 'https://radzombies.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
+    image: {
+      src: '/img/radzombies.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'RadZombies: zombie Radbros shambling through the lobby of a derelict neon movie palace at night.',
     },
     credit: {
       before: 'Built on',
