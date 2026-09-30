@@ -100,14 +100,14 @@ export const projects = [
   },
   {
     cmd: 'rbgo',
-    boot: 'plant or defuse the bomb, 5v5', // the hero's boot log line
+    boot: 'plant or defuse the bomb, 2v2 online', // the hero's boot log line
     aliases: ['rb-go'],
     slug: 'rbgo',
     group: 'games',
     name: 'RBGO',
     kind: 'First-person bomb-defusal shooter, early preview',
     blurb:
-      'Radbros vs Radbros, up to 5 a side, against bots for now. Plant the bomb or defuse it in a desert bazaar, a round at a time. Pick a gun each round, crouch, peek, clutch. Real gun models, your Radbro\'s own hands fitted to each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, 2v2 online with a friend or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Pick a gun each round, crouch, peek, clutch. Real gun models, your Radbro\'s own hands fitted to each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
@@ -126,13 +126,13 @@ export const projects = [
   },
   {
     cmd: 'radops',
-    boot: 'team deathmatch, first to 50', // the hero's boot log line
+    boot: 'team deathmatch, 5v5 online', // the hero's boot log line
     slug: 'radops',
     group: 'games',
     name: 'RadOps',
     kind: 'First-person team deathmatch, early preview',
     blurb:
-      'Radbros vs Radbros, up to 5 a side, against bots for now. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Real gun models, your Radbro\'s own hands fitted to each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, 4v4 or 5v5 online, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Real gun models, your Radbro\'s own hands fitted to each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
