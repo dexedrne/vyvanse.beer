@@ -198,7 +198,7 @@ const page = {
 // #4764 in the hero: loads the 3D viewer once he's on screen (see src/bro.js).
 const bro = createBro(document.querySelector('.hero__bro model-viewer'));
 
-// the UTC clock and live BTC / ETH / SOL / XRP in the top-left corner (src/ticker.js)
+// the UTC clock, live BTC / ETH / SOL / XRP and RETARDIO in the top-left corner (src/ticker.js)
 createTicker();
 
 // sections surface as they scroll into view, and glass panes catch the light (src/reveal.js)

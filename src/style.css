@@ -2697,7 +2697,7 @@ a.cmd-hint:hover {
   }
 }
 
-/* ---------- the top-left strip: UTC clock + BTC / ETH / SOL / XRP (src/ticker.js) ---------- */
+/* ---------- the top-left strip: UTC clock + BTC / ETH / SOL / XRP + RETARDIO (src/ticker.js) ---------- */
 
 /* A single scrollable strip in the page column when there is no room for the corner stack. */
 .ticker {
@@ -2754,6 +2754,67 @@ a.cmd-hint:hover {
   color: var(--rose);
 }
 
+/* RETARDIO: a link to its pool on DexScreener, with market cap and a one-day sparkline. In the
+   strip it comes straight after the clock, so phones see it without scrolling. */
+.ticker__time {
+  order: -2;
+}
+
+.ticker__tok {
+  order: -1;
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ticker__tok .ticker__k {
+  color: var(--lilac);
+}
+
+.ticker__tok:hover .ticker__k,
+.ticker__tok:focus-visible .ticker__k {
+  color: var(--lilac-hi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* price and 24 h change first, so a phone sees both before the strip scrolls */
+.ticker__mc {
+  order: 1;
+  color: var(--faint);
+}
+
+.ticker__mc:empty {
+  display: none;
+}
+
+.ticker__spark {
+  flex: none;
+  order: 2;
+  align-self: center;
+  width: 40px;
+  height: 12px;
+  overflow: visible;
+  color: var(--faint);
+}
+
+.ticker__spark polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ticker__spark.is-up {
+  color: var(--phosphor);
+}
+
+.ticker__spark.is-down {
+  color: var(--rose);
+}
+
 /* Wide screens with Radbro OS closed: a stack in the top-left corner, clear of the hero. Below
    1260px (or with the terminal docked) the hero's prompt line would sit under it. */
 @media (min-width: 1260px) {
@@ -2770,6 +2831,43 @@ a.cmd-hint:hover {
     padding: 10px 14px 9px;
     font-size: 1.3125rem;
   }
+
+  /* last in the corner stack, on three short lines so the stack stays narrow:
+     name + sparkline, price + 24 h change, market cap */
+  :root:not(.term-open) .ticker__tok {
+    display: grid;
+    order: 1;
+    grid-template-columns: auto auto;
+    grid-template-areas: 'k spark' 'px ch' 'mc mc';
+    align-items: baseline;
+    gap: 5px 1ch;
+    margin-top: 2px;
+    padding-top: 8px;
+    border-top: 1px solid rgb(198 179 247 / 0.14);
+    border-radius: 0;
+  }
+
+  :root:not(.term-open) .ticker__tok .ticker__k {
+    grid-area: k;
+  }
+
+  :root:not(.term-open) .ticker__tok .ticker__px {
+    grid-area: px;
+  }
+
+  :root:not(.term-open) .ticker__tok .ticker__ch {
+    grid-area: ch;
+    justify-self: end;
+  }
+
+  :root:not(.term-open) .ticker__tok .ticker__mc {
+    grid-area: mc;
+  }
+
+  :root:not(.term-open) .ticker__tok .ticker__spark {
+    grid-area: spark;
+    justify-self: end;
+  }
 }
 
 @media (max-width: 599.98px) {
@@ -2780,5 +2878,9 @@ a.cmd-hint:hover {
 
   .ticker__ch {
     display: none;
+  }
+
+  .ticker__tok .ticker__ch {
+    display: inline;
   }
 }
