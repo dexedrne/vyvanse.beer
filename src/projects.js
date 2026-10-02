@@ -57,10 +57,10 @@ export const projects = [
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
     image: {
-      src: '/img/radrun2.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'RadRun: Radbro #4764 glides in a wingsuit over a neon city at sunset, chasing #652 and the bag across the rooftops.',
+      src: '/img/radrun3.webp',
+      width: 960,
+      height: 504,
+      alt: 'RadRun: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 web-swing and wingsuit-glide over rain-slick neon rooftops at dusk.',
     },
     credit: {
       before: 'Built on',
@@ -86,10 +86,10 @@ export const projects = [
       { label: 'Source', href: 'https://github.com/dexedrne/radpayne' },
     ],
     image: {
-      src: '/img/radpayne.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'RadPayne, bullet-time noir: Radbro #4764 dives through the rain in bullet time, firing two pistols outside the CLUB MILADY neon while Pockit Miladys scatter.',
+      src: '/img/radpayne3.webp',
+      width: 960,
+      height: 504,
+      alt: 'RadPayne, bullet-time noir: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 dive through the rain with pistols blazing on a neon-lit street.',
     },
     credit: {
       before: 'Built on',
@@ -112,10 +112,10 @@ export const projects = [
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
     image: {
-      src: '/img/rbgo2.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'RBGO: Radbro #4764 plants a satchel bomb in a sunlit desert bazaar while #723 and #652 cover him, under big painted A and B signs.',
+      src: '/img/rbgo3.webp',
+      width: 960,
+      height: 504,
+      alt: 'RBGO: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 plant the bomb in a sunlit desert bazaar under big painted A and B signs.',
     },
     credit: {
       before: 'Built on',
@@ -137,10 +137,10 @@ export const projects = [
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
     image: {
-      src: '/img/radops2.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'RadOps: Radbro #4764 fires from behind a wrecked car in a pastel cul-de-sac, a school bus, a box truck and the RUGTOWN water tower behind.',
+      src: '/img/radops3.webp',
+      width: 960,
+      height: 504,
+      alt: 'RadOps: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 trade fire across a pastel cul-de-sac, a school bus, a box truck and a water tower behind.',
     },
     credit: {
       before: 'Built on',
@@ -162,10 +162,10 @@ export const projects = [
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
     image: {
-      src: '/img/radzombies.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'RadZombies: zombie Radbros shambling through the lobby of a derelict neon movie palace at night.',
+      src: '/img/radzombies3.webp',
+      width: 960,
+      height: 504,
+      alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
     },
     credit: {
       before: 'Built on',
