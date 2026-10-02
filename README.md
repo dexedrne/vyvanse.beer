@@ -72,6 +72,24 @@ clears, Esc closes it (and minimises a focused window). Open or closed is rememb
 tab session only, so new visits always start on the plain landing. `set windows on|off` is the
 one setting that sticks between visits.
 
+## Tip jar
+
+The amber "tip vyvanse.sol" pill in the contact pane (or `tip` in the terminal, or
+vyvanse.beer/#tip) opens a small panel: SOL to vyvanse.sol, or ETH on Ethereum, Arbitrum or
+Robinhood Chain to one wallet. It shows the address (copy it, check it against your wallet),
+quick amounts or your own, a Solana Pay / EIP-681 link with its QR for phone wallets, and
+"connect wallet & send" for browser wallets: Wallet Standard (Phantom, Solflare, Backpack) for
+SOL, EIP-6963 (MetaMask, Rabby, Robinhood Wallet's browser) for ETH, which switches or adds the
+chain first. The visitor approves a plain transfer in their own wallet; there's no backend.
+
+- Addresses live in [`src/tip/config.js`](src/tip/config.js). vyvanse.sol was resolved the
+  way wallets do it (SOL record, else the domain's owner); the panel re-reads those SNS
+  accounts from a public RPC when it opens and turns sending off if the answer has changed.
+- The SOL transfer is built by hand (`src/tip/sol.js`), so @solana/web3.js never loads. The
+  EVM side is plain EIP-1193 calls (`src/tip/evm.js`).
+- The panel (with its QR encoder, [uqr](https://github.com/unjs/uqr)) is a lazy chunk of about
+  8 KB gzipped, and the wallet code another 1 to 2 KB, loaded only on "connect wallet & send".
+
 ## Look
 
 A rainy night in midnight purple. The neon sign (`vyvanse.beer`, the `.beer` in amber) and #4764

@@ -9,6 +9,7 @@ import { createCommands, openTab } from './commands.js';
 import { createBro } from './bro.js';
 import { createTicker } from './ticker.js';
 import { createReveal, createSheen } from './reveal.js';
+import { openTip, loadTip } from './tip/open.js';
 
 const root = document.documentElement;
 const termEl = document.getElementById('term');
@@ -238,6 +239,21 @@ term = createTerminal(termEl, {
 });
 commands = createCommands({ site, groups, projects, crew, contact, wm, term, page, bro });
 
+// ---- the tip jar: anything with data-tip opens it (src/tip/), fetched on first hover ----
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest?.('[data-tip]') || e.button !== 0) return;
+  e.preventDefault();
+  openTip();
+});
+// vyvanse.beer/#tip opens it straight away
+const tipHash = () => location.hash === '#tip' && openTip();
+addEventListener('hashchange', tipHash);
+tipHash();
+for (const ev of ['pointerover', 'focusin']) {
+  document.addEventListener(ev, (e) => e.target.closest?.('[data-tip]') && loadTip().catch(() => {}), { passive: true });
+}
+
 // ---- clicks anywhere with data-cmd run that command in the terminal ----
 
 document.addEventListener('click', (e) => {
@@ -286,10 +302,10 @@ document.addEventListener('click', (e) => {
 const editable = (el) => el?.closest?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]');
 
 document.addEventListener('keydown', (e) => {
-  if ((e.key === '/' || e.key === '`') && !e.ctrlKey && !e.metaKey && !e.altKey && !editable(e.target)) {
+  if ((e.key === '/' || e.key === '`') && !e.ctrlKey && !e.metaKey && !e.altKey && !editable(e.target) && !document.querySelector('dialog[open]')) {
     e.preventDefault();
     panel.open({ focus: 'input' });
-  } else if (e.key === 'Escape' && panel.isOpen()) {
+  } else if (e.key === 'Escape' && panel.isOpen() && !document.querySelector('dialog[open]')) {
     panel.close();
   }
 });

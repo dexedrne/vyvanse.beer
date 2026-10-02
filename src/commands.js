@@ -4,6 +4,7 @@
 import { h } from './dom.js';
 import { shortUrl } from './projects.js';
 import { neofetch } from './fetch.js';
+import { openTip } from './tip/open.js';
 
 const norm = (s) => s.toLowerCase().replace(/^[#$]+/, '').trim();
 
@@ -348,6 +349,13 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
         page.show('contact');
       },
     },
+    tip: {
+      desc: 'tip jar: sol or eth',
+      run() {
+        term.print(line('sol to ', strong('vyvanse.sol'), ', or eth on ethereum, arbitrum and robinhood chain. thank you!'));
+        openTip();
+      },
+    },
     neofetch: {
       desc: 'radbro os system info',
       run() {
@@ -453,6 +461,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
     fetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
     ps: { hidden: true, run: (a, c) => table.windows.run(a, c) },
     dm: { hidden: true, run: (a, c) => table.contact.run(a, c) },
+    donate: { hidden: true, run: (a, c) => table.tip.run(a, c) },
     man: { hidden: true, run: (a, c) => table.help.run(a, c) },
 
     // Easter eggs.

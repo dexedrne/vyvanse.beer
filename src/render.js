@@ -241,6 +241,7 @@ function contactSection(c) {
     <a class="btn btn--primary contact__dm" ${rel}>${icon('x')}<span>${esc(c.dm.label)}</span>${newTab}</a>
     <span class="contact__handle">${esc(c.dm.handle)}</span>
     <a class="contact__gh" ${gh}>${icon('github')}<span>${esc(c.code.label)}</span>${newTab}</a>
+    <button class="contact__tip js-only" type="button" data-tip aria-haspopup="dialog"><svg class="contact__coin" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.4 5.9h5.6l-.8.9H4.6zm0 2.6h5.6l-.8.9H4.6zm.8 2.6h5.6l-.8.9H5.4z" fill="currentColor" transform="translate(.4 -1.2)"/></svg><span>tip vyvanse.sol</span></button>
   </div>
 </section>`;
 }

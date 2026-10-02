@@ -1641,7 +1641,45 @@ a.cmd-hint:hover {
   color: var(--lilac-hi);
 }
 
+/* the tip jar's way in (the panel is src/tip/): a small amber pill at the far end */
+.contact__tip {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  margin-left: auto;
+  padding: 0 16px 0 13px;
+  border: 1px solid rgb(233 196 126 / 0.32);
+  border-radius: 999px;
+  background: rgb(14 9 26 / 0.55);
+  color: var(--text);
+  font: 500 0.9375rem/1 var(--sans);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.contact__tip:hover {
+  border-color: var(--amber);
+  box-shadow: 0 0 22px -6px rgb(233 196 126 / 0.5);
+}
+
+.contact__coin {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--amber);
+}
+
 @container (max-width: 479.98px) {
+  .contact__tip {
+    flex-basis: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+
   .contact__dm {
     flex-basis: 100%;
     justify-content: center;
