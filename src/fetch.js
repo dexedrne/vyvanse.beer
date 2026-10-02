@@ -49,7 +49,7 @@ export function neofetch({ site, projects, crew }) {
     ['Host', site.name],
     ['Kernel', '6.9.420-rugged'],
     ['Uptime', uptime()],
-    ['Packages', `${projects.length} projects (rugpm), ${crew.members.length} radbros`],
+    ['Packages', `${projects.length} projects (rugpm), ${crew.members.filter((b) => !b.slug.startsWith('retardio')).length} radbros, ${crew.members.filter((b) => b.slug.startsWith('retardio')).length} retardios`],
     ['Shell', 'rugsh 0.0.113'],
     ['Resolution', `${innerWidth}x${innerHeight}`],
     ['DE', 'landing + terminal'],

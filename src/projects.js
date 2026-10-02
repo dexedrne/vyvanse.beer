@@ -300,7 +300,7 @@ export const projects = [
 // `soon` = built for RadRun but not playable there yet; drop it once he is.
 export const crew = {
   title: 'The crew',
-  line: 'Radbros #652, #4764, #2564 and #723, built in 3D and playable in RadRun.',
+  line: 'Radbros #652, #4764, #2564 and #723, and Retardios #555 and #85, built in 3D and playable in RadRun.',
   playIn: 'radrun',
   downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '81 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
@@ -362,6 +362,36 @@ export const crew = {
         width: 336,
         height: 500,
         alt: 'Radbro #723 in 3D, tipping his hat: a brown wide-brim cowboy hat over shaggy brown hair, one big amber anime eye open and the other winking, and a black plate carrier with a HOT TOPIC BRO name patch and a TempleOS patch over a black shirt, dark jeans and brown boots.',
+      },
+    },
+    // The Retardios (Retardio Cousin #555 and Retardio Classic #85): built on the Radbro rig, not part of the
+    // radbros-3d repo (`repo: false`), so their download is the web model the site serves.
+    {
+      num: '555',
+      slug: 'retardio-555',
+      name: 'Retardio #555',
+      line: 'Long brown hair, heart blush, BRITISH FOOD tee.',
+      repo: false,
+      download: { href: '/models/retardio555-hero.glb', label: '3D model .glb', size: '0.6 MB' },
+      image: {
+        src: '/img/retardios/retardio-555.webp',
+        width: 340,
+        height: 500,
+        alt: 'Retardio #555 in 3D, waving: long straight brown hair, grey-green anime eyes, a double ring piercing at the end of his right brow, pink heart blush, a :3 mouth, a white BRITISH FOOD tee with a vomiting emoji, light-blue jeans and white sneakers.',
+      },
+    },
+    {
+      num: '85',
+      slug: 'retardio-85',
+      name: 'Retardio #85',
+      line: 'Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
+      repo: false,
+      download: { href: '/models/retardio85-hero.glb', label: '3D model .glb', size: '0.6 MB' },
+      image: {
+        src: '/img/retardios/retardio-85.webp',
+        width: 233,
+        height: 500,
+        alt: 'Retardio #85 in 3D, both arms up in a cheer: long black hair with blunt bangs, blue eyes with pink paint around his right eye and blue around his left, purple freckles, a white NEED MONEY FOR PORSCHE tee, black jeans and black sneakers.',
       },
     },
   ],

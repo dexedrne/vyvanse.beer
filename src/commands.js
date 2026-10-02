@@ -94,7 +94,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
   for (const p of projects) for (const n of [p.cmd, ...(p.aliases || [])]) byName.set(n, p);
   const findProject = (args) => byName.get(norm(args.join('-')));
   const findBro = (args) => {
-    const n = norm(args.join('')).replace(/^radbro-?/, '').replace(/^#/, '');
+    const n = norm(args.join('')).replace(/^(radbro|retardio)-?/, '').replace(/^#/, '');
     return crew.members.find((b) => b.num === n);
   };
   const sections = [...groups.map((g) => g.id), 'crew'];
@@ -184,7 +184,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
           line(muted(b.line)),
           playIn ? line(b.soon ? 'coming soon to ' : 'playable in ', run(`open ${playIn.cmd}`)) : null,
           b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
-          crew.repo ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
+          crew.repo && b.repo !== false ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
         ),
       ),
     );
@@ -288,7 +288,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
       },
     },
     crew: {
-      desc: 'meet the Radbros',
+      desc: 'meet the Radbros and Retardios',
       run() {
         term.print(line(strong('the crew'), muted(`  ${crew.line}`)));
         term.print(

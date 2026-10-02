@@ -145,7 +145,10 @@ Open the card pages after `npm install` so the fonts resolve.
 
 `public/img/radbros/` holds flat renders of the rigged Radbro models on transparent
 backgrounds: `radbro-4764-hero.webp` (719×1100, waving) for the hero, and 500px-tall crew
-figures.
+figures. `public/img/retardios/` holds the same 500px crew figures of Retardio #555 (waving) and
+Retardio #85 (cheering), rendered from their game models; their crew downloads are the web models
+`public/models/retardio555-hero.glb` and `retardio85-hero.glb` (mesh + `Idle` and `Big_Wave_Hello`,
+the same cut as #4764's).
 
 ## #4764 in 3D
 
@@ -171,11 +174,12 @@ terminal, `spin` spins him round.
 ## License
 
 - The site code is MIT: [`LICENSE`](LICENSE).
-- The Radbro renders and 3D models (`public/img/radbros/`, `public/models/`,
+- The Radbro renders and 3D models (`public/img/radbros/`, `public/models/radbro*`,
   `public/img/radrun.jpg`, `public/og.png`, `public/og2.jpg`) and the `radbros-3d` release downloads are under
   the [Viral Public License](https://viralpubliclicense.org/VPL.txt):
   [`LICENSE-ASSETS`](LICENSE-ASSETS). Use them, remix them, rig them, sell them or put them in
   a game. Anything made from them keeps the same license. The source models are also at
   [dexedrne/radbros-3d](https://github.com/dexedrne/radbros-3d).
 - `public/draco/` is the Draco decoder that ships with three.js (Apache-2.0).
+- Retardio #555 and #85 (`public/img/retardios/`, `public/models/retardio*`) are dexedrne's own Retardios.
 - The screenshots of other people's projects in `public/img/` belong to those projects.

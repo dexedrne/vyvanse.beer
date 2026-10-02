@@ -1415,7 +1415,7 @@ a.cmd-hint:hover {
 .crew {
   --bh: clamp(150px, 22cqi, 250px);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(8px, 2.4cqi, 28px);
   margin: 0;
   padding: 0;
