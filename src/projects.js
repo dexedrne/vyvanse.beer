@@ -42,14 +42,14 @@ export const groups = [
 export const projects = [
   {
     cmd: 'radrun',
-    boot: 'rooftop web-swing chase + SPIDER-TAG', // the hero's boot log line
+    boot: 'rooftop chase + SPIDER-TAG, now with the Retardios', // the hero's boot log line
     aliases: ['rug-run', 'rugrun'],
     slug: 'radrun',
     group: 'games',
     name: 'RadRun',
     kind: 'Radbro rooftop chase, free-swing 3D browser game',
     blurb:
-      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back, to a chill lo-fi soundtrack. Or play SPIDER-TAG against bots or a friend online. Runs in the browser, keyboard or controller, nothing to install.',
+      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back, to a chill lo-fi soundtrack. Or play SPIDER-TAG against bots or a friend online. Five Radbros and two Retardios to play as. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://radrun.vyvanse.beer',
     frame: true,
     links: [
@@ -107,7 +107,7 @@ export const projects = [
     name: 'RBGO',
     kind: 'First-person bomb-defusal shooter, early preview',
     blurb:
-      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Pick a gun each round, crouch, peek, clutch. Chunky gun models in the Radbros\' own style, your Radbro\'s own hands on each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Four Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
@@ -132,7 +132,7 @@ export const projects = [
     name: 'RadOps',
     kind: 'First-person team deathmatch, early preview',
     blurb:
-      'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Chunky gun models in the Radbros\' own style, your Radbro\'s own hands on each one, and frags you hold to see where they land. Keyboard and mouse or a controller.',
+      'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Four Radbros and two Retardios, a gun picked at every spawn, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
@@ -151,13 +151,13 @@ export const projects = [
   },
   {
     cmd: 'radzombies',
-    boot: 'radbros vs the dead, 2 maps, co-op', // the hero's boot log line
+    boot: 'radbros vs the dead, co-op, leaderboards', // the hero's boot log line
     slug: 'radzombies',
     group: 'games',
     name: 'RadZombies',
     kind: 'First-person zombies survival, early preview',
     blurb:
-      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Two maps: a derelict neon picture palace (turn on the power, find the perks, re-cut your gun in the glow-up machine, a hidden song if you look around) or a small sandbagged bunker on a dead air base at night. Solo, with a bot, or with a friend online (quick play or a room code) or on split screen. Keyboard and mouse or a controller, or one of each on split screen.',
+      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Two maps: a derelict picture palace, nine rooms on one loop (the power, six perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets) or a small sandbagged bunker on a dead air base at night. A leaderboard for each. Solo, with a bot, with a friend online (quick play or a room code) or on split screen. Keyboard and mouse or a controller.',
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
