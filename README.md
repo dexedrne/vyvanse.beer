@@ -3,36 +3,51 @@
 Projects by dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com/dexedrne).
 Live at https://vyvanse.beer. To get in touch, DM [@dexedrne on X](https://x.com/dexedrne).
 
-A rainy-night landing page with a terminal, Radbro OS, one click away. It starts hidden: the
-`>_ radbro os` button (or `/`) opens it, docked beside the page on desktop and as a bottom
-sheet on phones, and the first open in a session greets you with `neofetch`. Both read the
-same data, so clicking a project runs `open <name>`, and typing commands moves the page.
-
-Projects open in a new tab. Projects that allow framing can also run in draggable in-page
-windows (full-screen sheets on phones), but only when asked: the small "In a window" button on
-their card, `win <name>` (or `open <name> --window`) in the terminal, or `set windows on`
-to make windows the default. That setting is remembered in `localStorage`; `set windows off`
-goes back to tabs, and `open <name> --tab` always uses a tab.
+A game-select screen on a rainy rooftop. Four tabs (**Games, Crew, Sites, Contact**), the selected
+game's key art filling the screen over a puddle that mirrors it, Radbro #4764 and Retardio #85
+standing in the water in 3D, and the cartridges along the bottom. Pick a game and it plays right
+here, full screen, with a keyboard, a mouse, touch or a controller, like a console's big-screen
+menu.
 
 ```sh
 npm install
 npm run dev      # local dev server
 npm run build    # -> dist/
+node test/ticker.js
 ```
 
-The landing is rendered into `index.html` at build time, so every project and link is in the
-HTML without JS. The terminal and windows (`src/main.js`, about 17 KB gzipped) are layered on top.
-The 3D viewer for the hero is a separate chunk (about 290 KB gzipped) that only loads once the
-hero is on screen, and the rainy night behind the page (`src/water.js`, about 13 KB gzipped) is
-another, fetched straight away and started right after the first paint.
+## How it's put together
+
+The whole screen is rendered into `index.html` at build time from
+[`src/projects.js`](src/projects.js) by [`src/render.js`](src/render.js), so every game (with its
+full blurb and links), every crew member (with his model download), every site and the contact
+links are plain HTML before any JS runs. Without JS (and for crawlers) the panels simply stack
+down the page. With JS the same markup becomes one screen with no page scroll.
+
+| File | What it does |
+| --- | --- |
+| `src/projects.js` | All the data: games, sites, crew, contact. Fields documented at the top. |
+| `src/render.js` | The build-time HTML (used by `vite.config.js`). |
+| `src/main.js` | The menu: tabs, the cursor, the address bar, the duo's spot, what the water mirrors. |
+| `src/input.js` | Keyboard and gamepads, turned into menu actions, and the on-screen glyphs. |
+| `src/player.js` | Games inside the page: the iframe, the loading card, getting back to the menu. |
+| `src/audio.js` | The background music and the menu blips. |
+| `src/stage.js` | One animation loop for the water and the duo; pauses while a game is open. |
+| `src/water.js` | The rain and the puddle (WebGL2). |
+| `src/duo.js` | #4764 and #85 in 3D (three.js). |
+| `src/ticker.js` | UTC clock and live BTC / ETH / SOL / XRP / RETARDIO prices in the bottom strip. |
+| `src/tip/` | The tip jar. |
+| `src/os/` | Radbro OS, the terminal. |
+| `src/style.css` | The look. Colour tokens at the top. |
 
 ## Add a project
 
-Add an entry to `projects` in [`src/projects.js`](src/projects.js). The fields are documented
-at the top of that file. `group: 'games'` gets a big pane with its screenshot on one side (the
-side swaps from one game to the next, and phones put it on top), `group: 'sites'` gets a picture
-card, three to a row (two on tablets, one on phones), with a short last row centred. The `cmd`
-name is what the terminal takes (`open <cmd>`, `info <cmd>`), and it tab-completes automatically.
+Add an entry to `projects` in `src/projects.js`. `group: 'games'` gets a cartridge on Games and
+its key art fills the screen (`image`, 1600×900 webp in `public/img/art/`); `group: 'sites'` gets
+a grey cartridge on Sites and its 800×420 screenshot in the preview monitor. Both want a
+cartridge label in `public/img/thumb/` (420×236 webp), a `shell` colour for the plastic and an
+`accent` for the glow. A game's `cast` lists who you can play as (by crew `num`); Crew reads it
+for each one's "in" list.
 
 Set `frame: true` only if the site allows being shown in an iframe:
 
@@ -40,42 +55,122 @@ Set `frame: true` only if the site allows being shown in an iframe:
 curl -sI https://example.com | grep -iE 'x-frame-options|frame-ancestors'
 ```
 
-No output means `frame: true` is fine, and the project gets the opt-in window controls. If
-the site sends either header, use `frame: false` and it only ever opens in a new tab.
+No output means `frame: true` is fine and PLAY runs it inside the page. With `frame: false` it
+opens in a new tab, and the button and status line say so (Solscape, bitcorn and sanic).
 
-Screenshots go in `public/img/`: 800×420 webp, under 80 KB. A project without one still gets
-a card, just with a plain tile where the picture would be.
+## Controls
 
-## Add a command
+The glyphs on screen follow whatever was used last: keys, Xbox buttons, or PlayStation shapes
+(a pad whose name or vendor says Sony).
 
-Add an entry to the `table` in [`src/commands.js`](src/commands.js):
+| | Keyboard | Controller | Mouse / touch |
+| --- | --- | --- | --- |
+| Move | ← → (A D); ↑ ↓ on Contact | D-pad or left stick (held: repeats) | click a cartridge; swipe the art |
+| Play / pick | Enter | A (✕), or Start | click it again, or PLAY |
+| Back | Esc | B (○) | |
+| Sections | Q / E | LB / RB (L1 / R1) | the tabs (a bottom bar on phones) |
+| Details | I | Y (△) | "details" |
+| Make one wave | G | X (□) | click or tap one of them |
+| Full screen | F | View / Select | ⛶ |
+| Music, menu sounds | M, N | | ♪ and the speaker |
+| Radbro OS | / or ` | | Contact → Radbro OS |
+
+A pad gives a small rumble on select where it can. The address bar keeps your place
+(`#games/rbgo`, `#crew/85`, `#sites/sanic`, `#contact`), `#tip` opens the tip jar, `#play/radrun`
+starts a game, and the old page's anchors (`#radrun`, `#radbro-4764`, `#bulk-os`) still land on
+the right item.
+
+## Games in the player
+
+PLAY runs a game in a full-screen iframe
+(`allow="gamepad; fullscreen; autoplay; clipboard-write; xr-spatial-tracking"`) behind a loading
+card: its art, its wordmark, and how to get back. While it's open the menu draws nothing at all
+(no water, no duo, no rain), the music fades out, and the menu is inert, so the game has the
+whole machine. Leaving unloads the game and puts the cursor (and the focus) back on its cartridge.
+
+Getting back to the menu, without clashing with the games' own pause (Esc / Start):
+
+- **Controller:** hold **View + Menu** (Select + Start; Create + Options on a PlayStation pad) for a
+  second. A ring fills up, then you're back. The page reads the pad itself, and the parent page
+  keeps getting the pad while the game's iframe has the focus (checked in a Chromium-based
+  browser with a real, kernel-level virtual pad, not a script stub).
+- **Mouse:** the small **◀ menu** button in the top-left corner, always there. In a game that
+  holds the mouse, Esc lets go of it first.
+- **Keyboard:** hold **Esc** for a second while the page has the focus (on the loading card, or
+  after clicking the corner button). Once the game has the focus, keys go to the game only; a
+  page can't see them. So it's Esc (the game pauses and lets go of the mouse), then ◀ menu.
+
+**An optional hook for the games.** A game can send the player back itself, which gives the
+keyboard a way back from inside the game (say, a "Back to the menu" line in its pause menu, shown
+only when it's framed). The menu already listens for it, and only from the playing game's own
+origin:
 
 ```js
-hello: {
-  desc: 'say hi',            // shown in `help`
-  run(args, ctx) {
-    term.print(line('hi ', args.join(' ')));
-  },
-},
+if (window.top !== window) window.parent.postMessage({ type: 'vyvanse:menu' }, 'https://vyvanse.beer');
 ```
 
-`usage: 'hello <name>'` changes how it shows in `help`, `args: (words) => [...]` gives it tab
-completion (`words` is what's typed so far, split on spaces), and `hidden: true` leaves it out
-of `help`. To add a quick-command chip, add a
-`<button data-cmd="...">` to `.term__chips` in `index.html`. Anything on the page with
-`data-cmd` runs that command when clicked.
+Some browsers only open new tabs (and allow full screen and sound) after a click or a key, and
+don't count a pad press as one. Chromium-based ones do count it. Where a `frame: false` game
+picked with a pad can't get its tab, the menu asks instead: open it in this tab (Back in the
+browser returns here) or click New tab.
 
-## Keys
+## Music and sounds
 
-`/` or `` ` `` opens the terminal at the prompt, Tab completes, ↑ and ↓ walk history, Ctrl+L
-clears, Esc closes it (and minimises a focused window). Open or closed is remembered for the
-tab session only, so new visits always start on the plain landing. `set windows on|off` is the
-one setting that sticks between visits.
+`public/audio/vyvanse-bg.webm` (Opus) and `vyvanse-bg.m4a` (AAC, for Safari): a chill piano loop
+made for this site, 1:54, at a low volume (0.3). Browsers only allow sound after a click or a key
+(or, in some, a pad press), so it fades in on the first one, unless the visitor turned it off (♪ or M, remembered in
+`localStorage`). It's fetched only then (`preload="none"`), and it pauses while a game is open
+and while the tab is hidden. The menu blips (a short square wave on move and select) are off by
+default and have their own toggle (N).
+
+## Look
+
+A rainy night in midnight purple, with a console menu on it. Bebas Neue for the wordmarks and
+tabs, VT323 for the status lines and key hints, Tilt Neon for the sign, Spline Sans for reading,
+Spline Sans Mono for small code bits; all SIL Open Font License, bundled from Fontsource. Amber
+is the cursor: whatever is selected wears it.
+
+**The water** ([`src/water.js`](src/water.js)) is one WebGL2 canvas over the art. Above the
+waterline it's clear except for the rain (and, on Games and Contact, a soft blur of the painted
+cast behind the duo, so the live pair doesn't fight it). Below it, the floor is a puddle that
+mirrors the art upside down, the neon of the cartridges and buttons standing in it, and the duo
+(or a crew render) about their own feet. A ripple sim stepped at a fixed 60 Hz takes the rain,
+heavy drops that splash, the pointer's wake and clicks. Under text the water is held dark enough
+for every pair to meet WCAG AA.
+
+**The duo** ([`src/duo.js`](src/duo.js)): `public/models/radbro4764-hero.glb` and
+`retardio85-hero.glb`, each with `Idle` and `Big_Wave_Hello`, plus a small groove on one shared
+beat (a head nod, a shoulder bounce, a hip sway), #85 a beat-fraction behind. Every 7 to 12
+seconds one of them waves, at you or at the other one; click or tap one (or press X / G) and he
+waves. They stand on the right of Games and Contact, and centre stage on Crew when #4764 or #85
+is picked. Until three.js and the models load (and without WebGL) their renders stand there
+instead.
+
+## Performance
+
+- First load: the HTML (about 10 KB gzipped, with all the content), the CSS (about 8 KB), the
+  menu's JS (about 18 KB), the fonts and the first key art. Everything else waits.
+- After the first paint: the stage (water and loop, about 8 KB) and then three.js with the two
+  models (about 155 KB gzipped plus 1.4 MB of models), skipped with Save-Data.
+- On demand: the tip jar (about 10 KB), its wallet code (1 to 2 KB), Radbro OS (about 9 KB with
+  its CSS), the music (1.4 MB).
+- One loop draws both, at 60 fps while you're doing something and 30 after a few idle seconds.
+  Pixel ratio capped at 1.25; the water draws at most about 0.9 MP and drops resolution itself
+  when frames run long. Nothing runs while the tab is hidden or a game is open.
+- Reduced motion: no rain, ripples, groove or automatic waves (a wave only when asked), and no
+  flicker or slides.
+- No WebGL2, or a failure: the plain backdrops and the duo's renders stay; everything works.
+
+## Phone
+
+The art on top with the puddle under it, the cartridges as a sideways swipe row, the tabs as a
+bottom bar, and the ticker drifting slowly above it. Swipe the art to move along the row; tap a
+cartridge to pick it, tap again to play.
 
 ## Tip jar
 
-The amber "tip vyvanse.sol" pill in the contact pane (or `tip` in the terminal, or
-vyvanse.beer/#tip) opens a small panel: SOL to vyvanse.sol, or ETH on Ethereum, Arbitrum or
+The amber "tip vyvanse.sol" pill (top right), Contact → Tip jar, `tip` in the terminal, or
+vyvanse.beer/#tip opens a small panel: SOL to vyvanse.sol, or ETH on Ethereum, Arbitrum or
 Robinhood Chain to one wallet. It shows the address (copy it, check it against your wallet),
 quick amounts or your own, a Solana Pay / EIP-681 link with its QR for phone wallets, and
 "connect wallet & send" for browser wallets: Wallet Standard (Phantom, Solflare, Backpack) for
@@ -87,90 +182,39 @@ chain first. The visitor approves a plain transfer in their own wallet; there's 
   accounts from a public RPC when it opens and turns sending off if the answer has changed.
 - The SOL transfer is built by hand (`src/tip/sol.js`), so @solana/web3.js never loads. The
   EVM side is plain EIP-1193 calls (`src/tip/evm.js`).
-- The panel (with its QR encoder, [uqr](https://github.com/unjs/uqr)) is a lazy chunk of about
-  8 KB gzipped, and the wallet code another 1 to 2 KB, loaded only on "connect wallet & send".
+- The panel (with its QR encoder, [uqr](https://github.com/unjs/uqr)) is a lazy chunk, and the
+  wallet code another, loaded only on "connect wallet & send". With a controller, the d-pad walks
+  its buttons and B closes it.
 
-## Look
+## Radbro OS
 
-A rainy night in midnight purple. The neon sign (`vyvanse.beer`, the `.beer` in amber) and #4764
-stand on the waterline of a puddle that mirrors them (on phones he stands up on the sign's
-letters), and a stream runs on down the page. It passes a drop at each section's heading, widens
-into pools with rings from the drips, and swings out behind the glass panes. The crew stand at a
-second waterline, mirrored in their own strip of water. The sections surface as they scroll in,
-and the panes on the water are dark glass.
+The terminal is a hidden extra: `/` (or `` ` ``) opens it over the menu, as does Contact → Radbro
+OS. It reads the same data: `ls`, `info <name>` (moves the menu to it), `open <name>` (plays it
+here; `--tab` for a new tab), `crew`, `cd sites`, `wave`, `neofetch`, `tip`, `help`. Tab completes,
+↑ and ↓ walk history, Esc closes it. Its code and CSS are their own chunk (`src/os/`).
 
-The water is [`src/water.js`](src/water.js): one WebGL2 canvas fixed behind the page, drawn by a
-single fragment shader over a small ripple simulation.
-
-- The sign's reflection is drawn from the real `<h1>` and flickers on with it, and #4764's copies
-  his live 3D canvas every frame while the hero is on screen (his render before that).
-- The stream is night water seen from above: wavelets riding the current catch the light as
-  glints and mirror a hazy sky in moving bands, flecks of foam drift down, and the neon of the
-  section titles and of each game's and site's art shows in it, broken up by the waves.
-- Rain lands everywhere below the waterline (now and then a heavy drop that splashes), the pools
-  get drips, the pointer (or a finger) leaves a wake, each section heading drops a ripple into
-  its pool as it scrolls in, and scrolling speeds the stream up. The ripples move with the page
-  and step at a fixed 60 Hz on any display.
-- On wide screens the drops sit in the margin and the stream runs down it past the headings. On
-  narrower ones the drops sit in the open water above each heading, and the stream dips under
-  it. Under text the water is held dark enough for every pair to meet WCAG AA, and a little less
-  so under the glass.
-- It starts right after the first paint (the CSS reflections stand in until it has drawn, then
-  fade out as it fades in), draws at most 60 frames a second (30 once nothing has moved for a few
-  seconds), and stops while the tab is hidden. If frames run long for the display it draws fewer
-  pixels, and if even the fewest stay under about 24 fps in its first seconds it hands over to
-  the CSS night. With reduced motion it draws still frames only: no rain, ripples or flow. The
-  sign's flicker, the reveals and the drop rings are off too.
-- Without WebGL2 (or JS) the page keeps a plain CSS night, and the sign, #4764 and the crew get a
-  CSS reflection instead.
-
-The colour tokens are at the top of [`src/style.css`](src/style.css), and every text pair meets
-WCAG AA. Type is [Tilt Neon](https://fonts.google.com/specimen/Tilt+Neon) for the sign and the
-section titles, [Spline Sans](https://fonts.google.com/specimen/Spline+Sans) for the page,
-[Spline Sans Mono](https://fonts.google.com/specimen/Spline+Sans+Mono) for small code bits, and
-the bitmap terminal face [VT323](https://fonts.google.com/specimen/VT323) for Radbro OS and the
-hero's boot log. All four are SIL Open Font License and bundled from Fontsource.
+To add a command, add an entry to the `table` in [`src/os/commands.js`](src/os/commands.js):
+`desc` shows in `help`, `usage` changes how it shows there, `args: (words) => [...]` gives it tab
+completion, and `hidden: true` leaves it out of `help`.
 
 ## Share card and icons
 
 - `public/og4.jpg` is the share card: a painted 1200×630 of Radbro #4764 and Retardio #85 hanging
-  out on a rainy neon rooftop under the vyvanse.beer sign. The older cards, `public/og3.jpg` (the
-  six on the same rooftop), `public/og2.jpg` and `public/og.png` (a screenshot of
-  `scripts/og-card.html`), stay so old links keep their preview.
+  out on a rainy neon rooftop under the vyvanse.beer sign. The older cards, `public/og3.jpg`,
+  `public/og2.jpg` and `public/og.png` (a screenshot of `scripts/og-card.html`), stay so old links
+  keep their preview.
 - `public/apple-touch-icon.png` is a 180×180 screenshot of `scripts/touch-icon.html`.
 - `public/favicon.svg` is hand-drawn SVG.
 
-Open the card pages after `npm install` so the fonts resolve.
+## Radbro renders and models
 
-## Radbro renders
-
-`public/img/radbros/` holds flat renders of the rigged Radbro models on transparent
-backgrounds: `radbro-4764-hero.webp` (719×1100, waving) for the hero, and 500px-tall crew
-figures. `public/img/retardios/` holds the same 500px crew figures of Retardio #555 (waving) and
-Retardio #85 (cheering), rendered from their game models; their crew downloads are the web models
-`public/models/retardio555-hero.glb` and `retardio85-hero.glb` (mesh + `Idle` and `Big_Wave_Hello`,
-the same cut as #4764's).
-
-## #4764 in 3D
-
-The hero is a [`<model-viewer>`](https://modelviewer.dev) you can drag around (`src/bro.js`).
-The render above is its poster, scaled to the same size and spot as the 3D view, so the first
-paint is the same picture, and without JS (or WebGL) it's just that image. The camera aims high
-enough that his feet sit near the bottom of the box, on the hero's waterline; the room over his
-head (for the katana and the tilt) is kept out of the layout with a negative margin. He idles, waves every 8 to 12 seconds (or when you tap him), and turns slowly
-after 4 seconds on his own. With reduced motion on, he doesn't turn or wave by himself. In the
-terminal, `spin` spins him round.
-
-- `public/models/radbro4764-hero.glb` (about 730 KB) is a web cut of the rigged model: the
-  mesh plus two clips, `Idle` and `Big_Wave_Hello`, with both turned to face the camera. It
-  was made with [glTF-Transform](https://gltf-transform.dev): unlit, texture resized to 1024
-  and converted to WebP at quality 90, animations resampled, then Draco.
-- `public/draco/` is the Draco decoder from `three/examples/jsm/libs/draco/gltf/`, served from
-  this site instead of Google's CDN. Copy those two files again if you update `three`.
-- `@google/model-viewer` and `three` are pinned to exact versions. model-viewer 4.3.1 never
-  fires `finished`, so `src/bro.js` watches the wave's clock instead, and its leftover debug
-  `console.log` calls are silenced in the build (`vite.config.js`). Keyboard focus lands inside
-  its shadow DOM, so `src/bro.js` adds the lilac focus ring there.
+`public/img/radbros/` and `public/img/retardios/` hold flat renders of the rigged models on
+transparent backgrounds (the crew renders, 500 px tall), `public/img/faces/` their 200×200 crops
+for the character-select tiles. The web models in `public/models/` (#4764, #555 and #85) are the
+mesh plus `Idle` and `Big_Wave_Hello`, unlit, textures at 1024 in WebP, Draco-compressed; the
+Retardios' crew downloads are these same files. `public/draco/` is the Draco decoder from
+`three/examples/jsm/libs/draco/gltf/`, served from this site; copy those two files again if you
+update `three` (pinned to an exact version).
 
 ## License
 
@@ -183,4 +227,6 @@ terminal, `spin` spins him round.
   [dexedrne/radbros-3d](https://github.com/dexedrne/radbros-3d).
 - `public/draco/` is the Draco decoder that ships with three.js (Apache-2.0).
 - Retardio #555 and #85 (`public/img/retardios/`, `public/models/retardio*`) are dexedrne's own Retardios.
+- The background music (`public/audio/`) was made for this site and isn't covered by either
+  license above.
 - The screenshots of other people's projects in `public/img/` belong to those projects.

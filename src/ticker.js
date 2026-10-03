@@ -1,4 +1,4 @@
-// The strip in the top-left corner: the UTC clock, live BTC / ETH / SOL / XRP and RETARDIO. Prices
+// The ticker in the strip along the bottom: the UTC clock, live BTC / ETH / SOL / XRP and RETARDIO. Prices
 // come from CoinGecko's public price API (Coinbase's spot prices if that fails), RETARDIO's from
 // DexScreener's (its deepest pool), once a minute while the tab is visible; the last good prices
 // stay up when a fetch fails. JS only: without it there is no strip.
@@ -99,7 +99,7 @@ const change = (node, ch) => {
   }
 };
 
-export function createTicker() {
+export function createTicker(host = document.querySelector('#ticker-host')) {
   const el = document.createElement('div');
   el.className = 'ticker';
   el.setAttribute('aria-label', 'UTC time and live crypto prices');
@@ -114,8 +114,7 @@ export function createTicker() {
     `<span class="ticker__k">${TOKEN.sym}</span> <span class="ticker__px">…</span>` +
     `<span class="ticker__mc"></span><span class="ticker__ch"></span>` +
     `<svg class="ticker__spark" viewBox="0 0 40 12" aria-hidden="true" focusable="false"><polyline points="" /></svg></a>`;
-  // in the page column, so the strip never sits over Radbro OS when it's docked beside the page
-  (document.querySelector('.page') || document.body).prepend(el);
+  (host || document.body).prepend(el);
 
   const clock = el.querySelector('.ticker__clock');
   const tick = () => {

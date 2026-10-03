@@ -1,10 +1,10 @@
 // Terminal commands. Each entry: { usage, desc, run(args, ctx), args?() , hidden? }.
 // `help` lists every entry that isn't hidden, in this order.
 
-import { h } from './dom.js';
-import { shortUrl } from './projects.js';
+import { h } from '../dom.js';
+import { shortUrl } from '../projects.js';
 import { neofetch } from './fetch.js';
-import { openTip } from './tip/open.js';
+import { openTip } from '../tip/open.js';
 
 const norm = (s) => s.toLowerCase().replace(/^[#$]+/, '').trim();
 
@@ -44,52 +44,25 @@ export function openTab(url) {
   return !!w;
 }
 
-// `set windows on|off`: whether projects that allow framing open in an in-page window instead
-// of a new tab. Off by default, remembered in localStorage. Blocked storage means it lasts until
-// the page is closed.
-const WINDOWS_KEY = 'vyv-windows';
-let windowsMem = null;
-export const prefs = {
-  get windows() {
-    if (windowsMem != null) return windowsMem;
-    try {
-      return localStorage.getItem(WINDOWS_KEY) === 'on';
-    } catch {
-      return false;
-    }
-  },
-  set windows(on) {
-    windowsMem = on;
-    try {
-      if (on) localStorage.setItem(WINDOWS_KEY, 'on');
-      else localStorage.removeItem(WINDOWS_KEY);
-      windowsMem = null;
-    } catch {
-      /* private mode or blocked storage: keep it in memory */
-    }
-  },
-  saved: () => windowsMem == null,
-};
-
-// `open` flags: --window / -w for an in-page window, --tab / -t for a new tab.
-const WINDOW_FLAGS = ['--window', '-w', '--win'];
+// `open` flags: --tab / -t for a new tab even when it could play here. (--window is still
+// understood, from the days of in-page windows: it means "here" now.)
 const TAB_FLAGS = ['--tab', '-t'];
+const HERE_FLAGS = ['--window', '-w', '--win', '--here'];
 function parseOpen(args, want = null) {
   const names = [];
   for (const a of args) {
     const f = a.toLowerCase();
-    if (WINDOW_FLAGS.includes(f)) want = 'window';
-    else if (TAB_FLAGS.includes(f)) want = 'tab';
+    if (TAB_FLAGS.includes(f)) want = 'tab';
+    else if (HERE_FLAGS.includes(f)) want = 'here';
     else names.push(a);
   }
   return { names, want };
 }
 
-// Where a project opens: a new tab, unless it allows framing and a window was asked for (or
-// `set windows on`, and a tab wasn't asked for).
-const howFor = (p, want) => (p.frame && (want === 'window' || (want !== 'tab' && prefs.windows)) ? 'window' : 'tab');
+// Where a project opens: here in the player when it allows framing, unless a tab was asked for.
+const howFor = (p, want) => (p.frame && want !== 'tab' ? 'here' : 'tab');
 
-export function createCommands({ site, groups, projects, crew, contact, wm, term, page, bro }) {
+export function createCommands({ site, groups, projects, crew, contact, term, shell, close }) {
   const byName = new Map();
   for (const p of projects) for (const n of [p.cmd, ...(p.aliases || [])]) byName.set(n, p);
   const findProject = (args) => byName.get(norm(args.join('-')));
@@ -102,53 +75,17 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
   const places = contact ? [...sections, 'contact'] : sections;
   const playIn = projects.find((p) => p.cmd === crew.playIn);
 
-  // ctx.how / ctx.opened: a click on the page already decided, and opened the tab itself inside
-  // the click, so no popup blocker gets a say.
+  // Games (and sites) that allow framing play right here, in the player; the rest get a new tab.
   function launch(p, ctx, want = null) {
-    if ((ctx.how || howFor(p, want)) === 'window') {
-      const how = wm.open(p, { focusFrame: ctx.source === 'page' });
-      term.print(
-        line(
-          how === 'opened' ? 'opening ' : 'bringing ',
-          strong(p.name),
-          how === 'opened' ? ' in a window ' : ' to the front ',
-          muted(`(${shortUrl(p.url)})`),
-        ),
-      );
+    if (howFor(p, want) === 'here') {
+      term.print(line('loading ', strong(p.name), muted(` (${shortUrl(p.url)}). hold esc, or view + menu on a pad, to come back.`)));
+      setTimeout(() => shell.play(p), ctx.source === 'terminal' ? 350 : 0);
       return;
     }
-    const ok = ctx.opened ?? openTab(p.url);
-    if (!ok) {
-      term.print(line('your browser blocked the new tab. open it here: ', link(p.url)));
-    } else if (want === 'window') {
-      term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't run in a window here.`));
-    } else {
-      term.print(
-        line(
-          'opened ',
-          strong(p.name),
-          ' in a new tab ',
-          muted(`(${shortUrl(p.url)})`),
-          p.frame ? [muted('. to run it in a window here: '), run(`win ${p.cmd}`)] : null,
-        ),
-      );
-    }
-  }
-
-  function showWindowsPref() {
-    const on = prefs.windows;
-    term.print(
-      grid(
-        muted('windows'),
-        h(
-          'span',
-          {},
-          on ? 'on  ' : 'off  ',
-          muted(on ? 'projects that allow it open in a window here.  ' : 'projects open in a new tab.  '),
-          run(`set windows ${on ? 'off' : 'on'}`, on ? 'turn off' : 'turn on'),
-        ),
-      ),
-    );
+    const ok = openTab(p.url);
+    if (!ok) term.print(line('your browser blocked the new tab. open it here: ', link(p.url)));
+    else if (want === 'here') term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't play here.`));
+    else term.print(line('opened ', strong(p.name), ' in a new tab ', muted(`(${shortUrl(p.url)})`)));
   }
 
   function describe(p) {
@@ -164,11 +101,11 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
         p.credit ? line(muted(`${p.credit.before} `), link(p.credit.href, p.credit.label), muted(` ${p.credit.after}`)) : null,
         p.note ? line(muted(p.note)) : null,
         p.frame
-          ? grid(run(`open ${p.cmd}`), muted('in a new tab'), run(`win ${p.cmd}`), muted('in a window here'))
+          ? grid(run(`open ${p.cmd}`), muted('plays here'), run(`open ${p.cmd} --tab`), muted('in a new tab'))
           : line(run(`open ${p.cmd}`), muted('  opens in a new tab')),
       ),
     );
-    page.show(p.slug);
+    shell.reveal(p.slug);
   }
 
   function describeBro(b) {
@@ -182,13 +119,13 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
           {},
           line(strong(b.name), b.featured ? muted('  the mascot') : null),
           line(muted(b.line)),
-          playIn ? line(b.soon ? 'coming soon to ' : 'playable in ', run(`open ${playIn.cmd}`)) : null,
+          line('playable in ', ...projects.filter((g) => g.cast?.includes(b.num)).flatMap((g, i) => [i ? ' ' : '', run(`open ${g.cmd}`, g.cmd)])),
           b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
           crew.repo && b.repo !== false ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
         ),
       ),
     );
-    page.show(b.slug);
+    shell.reveal(b.slug);
   }
 
   const table = {
@@ -203,7 +140,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
         }
         term.print(line(strong('commands')));
         term.print(grid(...rows));
-        term.print(line(muted('tab completes, ↑ and ↓ walk history, / or ` opens radbro os from anywhere, esc closes it.')));
+        term.print(line(muted('tab completes, ↑ and ↓ walk history, / or ` opens radbro os from the menu, esc closes it.')));
       },
     },
     ls: {
@@ -237,12 +174,12 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
     },
     open: {
       usage: 'open <name>',
-      desc: 'open a project in a new tab',
-      args: (parts) => (parts.length > 2 ? ['--window', '--tab'] : projects.map((p) => p.cmd)),
+      desc: 'play a game here, or open a site',
+      args: (parts) => (parts.length > 2 ? ['--tab'] : projects.map((p) => p.cmd)),
       run(rawArgs, ctx) {
         const { names: args, want } = parseOpen(rawArgs, ctx.want);
         if (!args.length) {
-          term.print(line('usage: open <name> [--window]. try ', run('ls'), ' to see names.'));
+          term.print(line('usage: open <name> [--tab]. try ', run('ls'), ' to see names.'));
           return;
         }
         const p = findProject(args);
@@ -250,7 +187,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
         const social = site.links.find((l) => l.cmd === norm(args[0]));
         if (social) return table[social.cmd].run([], ctx);
         if (findBro(args)) {
-          term.print(line("radbros aren't websites, but they're playable in ", run('open radrun'), '.'));
+          term.print(line("radbros aren't websites, but they're playable in every game. try ", run('open radrun'), '.'));
           return;
         }
         const guess = closest(norm(args.join('')), [...byName.keys()]);
@@ -259,16 +196,10 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
       },
     },
     win: {
-      usage: 'win <name>',
-      desc: 'open a project in a window here',
+      hidden: true,
       args: () => projects.filter((p) => p.frame).map((p) => p.cmd),
       run(args, ctx) {
-        if (!parseOpen(args).names.length) {
-          const can = projects.filter((p) => p.frame);
-          term.print(line('usage: win <name>. these can run in a window: ', ...can.flatMap((p, i) => [i ? ' ' : '', run(`win ${p.cmd}`, p.cmd)])));
-          return;
-        }
-        table.open.run(args, { ...ctx, want: 'window' });
+        table.open.run(args, { ...ctx, want: 'here' });
       },
     },
     info: {
@@ -307,30 +238,28 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
         );
         if (playIn) term.print(line('play them: ', run(`open ${playIn.cmd}`)));
         if (crew.repo) term.print(line('free to use: ', link(crew.repo.href), muted(` (${crew.repo.license.label})`)));
-        page.show('crew');
+        shell.reveal('crew');
       },
     },
-    spin: {
-      desc: 'spin #4764 round',
+    wave: {
+      desc: 'make #4764 and #85 wave',
       run() {
-        page.hero();
-        const how = bro?.spin() ?? 'missing';
-        if (how === 'ok') term.print(line('wheee. ', muted('drag him to spin him yourself.')));
-        else if (how === 'spinning') term.print(line(muted("he's already spinning.")));
-        else if (how === 'loading') term.print(line(muted('warming him up. he spins as soon as he loads.')));
-        else term.print(line(muted("he's a picture right now (no 3d in this browser), so he can't spin.")));
+        const how = shell.wave();
+        if (how === 'ok') term.print(line('gm. ', muted('click them on the water to make one wave.')));
+        else if (how === 'loading') term.print(line(muted("they're still warming up. try again in a second.")));
+        else term.print(line(muted("they're pictures right now (no 3d in this browser), so they can't wave.")));
       },
     },
     cd: {
       usage: 'cd <section>',
-      desc: 'scroll the page to a section',
+      desc: 'go to games, crew, sites or contact',
       args: () => places,
       run(args) {
         const to = args[0] ? norm(args[0]).replace(/\/$/, '') : '~';
-        if (to === '~' || to === '/' || to === '') return page.go(null);
+        if (to === '~' || to === '/' || to === '') return shell.go('games');
         if (to === '..') return term.print(line(muted("you're already at the top. there's nothing above vyvanse.beer.")));
         if (!places.includes(to)) return term.print(err(`cd: no such section: ${args[0]}`));
-        page.go(to);
+        shell.go(to);
       },
     },
     whoami: {
@@ -346,7 +275,7 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
       run() {
         term.print(line('dms are open on x: ', link(contact.dm.href, shortUrl(contact.dm.href), 'me noopener'), muted(`  ${contact.dm.handle}`)));
         term.print(line(muted('code and models: '), link(contact.code.href, shortUrl(contact.code.href), 'me noopener')));
-        page.show('contact');
+        shell.reveal('contact');
       },
     },
     tip: {
@@ -380,55 +309,19 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
         },
       ]),
     ),
-    windows: {
-      desc: 'list open windows',
+    ps: {
+      desc: "what's playing",
       run() {
-        const list = wm.list();
-        if (!list.length) return term.print(line(muted('no windows open. projects open in a new tab; to run one here, try '), run('win radrun')));
-        term.print(
-          grid(
-            ...list.flatMap((w) => [
-              run(`open ${w.cmd}`, w.cmd),
-              muted(w.min ? 'minimised' : w.active ? 'in front' : 'open'),
-            ]),
-          ),
-        );
+        const p = shell.playing();
+        if (!p) return term.print(line(muted('nothing playing. try '), run('open radrun')));
+        term.print(grid(strong(p.cmd), muted(`playing (${shortUrl(p.url)})`)));
       },
     },
     close: {
-      usage: 'close <name|all>',
-      desc: 'close windows',
-      args: () => [...wm.list().map((w) => w.cmd), 'all'],
-      run(args) {
-        const want = args[0] ? norm(args[0]) : wm.active();
-        if (!want) return term.print(line(muted('no window to close.')));
-        if (want === 'all') {
-          const n = wm.closeAll();
-          return term.print(line(muted(n ? `closed ${n} window${n > 1 ? 's' : ''}` : 'no windows open.')));
-        }
-        const p = findProject([want]);
-        if (p && wm.close(p.cmd)) return term.print(line(muted(`closed ${p.name}`)));
-        term.print(err(`close: no open window called ${args[0] || want}`));
-      },
-    },
-    set: {
-      usage: 'set windows on|off',
-      desc: 'open projects in windows here by default',
-      args: (parts) => (parts.length > 2 ? ['on', 'off'] : ['windows']),
-      run(args) {
-        if (!args.length) return showWindowsPref();
-        if (!['windows', 'window', 'win'].includes(norm(args[0]))) {
-          term.print(err(`set: no such setting: ${args[0]}`));
-          return showWindowsPref();
-        }
-        const v = args[1]?.toLowerCase();
-        if (!v) return showWindowsPref();
-        const on = ['on', 'yes', 'true', '1'].includes(v);
-        if (!on && !['off', 'no', 'false', '0'].includes(v)) return term.print(err('set: windows is on or off'));
-        prefs.windows = on;
-        if (on) term.print(line('windows on. ', muted('projects that allow it now open in a window here. '), run('set windows off', 'undo')));
-        else term.print(line('windows off. ', muted('projects open in a new tab. for a one-off window: '), run('win radrun')));
-        if (!prefs.saved()) term.print(line(muted("this browser won't let the page remember it, so it lasts until you leave.")));
+      desc: 'stop the game and come back',
+      run() {
+        if (!shell.playing()) return term.print(line(muted('nothing playing.')));
+        shell.stop();
       },
     },
     history: {
@@ -453,13 +346,14 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
       hidden: true,
       run() {
         term.print(line(muted('logging out of radbro os. / brings it back.')));
-        setTimeout(() => page.collapse(), 450);
+        setTimeout(() => close(), 450);
       },
     },
     radbros: { hidden: true, run: (a, c) => table.crew.run(a, c) },
     radbrofetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
     fetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
-    ps: { hidden: true, run: (a, c) => table.windows.run(a, c) },
+    windows: { hidden: true, run: (a, c) => table.ps.run(a, c) },
+    spin: { hidden: true, run: (a, c) => table.wave.run(a, c) },
     dm: { hidden: true, run: (a, c) => table.contact.run(a, c) },
     donate: { hidden: true, run: (a, c) => table.tip.run(a, c) },
     man: { hidden: true, run: (a, c) => table.help.run(a, c) },
@@ -506,15 +400,6 @@ export function createCommands({ site, groups, projects, crew, contact, wm, term
 
   return {
     names,
-    // For clicks on the page: `open <name>` / `win <name>` -> { p, how: 'tab' | 'window' }.
-    target(cmd) {
-      const [verb, ...rest] = cmd.trim().split(/\s+/);
-      const v = verb.toLowerCase();
-      if (v !== 'open' && v !== 'win') return null;
-      const { names: args, want } = parseOpen(rest, v === 'win' ? 'window' : null);
-      const p = findProject(args);
-      return p ? { p, how: howFor(p, want) } : null;
-    },
     run(raw, ctx = {}) {
       const [first, ...args] = raw.trim().split(/\s+/);
       if (!first) return;

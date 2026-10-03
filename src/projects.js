@@ -1,8 +1,8 @@
-// Single source of truth for the page and the terminal.
+// Single source of truth for the game-select screen and the terminal.
 //
-// The landing (hero, project lists, crew, contact, footer) is rendered into index.html at build time
-// from this file (see src/render.js), and the terminal (src/commands.js) reads the same data
-// at runtime, so a project added here shows up in both.
+// The screen (games, crew, sites, contact) is rendered into index.html at build time from this
+// file (see src/render.js), so every game, model download and link is plain HTML before any JS
+// runs. The menu (src/main.js) and Radbro OS (src/os/) read the same data at runtime.
 //
 // Project fields:
 //   cmd       terminal name: `open <cmd>`, `info <cmd>`. Lowercase, no spaces.
@@ -13,14 +13,16 @@
 //   kind      one line saying what it is
 //   blurb     plain-text description
 //   url       what `open` launches (also the card's main link)
-//   frame     true if the site allows being shown in an iframe. Everything opens in a new tab;
-//             frame: true also lets it run in an in-page window when asked (`win <cmd>`, the
-//             card's "In a window" button, or `set windows on`). false = it sends
-//             X-Frame-Options / frame-ancestors, so it's only ever a new tab.
+//   frame     true if the site allows being shown in an iframe: PLAY then runs it inside this
+//             page, full screen, in the player (src/player.js). false = it sends
+//             X-Frame-Options / frame-ancestors, so it opens in a new tab (and says so).
 //             Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
 //   links     [{ label, href }]; the first one is the main action and should match `url`
-//   image     optional { src, width, height, alt } in public/img/ (800x420 webp); games and
-//             sites both show it on their card, and a card without one still works
+//   image     optional { src, width, height, alt } in public/img/: a game's key art (it fills
+//             the screen behind the menu) or a site's 800x420 screenshot (its preview monitor)
+//   thumb     optional cartridge label in public/img/thumb/ (420x236 webp)
+//   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
+//   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
 //   credit    optional { before, label, href, after } rendered as one line
 //   note      optional plain-text line
 
@@ -35,9 +37,12 @@ export const site = {
 };
 
 export const groups = [
-  { id: 'games', title: 'Games', line: 'Games I make. They run in a browser tab.' },
+  { id: 'games', title: 'Games', line: 'Games I make. Free, in the browser, keyboard or controller.' },
   { id: 'sites', title: 'Sites I built', line: 'Websites I made for other people’s projects.' },
 ];
+
+// Everyone in the crew. Most games let you play as all six.
+const ALL = ['652', '4764', '2564', '723', '555', '85'];
 
 export const projects = [
   {
@@ -56,10 +61,14 @@ export const projects = [
       { label: 'Play', href: 'https://radrun.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
+    thumb: '/img/thumb/radrun.webp',
+    shell: '#3d2263',
+    accent: '#ff5fd2',
+    cast: ALL,
     image: {
-      src: '/img/radrun3.webp',
-      width: 960,
-      height: 504,
+      src: '/img/art/radrun.webp',
+      width: 1600,
+      height: 900,
       alt: 'RadRun: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 web-swing and wingsuit-glide over rain-slick neon rooftops at dusk.',
     },
     credit: {
@@ -85,11 +94,49 @@ export const projects = [
       { label: 'Play', href: 'https://radpayne.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radpayne' },
     ],
+    thumb: '/img/thumb/radpayne.webp',
+    shell: '#1e2a3b',
+    accent: '#7cc4ff',
+    cast: ALL,
     image: {
-      src: '/img/radpayne3.webp',
-      width: 960,
-      height: 504,
+      src: '/img/art/radpayne.webp',
+      width: 1600,
+      height: 900,
       alt: 'RadPayne, bullet-time noir: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 dive through the rain with pistols blazing on a neon-lit street.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth. Pockit Miladys by prnth.',
+    },
+  },
+  {
+    cmd: 'retardiopayne',
+    boot: 'the harder cut, Retardios only', // the hero's boot log line
+    aliases: ['retardio-payne', 'rpayne'],
+    slug: 'retardiopayne',
+    group: 'games',
+    name: 'RetardioPayne',
+    kind: 'The harder cut of RadPayne, only the Retardio boys #555 and #85',
+    blurb:
+      'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555 and #85 to play: the same rainy Manhattan night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
+    url: 'https://retardiopayne.vyvanse.beer',
+    frame: true,
+    links: [
+      { label: 'Play', href: 'https://retardiopayne.vyvanse.beer' },
+      { label: 'Source', href: 'https://github.com/dexedrne/radpayne' },
+    ],
+    thumb: '/img/thumb/retardiopayne.webp',
+    shell: '#1f2a44',
+    accent: '#ff7ab6',
+    cast: ['555', '85'],
+    image: {
+      src: '/img/art/retardiopayne.webp',
+      width: 1200,
+      height: 630,
+      alt: 'RetardioPayne, the harder cut: Retardio #555 and Retardio #85 with pistols, on two snapshots over a rainy neon street, beside the blue and pink RETARDIO PAYNE wordmark.',
+      position: '78% 50%', // keep the two of them in view (object-position)
     },
     credit: {
       before: 'Built on',
@@ -111,10 +158,14 @@ export const projects = [
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
+    thumb: '/img/thumb/rbgo.webp',
+    shell: '#5c4228',
+    accent: '#f2b45c',
+    cast: ALL,
     image: {
-      src: '/img/rbgo3.webp',
-      width: 960,
-      height: 504,
+      src: '/img/art/rbgo.webp',
+      width: 1600,
+      height: 900,
       alt: 'RBGO: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 plant the bomb in a sunlit desert bazaar under big painted A and B signs.',
     },
     credit: {
@@ -136,10 +187,14 @@ export const projects = [
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
+    thumb: '/img/thumb/radops.webp',
+    shell: '#1d4746',
+    accent: '#ff8fb1',
+    cast: ALL,
     image: {
-      src: '/img/radops3.webp',
-      width: 960,
-      height: 504,
+      src: '/img/art/radops.webp',
+      width: 1600,
+      height: 900,
       alt: 'RadOps: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 trade fire across a pastel cul-de-sac, a school bus, a box truck and a water tower behind.',
     },
     credit: {
@@ -161,10 +216,14 @@ export const projects = [
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
+    thumb: '/img/thumb/radzombies.webp',
+    shell: '#3c1838',
+    accent: '#ff8a3d',
+    cast: ALL,
     image: {
-      src: '/img/radzombies3.webp',
-      width: 960,
-      height: 504,
+      src: '/img/art/radzombies.webp',
+      width: 1600,
+      height: 900,
       alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
     },
     credit: {
@@ -184,16 +243,20 @@ export const projects = [
     blurb:
       'An open-source, copyright-free rev254 private server with a Solana twist. Create an account, train skills, take on quests and explore with other players.',
     url: 'https://play.solscape.fun',
-    frame: true,
+    // its sign-in and wallets want a tab of their own, and solscape.fun refuses framing
+    frame: false,
     links: [
       { label: 'Play', href: 'https://play.solscape.fun' },
       { label: 'Site', href: 'https://www.solscape.fun' },
       { label: '$XP on pump.fun', href: 'https://pump.fun/coin/9spN3Lrz4tnFXaXfR9QzKdiMd2hE4AUbAJntui21pump' },
     ],
+    thumb: '/img/thumb/solscape.webp',
+    shell: '#262046',
+    accent: '#5fe3d0',
     image: {
-      src: '/img/solscape.webp',
-      width: 800,
-      height: 420,
+      src: '/img/art/solscape.webp',
+      width: 1600,
+      height: 840,
       alt: 'Solscape login screen: the glowing Solscape logo over a harbor town at dusk, with Create account and Existing User buttons.',
     },
   },
@@ -210,6 +273,8 @@ export const projects = [
       { label: 'Run the maze', href: 'https://bitcorn.lol/maze' },
       { label: 'Site', href: 'https://bitcorn.lol' },
     ],
+    thumb: '/img/thumb/bitcorn.webp',
+    accent: '#f4c84a',
     image: {
       src: '/img/bitcorn.webp',
       width: 800,
@@ -232,6 +297,8 @@ export const projects = [
       { label: 'Open', href: 'https://www.bulked.lol/os' },
       { label: 'Site', href: 'https://www.bulked.lol' },
     ],
+    thumb: '/img/thumb/bulk.webp',
+    accent: '#b07cff',
     image: {
       src: '/img/bulk.webp',
       width: 800,
@@ -250,6 +317,8 @@ export const projects = [
     url: 'https://www.bulked.lol/games/bulkagachi',
     frame: true,
     links: [{ label: 'Play', href: 'https://www.bulked.lol/games/bulkagachi' }],
+    thumb: '/img/thumb/bulkagachi.webp',
+    accent: '#e08bff',
     image: {
       src: '/img/bulkagachi.webp',
       width: 800,
@@ -268,6 +337,8 @@ export const projects = [
     url: 'https://www.sanic.fun',
     frame: false,
     links: [{ label: 'Play', href: 'https://www.sanic.fun' }],
+    thumb: '/img/thumb/sanic.webp',
+    accent: '#4f8dff',
     image: {
       src: '/img/sanic.webp',
       width: 800,
@@ -286,6 +357,8 @@ export const projects = [
     url: 'https://www.crankmyhog.lol/assets/hog-rider-3d/index.html',
     frame: true,
     links: [{ label: 'Ride', href: 'https://www.crankmyhog.lol/assets/hog-rider-3d/index.html' }],
+    thumb: '/img/thumb/hog.webp',
+    accent: '#ff9d5c',
     image: {
       src: '/img/hog.webp',
       width: 800,
@@ -296,11 +369,11 @@ export const projects = [
 ];
 
 // The Radbros, rendered in 3D with transparent backgrounds.
-// `num` is what the terminal takes (`info 4764`). `featured` = the site mascot.
-// `soon` = built for RadRun but not playable there yet; drop it once he is.
+// `num` is what the terminal takes (`info 4764`). `featured` = the site mascot (picked first
+// on Crew). The games each one is in come from the games' `cast`.
 export const crew = {
   title: 'The crew',
-  line: 'Radbros #652, #4764, #2564 and #723, and Retardios #555 and #85, built in 3D and playable in RadRun.',
+  line: 'Radbros #652, #4764, #2564 and #723, and Retardios #555 and #85, built in 3D. You play as them in the games.',
   playIn: 'radrun',
   downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '81 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
@@ -314,6 +387,8 @@ export const crew = {
     {
       num: '652',
       slug: 'radbro-652',
+      kind: 'Radbro',
+      face: '/img/faces/radbro-652.webp', // 200x200 crop for the character-select tile
       name: 'Radbro #652',
       line: 'Brown mop, big blue eyes, the Nobody sweatshirt.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v3.zip', label: '3D model .zip', size: '17 MB' },
@@ -327,6 +402,8 @@ export const crew = {
     {
       num: '4764',
       slug: 'radbro-4764',
+      kind: 'Radbro',
+      face: '/img/faces/radbro-4764.webp', // 200x200 crop for the character-select tile
       name: 'Radbro #4764',
       line: 'Skull shades, scribble hoodie, katana at his left hip.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v3.zip', label: '3D model .zip', size: '19 MB' },
@@ -341,6 +418,8 @@ export const crew = {
     {
       num: '2564',
       slug: 'radbro-2564',
+      kind: 'Radbro',
+      face: '/img/faces/radbro-2564.webp', // 200x200 crop for the character-select tile
       name: 'Radbro #2564',
       line: 'The ghost. Foil hat, aviators, RAD RESPONSE vest.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro2564-3d-model.zip', label: '3D model .zip', size: '20 MB' },
@@ -354,6 +433,8 @@ export const crew = {
     {
       num: '723',
       slug: 'radbro-723',
+      kind: 'Radbro',
+      face: '/img/faces/radbro-723.webp', // 200x200 crop for the character-select tile
       name: 'Radbro #723',
       line: 'The new guy. Cowboy hat, a wink, HOT TOPIC BRO vest.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro723-3d-model.zip', label: '3D model .zip', size: '21 MB' },
@@ -369,6 +450,8 @@ export const crew = {
     {
       num: '555',
       slug: 'retardio-555',
+      kind: 'Retardio Cousin',
+      face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
       name: 'Retardio #555',
       line: 'Long brown hair, heart blush, BRITISH FOOD tee.',
       repo: false,
@@ -383,6 +466,8 @@ export const crew = {
     {
       num: '85',
       slug: 'retardio-85',
+      kind: 'Retardio Classic',
+      face: '/img/faces/retardio-85.webp', // 200x200 crop for the character-select tile
       name: 'Retardio #85',
       line: 'Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
       repo: false,
@@ -405,8 +490,11 @@ export const contact = {
   code: { label: 'GitHub', href: 'https://github.com/dexedrne' },
 };
 
-// The big #4764 in the hero. The render is the poster (and what no-JS visitors and crawlers
-// get); `model` is the small web GLB <model-viewer> swaps in so you can drag him around.
+// #4764 and #85 stand on the puddle together, live in 3D (src/duo.js). Their renders are the
+// poster pair until the models load (and all there is without WebGL).
+export const duo = ['4764', '85'];
+
+// #4764's big render: the share card's alt and the terminal's neofetch use it.
 export const mascot = {
   src: '/img/radbros/radbro-4764-hero.webp',
   width: 719,

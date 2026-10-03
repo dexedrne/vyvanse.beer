@@ -33,15 +33,3 @@ export const media = {
 };
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-// Where an element sits in the document, in css px, ignoring transforms and `translate` (a
-// section that hasn't surfaced yet is still shifted down; this is where it will land).
-export function docBox(el) {
-  let x = 0;
-  let y = 0;
-  for (let e = el; e; e = e.offsetParent) {
-    x += e.offsetLeft;
-    y += e.offsetTop;
-  }
-  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
-}
