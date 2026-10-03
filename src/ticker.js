@@ -1,4 +1,4 @@
-// The strip in the top-left corner: the UTC clock, live BTC / ETH / SOL / XRP and RETARDIO. Prices
+// The ticker in the strip along the bottom: the UTC clock, live BTC / ETH / SOL / XRP and RETARDIO. Prices
 // come from CoinGecko's public price API (Coinbase's spot prices if that fails), RETARDIO's from
 // DexScreener's (its deepest pool), once a minute while the tab is visible; the last good prices
 // stay up when a fetch fails. JS only: without it there is no strip.
@@ -99,7 +99,7 @@ const change = (node, ch) => {
   }
 };
 
-export function createTicker() {
+export function createTicker(host = document.querySelector('#ticker-host')) {
   const el = document.createElement('div');
   el.className = 'ticker';
   el.setAttribute('aria-label', 'UTC time and live crypto prices');
@@ -114,15 +114,18 @@ export function createTicker() {
     `<span class="ticker__k">${TOKEN.sym}</span> <span class="ticker__px">…</span>` +
     `<span class="ticker__mc"></span><span class="ticker__ch"></span>` +
     `<svg class="ticker__spark" viewBox="0 0 40 12" aria-hidden="true" focusable="false"><polyline points="" /></svg></a>`;
-  // in the page column, so the strip never sits over Radbro OS when it's docked beside the page
-  (document.querySelector('.page') || document.body).prepend(el);
+  (host || document.body).prepend(el);
 
   const clock = el.querySelector('.ticker__clock');
+  let paused = false;
+  let ticking = 0;
   const tick = () => {
+    clearTimeout(ticking);
+    if (paused) return;
     const now = new Date();
     clock.textContent = now.toISOString().slice(11, 19);
     clock.dateTime = now.toISOString();
-    setTimeout(tick, 1000 - (now.getTime() % 1000));
+    ticking = setTimeout(tick, 1000 - (now.getTime() % 1000));
   };
   tick();
 
@@ -132,7 +135,8 @@ export function createTicker() {
   let timer = 0;
   const refresh = async () => {
     clearTimeout(timer);
-    if (document.hidden) return;
+    timer = 0;
+    if (document.hidden || paused) return;
     last = Date.now();
     const [got, t] = await Promise.all([prices().catch(() => []), token().catch(() => null)]);
     got.forEach((p, i) => {
@@ -151,11 +155,29 @@ export function createTicker() {
       spark.classList.toggle('is-down', t.ch < 0);
       spark.querySelector('polyline').setAttribute('points', t.spark.length > 1 ? sparkPath(t.spark) : '');
     }
-    timer = setTimeout(refresh, EVERY);
+    if (!paused) timer = setTimeout(refresh, EVERY);
   };
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && Date.now() - last >= EVERY) refresh();
-    else if (!document.hidden && !timer) timer = setTimeout(refresh, EVERY - (Date.now() - last));
-  });
+  const wake = () => {
+    if (document.hidden || paused) return;
+    if (Date.now() - last >= EVERY) refresh();
+    else if (!timer) timer = setTimeout(refresh, EVERY - (Date.now() - last));
+  };
+  document.addEventListener('visibilitychange', wake);
   refresh();
+
+  // while a game has the screen: no clock, no fetches
+  return {
+    pause() {
+      paused = true;
+      clearTimeout(ticking);
+      clearTimeout(timer);
+      timer = 0;
+    },
+    resume() {
+      if (!paused) return;
+      paused = false;
+      tick();
+      wake();
+    },
+  };
 }

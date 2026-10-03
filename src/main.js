@@ -1,315 +1,845 @@
-// Wires the landing, the terminal and the windows together. The landing works without any
-// of this; everything here is progressive enhancement.
+// The game-select screen. src/render.js already put every game, crew member, site and link in
+// the HTML; this turns it into one full-screen menu you can drive with a mouse, touch, a
+// keyboard or a controller (src/input.js), plays the games inside the page (src/player.js),
+// and starts the rain, the puddle and the live duo after the first paint (src/stage.js).
 
-import { site, groups, projects, crew, contact } from './projects.js';
-import { h, media } from './dom.js';
-import { createWindows } from './windows.js';
-import { createTerminal } from './terminal.js';
-import { createCommands, openTab } from './commands.js';
-import { createBro } from './bro.js';
+import { site, groups, projects, crew, contact, duo as DUO } from './projects.js';
+import { createInput } from './input.js';
+import { createAudio } from './audio.js';
+import { createPlayer } from './player.js';
 import { createTicker } from './ticker.js';
-import { createReveal, createSheen } from './reveal.js';
 import { openTip, loadTip } from './tip/open.js';
 
-const root = document.documentElement;
-const termEl = document.getElementById('term');
-const scrim = document.getElementById('scrim');
-const launcher = document.getElementById('launcher');
-const closeBtn = termEl.querySelector('.term__close');
-const bar = termEl.querySelector('.term__bar');
-const coarse = matchMedia('(pointer: coarse)');
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const phone = matchMedia('(max-width: 760px)');
 
-// Open/closed and "has seen the neofetch" last for the tab session only, so every new visit
-// starts on the plain landing. Blocked storage just means nothing is remembered.
-const OPEN_KEY = 'vyv-term-open';
-const FETCHED_KEY = 'vyv-fetched';
-const session = {
-  get(k) {
-    try {
-      return sessionStorage.getItem(k);
-    } catch {
-      return null;
-    }
-  },
-  set(k, v) {
-    try {
-      sessionStorage.setItem(k, v);
-    } catch {
-      /* private mode or blocked storage */
-    }
-  },
+const screen = $('#screen');
+const duoEl = $('#duo');
+const hint = $('#duo-hint');
+
+const TABS = ['games', 'crew', 'sites', 'contact'];
+const LISTS = {
+  games: projects.filter((p) => p.group === 'games'),
+  crew: crew.members,
+  sites: projects.filter((p) => p.group === 'sites'),
+  contact: $$('#contact .mi'),
 };
+const S = {
+  tab: 'games',
+  games: 0,
+  crew: Math.max(0, crew.members.findIndex((m) => m.featured)),
+  sites: 0,
+  contact: 0,
+};
+const idOf = (tab, i) => (tab === 'crew' ? LISTS.crew[i]?.num : tab === 'contact' ? '' : LISTS[tab][i]?.cmd);
 
-let term;
+// ---- little helpers: a toast, the announcer, new tabs ----
 
-// ---- Radbro OS: hidden until asked for ----
-// The launcher, / or `, or clicking something on the page that prints output opens it. From
-// 1100px up it docks beside the page; below that it's a bottom sheet over a scrim.
+let toastEl;
+let toastT = 0;
+function toast(text, ms = 2200) {
+  toastEl ||= Object.assign(document.createElement('p'), { className: 'toast', role: 'status' });
+  if (!toastEl.isConnected) document.body.append(toastEl);
+  toastEl.textContent = text;
+  toastEl.hidden = false;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => (toastEl.hidden = true), ms);
+}
+const announce = (t) => ($('#announce').textContent = t);
 
-const panel = (() => {
-  let open = false;
-  let greeted = false;
-  let back = null; // where focus goes back to when it closes
-
-  function layout() {
-    const sheet = open && !media.wide.matches;
-    root.classList.toggle('term-open', open);
-    root.classList.toggle('sheet-open', sheet);
-    scrim.hidden = !sheet;
-  }
-
-  // Keyboard openings go to the prompt. A tap on a phone lands on the close button instead, so
-  // the on-screen keyboard doesn't jump up over the output.
-  function focusIn(where) {
-    if (where === 'input' || !coarse.matches) term.focus();
-    else closeBtn.focus({ preventScroll: true });
-  }
-
-  function set(v, { focus } = {}) {
-    if (v !== open) {
-      open = v;
-      termEl.inert = !v;
-      launcher.setAttribute('aria-expanded', String(v));
-      layout();
-      session.set(OPEN_KEY, v ? '1' : '0');
-      if (v) {
-        back = document.activeElement;
-        greet();
-      } else if (termEl.contains(document.activeElement)) {
-        const to = back && back !== document.body && back.isConnected && !termEl.contains(back) ? back : launcher;
-        to.focus({ preventScroll: true });
-      }
-    }
-    if (v && focus) focusIn(focus);
-  }
-
-  // First time it's needed: boot lines, then neofetch on the first open of the session (a plain
-  // `ls` after that). While it's still closed (a click on the page ran something) it all prints
-  // at once, so nothing waits on it.
-  function greet() {
-    if (greeted) return;
-    greeted = true;
-    const quiet = !open || !media.wide.matches;
-    const fetched = session.get(FETCHED_KEY);
-    session.set(FETCHED_KEY, '1');
-    const muted = (t) => h('span', { class: 't-muted' }, t);
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    term.boot(
-      [
-        h(
-          'div',
-          { class: 't-line' },
-          h('span', { class: 't-strong' }, 'Radbro OS v4.7.64'),
-          muted(' (midnight ube)'),
-          ' — type ',
-          h('button', { class: 't-cmd', type: 'button', 'data-cmd': 'help' }, 'help'),
-        ),
-        h('div', { class: 't-line' }, muted(`last login ${today.toLowerCase()} from the internet. click anything on the page, too.`)),
-      ],
-      { instant: quiet },
-    );
-    term.type(fetched ? 'ls' : 'neofetch', { instant: quiet }).then(() => {
-      // Show the greeting from its first line: on a phone the neofetch is taller than the sheet.
-      if (!fetched) termEl.querySelector('.term__out').scrollTop = 0;
-    });
-  }
-
-  launcher.addEventListener('click', () => set(!open, { focus: 'auto' }));
-  closeBtn.addEventListener('click', () => set(false));
-  scrim.addEventListener('click', () => set(false));
-  media.wide.addEventListener('change', layout);
-
-  // Below 1100px: drag the bar down to put the sheet away.
-  let drag = null;
-  bar.addEventListener('pointerdown', (e) => {
-    if (!open || media.wide.matches || e.button !== 0 || e.target.closest('button')) return;
-    drag = { y: e.clientY, dy: 0 };
-  });
-  bar.addEventListener('pointermove', (e) => {
-    if (!drag) return;
-    drag.dy = Math.max(0, e.clientY - drag.y);
-    if (drag.dy < 6) return;
-    if (!bar.hasPointerCapture(e.pointerId)) bar.setPointerCapture(e.pointerId);
-    termEl.classList.add('is-dragging');
-    termEl.style.transform = `translateY(${drag.dy}px)`;
-  });
-  const end = () => {
-    if (!drag) return;
-    const { dy } = drag;
-    drag = null;
-    termEl.classList.remove('is-dragging');
-    termEl.style.transform = '';
-    if (dy > 60) set(false);
-  };
-  bar.addEventListener('pointerup', end);
-  bar.addEventListener('pointercancel', end);
-
-  return {
-    open: (opts) => set(true, opts),
-    close: () => set(false),
-    isOpen: () => open,
-    greet,
-    restore() {
-      if (session.get(OPEN_KEY) === '1') set(true);
-    },
-  };
-})();
-
-// ---- the page side: scroll to things, flash them, mark open projects ----
-
-function flash(el) {
-  el.classList.remove('is-flash');
-  void el.offsetWidth;
-  el.classList.add('is-flash');
-  setTimeout(() => el.classList.remove('is-flash'), 1600);
+function openTab(url) {
+  const w = window.open(url, '_blank');
+  if (w) w.opener = null;
+  return !!w;
 }
 
-const behavior = () => (media.reduced.matches ? 'auto' : 'smooth');
+// A pad press doesn't count as a click to the browser, so it may not be allowed to open a tab.
+// Then ask: open it here (leaving the menu), or a real link to click.
+let ask = null;
+function askTab({ title, text, url }) {
+  if (!ask) {
+    ask = document.createElement('div');
+    ask.className = 'ask';
+    ask.hidden = true;
+    ask.innerHTML = `<div class="ask__box" role="alertdialog" aria-modal="true" aria-labelledby="ask-title" aria-describedby="ask-text">
+      <p class="ask__title" id="ask-title"></p><p class="ask__text" id="ask-text"></p>
+      <div class="ask__acts"><button class="play" type="button" data-here><span class="g g--a" data-g="a">A</span>Open it here</button>
+      <a class="play play--ghost" target="_blank" rel="noopener" data-tabby>New tab</a>
+      <button class="play play--ghost" type="button" data-cancel><span class="g g--b" data-g="b">B</span>Back</button></div></div>`;
+    ask.addEventListener('click', (e) => {
+      if (e.target === ask || e.target.closest('[data-cancel]')) closeAsk();
+      else if (e.target.closest('[data-here]')) location.assign(ask.dataset.url);
+      else if (e.target.closest('[data-tabby]')) setTimeout(closeAsk, 0);
+    });
+    ask.addEventListener('keydown', (e) => e.key === 'Escape' && (e.preventDefault(), closeAsk()));
+    document.body.append(ask);
+  }
+  ask.dataset.url = url;
+  $('#ask-title').textContent = title;
+  $('#ask-text').textContent = text;
+  $('[data-tabby]', ask).href = url;
+  input.paintGlyphs(ask);
+  ask.hidden = false;
+  ask.back = document.activeElement;
+  $('[data-here]', ask).focus();
+}
+function closeAsk() {
+  if (!ask || ask.hidden) return false;
+  ask.hidden = true;
+  ask.back?.focus?.({ preventScroll: true });
+  return true;
+}
 
-const page = {
-  // `cd`: move the page. Below 1100px the sheet gets out of the way first.
-  go(id) {
-    if (!media.wide.matches) panel.close();
-    if (!id) return scrollTo({ top: 0, behavior: behavior() });
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: behavior(), block: 'start' });
-    flash(el.querySelector('.sec__head') || el);
-  },
-  // `info` and friends: point at the thing on the page, only when the page is beside the terminal.
-  show(id) {
-    if (!media.wide.matches || !panel.isOpen()) return;
-    const el = document.getElementById(id);
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: behavior(), block: 'center' });
-    flash(el.matches('.bro') ? el.querySelector('.bro__link') : el.querySelector('.sec__head') || el);
-  },
-  collapse: () => panel.close(),
-  // `spin`: bring the hero into view so the spin can be seen.
-  hero() {
-    if (!media.wide.matches) panel.close();
-    const el = bro.el;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    if (r.top < 0 || r.bottom > innerHeight) el.scrollIntoView({ behavior: behavior(), block: 'center' });
-  },
-};
+// ---- backdrops: one <img> per picture, crossfaded; made when first needed ----
 
-// #4764 in the hero: loads the 3D viewer once he's on screen (see src/bro.js).
-const bro = createBro(document.querySelector('.hero__bro model-viewer'));
+// art with its own lettering on the left (a share card): where the lettering ends on screen, from
+// object-fit: cover and the object-position, so the page can fade it out up to there
+function cutLettered(img) {
+  const k = +img.dataset.lettered;
+  if (!k) return;
+  const [bw, bh, iw, ih] = [img.offsetWidth, img.offsetHeight, +img.dataset.w, +img.dataset.h];
+  if (!bw || !bh || !iw || !ih) return;
+  const s = Math.max(bw / iw, bh / ih);
+  const px = parseFloat(img.style.objectPosition) / 100;
+  img.style.setProperty('--cut', `${Math.round((bw - iw * s) * (isFinite(px) ? px : 0.5) + k * iw * s)}px`);
+}
 
-// the UTC clock, live BTC / ETH / SOL / XRP and RETARDIO in the top-left corner (src/ticker.js)
-createTicker();
+const BD = {};
+for (const img of $$('#backdrops .bd')) BD[img.dataset.bd] = img;
+function bdFor(tab, i) {
+  if (tab === 'games') {
+    const { src, position: pos, lettered, width: w, height: h } = LISTS.games[i].image;
+    return { key: `games:${LISTS.games[i].cmd}`, src, pos, lettered, w, h };
+  }
+  if (tab === 'sites') return { key: `sites:${LISTS.sites[i].cmd}`, src: LISTS.sites[i].image.src, soft: true };
+  if (tab === 'crew') return { key: 'crew', src: '/img/art/vyvanse.webp', soft: true };
+  return { key: 'contact', src: '/img/art/vyvanse.webp', pos: '60% 6%' };
+}
+function backdrop(tab, i) {
+  const b = bdFor(tab, i);
+  let img = BD[b.key];
+  if (!img) {
+    img = new Image();
+    img.className = `bd${b.soft ? ' bd--soft' : ''}${b.lettered ? ' bd--lettered' : ''}`;
+    if (b.lettered) Object.assign(img.dataset, { lettered: b.lettered, w: b.w, h: b.h });
+    img.alt = '';
+    img.decoding = 'async';
+    img.src = b.src;
+    if (b.pos) img.style.objectPosition = b.pos;
+    $('#backdrops').append(img);
+    BD[b.key] = img;
+    cutLettered(img);
+  }
+  const show = () => {
+    for (const k in BD) BD[k].classList.toggle('on', k === b.key);
+    emit();
+  };
+  // crossfade once it's decoded, so there's never a blank frame
+  if (img.complete) show();
+  else (img.decode?.() || Promise.resolve()).then(show, show);
+}
+// the neighbours of what's showing, fetched while nothing else is going on
+function warm(tab, i) {
+  const n = LISTS[tab]?.length;
+  if (!n || tab === 'contact') return;
+  const go = () => [i - 1, i + 1].forEach((j) => {
+    const b = bdFor(tab, (j + n) % n);
+    if (!BD[b.key]) new Image().src = b.src;
+  });
+  (window.requestIdleCallback || setTimeout)(go);
+}
 
-// sections surface as they scroll into view, and glass panes catch the light (src/reveal.js)
-createReveal();
-createSheen();
+// ---- painting ----
 
-// The rainy night behind the page (src/water.js): its own small chunk, fetched straight away and
-// started right after the first paint. Until it has drawn, the CSS reflections stand in, and it
-// fades in over them. No WebGL2, Save-Data, or a failure: the CSS night stays (.water-off).
-(() => {
-  const off = () => root.classList.add('water-off');
-  if (navigator.connection?.saveData) return off();
-  const mod = import('./water.js');
-  const painted = new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
-  Promise.all([mod, painted])
-    .then(([m]) => m.createWater() || off())
-    .catch(off);
-})();
-
-const wm = createWindows({
-  layer: document.getElementById('wm'),
-  dock: document.getElementById('dock'),
-  termEl,
-  onChange(open) {
-    for (const el of document.querySelectorAll('[data-project]')) {
-      if (el.closest('.wm')) continue;
-      el.toggleAttribute('data-open', open.includes(el.dataset.project));
+let typeTimer = 0;
+function typeOut(item) {
+  clearInterval(typeTimer);
+  const el = item && $('[data-type]', item);
+  if (!el) return;
+  const full = (el.dataset.full ||= el.textContent);
+  if (reduced.matches) {
+    el.textContent = full;
+    return;
+  }
+  let n = 0;
+  el.textContent = '';
+  el.classList.add('typed');
+  typeTimer = setInterval(() => {
+    el.textContent = full.slice(0, ++n);
+    if (n >= full.length) {
+      clearInterval(typeTimer);
+      setTimeout(() => el.classList.remove('typed'), 900);
     }
+  }, 22);
+}
+
+const panelOf = (tab) => $(`#${tab}`);
+const itemsOf = (tab) => $$('.item', panelOf(tab));
+const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
+const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
+
+function paint(tab) {
+  const i = S[tab];
+  const panel = panelOf(tab);
+  if (tab === 'contact') {
+    LISTS.contact.forEach((el, j) => el.classList.toggle('sel', j === i));
+  } else {
+    itemsOf(tab).forEach((el, j) => {
+      el.classList.toggle('on', j === i);
+      if (j !== i) {
+        el.classList.remove('is-more');
+        $('[data-more]', el)?.setAttribute('aria-expanded', 'false');
+      }
+    });
+    slotsOf(tab).forEach((el, j) => el.classList.toggle('sel', j === i));
+    controlsOf(tab).forEach((el, j) => (j === i ? el.setAttribute('aria-current', 'true') : el.removeAttribute('aria-current')));
+    const count = $('.count', panel);
+    if (count) count.textContent = `${i + 1} of ${LISTS[tab].length}`;
+    keepInView(controlsOf(tab)[i]);
+    typeOut(itemsOf(tab)[i]);
+  }
+  backdrop(tab, i);
+  warm(tab, i);
+}
+
+// keep the picked cartridge in view in the phone's swipe row (scroll the row, not the page)
+function keepInView(el) {
+  const sc = el?.closest('.carts, .tgroups');
+  if (!sc || sc.scrollWidth <= sc.clientWidth) return;
+  const r = el.getBoundingClientRect();
+  const sr = sc.getBoundingClientRect();
+  sc.scrollTo({ left: sc.scrollLeft + (r.left + r.width / 2) - (sr.left + sr.width / 2), behavior: reduced.matches ? 'auto' : 'smooth' });
+}
+
+function show(tab, { sound = true, focus = false } = {}) {
+  if (!TABS.includes(tab)) tab = 'games';
+  const changed = tab !== S.tab;
+  S.tab = tab;
+  for (const t of $$('.tab')) {
+    const on = t.dataset.tab === tab;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+  }
+  for (const p of $$('.panel')) p.classList.toggle('on', p.dataset.panel === tab);
+  screen.dataset.tab = tab;
+  paint(tab);
+  hints();
+  save();
+  layout();
+  if (tab === 'contact' && changed) {
+    waveDuo(1);
+    setTimeout(() => waveDuo(0), 700);
+  }
+  if (sound && changed) audio.blip('tab');
+  if (focus) controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
+  announce(`${tab}: ${label(tab, S[tab])}`);
+}
+const tabStep = (d) => show(TABS[(TABS.indexOf(S.tab) + d + TABS.length) % TABS.length], { focus: focusInRow() });
+
+function label(tab, i) {
+  if (tab === 'crew') return `${LISTS.crew[i].name}, ${i + 1} of ${LISTS.crew.length}`;
+  if (tab === 'contact') return LISTS.contact[i].querySelector('.mi__label').textContent;
+  return `${LISTS[tab][i].name}, ${i + 1} of ${LISTS[tab].length}`;
+}
+
+// focus was on the row: carry it along (keyboard users see the focus move with the cursor)
+const focusInRow = () => !!document.activeElement?.matches('.cart, .tile, .mi');
+
+function select(i, { sound = true } = {}) {
+  const n = LISTS[S.tab].length;
+  const next = ((i % n) + n) % n;
+  if (next === S[S.tab]) return;
+  const carry = focusInRow();
+  S[S.tab] = next;
+  paint(S.tab);
+  save();
+  layout();
+  if (S.tab === 'crew' && DUO.includes(LISTS.crew[next].num)) waveDuo(DUO.indexOf(LISTS.crew[next].num));
+  if (sound) audio.blip('move');
+  if (carry) controlsOf(S.tab)[next]?.focus({ preventScroll: true });
+  announce(label(S.tab, next));
+}
+const move = (d) => select(S[S.tab] + d);
+
+// ---- doing things ----
+
+function current() {
+  if (S.tab === 'games' || S.tab === 'sites') return LISTS[S.tab][S[S.tab]];
+  return null;
+}
+
+function play(p, { from } = {}) {
+  if (!p) return;
+  audio.blip('ok');
+  if (p.frame) return player.open(p);
+  // it can't run inside the page: a new tab, which a pad press may not be allowed to open
+  if (!openTab(p.url) && from === 'pad') {
+    askTab({
+      title: p.name,
+      text: `${p.name} can’t run inside this page, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
+      url: p.url,
+    });
+  }
+}
+
+function activate({ from, pad } = {}) {
+  if (from === 'pad') input.rumble(pad);
+  if (S.tab === 'contact') {
+    const el = LISTS.contact[S.contact];
+    if (el.matches('[data-tip]')) return openTipJar();
+    if (el.matches('[data-os]')) return openOS();
+    audio.blip('ok');
+    if (from === 'pad' && !openTab(el.href)) askTab({ title: el.querySelector('.mi__label').textContent, text: 'The browser only opens new tabs from a click or a key. Open it in this tab instead, or click New tab.', url: el.href });
+    else if (from !== 'pad') el.click();
+    return;
+  }
+  const item = itemsOf(S.tab)[S[S.tab]];
+  const btn = $('[data-act]', item);
+  btn?.classList.remove('is-hit');
+  void btn?.offsetWidth;
+  btn?.classList.add('is-hit');
+  if (S.tab === 'crew') {
+    audio.blip('ok');
+    btn.click(); // the model download
+    toast(`downloading ${LISTS.crew[S.crew].download.label} (${LISTS.crew[S.crew].download.size})`);
+    return;
+  }
+  play(current(), { from });
+}
+
+function details() {
+  if (S.tab === 'crew') {
+    const n = DUO.indexOf(LISTS.crew[S.crew].num);
+    return waveDuo(n >= 0 ? n : Math.round(Math.random()));
+  }
+  const item = itemsOf(S.tab)[S[S.tab]];
+  if (!item) return;
+  const open = item.classList.toggle('is-more');
+  $('[data-more]', item)?.setAttribute('aria-expanded', String(open));
+  audio.blip(open ? 'ok' : 'back');
+  emit();
+}
+
+function back() {
+  if (closeAsk()) return;
+  const dlg = $('dialog[open]');
+  if (dlg) return dlg.close();
+  if (os?.isOpen()) return os.close();
+  const item = S.tab !== 'contact' ? itemsOf(S.tab)[S[S.tab]] : null;
+  if (item?.classList.contains('is-more')) return details();
+  if (S.tab !== 'games') {
+    audio.blip('back');
+    show('games', { focus: focusInRow() });
+  }
+}
+
+// ---- fullscreen: the whole menu, like a console ----
+
+const fsBtn = $('#fs');
+function toggleFullscreen() {
+  const d = document;
+  if (d.fullscreenElement) return d.exitFullscreen?.().catch(() => {});
+  const go = d.documentElement.requestFullscreen?.({ navigationUI: 'hide' });
+  if (!go) return toast('full screen isn’t available here');
+  go.catch(() => toast(`press ${input.scheme === 'kb' ? 'F' : 'F on a keyboard'} or click ⛶ for full screen: browsers only allow it from a key or a click`, 3600));
+}
+fsBtn?.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', () => fsBtn?.setAttribute('aria-pressed', String(!!document.fullscreenElement)));
+
+// ---- the modal walk: arrows (or the d-pad) move through a dialog's buttons ----
+
+function openModal() {
+  return (ask && !ask.hidden && ask) || $('dialog[open]') || (os?.isOpen() && os.el) || null;
+}
+function walk(dir) {
+  const m = openModal();
+  if (!m) return;
+  const list = $$('a[href], button:not([disabled]), input:not([disabled]), [tabindex="0"]', m).filter((el) => el.offsetParent || el.getClientRects().length);
+  if (!list.length) return;
+  const at = list.indexOf(document.activeElement);
+  const step = dir === 'left' || dir === 'up' ? -1 : 1;
+  list[at < 0 ? 0 : (at + step + list.length) % list.length].focus();
+}
+
+// ---- input ----
+
+function mode() {
+  if (player.current) return 'play';
+  if (os?.isOpen() && os.el.contains(document.activeElement) && document.activeElement.matches('input')) return 'os';
+  if (openModal()) return 'modal';
+  return 'menu';
+}
+
+function act(name, info = {}) {
+  const m = mode();
+  if (m === 'modal' || m === 'os') {
+    if (['left', 'right', 'up', 'down'].includes(name)) return walk(name);
+    if (info.from !== 'pad') return false;
+    if (name === 'ok' || name === 'start') document.activeElement?.click?.();
+    else if (name === 'back') back();
+    return;
+  }
+  const vert = S.tab === 'contact';
+  switch (name) {
+    case 'left':
+      return move(-1);
+    case 'right':
+      return move(1);
+    case 'up':
+      return vert ? move(-1) : false;
+    case 'down':
+      return vert ? move(1) : false;
+    case 'ok':
+    case 'start':
+      return activate(info);
+    case 'back':
+      return back();
+    case 'prev':
+      return tabStep(-1);
+    case 'next':
+      return tabStep(1);
+    case 'details':
+      return details();
+    case 'wave':
+      return waveDuo(Math.round(Math.random()), Math.random() < 0.4 ? 'other' : 'viewer');
+    case 'fullscreen':
+      return toggleFullscreen();
+    case 'music':
+      return audio.toggleMusic();
+    case 'sfx':
+      return audio.toggleSfx();
+    case 'os':
+      return openOS({ focus: 'input' });
+  }
+  return false;
+}
+
+const input = createInput({ act, mode, onScheme: () => hints() });
+const audio = createAudio({ musicBtn: $('#music'), sfxBtn: $('#sfx'), toast });
+
+// ---- the player ----
+
+let stage = null;
+let ticker = null;
+const player = createPlayer({
+  glyph: (n) => input.glyph(n),
+  paintGlyphs: (el) => input.paintGlyphs(el),
+  pads: () => input.pads(),
+  blip: (k) => audio.blip(k),
+  onOpen() {
+    os?.close();
+    closeAsk();
+    screen.classList.add('is-away');
+    screen.inert = true;
+    stage?.pause();
+    ticker?.pause();
+    audio.duck(true);
+  },
+  onClose(p) {
+    screen.classList.remove('is-away');
+    screen.inert = false;
+    audio.duck(false);
+    const tab = p.group === 'sites' ? 'sites' : 'games';
+    const i = LISTS[tab].indexOf(p);
+    if (i >= 0) S[tab] = i;
+    show(tab, { sound: false });
+    stage?.resume();
+    ticker?.resume();
+    // back on the same cartridge
+    controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
   },
 });
+addEventListener('message', (e) => player.message(e.data, e.origin));
 
-let commands;
-term = createTerminal(termEl, {
-  exec: (cmd, ctx) => commands.run(cmd, ctx),
-  complete: (value) => commands.complete(value),
-  onInputFocus: () => panel.open(),
-});
-commands = createCommands({ site, groups, projects, crew, contact, wm, term, page, bro });
-
-// ---- the tip jar: anything with data-tip opens it (src/tip/), fetched on first hover ----
+// ---- mouse and touch ----
 
 document.addEventListener('click', (e) => {
-  if (!e.target.closest?.('[data-tip]') || e.button !== 0) return;
-  e.preventDefault();
-  openTip();
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const t = e.target.closest('.tab');
+  if (t) {
+    e.preventDefault();
+    return show(t.dataset.tab);
+  }
+  const b = e.target.closest('.bump');
+  if (b) return tabStep(+b.dataset.step);
+  const go = e.target.closest('[data-goto]');
+  if (go) {
+    e.preventDefault();
+    S.games = LISTS.games.findIndex((g) => g.cmd === go.dataset.goto);
+    return show('games');
+  }
+  const c = e.target.closest('.cart, .tile');
+  if (c) {
+    const i = +c.dataset.i;
+    if (i === S[S.tab]) activate({ from: 'mouse' });
+    else select(i);
+    return;
+  }
+  const more = e.target.closest('[data-more]');
+  if (more) return details();
+  const playLink = e.target.closest('.panel a[data-act="play"]');
+  if (playLink) {
+    const p = current();
+    if (p?.frame) {
+      e.preventDefault();
+      play(p);
+    } else audio.blip('ok'); // the link opens the new tab itself
+    return;
+  }
+  if (e.target.closest('[data-newtab]')) return;
+  const tip = e.target.closest('[data-tip]');
+  if (tip) {
+    e.preventDefault();
+    return openTipJar();
+  }
+  if (e.target.closest('[data-os]')) return openOS();
+  const mi = e.target.closest('.mi');
+  if (mi) select(LISTS.contact.indexOf(mi), { sound: false });
 });
-// vyvanse.beer/#tip opens it straight away
-const tipHash = () => location.hash === '#tip' && openTip();
-addEventListener('hashchange', tipHash);
-tipHash();
+// hovering a contact line moves the cursor, like a pause menu
+$('#contact').addEventListener('pointerover', (e) => {
+  const mi = e.target.closest('.mi');
+  if (mi && e.pointerType === 'mouse') select(LISTS.contact.indexOf(mi));
+});
+// focus moving onto a row item with the keyboard (Tab) picks it too; a click picks it itself
+document.addEventListener('focusin', (e) => {
+  if (!e.target.matches?.(':focus-visible')) return;
+  const c = e.target.closest?.('.cart, .tile');
+  if (c && +c.dataset.i !== S[S.tab]) select(+c.dataset.i, { sound: false });
+  const mi = e.target.closest?.('.mi');
+  if (mi && S.tab === 'contact') select(LISTS.contact.indexOf(mi), { sound: false });
+});
+
+// swipe the art (phones) to move along the row
+let sx = 0;
+let sy = 0;
+screen.addEventListener('touchstart', (e) => {
+  sx = e.touches[0].clientX;
+  sy = e.touches[0].clientY;
+}, { passive: true });
+screen.addEventListener('touchend', (e) => {
+  if (e.target.closest('.row, .tabs, .menu, .tgroups, a, button')) return;
+  const dx = e.changedTouches[0].clientX - sx;
+  const dy = e.changedTouches[0].clientY - sy;
+  if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4 && S.tab !== 'contact') move(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+// ---- the address bar keeps your place: #games/rbgo, #crew/85, #sites/sanic, #contact, #tip ----
+
+function save() {
+  if (player.current) return;
+  const id = idOf(S.tab, S[S.tab]);
+  history.replaceState(null, '', `#${S.tab}${id ? `/${id}` : ''}`);
+}
+function load() {
+  const [t, id] = decodeURIComponent(location.hash.slice(1)).split('/');
+  // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
+  const bySlug = projects.find((p) => p.slug === t || p.cmd === t);
+  const bro = crew.members.find((m) => m.slug === t);
+  let tab = TABS.includes(t) ? t : 'games';
+  if (bySlug) {
+    tab = bySlug.group;
+    S[tab] = LISTS[tab].indexOf(bySlug);
+  } else if (bro) {
+    tab = 'crew';
+    S.crew = LISTS.crew.indexOf(bro);
+  } else if (id && TABS.includes(t) && t !== 'contact') {
+    const j = LISTS[t].findIndex((x) => (t === 'crew' ? x.num : x.cmd) === id);
+    if (j >= 0) S[t] = j;
+  }
+  if (t === 'play' && id) {
+    const p = projects.find((x) => x.cmd === id);
+    if (p) {
+      tab = p.group;
+      S[tab] = LISTS[tab].indexOf(p);
+    }
+  }
+  show(tab, { sound: false });
+  if (t === 'tip') openTipJar();
+  if (t === 'play' && id) {
+    const p = projects.find((x) => x.cmd === id);
+    if (p?.frame) player.open(p);
+  }
+}
+
+// ---- hints in the strip, in the glyphs of whatever was used last ----
+// Each has a rank: when the strip is short, the lowest go first, so "play" and "back" stay.
+
+function hints() {
+  const hintsEl = $('#hints');
+  const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
+  const pad = input.scheme !== 'kb';
+  const verb = { games: 'play', crew: 'get model', sites: 'open', contact: 'pick' }[S.tab];
+  const nav = S.tab === 'contact' ? 'vmove' : 'move';
+  const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
+  const out = [
+    hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
+    hint(9, `${k('a')} ${verb}`),
+    pad ? hint(8, `${k('b')} back`) : '',
+    hint(6, `${k('lb')}${k('rb')} sections`),
+    S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} details`) : '',
+    hint(2, `${k('x')} wave`),
+    hint(3, `${k('select')} full screen`),
+    pad ? '' : hint(1, '<span class="g">M</span> music'),
+    pad ? '' : hint(0, '<span class="g">/</span> terminal'),
+  ];
+  hintsEl.innerHTML = out.join('');
+  fitHints();
+}
+// the strip gives the hints what the ticker leaves; drop the lowest ranks until the rest fit whole
+function fitHints() {
+  const hintsEl = $('#hints');
+  const all = $$('.hint', hintsEl);
+  for (const el of all) el.hidden = false;
+  if (!hintsEl.clientWidth) return;
+  const order = all.slice().sort((a, b) => a.dataset.rank - b.dataset.rank);
+  while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) order.shift().hidden = true;
+}
+
+// ---- the stage: the waterline, where the duo stands, what the water mirrors ----
+
+const FEET = 0.976; // src/duo.js: their feet sit at this share of the box height
+let duoLive = false;
+function rel(el) {
+  const h = screen.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  return { x: r.left - h.left, y: r.top - h.top, w: r.width, h: r.height };
+}
+function duoMode() {
+  if (S.tab === 'games' || S.tab === 'contact') return 'side';
+  if (S.tab === 'crew' && duoLive && DUO.includes(LISTS.crew[S.crew].num)) return 'stage';
+  return null;
+}
+// the same framing as src/duo.js: where each one stands across the box, and how tall
+function framing(w, h) {
+  const a = w / h;
+  const half = Math.max(1.06, 1.6 / a);
+  return { spots: [0.5 - 0.62 / (2 * half * a), 0.5 + 0.62 / (2 * half * a)], tall: 1.7 / (2 * half) };
+}
+const box = { wl: 0, feet: 0, b: null };
+const m0 = () => (duoEl.classList.contains('duo--side') ? 'side' : null);
+// a long name (RetardioPayne) comes down in size to fit its column instead of running off it
+function fitWm() {
+  const wm = $('.item.on .wm', panelOf(S.tab));
+  if (!wm) return;
+  wm.style.fontSize = '';
+  const r = document.createRange();
+  r.selectNodeContents(wm);
+  const tw = r.getBoundingClientRect().width;
+  const cw = wm.clientWidth;
+  if (cw > 0 && tw > cw) wm.style.fontSize = `${Math.floor((parseFloat(getComputedStyle(wm).fontSize) * cw) / tw)}px`;
+}
+function layout() {
+  fitWm();
+  const W = screen.clientWidth;
+  const H = innerHeight;
+  const ph = phone.matches;
+  box.wl = ph ? $('#backdrops').offsetHeight : Math.round(H * 0.655);
+  screen.style.setProperty('--wl', `${box.wl}px`);
+  for (const img of $$('.bd--lettered')) cutLettered(img);
+  const m = duoMode();
+  const vis = $('.item.on .visual--crew', panelOf('crew'));
+  $$('.visual--crew').forEach((v) => v.classList.toggle('is-duo', m === 'stage' && v === vis));
+  duoEl.classList.toggle('duo--off', !m);
+  duoEl.classList.toggle('duo--side', m === 'side');
+  let b = null;
+  if (m === 'stage' && vis) {
+    b = rel(vis);
+  } else if (m === 'side') {
+    const big = S.tab === 'contact';
+    const w = ph ? Math.round(W * 0.56) : Math.round(Math.min(W * (big ? 0.38 : 0.34), big ? 560 : 500));
+    const h = ph ? Math.round(w * 0.98) : Math.round(Math.min(H * (big ? 0.56 : 0.48), big ? 520 : 430));
+    // feet just past the waterline, so there's floor below them for the whole reflection
+    const feet = ph ? box.wl + 16 : box.wl + H * (big ? 0.05 : 0.045);
+    const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 48;
+    b = { x: ph ? W - w : W - w - pad * 0.4, y: feet - h * FEET, w, h };
+  }
+  box.b = b;
+  if (b) {
+    Object.assign(duoEl.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
+    box.feet = b.y + b.h * FEET;
+    const f = framing(b.w, b.h);
+    duoEl.style.setProperty('--s0', `${f.spots[0] * 100}%`);
+    duoEl.style.setProperty('--s1', `${f.spots[1] * 100}%`);
+    duoEl.style.setProperty('--ph', `${f.tall * 100}%`);
+  }
+  placeHint();
+  emit();
+}
+
+// "click them to wave": under their feet, until the first wave
+let waved = false;
+function placeHint() {
+  // (on a phone, only on Crew: on Games it would sit on the words)
+  const on = duoLive && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !(phone.matches && S.tab !== 'crew');
+  hint.hidden = !on;
+  if (!on) return;
+  hint.style.left = `${box.b.x + box.b.w / 2}px`;
+  hint.style.top = `${Math.min(screen.clientHeight - 60, box.feet + 18)}px`;
+}
+
+const hexRgb = (hx) => {
+  const n = parseInt(String(hx).trim().slice(1), 16);
+  return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+};
+// what the water needs to know, read off the page
+function scene() {
+  const panel = panelOf(S.tab);
+  const lights = [];
+  for (const el of $$('.slot', panel)) {
+    const k = el.classList.contains('sel') ? 0.8 : 0.26;
+    lights.push([$('.cart', el), hexRgb(el.style.getPropertyValue('--accent')).map((v) => v * k)]);
+  }
+  const playBtn = $('.item.on [data-act]', panel);
+  if (playBtn) lights.push([playBtn, [0.3, 0.2, 0.68]]);
+  const tile = $('.tslot.sel .tile', panel);
+  if (tile) lights.push([tile, [0.64, 0.54, 0.34]]);
+  const mi = $('.mi.sel', panel);
+  if (mi) lights.push([mi, [0.5, 0.42, 0.26]]);
+  const ink = [$('.item.on .info', panel), $('.row__head', panel), $('.item.on .visual--site', panel)].filter((x) => x && x.offsetParent);
+  const art = Object.values(BD).find((i) => i.classList.contains('on'));
+  let figure = null;
+  let halo = null;
+  if (box.b && !duoEl.classList.contains('duo--off')) {
+    figure = { kind: 'duo', feet: box.feet };
+    if (m0() === 'side') {
+      const b = box.b;
+      halo = [b.x - b.w * 0.08, b.y + b.h * 0.02, b.w * 1.16, (box.feet - b.y) * 1.02];
+    }
+  } else if (S.tab === 'crew') {
+    const bro = $('.item.on .bro', panel);
+    if (bro) {
+      const r = rel(bro);
+      figure = { kind: 'img', el: bro, feet: r.y + r.h * 0.985 };
+    }
+  }
+  const lettered = art && !phone.matches ? +art.dataset.lettered || 0 : 0;
+  return { water: box.wl, art, soft: art?.classList.contains('bd--soft'), lettered, lights, ink, figure, halo };
+}
+let emitT = 0;
+function emit() {
+  dispatchEvent(new Event('vyv:scene'));
+  // once things have settled (the lifted cartridge, a render sliding in), once more
+  clearTimeout(emitT);
+  emitT = setTimeout(() => dispatchEvent(new Event('vyv:scene')), 460);
+}
+function waveDuo(i, at = 'viewer') {
+  if (!duoLive || !stage || duoEl.classList.contains('duo--off')) return false;
+  if (stage.wave(i, at)) {
+    waved = true;
+    placeHint();
+  }
+}
+const shell = {
+  scene,
+  layout,
+  setDuoLive(on) {
+    duoLive = on;
+    screen.classList.toggle('duo-live', on);
+    layout();
+    if (on && S.tab === 'contact') {
+      waveDuo(1);
+      setTimeout(() => waveDuo(0), 700);
+    }
+  },
+};
+addEventListener('resize', () => requestAnimationFrame(layout));
+document.fonts?.ready.then(() => layout());
+
+// click (or tap) one of them: he waves
+document.addEventListener('pointerdown', (e) => {
+  if (!duoLive || !box.b || duoEl.classList.contains('duo--off') || e.target.closest('a, button, dialog, .ask, .player')) return;
+  const h = screen.getBoundingClientRect();
+  const x = e.clientX - h.left;
+  const y = e.clientY - h.top;
+  const b = box.b;
+  if (x < b.x || x > b.x + b.w || y > box.feet + 6) return;
+  const f = framing(b.w, b.h);
+  if (y < box.feet - b.h * f.tall * 1.05) return;
+  const u = (x - b.x) / b.w;
+  const i = Math.abs(u - f.spots[0]) < Math.abs(u - f.spots[1]) ? 0 : 1;
+  if (Math.abs(u - f.spots[i]) > 0.16 * (b.h / b.w) + 0.05) return;
+  audio.blip('ok');
+  waveDuo(i);
+});
+
+// ---- the tip jar (src/tip/): fetched on first hover, opened from the pill or #tip ----
+
+function openTipJar() {
+  audio.blip('ok');
+  openTip();
+}
+addEventListener('hashchange', () => location.hash === '#tip' && openTipJar());
 for (const ev of ['pointerover', 'focusin']) {
   document.addEventListener(ev, (e) => e.target.closest?.('[data-tip]') && loadTip().catch(() => {}), { passive: true });
 }
 
-// ---- clicks anywhere with data-cmd run that command in the terminal ----
+// ---- Radbro OS: the terminal, a hidden extra on / (src/os/, its own chunk) ----
 
-document.addEventListener('click', (e) => {
-  const el = e.target.closest('[data-cmd], [data-fill]');
-  if (!el || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+let os = null;
+function openOS(opts = {}) {
+  audio.blip('ok');
+  import('./os/index.js')
+    .then((m) => {
+      os ||= m.createOS({
+        site,
+        groups,
+        projects,
+        crew,
+        contact,
+        shell: {
+          play: (p) => play(p),
+          playing: () => player.current,
+          stop: () => player.close(),
+          go: (tab) => show(tab || 'games', { sound: false }),
+          reveal(slug) {
+            const p = projects.find((x) => x.slug === slug);
+            const b = crew.members.find((x) => x.slug === slug);
+            if (p) {
+              S[p.group] = LISTS[p.group].indexOf(p);
+              show(p.group, { sound: false });
+              paint(p.group);
+            } else if (b) {
+              S.crew = LISTS.crew.indexOf(b);
+              show('crew', { sound: false });
+              paint('crew');
+              layout();
+            } else if (TABS.includes(slug)) show(slug, { sound: false });
+          },
+          wave: () => (stage?.live ? (waveDuo(0), setTimeout(() => waveDuo(1), 600), 'ok') : stage ? 'loading' : 'missing'),
+        },
+      });
+      os.open(opts);
+    })
+    .catch(() => toast('couldn’t load radbro os. check your connection.'));
+}
 
-  if (el.dataset.fill != null) {
-    e.preventDefault();
-    panel.open();
-    term.fill(el.dataset.fill);
-    return;
-  }
+// ---- go ----
 
-  const cmd = el.dataset.cmd;
-  const fromTerminal = termEl.contains(el);
-  const t = commands.target(cmd);
-  const p = t?.p;
-  const ctx = { source: fromTerminal ? 'terminal' : 'page' };
+// with JS the section links become tabs (without it they're plain links down the page)
+$('.tabs__list').setAttribute('role', 'tablist');
+$('.tabs__list').setAttribute('aria-label', 'Sections');
+for (const t of $$('.tab')) t.setAttribute('role', 'tab');
+for (const p of $$('.panel')) p.setAttribute('role', 'tabpanel');
+load();
+hints();
+if ('ResizeObserver' in window) new ResizeObserver(() => fitHints()).observe($('#hints'));
+document.fonts?.ready.then(fitHints);
+ticker = createTicker($('#ticker-host'));
+if (player.current) ticker.pause();
+setTimeout(() => screen.classList.remove('boot'), 1800);
 
-  // Projects open in a new tab, right here inside the click, so no popup blocker gets a say:
-  // a link opens it itself, a button opens it now. The command still runs (and shows) after.
-  if (t?.how === 'tab') {
-    ctx.how = 'tab';
-    if (el.tagName === 'A' && el.href === new URL(p.url, location.href).href) ctx.opened = true;
-    else {
-      e.preventDefault();
-      ctx.opened = openTab(p.url);
-    }
-  } else {
-    if (t) ctx.how = 'window';
-    e.preventDefault();
-  }
-
-  if (!fromTerminal && (!panel.isOpen() || !media.wide.matches)) {
-    // The terminal is out of sight: windows and new tabs just happen (the command still lands
-    // in its log), and anything that prints output opens it so it can be read.
-    if (p) ctx.instant = true;
-    else panel.open();
-  }
-  panel.greet();
-  term.type(cmd, ctx);
-});
-
-// ---- keyboard: / or ` opens Radbro OS at the prompt, Esc puts it away ----
-
-const editable = (el) => el?.closest?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]');
-
-document.addEventListener('keydown', (e) => {
-  if ((e.key === '/' || e.key === '`') && !e.ctrlKey && !e.metaKey && !e.altKey && !editable(e.target) && !document.querySelector('dialog[open]')) {
-    e.preventDefault();
-    panel.open({ focus: 'input' });
-  } else if (e.key === 'Escape' && panel.isOpen() && !document.querySelector('dialog[open]')) {
-    panel.close();
-  }
-});
-
-// ---- boot: closed, unless it was left open earlier in this tab ----
-
-panel.restore();
+// The rain, the puddle and the duo: their own chunks, started right after the first paint.
+// Save-Data, no WebGL or a failure: the plain backdrops and the poster pair stay.
+requestAnimationFrame(() =>
+  setTimeout(() => {
+    import('./stage.js')
+      .then((m) => {
+        stage = m.createStage(shell, { screen, duoBox: duoEl });
+        if (player.current) stage.pause();
+      })
+      .catch((e) => console.warn('stage off', e));
+  }, 0),
+);

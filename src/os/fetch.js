@@ -1,7 +1,7 @@
 // `neofetch` for Radbro OS: #4764 in text on the left, "system" info on the right, the site
 // palette underneath. Stacks art-over-info when the terminal is too narrow for both.
 
-import { h } from './dom.js';
+import { h } from '../dom.js';
 
 // Radbro #4764: shaggy hair, skull-lens shades, a smirk with a drip, the scribbled hoodie.
 const ART = [
@@ -52,7 +52,7 @@ export function neofetch({ site, projects, crew }) {
     ['Packages', `${projects.length} projects (rugpm), ${crew.members.filter((b) => !b.slug.startsWith('retardio')).length} radbros, ${crew.members.filter((b) => b.slug.startsWith('retardio')).length} retardios`],
     ['Shell', 'rugsh 0.0.113'],
     ['Resolution', `${innerWidth}x${innerHeight}`],
-    ['DE', 'landing + terminal'],
+    ['DE', 'game select + terminal'],
     ['WM', 'yoinkwm'],
     ['Theme', 'midnight-ube [dark]'],
     ['Terminal', 'radbro-term'],

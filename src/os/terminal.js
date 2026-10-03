@@ -1,7 +1,7 @@
 // The terminal: output log, input line, history, tab completion, and typed-in commands
 // for clicks on the page (so every click shows the command it maps to).
 
-import { h, media, sleep } from './dom.js';
+import { h, media, sleep } from '../dom.js';
 
 const HISTORY_KEY = 'vyv-history';
 

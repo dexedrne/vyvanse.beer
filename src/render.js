@@ -1,9 +1,12 @@
-// Build-time HTML for the landing. Everything a crawler or a no-JS visitor needs (every
-// project, every link) is plain HTML; the terminal and windows layer on top in src/main.js.
+// Build-time HTML for the game-select screen (vite.config.js puts it into index.html).
 //
-// `data-cmd` marks anything that runs a terminal command when clicked with JS on.
+// Everything a crawler or a no-JS visitor needs is plain HTML here: every game with its blurb
+// and links, every crew member with his model download, every site, and the contact links.
+// Without JS the panels simply stack down the page. With JS (src/main.js) the same markup
+// becomes one full-screen menu: one panel at a time, one item of each panel at a time, picked
+// from the cartridge row along the bottom.
 
-import { projects, shortUrl } from './projects.js';
+import { shortUrl } from './projects.js';
 
 const esc = (s) =>
   String(s).replace(
@@ -11,268 +14,231 @@ const esc = (s) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
   );
 
-const ext = (href) => `href="${esc(href)}" target="_blank" rel="noopener"`;
-const icon = (id) => `<svg class="i" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+const ext = (href, rel = 'noopener') => `href="${esc(href)}" target="_blank" rel="${rel}"`;
+const icon = (id, state) => `<svg class="i${state ? ` i--${state}` : ''}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
 const newTab = `<span class="vh"> (opens in a new tab)</span>`;
+// a button glyph that follows the last input used: keyboard keys, Xbox or PlayStation buttons
+const glyph = (name, fallback) => `<span class="g g--${name}" data-g="${name}" aria-hidden="true">${esc(fallback)}</span>`;
 
-function img(image, { eager = false, cls = '' } = {}) {
-  return `<img${cls ? ` class="${cls}"` : ''} src="${esc(image.src)}" width="${image.width}" height="${image.height}" alt="${esc(image.alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+const TABS = [
+  { id: 'games', label: 'Games', icon: 'cart' },
+  { id: 'crew', label: 'Crew', icon: 'crew' },
+  { id: 'sites', label: 'Sites', icon: 'site' },
+  { id: 'contact', label: 'Contact', icon: 'dm' },
+];
+
+function img(image, { cls = '', eager = false, alt = image.alt } = {}) {
+  const pos = image.position ? ` style="object-position:${esc(image.position)}"` : '';
+  return `<img${cls ? ` class="${cls}"` : ''} src="${esc(image.src)}" width="${image.width}" height="${image.height}" alt="${esc(alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${pos}>`;
 }
 
-export function renderHero(site, mascot) {
-  const links = site.links
-    .map(
-      (l) =>
-        `<li><a class="btn btn--ghost" ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${icon(l.cmd)}<span>${esc(l.label)}</span>${newTab}</a></li>`,
-    )
-    .join('');
+function credit(p) {
+  if (!p.credit) return '';
+  const c = p.credit;
+  return `<p class="credit">${esc(c.before)} <a ${ext(c.href)}>${esc(c.label)}${newTab}</a> ${esc(c.after)}</p>`;
+}
+
+// the other links (Source, Site, …), and the main one in a new tab when it plays in here
+function moreLinks(p) {
+  const [main, ...rest] = p.links;
+  const items = rest.map((l) => `<a class="more-link" ${ext(l.href)}>${esc(l.label)} ${icon('ext')}${newTab}</a>`);
+  if (p.frame) items.push(`<a class="more-link js-only" ${ext(main.href)} data-newtab>${esc(shortUrl(main.href))} in a new tab ${icon('ext')}${newTab}</a>`);
+  return items.length ? `<p class="more">${items.join('')}</p>` : '';
+}
+
+// PLAY: a plain link to the game. With JS, a game that allows framing runs inside the page
+// instead (src/player.js); one that doesn't still opens in a new tab, and says so.
+function playButton(p, label, { small = false } = {}) {
+  const tab = !p.frame;
+  return `<a class="play${small ? ' play--sm' : ''}" ${ext(p.url)} data-act="play"${tab ? ' data-tab' : ''}>${glyph('a', 'A')}<span class="play__label">${esc(label)}</span>${tab ? `<span class="play__tab">new tab ${icon('ext')}</span>` : ''}<span class="vh"> ${esc(p.name)}${tab ? ' (opens in a new tab)' : ''}</span></a>`;
+}
+
+// Details (Y on a pad, I on a keyboard): the whole blurb, the credit and every link
+const moreButton = `<button class="more-btn js-only" type="button" data-more aria-expanded="false">${glyph('y', 'I')}<span>details</span></button>`;
+
+function status(cmd, line, ok = '[ OK ]') {
+  return `<p class="status"><span class="cmd">&gt; ${esc(cmd)}</span> <span class="ok">${esc(ok)}</span><span class="status__more"><br><span data-type>${esc(line)}</span></span></p>`;
+}
+
+function gameItem(p, i) {
+  const line = p.frame ? p.boot || p.kind : 'opens in a new tab: it can’t run inside this page';
+  return `<article class="item item--game" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
+  <div class="info">
+    <p class="kindline">${esc(p.kind)}</p>
+    <h3 class="wm" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
+    <p class="pitch">${esc(p.blurb)}</p>
+    ${moreButton}
+    <div class="act">
+      ${playButton(p, 'Play')}
+      ${status(`${p.cmd}.exe`, line, p.frame ? '[ OK ]' : '[ TAB ]')}
+    </div>
+    <div class="extra">${credit(p)}${moreLinks(p)}</div>
+  </div>
+  ${p.image ? `<figure class="nojs-art">${img(p.image)}</figure>` : ''}
+</article>`;
+}
+
+function siteItem(p, i) {
+  const [main, ...rest] = p.links;
+  const home = rest.find((l) => /^site$/i.test(l.label));
+  const line = p.frame ? `plays here${home ? `. home: ${shortUrl(home.href)}` : ''}` : 'opens in a new tab';
+  const shot = p.image
+    ? `<figure class="visual visual--site"><figcaption class="monitor__bar"><b>${esc(shortUrl(p.url))}</b><span>${esc(p.kind)}</span></figcaption>${img(p.image)}</figure>`
+    : '';
+  return `<article class="item item--site" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" style="--accent:${esc(p.accent)}" aria-labelledby="${esc(p.slug)}-name">
+  ${shot}
+  <div class="info">
+    <p class="kindline">${esc(p.kind)}</p>
+    <h3 class="wm wm--site" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
+    <p class="pitch">${esc(p.blurb)}</p>
+    ${moreButton}
+    <div class="act">
+      ${playButton(p, main.label, { small: true })}
+      ${status(`open ${shortUrl(p.url)}`, line, p.frame ? '[ OK ]' : '[ TAB ]')}
+    </div>
+    <div class="extra">${moreLinks(p)}</div>
+  </div>
+</article>`;
+}
+
+function crewItem(b, i, { crew, games }) {
+  const plays = games.filter((g) => g.cast?.includes(b.num));
+  const own = b.repo === false;
+  const file = b.download.href.split('/').pop();
+  const fine = own
+    ? `<p class="credit">My own Retardio, built on the Radbro rig. The download is the same web model this site uses: the mesh, Idle and a wave.</p>`
+    : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>${crew.downloadAll ? `, or all four in <a href="${esc(crew.downloadAll.href)}" download>one .zip</a> (${esc(crew.downloadAll.size)})` : ''}. ${esc(crew.repo.line)}</p>`;
+  return `<article class="item item--crew" id="${esc(b.slug)}" data-i="${i}" data-id="${esc(b.num)}" aria-labelledby="${esc(b.slug)}-name">
+  <div class="visual visual--crew">
+    <div class="bignum" aria-hidden="true">${esc(b.num)}</div>
+    ${img(b.image, { cls: 'bro' })}
+  </div>
+  <div class="info">
+    <p class="kindline">${esc(b.kind)}</p>
+    <h3 class="wm" id="${esc(b.slug)}-name"><span class="vh">${esc(b.kind)} </span>#${esc(b.num)}</h3>
+    <p class="pitch">${esc(b.line)}${own ? ' Built on the Radbro rig.' : ' Rigged and animated.'}</p>
+    <div class="plays"><span class="plays__label">in</span>${plays
+      .map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(g.shell)};--accent:${esc(g.accent)}">${esc(g.name)}</a>`)
+      .join('')}</div>
+    <div class="act">
+      <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
+      ${status(file, `${b.download.size}, ${own ? 'web model with Idle and a wave' : 'rigged and animated'}`)}
+    </div>
+    <div class="extra">${fine}</div>
+  </div>
+</article>`;
+}
+
+function cart(p, i) {
+  return `<li class="slot" style="--i:${i};--shell:${esc(p.shell || '#4b4855')};--accent:${esc(p.accent)}" data-i="${i}">
+      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"><span class="cart__label">${p.thumb ? `<img src="${esc(p.thumb)}" width="420" height="236" alt="" loading="lazy" decoding="async">` : ''}</span><span class="cart__name">${esc(p.name)}</span></button></li>`;
+}
+
+function tile(b, i) {
+  return `<li class="tslot" style="--i:${i}" data-i="${i}"><button class="tile" type="button" data-i="${i}" aria-controls="${esc(b.slug)}" aria-label="${esc(b.kind)} #${esc(b.num)}"><img src="${esc(b.face)}" width="200" height="200" alt="" loading="lazy" decoding="async"><span class="tile__num">#${esc(b.num)}</span></button></li>`;
+}
+
+function row(head, items, cls, tag = 'ul') {
+  return `<div class="row js-only">
+      <p class="row__head"><span>${head}</span><span class="count" aria-hidden="true"></span></p>
+      <${tag} class="carts ${cls}" role="list">${items}</${tag}>
+    </div>`;
+}
+
+function panel(id, title, body) {
+  return `<section class="panel panel--${id}" id="${id}" data-panel="${id}" aria-labelledby="tab-${id}">
+    <h2 class="vh">${esc(title)}</h2>
+    ${body}
+  </section>`;
+}
+
+export function renderShell({ site, groups, projects, crew, contact, duo }) {
+  const games = projects.filter((p) => p.group === 'games');
+  const sites = projects.filter((p) => p.group === 'sites');
+  const g = Object.fromEntries(groups.map((x) => [x.id, x]));
   const [host, ...tld] = site.name.split('.');
-  const dot = tld.length ? `<span class="hero__tld">.${esc(tld.join('.'))}</span>` : '';
-  const games = projects.filter((p) => p.group === 'games' && p.boot);
-  const boot = games
-    .map(
-      (p, i) =>
-        `<li style="--i:${i}"><a ${ext(p.url)}><span class="boot__caret" aria-hidden="true">&gt;</span><span class="boot__exe">${esc(p.cmd)}.exe</span><span class="boot__status">[ OK ]</span><span class="boot__what">${esc(p.boot)}</span>${newTab}</a></li>`,
-    )
-    .join('');
-  // The stage is the neon sign and #4764, both standing on the waterline (its bottom edge).
-  // Below it the puddle: src/water.js draws their rippling reflection there. Until it does, and
-  // without WebGL (or JS), .hero__mirror and .hero__bro-mirror are a plain CSS reflection of the
-  // sign and of his render instead.
-  return `<header class="hero">
-  <div class="hero__stage">
-    <p class="hero__prompt" aria-hidden="true"><span class="hero__ps1">${esc(site.handle)}@vyvanse:~$</span> <span class="hero__cmd">./hello</span><span class="hero__cursor"></span></p>
-    <h1 class="hero__title"><span class="hero__host">${esc(host)}</span>${dot}</h1>
-    <p class="hero__mirror" aria-hidden="true"><span class="hero__host">${esc(host)}</span>${dot}</p>
-    <figure class="hero__bro">
-      <span class="hero__bubble" aria-hidden="true">gm</span>
-      ${mascot.model ? bro3d(mascot) : img(mascot, { eager: true })}
-      <span class="hero__bro-mirror" aria-hidden="true"><img src="${esc(mascot.src)}" width="${mascot.width}" height="${mascot.height}" alt="" decoding="async"></span>
-    </figure>
+  const lead = games[0];
+  const pair = duo.map((n) => crew.members.find((m) => m.num === n));
+
+  const tabs = TABS.map(
+    (t) =>
+      `<a class="tab" id="tab-${t.id}" href="#${t.id}" aria-controls="${t.id}" data-tab="${t.id}">${icon(t.icon)}<span>${esc(t.label)}</span></a>`,
+  ).join('');
+
+  const radbros = crew.members.filter((m) => !m.kind.startsWith('Retardio'));
+  const retardios = crew.members.filter((m) => m.kind.startsWith('Retardio'));
+  const idx = (m) => crew.members.indexOf(m);
+  const tiles = `<div class="tgroup"><p class="tgroup__label">radbros</p><ul class="tiles" role="list">${radbros.map((m) => tile(m, idx(m))).join('')}</ul></div><div class="tgroup"><p class="tgroup__label">retardios</p><ul class="tiles" role="list">${retardios.map((m) => tile(m, idx(m))).join('')}</ul></div>`;
+
+  const menu = [
+    `<li><a class="mi" data-i="0" ${ext(contact.dm.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('x')}${esc(contact.dm.label)}</span><span class="det">${esc(contact.dm.handle)}</span>${newTab}</a></li>`,
+    `<li><a class="mi" data-i="1" ${ext(contact.code.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('github')}${esc(contact.code.label)}</span><span class="det">${esc(shortUrl(contact.code.href))}: source and the 3D models</span>${newTab}</a></li>`,
+    `<li class="js-only"><button class="mi" type="button" data-i="2" data-tip aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('coin')}Tip jar</span><span class="det">SOL to vyvanse.sol, or ETH</span></button></li>`,
+    `<li class="js-only"><button class="mi" type="button" data-i="3" data-os aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('term')}Radbro OS</span><span class="det">the terminal, or <kbd>/</kbd></span></button></li>`,
+  ].join('');
+
+  return `<div class="screen boot" id="screen">
+  <div class="backdrops" id="backdrops" aria-hidden="true"><img class="bd on" data-bd="games:${esc(lead.cmd)}" src="${esc(lead.image.src)}" alt="" fetchpriority="high" decoding="async"></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="duo duo--off" id="duo" aria-hidden="true">
+    <div class="duo__poster">${pair.map((m) => `<img src="${esc(m.image.src)}" width="${m.image.width}" height="${m.image.height}" alt="" decoding="async">`).join('')}</div>
   </div>
-  <div class="hero__deck">
-    <div class="hero__intro">
-      <p class="hero__tag">${esc(site.tagline)}</p>
-      <ul class="hero__links" role="list">${links}</ul>
-      <p class="hero__hint js-only"><span class="only-wide">Click a project to open it in a new tab, or press <kbd>/</kbd> for Radbro OS.</span><span class="only-narrow">Tap any project to open it in a new tab.</span></p>
+  <p class="duo__hint js-only" id="duo-hint" hidden><span class="duo__hint-mouse">click them to wave</span><span class="duo__hint-pad">${glyph('x', 'G')} wave</span></p>
+
+  <header class="top">
+    <h1 class="sign"><a href="/" aria-label="${esc(site.name)}, games, 3D Radbros and websites by ${esc(site.handle)}"><span class="host">${esc(host)}</span><span class="tld">.${esc(tld.join('.'))}</span></a></h1>
+    <nav class="tabs" aria-label="Sections">
+      <button class="bump js-only" type="button" data-step="-1" aria-label="Previous section" tabindex="-1">${glyph('lb', 'Q')}</button>
+      <div class="tabs__list">${tabs}</div>
+      <button class="bump js-only" type="button" data-step="1" aria-label="Next section" tabindex="-1">${glyph('rb', 'E')}</button>
+    </nav>
+    <div class="top__right js-only">
+      <button class="tog" id="music" type="button" aria-pressed="false" title="Music (M)">${icon('note', 'on')}${icon('note-off', 'off')}<span class="tog__label">music</span></button>
+      <button class="tog" id="sfx" type="button" aria-pressed="false" title="Menu sounds (N)">${icon('sfx', 'on')}${icon('sfx-off', 'off')}<span class="tog__label">sfx</span></button>
+      <button class="tog tog--fs" id="fs" type="button" aria-pressed="false" title="Full screen (F)">${icon('fs')}<span class="vh">Full screen</span></button>
+      <button class="tip-pill" type="button" data-tip aria-haspopup="dialog"><span class="coin" aria-hidden="true">◎</span><span><span class="tip-pill__what">tip </span><b>vyvanse.sol</b></span></button>
     </div>
-    <div class="hero__boot" role="group" aria-label="Games online">
-      <p class="boot__head"><span class="boot__os">radbro os</span> <span aria-hidden="true">//</span> <span class="boot__ok">${games.length} games online</span></p>
-      <ul class="boot__list" role="list">${boot}</ul>
-    </div>
-  </div>
-</header>`;
-}
+  </header>
 
-// #4764 as a <model-viewer> you can drag around. The render sits inside as the poster, so the
-// first paint is the same picture, and without JS (or before the viewer loads) it's just the
-// <img>. src/bro.js loads the viewer, and sets auto-rotate and the waves.
-function bro3d(m) {
-  const attrs = {
-    class: 'bro3d',
-    src: m.model,
-    alt: m.alt,
-    loading: 'lazy',
-    reveal: 'auto',
-    'camera-controls': '',
-    'disable-zoom': '',
-    'disable-pan': '',
-    'disable-tap': '',
-    'touch-action': 'pan-y',
-    'interaction-prompt': 'none',
-    'camera-orbit': BRO_CAMERA.orbit,
-    'min-camera-orbit': BRO_CAMERA.min,
-    'max-camera-orbit': BRO_CAMERA.max,
-    'camera-target': BRO_CAMERA.target,
-    'field-of-view': BRO_CAMERA.fov,
-    'min-field-of-view': BRO_CAMERA.fov,
-    'max-field-of-view': BRO_CAMERA.fov,
-    'orbit-sensitivity': '0.7',
-    'interpolation-decay': '120',
-    'auto-rotate-delay': '4000',
-    'rotation-per-second': '16deg',
-    'animation-name': 'Idle',
-    autoplay: '',
-    'animation-crossfade-duration': '400',
-    'tone-mapping': 'none',
-    exposure: '1',
-    'shadow-intensity': '0',
-  };
-  const a = Object.entries(attrs)
-    .map(([k, v]) => (v === '' ? k : `${k}="${esc(v)}"`))
-    .join(' ');
-  return `<model-viewer ${a}>
-      ${img(m, { eager: true }).replace('<img ', '<img slot="poster" ')}
-    </model-viewer>`;
-}
+  <main id="main" class="panels">
+    ${panel(
+      'games',
+      g.games.title,
+      `<div class="items">${games.map(gameItem).join('\n')}</div>
+    ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, games.map(cart).join(''), 'carts--games')}`,
+    )}
+    ${panel(
+      'crew',
+      crew.title,
+      `<p class="panel__line">${esc(crew.line)}</p>
+    <div class="items">${crew.members.map((m, i) => crewItem(m, i, { crew, games })).join('\n')}</div>
+    <div class="row js-only"><div class="tgroups">${tiles}</div></div>`,
+    )}
+    ${panel(
+      'sites',
+      g.sites.title,
+      `<div class="items">${sites.map(siteItem).join('\n')}</div>
+    ${row(`sites I built<span class="cap-long"> for other people’s projects</span>`, sites.map(cart).join(''), 'carts--sites')}`,
+    )}
+    ${panel(
+      'contact',
+      contact.title,
+      `<div class="items"><div class="item item--contact on">
+      <div class="info">
+        <p class="wm wm--contact" aria-hidden="true">${esc(contact.title)}</p>
+        <p class="pitch">${esc(contact.line)}</p>
+        <ul class="menu" role="list">${menu}</ul>
+        <p class="fine">Made by ${esc(site.handle)}. Site code MIT, Radbro models VPL. Not a pharmacy. Not a brewery.</p>
+      </div>
+    </div></div>`,
+    )}
+  </main>
 
-// Framing for the 719x1100 box: wide enough that his katana's scabbard tip (0.74 m out) stays in
-// frame at every angle while he spins, and aimed high enough that his feet are near the bottom
-// of the box (on the hero's waterline), with the room left over his head. Drag spins him all
-// the way round; the tilt stays between a little below and a little above eye level.
-const BRO_CAMERA = {
-  orbit: '0deg 82deg 7.8m',
-  min: '-Infinity 66deg 7.8m',
-  max: 'Infinity 96deg 7.8m',
-  target: '0m 1m 0m',
-  fov: '17deg',
-};
-
-// Projects open in a new tab. The ones that allow framing also get this small opt-in: run it
-// in an in-page window instead (`win <cmd>`). JS only, like the windows themselves.
-function winButton(p, cls) {
-  if (!p.frame) return '';
-  return `<button class="${cls}" type="button" data-cmd="win ${esc(p.cmd)}" aria-label="Open ${esc(p.name)} in a window on this page" title="Open in a window on this page">${icon('win')}<span>In a window</span></button>`;
-}
-
-// Games are big panes stacked down the page, one per game in the order of src/projects.js:
-// the cover art on one side (standing on a thin strip of water), the words and buttons on the
-// other, swapping sides from one game to the next. Phones get the art on top.
-function gameCard(p) {
-  const [main, ...rest] = p.links;
-  const shot = p.image
-    ? `<div class="game__shot">${img(p.image)}</div>`
-    : `<div class="game__shot game__shot--none" aria-hidden="true"><span>${esc(shortUrl(p.url))}</span></div>`;
-  const more = rest
-    .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
-    .join('');
-  const credit = p.credit
-    ? `<p class="game__note">${esc(p.credit.before)} <a ${ext(p.credit.href)}>${esc(p.credit.label)}</a> ${esc(p.credit.after)}</p>`
-    : '';
-  const note = p.note ? `<p class="game__note">${esc(p.note)}</p>` : '';
-  return `<li class="game game--feature glass reveal" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
-  ${shot}
-  <div class="game__text">
-    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
-    <h3 class="game__name">${esc(p.name)}</h3>
-    <p class="game__kind">${esc(p.kind)}</p>
-    <p class="game__blurb">${esc(p.blurb)}</p>
-    <div class="game__actions">
-      <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
-      ${more}${winButton(p, 'game__more game__win js-only')}
-    </div>
-    ${credit}${note}
-  </div>
-</li>`;
-}
-
-// Sites get a picture card: screenshot on top, then name, host, kind and links. Same parts
-// as a game row, stacked, two to a row. No screenshot = a plain tile with the host on it.
-function siteCard(p) {
-  const [main, ...rest] = p.links;
-  const host = shortUrl(p.url);
-  const shot = p.image
-    ? `<div class="game__shot">${img(p.image)}</div>`
-    : `<div class="game__shot game__shot--none" aria-hidden="true"><span>${esc(host)}</span></div>`;
-  const more = rest
-    .map((l) => `<a class="game__more" ${ext(l.href)}>${esc(l.label)}${icon('ext')}${newTab}</a>`)
-    .join('');
-  return `<li class="game game--card glass reveal" id="${esc(p.slug)}" data-project="${esc(p.cmd)}">
-  ${shot}
-  <div class="game__text">
-    <p class="game__status"><span>[ OK ]</span> ${esc(p.cmd)}.exe</p>
-    <h3 class="game__name">${esc(p.name)}</h3>
-    <p class="game__host">${esc(host)}</p>
-    <p class="game__kind">${esc(p.kind)}</p>
-    <div class="game__actions">
-      <a class="btn btn--primary game__main" ${ext(main.href)} data-cmd="open ${esc(p.cmd)}"><span>${esc(main.label)}</span><span class="vh"> ${esc(p.name)}</span>${newTab}</a>
-      ${more}${winButton(p, 'game__more game__win js-only')}
-    </div>
-  </div>
-</li>`;
-}
-
-function sectionHead(id, title, line, cmd = `ls ${id}`) {
-  return `<header class="sec__head reveal">
-    <span class="sec__drop" aria-hidden="true"></span>
-    <p class="sec__prompt" aria-hidden="true"><span>~/${esc(id)} $</span> ${esc(cmd)}</p>
-    <h2 class="sec__title" id="${esc(id)}-title">${esc(title)}</h2>
-    <a class="cmd-hint js-only" href="#${esc(id)}" data-cmd="${esc(cmd)}" aria-label="Run ${esc(cmd)} in the terminal">${esc(cmd)}</a>
-    <p class="sec__line">${esc(line)}</p>
-  </header>`;
-}
-
-function crewSection(crew, projects) {
-  const play = projects.find((p) => p.cmd === crew.playIn);
-  const bros = crew.members
-    .map(
-      (b) => `<li class="bro${b.featured ? ' bro--featured' : ''}" id="${esc(b.slug)}">
-    <span class="bro__status" aria-hidden="true"><span>[ OK ]</span> #${esc(b.num)}</span>
-    <a class="bro__link" href="#${esc(b.slug)}" data-cmd="info ${esc(b.num)}">
-      <span class="bro__stage">${img(b.image)}</span>
-      <span class="bro__name">${esc(b.name)}</span>
-      <span class="bro__line">${esc(b.line)}</span>
-    </a>${b.download ? `
-    <a class="bro__dl" href="${esc(b.download.href)}" download rel="noopener">↓ ${esc(b.download.label)} <span class="bro__dl-size">${esc(b.download.size)}</span></a>` : ''}
-  </li>`,
-    )
-    .join('\n');
-  const all = crew.downloadAll
-    ? ` <a class="bro__dl bro__dl--all" href="${esc(crew.downloadAll.href)}" download rel="noopener">↓ ${esc(crew.downloadAll.label)} <span class="bro__dl-size">${esc(crew.downloadAll.size)}</span></a>`
-    : '';
-  const cta = play
-    ? `<p class="crew__cta"><a class="btn btn--ghost" ${ext(play.url)} data-cmd="open ${esc(play.cmd)}">Play them in ${esc(play.name)}${newTab}</a>${all}</p>`
-    : '';
-  const r = crew.repo;
-  const repo = r
-    ? `<div class="crew__free">
-    <p class="crew__links"><a class="crew__repo" ${ext(r.href)}>${icon('github')}${esc(r.label)}${newTab}</a><a class="crew__lic" ${ext(r.license.href)}>${esc(r.license.label)}${newTab}</a></p>
-    <p class="crew__use">${esc(r.line)}</p>
-  </div>`
-    : '';
-  return `<section class="sec sec--crew" id="crew" aria-labelledby="crew-title">
-  ${sectionHead('crew', crew.title, crew.line)}
-  <ul class="crew reveal" role="list">
-  ${bros}
-  </ul>
-  ${cta}
-  ${repo}
-</section>`;
-}
-
-// The last section: one clear way to reach me (a DM on X), and GitHub beside it.
-function contactSection(c) {
-  const rel = ext(c.dm.href).replace('rel="noopener"', 'rel="me noopener"');
-  const gh = ext(c.code.href).replace('rel="noopener"', 'rel="me noopener"');
-  return `<section class="sec sec--contact" id="contact" aria-labelledby="contact-title">
-  ${sectionHead('contact', c.title, c.line, 'contact')}
-  <div class="contact glass reveal">
-    <p class="contact__status"><span>[ OK ]</span> connection ready</p>
-    <a class="btn btn--primary contact__dm" ${rel}>${icon('x')}<span>${esc(c.dm.label)}</span>${newTab}</a>
-    <span class="contact__handle">${esc(c.dm.handle)}</span>
-    <a class="contact__gh" ${gh}>${icon('github')}<span>${esc(c.code.label)}</span>${newTab}</a>
-    <button class="contact__tip js-only" type="button" data-tip aria-haspopup="dialog"><svg class="contact__coin" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.4 5.9h5.6l-.8.9H4.6zm0 2.6h5.6l-.8.9H4.6zm.8 2.6h5.6l-.8.9H5.4z" fill="currentColor" transform="translate(.4 -1.2)"/></svg><span>tip vyvanse.sol</span></button>
-  </div>
-</section>`;
-}
-
-export function renderContent({ groups, projects, crew, contact }) {
-  const out = [];
-  for (const g of groups) {
-    const items = projects.filter((p) => p.group === g.id);
-    const body =
-      g.id === 'games'
-        ? `<ul class="games games--feature" role="list">${items.map(gameCard).join('\n')}</ul>`
-        : `<ul class="games games--grid" role="list">${items.map(siteCard).join('\n')}</ul>`;
-    out.push(`<section class="sec sec--${esc(g.id)}" id="${esc(g.id)}" aria-labelledby="${esc(g.id)}-title">
-  ${sectionHead(g.id, g.title, g.line)}
-  ${body}
-</section>`);
-    // The crew sits between the games and the sites.
-    if (g.id === 'games') out.push(crewSection(crew, projects));
-  }
-  if (contact) out.push(contactSection(contact));
-  return out.join('\n');
-}
-
-export function renderFooter(site) {
-  const to = (cmd) => {
-    const l = site.links.find((x) => x.cmd === cmd);
-    return `<a ${ext(l.href).replace('rel="noopener"', 'rel="me noopener"')}>${esc(shortUrl(l.href))}${newTab}</a>`;
-  };
-  return `<footer class="foot">
-  <p class="foot__status">radbro os <span>//</span> <strong>online</strong> <span>//</span> © ${esc(site.handle)}</p>
-  <p>Made by ${esc(site.handle)}. DMs open at ${to('x')}, code at ${to('github')}.</p>
-  <p class="foot__small">Site code MIT, Radbro models VPL. Not a pharmacy. Not a brewery.</p>
-</footer>`;
+  <footer class="strip">
+    <p class="hints js-only" id="hints" aria-hidden="true"></p>
+    <div class="strip__ticker" id="ticker-host"></div>
+  </footer>
+  <p class="vh" id="announce" aria-live="polite"></p>
+</div>
+<audio id="bgm" loop preload="none"><source src="/audio/vyvanse-bg.webm" type='audio/webm; codecs="opus"'><source src="/audio/vyvanse-bg.m4a" type="audio/mp4"></audio>`;
 }
