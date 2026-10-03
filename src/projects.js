@@ -48,19 +48,20 @@ const RADBROS = ['652', '4764', '2564', '723'];
 
 export const projects = [
   {
-    cmd: 'radrun',
-    boot: 'rooftop chase + SPIDER-TAG, now with the Retardios', // the hero's boot log line
-    aliases: ['rug-run', 'rugrun'],
-    slug: 'radrun',
+    cmd: 'spidertag',
+    boot: 'web-slinger tag on the rooftops, the Robinhood Chain game', // the hero's boot log line
+    aliases: ['radrun', 'rad-run', 'rug-run', 'rugrun'],
+    slug: 'spidertag',
     group: 'games',
-    name: 'RadRun',
-    kind: 'Radbro rooftop chase, free-swing 3D browser game',
+    name: 'SPIDERTAG',
+    kind: 'Web-slinger tag on the rooftops, the Robinhood Chain game',
     blurb:
-      'He swiped your bag. You get 90 seconds to swing across the rooftops and take it back, to a chill lo-fi soundtrack. Or play SPIDER-TAG against bots or a friend online. Five Radbros and two Retardios to play as. Runs in the browser, keyboard or controller, nothing to install.',
-    url: 'https://radrun.vyvanse.beer',
+      'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Five Radbros and the two Retardios to play as. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
+    url: 'https://spidertag.vyvanse.beer',
     frame: true,
     links: [
-      { label: 'Play', href: 'https://radrun.vyvanse.beer' },
+      { label: 'Play', href: 'https://spidertag.vyvanse.beer' },
+      { label: '$SPIDERTAG token', href: 'https://token.spidertag.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
     thumb: '/img/thumb/radrun.webp',
@@ -71,7 +72,7 @@ export const projects = [
       src: '/img/art/radrun.webp',
       width: 1600,
       height: 900,
-      alt: 'RadRun: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 web-swing and wingsuit-glide over rain-slick neon rooftops at dusk.',
+      alt: 'SPIDERTAG: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Cousin Classic #85 web-swing and wingsuit-glide over rain-slick neon rooftops at dusk.',
     },
     credit: {
       before: 'Built on',
@@ -404,7 +405,7 @@ export const projects = [
 export const crew = {
   title: 'The crew',
   line: 'Radbros #652, #4764, #2564 and #723, and Retardios #555 and #85, built in 3D. You play as them in the games.',
-  playIn: 'radrun',
+  playIn: 'spidertag',
   downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '81 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
   repo: {

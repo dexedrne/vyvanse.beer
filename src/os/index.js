@@ -22,7 +22,7 @@ export function createOS({ site, groups, projects, crew, contact, shell }) {
       <button type="button" data-cmd="help">help</button>
       <button type="button" data-cmd="ls">ls</button>
       <button type="button" data-cmd="neofetch">neofetch</button>
-      <button type="button" data-cmd="open radrun">open radrun</button>
+      <button type="button" data-cmd="open spidertag">open spidertag</button>
       <button type="button" data-cmd="crew">crew</button>
       <button type="button" data-cmd="whoami">whoami</button>
       <button type="button" data-cmd="clear">clear</button>

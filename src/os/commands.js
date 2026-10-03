@@ -188,7 +188,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         const social = site.links.find((l) => l.cmd === norm(args[0]));
         if (social) return table[social.cmd].run([], ctx);
         if (findBro(args)) {
-          term.print(line("radbros aren't websites, but they're playable in every game. try ", run('open radrun'), '.'));
+          term.print(line("radbros aren't websites, but they're playable in every game. try ", run('open spidertag'), '.'));
           return;
         }
         const guess = closest(norm(args.join('')), [...byName.keys()]);
@@ -314,7 +314,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       desc: "what's playing",
       run() {
         const p = shell.playing();
-        if (!p) return term.print(line(muted('nothing playing. try '), run('open radrun')));
+        if (!p) return term.print(line(muted('nothing playing. try '), run('open spidertag')));
         term.print(grid(strong(p.cmd), muted(`playing (${shortUrl(p.url)})`)));
       },
     },
@@ -385,7 +385,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       run() {
         term.rug();
         term.print(line('the rug has been pulled. your bag is somewhere on the rooftops.'));
-        term.print(line('go get it: ', run('open radrun')));
+        term.print(line('go get it: ', run('open spidertag')));
       },
     },
   };

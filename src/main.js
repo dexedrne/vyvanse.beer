@@ -536,7 +536,7 @@ function save() {
 function load() {
   const [t, id] = decodeURIComponent(location.hash.slice(1)).split('/');
   // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
-  const bySlug = projects.find((p) => p.slug === t || p.cmd === t);
+  const bySlug = projects.find((p) => p.slug === t || p.cmd === t || p.aliases?.includes(t));
   const bro = crew.members.find((m) => m.slug === t);
   let tab = TABS.includes(t) ? t : 'games';
   if (bySlug) {
@@ -546,11 +546,11 @@ function load() {
     tab = 'crew';
     S.crew = LISTS.crew.indexOf(bro);
   } else if (id && TABS.includes(t) && t !== 'contact') {
-    const j = LISTS[t].findIndex((x) => (t === 'crew' ? x.num : x.cmd) === id);
+    const j = LISTS[t].findIndex((x) => (t === 'crew' ? x.num === id : x.cmd === id || x.aliases?.includes(id)));
     if (j >= 0) S[t] = j;
   }
   if (t === 'play' && id) {
-    const p = projects.find((x) => x.cmd === id);
+    const p = projects.find((x) => x.cmd === id || x.aliases?.includes(id));
     if (p) {
       tab = p.group;
       S[tab] = LISTS[tab].indexOf(p);
@@ -559,7 +559,7 @@ function load() {
   show(tab, { sound: false });
   if (t === 'tip') openTipJar();
   if (t === 'play' && id) {
-    const p = projects.find((x) => x.cmd === id);
+    const p = projects.find((x) => x.cmd === id || x.aliases?.includes(id));
     if (p?.frame) player.open(p);
   }
 }
