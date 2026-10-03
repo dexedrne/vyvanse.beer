@@ -1,7 +1,7 @@
 // The game-select screen. src/render.js already put every game, crew member, site and link in
 // the HTML; this turns it into one full-screen menu you can drive with a mouse, touch, a
 // keyboard or a controller (src/input.js), plays the games inside the page (src/player.js),
-// and starts the rain, the puddle and the live duo after the first paint (src/stage.js).
+// and starts the rain, the puddle and the crew in 3D after the first paint (src/stage.js).
 
 import { site, groups, projects, crew, contact, duo as DUO } from './projects.js';
 import { createInput } from './input.js';
@@ -143,6 +143,7 @@ function backdrop(tab, i) {
 }
 // the neighbours of what's showing, fetched while nothing else is going on
 function warm(tab, i) {
+  nextUp();
   const n = LISTS[tab]?.length;
   if (!n || tab === 'contact') return;
   const go = () => [i - 1, i + 1].forEach((j) => {
@@ -150,6 +151,12 @@ function warm(tab, i) {
     if (!BD[b.key]) new Image().src = b.src;
   });
   (window.requestIdleCallback || setTimeout)(go);
+}
+// on Crew, the 3D models of the cards either side (the stage fetches them once his is in)
+function nextUp() {
+  const n = LISTS.crew.length;
+  const i = S.crew;
+  stage?.prefetch(S.tab === 'crew' ? [LISTS.crew[(i + 1) % n].num, LISTS.crew[(i + n - 1) % n].num] : []);
 }
 
 // ---- painting ----
@@ -229,10 +236,7 @@ function show(tab, { sound = true, focus = false } = {}) {
   hints();
   save();
   layout();
-  if (tab === 'contact' && changed) {
-    waveDuo(1);
-    setTimeout(() => waveDuo(0), 700);
-  }
+  if (changed) hello(tab === 'contact' ? [DUO[1], DUO[0]] : tab === 'crew' ? want() : []);
   if (sound && changed) audio.blip('tab');
   if (focus) controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
   announce(`${tab}: ${label(tab, S[tab])}`);
@@ -257,7 +261,7 @@ function select(i, { sound = true } = {}) {
   paint(S.tab);
   save();
   layout();
-  if (S.tab === 'crew' && DUO.includes(LISTS.crew[next].num)) waveDuo(DUO.indexOf(LISTS.crew[next].num));
+  if (S.tab === 'crew') hello(want());
   if (sound) audio.blip('move');
   if (carry) controlsOf(S.tab)[next]?.focus({ preventScroll: true });
   announce(label(S.tab, next));
@@ -311,10 +315,7 @@ function activate({ from, pad } = {}) {
 }
 
 function details() {
-  if (S.tab === 'crew') {
-    const n = DUO.indexOf(LISTS.crew[S.crew].num);
-    return waveDuo(n >= 0 ? n : Math.round(Math.random()));
-  }
+  if (S.tab === 'crew') return waveDuo(LISTS.crew[S.crew].num);
   const item = itemsOf(S.tab)[S[S.tab]];
   if (!item) return;
   const open = item.classList.toggle('is-more');
@@ -403,8 +404,10 @@ function act(name, info = {}) {
       return tabStep(1);
     case 'details':
       return details();
-    case 'wave':
-      return waveDuo(Math.round(Math.random()), Math.random() < 0.4 ? 'other' : 'viewer');
+    case 'wave': {
+      const w = want();
+      return waveDuo(w[Math.floor(Math.random() * w.length)], Math.random() < 0.4 ? 'other' : 'viewer');
+    }
     case 'fullscreen':
       return toggleFullscreen();
     case 'music':
@@ -598,31 +601,34 @@ function fitHints() {
   while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) order.shift().hidden = true;
 }
 
-// ---- the stage: the waterline, where the duo stands, what the water mirrors ----
+// ---- the stage: the waterline, who stands on it, what the water mirrors ----
 
 const FEET = 0.976; // src/duo.js: their feet sit at this share of the box height
-let duoLive = false;
+const MODELS = Object.fromEntries(crew.members.map((m) => [m.num, m.model]));
 function rel(el) {
   const h = screen.getBoundingClientRect();
   const r = el.getBoundingClientRect();
   return { x: r.left - h.left, y: r.top - h.top, w: r.width, h: r.height };
 }
+// who stands on the water in 3D: #4764 and #85 on Games and Contact, on Crew the picked one alone
+function want() {
+  if (S.tab === 'games' || S.tab === 'contact') return DUO;
+  if (S.tab === 'crew') return [LISTS.crew[S.crew].num];
+  return [];
+}
+// are they in (three.js and their models loaded)? Until then their renders stand there
+const live = () => !!stage?.ready(want());
 function duoMode() {
   if (S.tab === 'games' || S.tab === 'contact') return 'side';
-  if (S.tab === 'crew' && duoLive && DUO.includes(LISTS.crew[S.crew].num)) return 'stage';
+  if (S.tab === 'crew' && live()) return 'stage';
   return null;
 }
-// on Crew, #4764's or #85's own card shows him alone (src/duo.js solo); null: the two together
-function soloIdx() {
-  return duoMode() === 'stage' ? DUO.indexOf(LISTS.crew[S.crew].num) : null;
-}
-// the same framing as src/duo.js: where each one stands across the box, and how tall (alone: the
-// middle; the other one off the canvas)
+// the same framing as src/duo.js: where each one stands across the box (a pair, or one in the
+// middle), and how tall
 function framing(w, h) {
   const a = w / h;
   const half = Math.max(1.06, 1.6 / a);
-  const one = soloIdx();
-  const spots = one === 0 || one === 1 ? [one === 0 ? 0.5 : -9, one === 1 ? 0.5 : -9] : [0.5 - 0.62 / (2 * half * a), 0.5 + 0.62 / (2 * half * a)];
+  const spots = want().length > 1 ? [0.5 - 0.62 / (2 * half * a), 0.5 + 0.62 / (2 * half * a)] : [0.5];
   return { spots, tall: 1.7 / (2 * half) };
 }
 const box = { wl: 0, feet: 0, b: null };
@@ -647,6 +653,7 @@ function layout() {
   screen.style.setProperty('--wl', `${box.wl}px`);
   for (const img of $$('.bd--lettered')) cutLettered(img);
   const m = duoMode();
+  screen.classList.toggle('duo-live', live());
   const vis = $('.item.on .visual--crew', panelOf('crew'));
   $$('.visual--crew').forEach((v) => v.classList.toggle('is-duo', m === 'stage' && v === vis));
   duoEl.classList.toggle('duo--off', !m);
@@ -664,15 +671,14 @@ function layout() {
     b = { x: ph ? W - w : W - w - pad * 0.4, y: feet - h * FEET, w, h };
   }
   box.b = b;
-  stage?.solo?.(soloIdx());
   if (b) {
     Object.assign(duoEl.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
     box.feet = b.y + b.h * FEET;
     const f = framing(b.w, b.h);
-    duoEl.style.setProperty('--s0', `${f.spots[0] * 100}%`);
-    duoEl.style.setProperty('--s1', `${f.spots[1] * 100}%`);
+    f.spots.forEach((x, k) => duoEl.style.setProperty(`--s${k}`, `${x * 100}%`));
     duoEl.style.setProperty('--ph', `${f.tall * 100}%`);
   }
+  stage?.show(want()); // on Crew, his model loads while his render stands in
   placeHint();
   emit();
 }
@@ -681,7 +687,7 @@ function layout() {
 let waved = false;
 function placeHint() {
   // (on a phone, only on Crew: on Games it would sit on the words)
-  const on = duoLive && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !(phone.matches && S.tab !== 'crew');
+  const on = live() && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !(phone.matches && S.tab !== 'crew');
   hint.hidden = !on;
   if (!on) return;
   hint.style.left = `${box.b.x + box.b.w / 2}px`;
@@ -733,24 +739,30 @@ function emit() {
   clearTimeout(emitT);
   emitT = setTimeout(() => dispatchEvent(new Event('vyv:scene')), 460);
 }
-function waveDuo(i, at = 'viewer') {
-  if (!duoLive || !stage || duoEl.classList.contains('duo--off')) return false;
-  if (stage.wave(i, at)) {
+// one of them waves (by crew num), if he's standing there
+function waveDuo(num, at = 'viewer') {
+  if (!live() || duoEl.classList.contains('duo--off') || !want().includes(num)) return false;
+  if (stage.wave(num, at)) {
     waved = true;
     placeHint();
   }
 }
+// arriving on Contact, or picking a crew card: they wave, as soon as they're standing there
+let greet = null;
+function hello(nums) {
+  greet = null;
+  if (!nums.length) return;
+  if (!live()) return void (greet = nums);
+  nums.forEach((n, k) => (k ? setTimeout(() => waveDuo(n), 700 * k) : waveDuo(n)));
+}
 const shell = {
   scene,
   layout,
-  setDuoLive(on) {
-    duoLive = on;
-    screen.classList.toggle('duo-live', on);
+  // the models just asked for are in: they take over from the renders (and say hello)
+  castReady() {
     layout();
-    if (on && S.tab === 'contact') {
-      waveDuo(1);
-      setTimeout(() => waveDuo(0), 700);
-    }
+    const g = greet;
+    if (g && g.every((n) => want().includes(n))) hello(g);
   },
 };
 addEventListener('resize', () => requestAnimationFrame(layout));
@@ -758,7 +770,7 @@ document.fonts?.ready.then(() => layout());
 
 // click (or tap) one of them: he waves
 document.addEventListener('pointerdown', (e) => {
-  if (!duoLive || !box.b || duoEl.classList.contains('duo--off') || e.target.closest('a, button, dialog, .ask, .player')) return;
+  if (!live() || !box.b || duoEl.classList.contains('duo--off') || e.target.closest('a, button, dialog, .ask, .player')) return;
   const h = screen.getBoundingClientRect();
   const x = e.clientX - h.left;
   const y = e.clientY - h.top;
@@ -767,10 +779,11 @@ document.addEventListener('pointerdown', (e) => {
   const f = framing(b.w, b.h);
   if (y < box.feet - b.h * f.tall * 1.05) return;
   const u = (x - b.x) / b.w;
-  const i = Math.abs(u - f.spots[0]) < Math.abs(u - f.spots[1]) ? 0 : 1;
-  if (Math.abs(u - f.spots[i]) > 0.16 * (b.h / b.w) + 0.05) return;
+  const near = f.spots.map((s) => Math.abs(u - s));
+  const i = near.indexOf(Math.min(...near));
+  if (near[i] > 0.16 * (b.h / b.w) + 0.05) return;
   audio.blip('ok');
-  waveDuo(i);
+  waveDuo(want()[i]);
 });
 
 // ---- the tip jar (src/tip/): fetched on first hover, opened from the pill or #tip ----
@@ -816,7 +829,7 @@ function openOS(opts = {}) {
               layout();
             } else if (TABS.includes(slug)) show(slug, { sound: false });
           },
-          wave: () => (stage?.live ? (waveDuo(0), setTimeout(() => waveDuo(1), 600), 'ok') : stage ? 'loading' : 'missing'),
+          wave: () => (live() ? (want().forEach((n, k) => setTimeout(() => waveDuo(n), 600 * k)), 'ok') : stage?.live ? 'loading' : 'missing'),
         },
       });
       os.open(opts);
@@ -845,7 +858,9 @@ requestAnimationFrame(() =>
   setTimeout(() => {
     import('./stage.js')
       .then((m) => {
-        stage = m.createStage(shell, { screen, duoBox: duoEl });
+        stage = m.createStage(shell, { screen, duoBox: duoEl, models: MODELS });
+        layout(); // who stands on the water, now that there's a stage to ask
+        nextUp();
         if (player.current) stage.pause();
       })
       .catch((e) => console.warn('stage off', e));

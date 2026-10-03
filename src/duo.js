@@ -1,12 +1,18 @@
-// #4764 and #85, live in 3D, standing on the water and vibing.
+// Whoever stands on the water, live in 3D: #4764 and #85 together on Games and Contact, and each
+// of the crew alone, centre stage, on his own Crew card.
 //
-// Both web models (public/models/: Draco meshes, unlit materials, a shared
-// Radbro rig) carry two clips, Idle and Big_Wave_Hello. On top of Idle each gets a small
-// procedural groove on one shared beat: a head nod, a shoulder bounce, a hip sway and a little
-// bob, with #85 a touch behind #4764 so they aren't in lockstep, and both turned in toward each
-// other. Every so often one of them waves (Big_Wave_Hello), at you or at the other one;
-// wave(i) does it on demand (a click). Reduced motion: they hold still unless you ask for a
-// wave.
+// One renderer, one scene, any number of characters. show([a, b]) puts two of them on the water,
+// turned in toward each other; show([a]) puts one in the middle facing out; show([]) nobody.
+// A model is fetched the first time it's shown (or prefetched, for the cards either side), then
+// kept; past KEEP loaded, the ones that haven't been on screen for STALE give their GPU memory
+// back. Until everyone asked for is in, nobody shows, and the page keeps the renders up.
+//
+// Every web model (public/models/: Draco meshes, unlit materials, the shared Radbro rig) carries
+// two clips, Idle and Big_Wave_Hello. On top of Idle each gets a small procedural groove on one
+// shared beat: a head nod, a shoulder bounce, a hip sway and a little bob, the second of a pair
+// a touch behind the first so they aren't in lockstep. Every so often one of them waves
+// (Big_Wave_Hello), at you or at the other one; wave(num) does it on demand (a click). Reduced
+// motion: they hold still unless you ask for a wave.
 //
 // The camera is framed so their feet (y = 0) land at FEET of the canvas height, whatever its
 // shape; the page uses that to put their reflection's waterline in the right place.
@@ -19,6 +25,14 @@ export const FEET = 0.976; // where y = 0 sits, as a share of the canvas height
 const FOV = 18;
 const BPM = 92;
 const WAVE_EVERY = [7, 12]; // seconds between waves they do on their own
+const KEEP = 4; // models kept loaded; past that, the ones off screen for STALE ms are let go
+const STALE = 30000;
+// a pair: where each stands (m), how far he faces the other one, his lag behind the beat, his energy
+const PAIR = [
+  { x: -0.62, turn: 0.17, beat: 0, energy: 1 },
+  { x: 0.62, turn: -0.17, beat: 0.55, energy: 0.85 },
+];
+const ALONE = { x: 0, turn: 0, beat: 0, energy: 1 };
 const X = new THREE.Vector3(1, 0, 0);
 const Y = new THREE.Vector3(0, 1, 0);
 const Z = new THREE.Vector3(0, 0, 1);
@@ -32,7 +46,8 @@ const _id = new THREE.Quaternion();
 const YAW_KEEP = 0.4; // how much of the clips' own body turn is kept (Idle looks around a lot)
 const GROOVY = ['Hips', 'Spine01', 'Spine02', 'neck', 'Head', 'LeftShoulder', 'RightShoulder', 'LeftArm', 'RightArm'];
 
-export async function createDuo(box, { calm, onWave, auto = true, vibe = true } = {}) {
+// models: { num: '/models/….glb' }. onReady(): everyone asked for by show() is now standing there.
+export function createCast(box, { calm, models, onReady }) {
   const canvas = document.createElement('canvas');
   canvas.className = 'duo__gl';
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: true, powerPreference: 'low-power' });
@@ -41,34 +56,135 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 40);
 
-  // the Draco decoder is served from public/draco/ (it ships with three.js)
-  const draco = new DRACOLoader().setDecoderPath('/draco/');
-  const loader = new GLTFLoader().setDRACOLoader(draco);
-  const [g4764, g85] = await Promise.all([
-    loader.loadAsync('/models/radbro4764-hero.glb'),
-    loader.loadAsync('/models/retardio85-hero.glb'),
-  ]);
-  draco.dispose();
+  const cast = new Map(); // num -> character, loaded
+  const loading = new Map(); // num -> promise
+  const bad = new Set(); // failed once: his render stays
+  let want = []; // who show() asked for
+  let soon = []; // who's likely next (prefetched when nothing else is loading)
+  let on = []; // who's on the water now (want, once all of them are in)
 
-  // x: where he stands (m). turn: how far he faces the other one. beat: his lag behind the beat.
-  const crew = [rig(g4764, -0.62, 0.17, 0, 1), rig(g85, 0.62, -0.17, 0.55, 0.85)];
-  for (const c of crew) scene.add(c.root);
-  // one of them alone (Crew, his own card): he stands in the middle facing out, the other one is away
-  let only = null;
-  function solo(i) {
-    only = i === 0 || i === 1 ? i : null;
-    crew.forEach((c, k) => {
-      c.root.visible = only === null || k === only;
-      c.x = only === null ? c.x0 : 0;
-      c.base = only === null ? c.base0 : 0;
-      if (!c.waving) c.look = c.base;
-    });
+  // ---- loading: the Draco decoder (public/draco/, it ships with three.js) runs while there's
+  // something to decode, and its workers go a while after the last one ----
+  let draco = null;
+  let dracoT = 0;
+  let order = 0;
+  function load(num) {
+    if (cast.has(num)) return Promise.resolve(cast.get(num));
+    if (loading.has(num)) return loading.get(num);
+    clearTimeout(dracoT);
+    draco ||= new DRACOLoader().setDecoderPath('/draco/').setWorkerLimit(2);
+    const p = new GLTFLoader()
+      .setDRACOLoader(draco)
+      .loadAsync(models[num])
+      .then((g) => {
+        const c = rig(num, g);
+        c.root.visible = false; // until show() puts him on
+        cast.set(num, c);
+        scene.add(c.root);
+        return c;
+      })
+      .catch((e) => {
+        bad.add(num);
+        console.warn(`#${num} stays a render`, e);
+      })
+      .finally(() => {
+        loading.delete(num);
+        if (!loading.size) {
+          dracoT = setTimeout(() => {
+            draco?.dispose();
+            draco = null;
+          }, 15000);
+        }
+      });
+    loading.set(num, p);
+    return p;
+  }
+  const can = (n) => models[n] && !cast.has(n) && !bad.has(n);
+
+  // fetch whoever's wanted (after a beat, so running the d-pad along the row doesn't fetch everyone
+  // it passes), and once that's done and the pick has held a moment, with the page idle, whoever's
+  // likely next, one at a time
+  let pumpT = 0;
+  const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 2000 }) : setTimeout(f, 200));
+  function pump() {
+    clearTimeout(pumpT);
+    if (want.some(can)) {
+      pumpT = setTimeout(() => want.filter(can).forEach((n) => load(n).then(settle)), 120);
+      return;
+    }
+    if (loading.size || !soon.some(can)) return;
+    pumpT = setTimeout(() => idle(() => {
+      const next = soon.find(can);
+      if (next && !loading.size && !want.some(can)) load(next).then(settle);
+    }), 700);
+  }
+  // a model came in (wanted, or fetched ahead and then picked): if that completes who's wanted, on
+  // they go
+  function settle() {
+    if (want.length && !on.length && place()) onReady?.();
+    pump();
   }
 
-  function rig(gltf, x, turn, beat, energy) {
+  // the pose they're placed in: two turned in toward each other, or one in the middle facing out
+  function place() {
+    const ok = want.length > 0 && want.every((n) => cast.has(n));
+    const was = on;
+    on = ok ? want.map((n) => cast.get(n)) : [];
+    const now = performance.now();
+    for (const c of cast.values()) c.root.visible = false;
+    on.forEach((c, k) => {
+      const s = on.length > 1 ? PAIR[k] : ALONE;
+      c.root.visible = true;
+      Object.assign(c, { x: s.x, base: s.turn, beat: s.beat, energy: s.energy, seen: now });
+      if (c.waving) return;
+      c.look = c.base;
+      if (!was.includes(c)) c.turn = c.base; // just stepped on: already facing the right way
+    });
+    gc(now);
+    return ok;
+  }
+  // returns whether who's standing there changed
+  function show(nums) {
+    want = nums.slice(0, 2);
+    const was = on.map((c) => c.num).join();
+    place();
+    pump();
+    return on.map((c) => c.num).join() !== was;
+  }
+  function prefetch(nums) {
+    soon = nums;
+    pump();
+  }
+
+  // past KEEP models, let go of the ones off screen longest (never who's on, wanted or next)
+  function gc(now) {
+    if (cast.size <= KEEP) return;
+    const old = [...cast.values()]
+      .filter((c) => !on.includes(c) && !want.includes(c.num) && !soon.includes(c.num) && now - c.seen > STALE)
+      .sort((a, b) => a.seen - b.seen);
+    while (cast.size > KEEP && old.length) drop(old.shift());
+  }
+  function drop(c) {
+    c.mixer.stopAllAction();
+    c.mixer.uncacheRoot(c.root);
+    scene.remove(c.root);
+    c.root.traverse((o) => {
+      if (o.isSkinnedMesh) o.skeleton.dispose();
+      o.geometry?.dispose();
+      for (const m of [].concat(o.material || [])) {
+        for (const v of Object.values(m)) {
+          if (!v?.isTexture) continue;
+          v.dispose();
+          v.image?.close?.(); // an ImageBitmap holds its pixels until closed
+        }
+        m.dispose();
+      }
+    });
+    cast.delete(c.num);
+  }
+
+  function rig(num, gltf) {
     const root = gltf.scene;
-    root.position.x = x;
-    root.rotation.y = turn;
     root.traverse((o) => {
       if (o.isMesh) o.frustumCulled = false;
     });
@@ -80,7 +196,7 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
     const clip = (n) => gltf.animations.find((a) => a.name === n);
     const idle = mixer.clipAction(clip('Idle'));
     idle.play();
-    idle.time = beat * 3.1; // not in lockstep
+    idle.time = (order++ * 1.7) % 3.1; // not in lockstep with whoever loaded with him
     const wave = mixer.clipAction(clip('Big_Wave_Hello'));
     wave.setLoop(THREE.LoopOnce, 1);
     wave.clampWhenFinished = true;
@@ -90,7 +206,7 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
     const clean = groovy.map((b) => ({ b, q: b.quaternion.clone(), p: b.position.clone() }));
     // the clips walk the hips sideways (the wave leans a long way out); keep them where they stand
     const rest = bones.Hips ? bones.Hips.position.clone() : null;
-    const c = { root, bones, mixer, idle, wave, x, x0: x, base: turn, base0: turn, turn, look: turn, beat, energy, waving: false, clean, rest };
+    const c = { num, root, bones, mixer, idle, wave, x: 0, base: 0, turn: 0, look: 0, beat: 0, energy: 1, waving: false, clean, rest, seen: performance.now() };
     mixer.addEventListener('finished', (e) => {
       if (e.action !== wave) return;
       idle.reset().fadeIn(0.45).play();
@@ -135,34 +251,35 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
     }
   }
 
-  function wave(i, at = 'viewer') {
-    const c = crew[i];
-    if (!c || c.waving || !c.root.visible) return false;
+  function wave(num, at = 'viewer') {
+    const c = cast.get(num);
+    if (!c || c.waving || !on.includes(c)) return false;
     c.waving = true;
-    c.look = at === 'other' && only === null ? c.base * 2.6 : 0;
+    c.look = at === 'other' && on.length > 1 ? c.base * 2.6 : 0;
     c.wave.reset().setEffectiveWeight(1).fadeIn(0.3).play();
     c.idle.fadeOut(0.3);
-    onWave?.(i, at);
     return true;
   }
 
   let nextWave = 4 + Math.random() * 3;
   let t = 0;
+  let gcAt = 0;
   function tick(dt) {
     const still = calm();
     if (!still) {
       t += dt;
-      if (auto && t > nextWave) {
-        const i = only ?? (Math.random() < 0.5 ? 0 : 1);
-        wave(i, Math.random() < 0.45 ? 'other' : 'viewer');
+      if (t > nextWave && on.length) {
+        wave(on[Math.floor(Math.random() * on.length)].num, Math.random() < 0.45 ? 'other' : 'viewer');
         nextWave = t + WAVE_EVERY[0] + Math.random() * (WAVE_EVERY[1] - WAVE_EVERY[0]);
       }
     }
-    for (const c of crew) {
+    const now = performance.now();
+    for (const c of on) {
+      c.seen = now;
       const live = !still || c.waving;
       c.turn += (c.look - c.turn) * (1 - Math.exp(-dt * 3.2));
-      c.root.rotation.y = c.turn + (live ? Math.sin(t * 0.4 + c.beat * 2) * 0.05 : 0);
       c.root.position.x = c.x + (still ? 0 : Math.sin(((t * BPM) / 60) * Math.PI - c.beat) * 0.018);
+      c.root.rotation.y = c.turn + (live ? Math.sin(t * 0.4 + c.beat * 2) * 0.05 : 0);
       for (const k of c.clean) {
         k.b.quaternion.copy(k.q);
         k.b.position.copy(k.p);
@@ -182,12 +299,16 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
         q.multiply(_tw.clone().invert()).multiply(_id.slerp(_tw, YAW_KEEP));
         _id.identity();
       }
-      if (!still && vibe) groove(c, t);
+      if (!still) groove(c, t);
+    }
+    if (now > gcAt) {
+      gcAt = now + 5000;
+      gc(now);
     }
     renderer.render(scene, camera);
   }
 
-  // frame both of them: feet at FEET of the height, room over their heads for a wave
+  // frame them: feet at FEET of the height, room over their heads for a wave
   function resize(w, h) {
     w = Math.max(1, Math.round(w));
     h = Math.max(1, Math.round(h));
@@ -201,12 +322,23 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
     camera.lookAt(0, cy, 0);
     camera.updateProjectionMatrix();
   }
-  // where each one stands, as a share of the canvas width (for clicks and the poster)
-  function spots() {
-    const half = camera.position.z * Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * camera.aspect;
-    return crew.map((c) => 0.5 + c.x / (2 * half));
-  }
 
   box.append(canvas);
-  return { canvas, tick, resize, wave, solo, spots, renderer, crew };
+  return {
+    canvas,
+    tick,
+    resize,
+    wave,
+    show,
+    prefetch,
+    // are all of these loaded (and so, once shown, standing there)?
+    ready: (nums) => nums.length > 0 && nums.every((n) => cast.has(n)),
+    get live() {
+      return on.length > 0;
+    },
+    get loaded() {
+      return [...cast.keys()];
+    },
+    renderer,
+  };
 }

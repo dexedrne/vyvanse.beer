@@ -639,9 +639,10 @@ export function createWater(canvas, host, { calm }) {
     watch(now, target);
     halo.k += (halo.want - halo.k) * Math.min(1, dt * 5);
     try {
-      if (fig.on && fig.src && (fig.live || fig.dirty)) {
-        // a live canvas is copied every frame, right after it drew (same task, so it's intact)
-        if (fig.src.width && (fig.src.naturalWidth !== 0)) upload(figTex, fig.src);
+      // a live canvas is copied every frame, right after it drew (same task, so it's intact); a
+      // render once it has fully come in (half-loaded, it's bad image data to WebGL)
+      if (fig.on && fig.src && (fig.live || fig.dirty) && fig.src.width && fig.src.naturalWidth !== 0 && fig.src.complete !== false) {
+        upload(figTex, fig.src);
         fig.dirty = false;
       }
     } catch {

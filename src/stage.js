@@ -1,6 +1,6 @@
-// The rain-and-puddle canvas (src/water.js) and the live duo (src/duo.js), on one animation
-// loop. Loaded after the first paint (src/main.js); without it, or without WebGL, the menu keeps
-// its plain backdrops and the duo's poster pair.
+// The rain-and-puddle canvas (src/water.js) and whoever stands on it in 3D (src/duo.js), on one
+// animation loop. Loaded after the first paint (src/main.js); without it, or without WebGL, the
+// menu keeps its plain backdrops, the duo's poster pair and the crew's renders.
 //
 // The loop draws at 60 fps while you're doing something, 30 after a few idle seconds, a few
 // still frames with reduced motion, nothing while the tab is hidden, and nothing at all while a
@@ -8,11 +8,12 @@
 
 import { createWater } from './water.js';
 
-export function createStage(shell, { screen, duoBox }) {
+export function createStage(shell, { screen, duoBox, models }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const calm = () => reduced.matches;
-  let duo = null;
-  let only = null;
+  let cast = null;
+  let want = []; // who the page wants on the water (show)
+  let soon = []; // and who's likely next (prefetch)
   let water = null;
 
   // ---- the water ----
@@ -56,8 +57,9 @@ export function createStage(shell, { screen, duoBox }) {
     const s = shell.scene();
     let figure = null;
     if (s.figure?.kind === 'duo') {
-      const el = duo ? duo.canvas : posterCanvas();
-      if (el) figure = { el, live: !!duo, feet: s.figure.feet };
+      const live = !!cast?.live;
+      const el = live ? cast.canvas : posterCanvas();
+      if (el) figure = { el, live, feet: s.figure.feet };
     } else if (s.figure?.kind === 'img') {
       figure = { el: s.figure.el, live: false, feet: s.figure.feet };
     }
@@ -73,9 +75,9 @@ export function createStage(shell, { screen, duoBox }) {
   for (const img of duoBox.querySelectorAll('img')) img.addEventListener('load', sync, { once: true });
   shell.layout(); // the backdrop just got shorter: place everything again
 
-  // ---- the duo: three.js and the two models, only now ----
-  const resizeDuo = () => duo?.resize(duoBox.clientWidth, duoBox.clientHeight);
-  new ResizeObserver(resizeDuo).observe(duoBox);
+  // ---- the cast: three.js only now, each model when it's first wanted ----
+  const resizeCast = () => cast?.resize(duoBox.clientWidth, duoBox.clientHeight);
+  new ResizeObserver(resizeCast).observe(duoBox);
   // no WebGL at all (the water would have had it): don't fetch three.js for nothing
   const gl = () => {
     try {
@@ -86,16 +88,24 @@ export function createStage(shell, { screen, duoBox }) {
   };
   if (!navigator.connection?.saveData && (water || gl())) {
     import('./duo.js')
-      .then((m) => m.createDuo(duoBox, { calm }))
-      .then((d) => {
-        duo = d;
-        duo.solo(only);
-        resizeDuo();
-        duo.tick(0); // a first frame before it shows
-        shell.setDuoLive(true);
-        wake();
+      .then((m) => {
+        cast = m.createCast(duoBox, {
+          calm,
+          models,
+          // everyone the page asked for is in: it swaps the renders out for them
+          onReady() {
+            shell.castReady();
+            resizeCast();
+            cast.tick(0); // a first frame before they show
+            sync();
+            wake();
+          },
+        });
+        cast.show(want);
+        cast.prefetch(soon);
+        resizeCast();
       })
-      .catch((e) => console.warn('the duo stays a poster', e));
+      .catch((e) => console.warn('the crew stay renders', e));
   }
 
   // ---- one loop ----
@@ -114,7 +124,7 @@ export function createStage(shell, { screen, duoBox }) {
     if (lastDraw && now - lastDraw < 1000 / target - 2) return;
     const dt = lastDraw ? Math.min(0.1, (now - lastDraw) / 1000) : 1 / 60;
     lastDraw = now;
-    if (duo && !duoBox.classList.contains('duo--off')) duo.tick(dt);
+    if (cast?.live && !duoBox.classList.contains('duo--off')) cast.tick(dt);
     if (water && !water.dead) water.frame(dt, now, target);
   }
   function wake() {
@@ -127,14 +137,25 @@ export function createStage(shell, { screen, duoBox }) {
   document.addEventListener('visibilitychange', () => !document.hidden && wake());
 
   return {
-    wave: (i, at) => duo?.wave(i, at) ?? false,
-    // one of the two alone (null: both)
-    solo(i) {
-      only = i;
-      duo?.solo(i);
+    wave: (num, at) => cast?.wave(num, at) ?? false,
+    // who stands on the water: [a, b] a pair, [a] one alone, [] nobody (src/duo.js)
+    show(nums) {
+      want = nums;
+      // someone else stepped on: draw him now, so the canvas never shows who was there before
+      if (cast?.show(nums) && cast.live) {
+        resizeCast();
+        cast.tick(0);
+      }
     },
+    // who's likely next (the crew cards either side): fetched when nothing else is
+    prefetch(nums) {
+      soon = nums;
+      cast?.prefetch(nums);
+    },
+    // are these loaded, so they can stand there now?
+    ready: (nums) => !!cast?.ready(nums),
     get live() {
-      return !!duo;
+      return !!cast;
     },
     // a game is open: draw nothing at all
     pause() {

@@ -243,7 +243,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       },
     },
     wave: {
-      desc: 'make #4764 and #85 wave',
+      desc: 'make whoever is on the water wave',
       run() {
         const how = shell.wave();
         if (how === 'ok') term.print(line('gm. ', muted('click them on the water to make one wave.')));

@@ -371,7 +371,9 @@ export const projects = [
 
 // The Radbros, rendered in 3D with transparent backgrounds.
 // `num` is what the terminal takes (`info 4764`). `featured` = the site mascot (picked first
-// on Crew). The games each one is in come from the games' `cast`.
+// on Crew). The games each one is in come from the games' `cast`. `model` is the small web
+// model (mesh, Idle and Big_Wave_Hello) that stands on his card in 3D, loaded when first shown;
+// `image` is his render, shown until then (and without WebGL).
 export const crew = {
   title: 'The crew',
   line: 'Radbros #652, #4764, #2564 and #723, and Retardios #555 and #85, built in 3D. You play as them in the games.',
@@ -390,6 +392,7 @@ export const crew = {
       slug: 'radbro-652',
       kind: 'Radbro',
       face: '/img/faces/radbro-652.webp', // 200x200 crop for the character-select tile
+      model: '/models/radbro652-hero.glb',
       name: 'Radbro #652',
       line: 'Brown mop, big blue eyes, the Nobody sweatshirt.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v3.zip', label: '3D model .zip', size: '17 MB' },
@@ -405,6 +408,7 @@ export const crew = {
       slug: 'radbro-4764',
       kind: 'Radbro',
       face: '/img/faces/radbro-4764.webp', // 200x200 crop for the character-select tile
+      model: '/models/radbro4764-hero.glb',
       name: 'Radbro #4764',
       line: 'Skull shades, scribble hoodie, katana at his left hip.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v3.zip', label: '3D model .zip', size: '19 MB' },
@@ -421,6 +425,7 @@ export const crew = {
       slug: 'radbro-2564',
       kind: 'Radbro',
       face: '/img/faces/radbro-2564.webp', // 200x200 crop for the character-select tile
+      model: '/models/radbro2564-hero.glb',
       name: 'Radbro #2564',
       line: 'The ghost. Foil hat, aviators, RAD RESPONSE vest.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro2564-3d-model.zip', label: '3D model .zip', size: '20 MB' },
@@ -436,6 +441,7 @@ export const crew = {
       slug: 'radbro-723',
       kind: 'Radbro',
       face: '/img/faces/radbro-723.webp', // 200x200 crop for the character-select tile
+      model: '/models/radbro723-hero.glb',
       name: 'Radbro #723',
       line: 'The new guy. Cowboy hat, a wink, HOT TOPIC BRO vest.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro723-3d-model.zip', label: '3D model .zip', size: '21 MB' },
@@ -455,6 +461,7 @@ export const crew = {
       slug: 'retardio-555',
       kind: 'Retardio Cousin',
       face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
+      model: '/models/retardio555-hero.glb',
       name: 'Retardio Cousin #555',
       line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee.',
       repo: false,
@@ -471,6 +478,7 @@ export const crew = {
       slug: 'retardio-85',
       kind: 'Retardio Cousin Classic',
       face: '/img/faces/retardio-85.webp', // 200x200 crop for the character-select tile
+      model: '/models/retardio85-hero.glb',
       name: 'Retardio Cousin Classic #85',
       line: 'Retardio Cousin Classic: the original artist’s true-to-the-original relaunch. Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
       repo: false,
@@ -493,8 +501,8 @@ export const contact = {
   code: { label: 'GitHub', href: 'https://github.com/dexedrne' },
 };
 
-// #4764 and #85 stand on the puddle together, live in 3D (src/duo.js). Their renders are the
-// poster pair until the models load (and all there is without WebGL).
+// #4764 and #85 stand on the puddle together on Games and Contact, live in 3D (src/duo.js).
+// Their renders are the poster pair until the models load (and all there is without WebGL).
 export const duo = ['4764', '85'];
 
 // #4764's big render: the share card's alt and the terminal's neofetch use it.
