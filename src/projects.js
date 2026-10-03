@@ -445,7 +445,8 @@ export const crew = {
       },
     },
     // The Retardios (Retardio Cousin #555 and Retardio Classic #85): built on the Radbro rig, not part of the
-    // radbros-3d repo (`repo: false`), so their download is the web model the site serves.
+    // radbros-3d repo (`repo: false`). Their download is a package like the Radbros' (static, rigged and
+    // animated .glb, a preview, README and the license) on the same radbros-3d release.
     {
       num: '555',
       slug: 'retardio-555',
@@ -454,7 +455,7 @@ export const crew = {
       name: 'Retardio #555',
       line: 'Long brown hair, heart blush, BRITISH FOOD tee.',
       repo: false,
-      download: { href: '/models/retardio555-hero.glb', label: '3D model .glb', size: '0.6 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '16 MB' },
       image: {
         src: '/img/retardios/retardio-555.webp',
         width: 350,
@@ -470,7 +471,7 @@ export const crew = {
       name: 'Retardio #85',
       line: 'Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
       repo: false,
-      download: { href: '/models/retardio85-hero.glb', label: '3D model .glb', size: '0.6 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio85-3d-model.zip', label: '3D model .zip', size: '18 MB' },
       image: {
         src: '/img/retardios/retardio-85.webp',
         width: 237,

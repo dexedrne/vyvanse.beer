@@ -106,7 +106,7 @@ function crewItem(b, i, { crew, games }) {
   const own = b.repo === false;
   const file = b.download.href.split('/').pop();
   const fine = own
-    ? `<p class="credit">My own Retardio, built on the Radbro rig. The download is the same web model this site uses: the mesh, Idle and a wave.</p>`
+    ? `<p class="credit">My own Retardio, built on the Radbro rig. Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>, like the Radbros: use him, remix him, put him in your game.</p>`
     : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>${crew.downloadAll ? `, or all four in <a href="${esc(crew.downloadAll.href)}" download>one .zip</a> (${esc(crew.downloadAll.size)})` : ''}. ${esc(crew.repo.line)}</p>`;
   return `<article class="item item--crew" id="${esc(b.slug)}" data-i="${i}" data-id="${esc(b.num)}" aria-labelledby="${esc(b.slug)}-name">
   <div class="visual visual--crew">
@@ -116,13 +116,13 @@ function crewItem(b, i, { crew, games }) {
   <div class="info">
     <p class="kindline">${esc(b.kind)}</p>
     <h3 class="wm" id="${esc(b.slug)}-name"><span class="vh">${esc(b.kind)} </span>#${esc(b.num)}</h3>
-    <p class="pitch">${esc(b.line)}${own ? ' Built on the Radbro rig.' : ' Rigged and animated.'}</p>
+    <p class="pitch">${esc(b.line)} Rigged and animated.</p>
     <div class="plays"><span class="plays__label">in</span>${plays
       .map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(g.shell)};--accent:${esc(g.accent)}">${esc(g.name)}</a>`)
       .join('')}</div>
     <div class="act">
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
-      ${status(file, `${b.download.size}, ${own ? 'web model with Idle and a wave' : 'rigged and animated'}`)}
+      ${status(file, `${b.download.size}, rigged and animated`)}
     </div>
     <div class="extra">${fine}</div>
   </div>

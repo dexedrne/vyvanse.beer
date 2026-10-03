@@ -122,6 +122,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           line('playable in ', ...projects.filter((g) => g.cast?.includes(b.num)).flatMap((g, i) => [i ? ' ' : '', run(`open ${g.cmd}`, g.cmd)])),
           b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
           crew.repo && b.repo !== false ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
+          crew.repo && b.repo === false ? line(muted('free to use  '), link(crew.repo.license.href, crew.repo.license.label)) : null,
         ),
       ),
     );
