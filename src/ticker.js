@@ -117,11 +117,15 @@ export function createTicker(host = document.querySelector('#ticker-host')) {
   (host || document.body).prepend(el);
 
   const clock = el.querySelector('.ticker__clock');
+  let paused = false;
+  let ticking = 0;
   const tick = () => {
+    clearTimeout(ticking);
+    if (paused) return;
     const now = new Date();
     clock.textContent = now.toISOString().slice(11, 19);
     clock.dateTime = now.toISOString();
-    setTimeout(tick, 1000 - (now.getTime() % 1000));
+    ticking = setTimeout(tick, 1000 - (now.getTime() % 1000));
   };
   tick();
 
@@ -131,7 +135,8 @@ export function createTicker(host = document.querySelector('#ticker-host')) {
   let timer = 0;
   const refresh = async () => {
     clearTimeout(timer);
-    if (document.hidden) return;
+    timer = 0;
+    if (document.hidden || paused) return;
     last = Date.now();
     const [got, t] = await Promise.all([prices().catch(() => []), token().catch(() => null)]);
     got.forEach((p, i) => {
@@ -150,11 +155,29 @@ export function createTicker(host = document.querySelector('#ticker-host')) {
       spark.classList.toggle('is-down', t.ch < 0);
       spark.querySelector('polyline').setAttribute('points', t.spark.length > 1 ? sparkPath(t.spark) : '');
     }
-    timer = setTimeout(refresh, EVERY);
+    if (!paused) timer = setTimeout(refresh, EVERY);
   };
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && Date.now() - last >= EVERY) refresh();
-    else if (!document.hidden && !timer) timer = setTimeout(refresh, EVERY - (Date.now() - last));
-  });
+  const wake = () => {
+    if (document.hidden || paused) return;
+    if (Date.now() - last >= EVERY) refresh();
+    else if (!timer) timer = setTimeout(refresh, EVERY - (Date.now() - last));
+  };
+  document.addEventListener('visibilitychange', wake);
   refresh();
+
+  // while a game has the screen: no clock, no fetches
+  return {
+    pause() {
+      paused = true;
+      clearTimeout(ticking);
+      clearTimeout(timer);
+      timer = 0;
+    },
+    resume() {
+      if (!paused) return;
+      paused = false;
+      tick();
+      wake();
+    },
+  };
 }

@@ -5,12 +5,12 @@
 // Everything turns into one of a few actions, handed to `act(name, info)`:
 //   left right up down   move the cursor (held: repeats)
 //   ok                   A / Enter: play, open, pick
-//   start                Start / Menu: play
+//   start                Start / Menu: play (on release, and not held with View)
 //   back                 B / Esc: close what's open, else back to Games
 //   prev next            LB RB / Q E: the tabs
 //   details              Y / I: the whole blurb and every link
 //   wave                 X / G: one of the duo waves
-//   fullscreen           View / Select / F
+//   fullscreen           View / Select / F (on a pad: on release, and not held with Menu)
 //   music sfx os         M, N, / (keyboard only)
 //
 // While a game is open (`mode() === 'play'`) the menu gets nothing; the player reads the pad
@@ -23,9 +23,10 @@ const STANDARD = {
   3: 'details',
   4: 'prev',
   5: 'next',
-  8: 'fullscreen',
-  9: 'start',
 };
+// View and Menu act when they're let go, and only if the other one wasn't held with them: held
+// together they're the player's way back to the menu, not full screen plus play
+const PAIR = { 8: 'fullscreen', 9: 'start' };
 const DIRS = { 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
 
 // what each glyph reads as, per input
@@ -114,10 +115,14 @@ export function createInput({ act, mode, onScheme }) {
   addEventListener('pointerdown', (e) => setDevice(e.pointerType === 'touch' ? 'touch' : 'mouse'), { passive: true, capture: true });
 
   // ---- gamepads ----
-  const prev = new Map(); // pad index -> pressed buttons last frame
+  // Read on a short timer, not on animation frames: frames can be slow (software WebGL, a busy
+  // start-up), and a tap that comes and goes between two reads is lost.
+  const prev = new Map(); // pad index -> pressed buttons last read
+  const pair = new Map(); // pad index -> View and Menu were held together since both were up
   let held = { dir: null, next: 0 };
-  let polling = false;
+  let timer = 0;
   let rumbleOk = true;
+  const EVERY = 8;
 
   const list = () => [...(navigator.getGamepads?.() || [])].filter((p) => p && p.connected !== false);
 
@@ -129,13 +134,14 @@ export function createInput({ act, mode, onScheme }) {
     return ax > ay ? (x < 0 ? 'left' : 'right') : y < 0 ? 'up' : 'down';
   }
 
-  function poll(now) {
+  function poll() {
     const pads = list();
     if (!pads.length) {
-      polling = false;
+      clearInterval(timer);
+      timer = 0;
       return;
     }
-    requestAnimationFrame(poll);
+    const now = performance.now();
     const m = mode();
     let dir = null;
     for (const gp of pads) {
@@ -143,12 +149,15 @@ export function createInput({ act, mode, onScheme }) {
       const now2 = gp.buttons.map((b) => !!(b?.pressed || b?.value > 0.6));
       prev.set(gp.index, now2);
       const pressed = (i) => now2[i] && !was[i];
+      const both = pair.get(gp.index) || (now2[8] && now2[9]);
+      pair.set(gp.index, both && (now2[8] || now2[9]));
       if (now2.some((b, i) => b && !was[i]) || stick(gp)) {
         setDevice(isPs(gp.id) ? 'ps' : 'xbox');
         dispatchEvent(new Event('vyv:input'));
       }
       if (m === 'play') continue;
       for (const [i, name] of Object.entries(STANDARD)) if (pressed(+i)) act(name, { from: 'pad', pad: gp });
+      for (const [i, name] of Object.entries(PAIR)) if (was[i] && !now2[i] && !both) act(name, { from: 'pad', pad: gp });
       for (const [i, name] of Object.entries(DIRS)) if (now2[i]) dir = name;
       dir ||= stick(gp);
     }
@@ -165,9 +174,8 @@ export function createInput({ act, mode, onScheme }) {
     }
   }
   function start() {
-    if (polling) return;
-    polling = true;
-    requestAnimationFrame(poll);
+    if (timer) return;
+    timer = setInterval(poll, EVERY);
   }
   addEventListener('gamepadconnected', start);
   addEventListener('gamepaddisconnected', () => list().length || setDevice('kb'));

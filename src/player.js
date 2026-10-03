@@ -12,6 +12,7 @@
 //     after a click on the corner button). Inside the game, keys go to the game only, so there
 //     it's Esc (the game pauses and lets go of the mouse), then the ◀ menu button.
 //   - the ◀ menu button in the top-left corner, always there.
+//   - the browser's Back, or a phone's back gesture: the game has its own history entry.
 
 import { h, icon } from './dom.js';
 import { shortUrl } from './projects.js';
@@ -58,11 +59,12 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     });
     addEventListener('keyup', (e) => e.key === 'Escape' && hold.by === 'key' && stopHold());
     addEventListener('blur', () => hold.by === 'key' && stopHold());
+    addEventListener('popstate', (e) => current && e.state?.vyvPlay !== current.cmd && close({ popped: true }));
   }
 
   function how() {
     const pad = `hold ${glyph('hold') === 'Esc' ? '<b>View + Menu</b> (Select + Start)' : `<b>${glyph('hold')}</b>`} on a controller`;
-    return `Back to the menu: ${pad}, <b>◀ menu</b> in the corner, or hold <b>Esc</b> here. Esc and Start in the game are the game's own.`;
+    return `Back to the menu: ${pad}, <b>◀ menu</b> in the corner, the browser’s <b>Back</b>, or hold <b>Esc</b> here. Esc and Start in the game are the game's own.`;
   }
 
   function open(p) {
@@ -109,7 +111,10 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     el.querySelector('.player__back').focus({ preventScroll: true });
     onOpen?.(p);
     timer = setInterval(watchPads, 50);
-    history.replaceState(null, '', `#play/${p.cmd}`);
+    // an entry of its own, so the browser's Back (or a phone's back gesture) leaves the game
+    // for the menu instead of leaving the site
+    if (history.state?.vyvPlay) history.replaceState({ vyvPlay: p.cmd }, '', `#play/${p.cmd}`);
+    else history.pushState({ vyvPlay: p.cmd }, '', `#play/${p.cmd}`);
   }
 
   function ready() {
@@ -129,10 +134,12 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     }
   }
 
-  function close({ quiet = false } = {}) {
+  function close({ quiet = false, popped = false } = {}) {
     if (!current) return;
     const p = current;
     current = null;
+    // take the game's entry back off the history (Back did that already when it closed it)
+    if (!quiet && !popped && history.state?.vyvPlay) history.back();
     clearInterval(timer);
     clearTimeout(readyTimer);
     stopHold();

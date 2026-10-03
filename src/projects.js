@@ -137,6 +137,7 @@ export const projects = [
       height: 630,
       alt: 'RetardioPayne, the harder cut: Retardio #555 and Retardio #85 with pistols, on two snapshots over a rainy neon street, beside the blue and pink RETARDIO PAYNE wordmark.',
       position: '78% 50%', // keep the two of them in view (object-position)
+      lettered: 0.505, // a share card: its wordmark and lines fill the left half, where the menu's words go (faded out there)
     },
     credit: {
       before: 'Built on',

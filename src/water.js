@@ -80,10 +80,10 @@ uniform float uRain;
 uniform float uWater;
 uniform sampler2D uArtA;
 uniform vec4 uFitA;
-uniform vec2 uLookA;
+uniform vec3 uLookA;
 uniform sampler2D uArtB;
 uniform vec4 uFitB;
-uniform vec2 uLookB;
+uniform vec3 uLookB;
 uniform float uMix;
 uniform sampler2D uFig;
 uniform vec4 uFigRect;
@@ -187,10 +187,12 @@ float rain(vec2 q, float cellW, float speed, float len, float dens, float seed) 
   return on * line * tail;
 }
 
-// the key art where the page shows it (object-fit: cover), blurred and dimmed for the soft ones
-vec3 artAt(sampler2D t, vec4 fit, vec2 look, vec2 p, float lod) {
+// the key art where the page shows it (object-fit: cover), blurred and dimmed for the soft ones;
+// art with lettering on its left has that part faded out, as the page does (look.z: where it ends)
+vec3 artAt(sampler2D t, vec4 fit, vec3 look, vec2 p, float lod) {
   vec2 uv = clamp((p - fit.xy) / fit.zw, vec2(0.002), vec2(0.998));
-  return textureLod(t, uv, lod + look.x).rgb * look.y;
+  float k = look.z > 0. ? smoothstep(look.z, look.z + 0.035, uv.x) : 1.;
+  return textureLod(t, uv, lod + look.x).rgb * look.y * k;
 }
 vec3 art(vec2 p, float lod) {
   vec3 a = artAt(uArtA, uFitA, uLookA, p, lod);
@@ -434,18 +436,19 @@ export function createWater(canvas, host, { calm }) {
     if (art.b) art.b.fit = fitOf(art.b.img);
   }
 
-  // the scene, from the page: { water, art: <img>, soft, lights: [[el, rgb]], ink: [el], figure, halo }
+  // the scene, from the page: { water, art: <img>, soft, lettered, lights: [[el, rgb]], ink: [el], figure, halo }
   function setScene(s, now = performance.now()) {
     L.water = s.water;
     halo.want = s.halo ? 1 : 0;
     if (s.halo) halo.rect = s.halo;
     if (s.art && (!art.a || art.a.img !== s.art)) {
       art.b = art.a;
-      art.a = { img: s.art, fit: fitOf(s.art), look: s.soft ? [4.2, 0.5] : [0, 1], tex: artTex(s.art) };
+      art.a = { img: s.art, fit: fitOf(s.art), look: s.soft ? [4.2, 0.5, 0] : [0, 1, 0], tex: artTex(s.art) };
       art.t0 = art.b ? now : -1e9;
     } else if (art.a) {
       art.a.fit = fitOf(art.a.img);
     }
+    if (art.a) art.a.look[2] = s.lettered || 0;
     L.lights = s.lights.slice(0, MAX_LIGHTS).map(([el, c]) => ({ rect: rel(el), c }));
     L.ink = s.ink.slice(0, MAX_INK).map((el) => rel(el)).filter((b) => b[2] && b[3]);
     setFigure(s.figure);
@@ -560,7 +563,7 @@ export function createWater(canvas, host, { calm }) {
     gl.bindTexture(gl.TEXTURE_2D, a?.tex.ready ? a.tex.tex : noSim);
     gl.uniform1i(u[uTex], unit);
     gl.uniform4fv(u[uFit], a ? a.fit : [0, 0, 1, 1]);
-    gl.uniform2fv(u[uLook], a?.tex.ready ? a.look : [0, 0]);
+    gl.uniform3fv(u[uLook], a?.tex.ready ? a.look : [0, 0, 0]);
   }
 
   function render(now) {

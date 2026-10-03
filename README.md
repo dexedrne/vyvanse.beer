@@ -75,6 +75,12 @@ The glyphs on screen follow whatever was used last: keys, Xbox buttons, or PlayS
 | Music, menu sounds | M, N | | ♪ and the speaker |
 | Radbro OS | / or ` | | Contact → Radbro OS |
 
+View and Start act when they're let go, and only on their own: pressed together they're the
+player's way back to the menu (below), so in the menu that combo does nothing. The pad is read on
+a short timer rather than on animation frames, so a quick tap still counts when frames are slow.
+The hints in the bottom strip drop their least important lines first when the strip is short, so
+the ones for picking and going back always show whole.
+
 A pad gives a small rumble on select where it can. The address bar keeps your place
 (`#games/rbgo`, `#crew/85`, `#sites/sanic`, `#contact`), `#tip` opens the tip jar, `#play/radrun`
 starts a game, and the old page's anchors (`#radrun`, `#radbro-4764`, `#bulk-os`) still land on
@@ -85,8 +91,9 @@ the right item.
 PLAY runs a game in a full-screen iframe
 (`allow="gamepad; fullscreen; autoplay; clipboard-write; xr-spatial-tracking"`) behind a loading
 card: its art, its wordmark, and how to get back. While it's open the menu draws nothing at all
-(no water, no duo, no rain), the music fades out, and the menu is inert, so the game has the
-whole machine. Leaving unloads the game and puts the cursor (and the focus) back on its cartridge.
+(no water, no duo, no rain), the ticker's clock and price checks stop, the music fades out, and
+the menu is inert, so the game has the whole machine. Leaving unloads the game and puts the
+cursor (and the focus) back on its cartridge.
 
 Getting back to the menu, without clashing with the games' own pause (Esc / Start):
 
@@ -98,7 +105,10 @@ Getting back to the menu, without clashing with the games' own pause (Esc / Star
   holds the mouse, Esc lets go of it first.
 - **Keyboard:** hold **Esc** for a second while the page has the focus (on the loading card, or
   after clicking the corner button). Once the game has the focus, keys go to the game only; a
-  page can't see them. So it's Esc (the game pauses and lets go of the mouse), then ◀ menu.
+  page can't see them. So it's Esc (the game pauses and lets go of the mouse), then ◀ menu, or
+  the browser's own Back shortcut (Alt + ←, ⌘ [ on a Mac) when the game doesn't swallow it.
+- **Back:** the browser's Back button, or a phone's back gesture. A game gets its own history
+  entry (`#play/<cmd>`), so Back closes it and lands on the menu instead of leaving the site.
 
 **An optional hook for the games.** A game can send the player back itself, which gives the
 keyboard a way back from inside the game (say, a "Back to the menu" line in its pause menu, shown

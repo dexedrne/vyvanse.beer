@@ -295,6 +295,15 @@ html:not(.js) .js-only {
   transform: scale(1);
 }
 
+/* art with its own lettering on the left: faded out up to where that ends (--cut, src/main.js),
+   since the menu's words go there */
+@media (min-width: 761px) {
+  .bd--lettered {
+    -webkit-mask-image: linear-gradient(90deg, transparent var(--cut, 45%), #000 calc(var(--cut, 45%) + 40px));
+    mask-image: linear-gradient(90deg, transparent var(--cut, 45%), #000 calc(var(--cut, 45%) + 40px));
+  }
+}
+
 .bd--soft {
   filter: blur(16px) saturate(1.15) brightness(0.5);
   transform: scale(1.14);
@@ -1371,8 +1380,12 @@ html:not(.js) .js-only {
 
 .duo__hint {
   position: absolute;
-  z-index: 4;
+  z-index: 5;
   margin: 0;
+  /* a dark backing: it sits on the water, over whatever the shoes are reflecting */
+  padding: 4px 9px;
+  border-radius: 4px;
+  background: rgb(12 8 22 / 0.62);
   color: var(--muted);
   font: 400 18px/1 var(--pixel);
   white-space: nowrap;
@@ -1442,9 +1455,11 @@ html:not(.js) .js-only {
   white-space: nowrap;
 }
 
+/* the ticker keeps its width; the hints take the rest and drop their lowest-ranked ones to fit
+   (src/main.js, fitHints) */
 .hints {
   display: flex;
-  flex: 0 1 auto;
+  flex: 1 1 0;
   gap: 16px;
   min-width: 0;
   margin: 0;
@@ -1457,11 +1472,16 @@ html:not(.js) .js-only {
   gap: 5px;
 }
 
+.hint[hidden] {
+  display: none;
+}
+
 .hint .g + .g {
   margin-left: -1px;
 }
 
 .strip__ticker {
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
 }
@@ -1542,15 +1562,14 @@ a.ticker__tok:hover .ticker__k {
   text-decoration: underline;
 }
 
-@media (max-width: 1599px) {
+@media (max-width: 1700px) {
   .ticker__mc,
-  .ticker__spark,
-  .hint--wide {
+  .ticker__spark {
     display: none;
   }
 }
 
-@media (max-width: 1599px) {
+@media (max-width: 1700px) {
   .ticker [data-sym='XRP'] {
     display: none;
   }
@@ -2190,13 +2209,26 @@ a.ticker__tok:hover .ticker__k {
     }
   }
 
+  /* here it sits by the name, not on the water: no backing */
   .duo__hint {
+    padding: 0;
+    background: none;
     font-size: 15px;
   }
 
   /* the words sit over the pair here, not under them */
   .duo {
     z-index: 2;
+  }
+
+  /* on Games the pair stand on the waterline at the right: the words start under their feet,
+     and the art gives up that room so the page still fits one screen */
+  .js .screen[data-tab='games'] {
+    --art: clamp(190px, 26vh, 300px);
+  }
+
+  .js .panel--games {
+    padding-top: calc(var(--top) + var(--art) + 20px);
   }
 
   .player__how {
@@ -2241,8 +2273,7 @@ a.ticker__tok:hover .ticker__k {
 }
 
 @media (min-width: 761px) and (max-width: 1180px) {
-  .tog__label,
-  .hint--wide {
+  .tog__label {
     display: none;
   }
 

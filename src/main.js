@@ -94,10 +94,25 @@ function closeAsk() {
 
 // ---- backdrops: one <img> per picture, crossfaded; made when first needed ----
 
+// art with its own lettering on the left (a share card): where the lettering ends on screen, from
+// object-fit: cover and the object-position, so the page can fade it out up to there
+function cutLettered(img) {
+  const k = +img.dataset.lettered;
+  if (!k) return;
+  const [bw, bh, iw, ih] = [img.offsetWidth, img.offsetHeight, +img.dataset.w, +img.dataset.h];
+  if (!bw || !bh || !iw || !ih) return;
+  const s = Math.max(bw / iw, bh / ih);
+  const px = parseFloat(img.style.objectPosition) / 100;
+  img.style.setProperty('--cut', `${Math.round((bw - iw * s) * (isFinite(px) ? px : 0.5) + k * iw * s)}px`);
+}
+
 const BD = {};
 for (const img of $$('#backdrops .bd')) BD[img.dataset.bd] = img;
 function bdFor(tab, i) {
-  if (tab === 'games') return { key: `games:${LISTS.games[i].cmd}`, src: LISTS.games[i].image.src, pos: LISTS.games[i].image.position };
+  if (tab === 'games') {
+    const { src, position: pos, lettered, width: w, height: h } = LISTS.games[i].image;
+    return { key: `games:${LISTS.games[i].cmd}`, src, pos, lettered, w, h };
+  }
   if (tab === 'sites') return { key: `sites:${LISTS.sites[i].cmd}`, src: LISTS.sites[i].image.src, soft: true };
   if (tab === 'crew') return { key: 'crew', src: '/img/art/vyvanse.webp', soft: true };
   return { key: 'contact', src: '/img/art/vyvanse.webp', pos: '60% 6%' };
@@ -107,13 +122,15 @@ function backdrop(tab, i) {
   let img = BD[b.key];
   if (!img) {
     img = new Image();
-    img.className = `bd${b.soft ? ' bd--soft' : ''}`;
+    img.className = `bd${b.soft ? ' bd--soft' : ''}${b.lettered ? ' bd--lettered' : ''}`;
+    if (b.lettered) Object.assign(img.dataset, { lettered: b.lettered, w: b.w, h: b.h });
     img.alt = '';
     img.decoding = 'async';
     img.src = b.src;
     if (b.pos) img.style.objectPosition = b.pos;
     $('#backdrops').append(img);
     BD[b.key] = img;
+    cutLettered(img);
   }
   const show = () => {
     for (const k in BD) BD[k].classList.toggle('on', k === b.key);
@@ -206,6 +223,7 @@ function show(tab, { sound = true, focus = false } = {}) {
     t.tabIndex = on ? 0 : -1;
   }
   for (const p of $$('.panel')) p.classList.toggle('on', p.dataset.panel === tab);
+  screen.dataset.tab = tab;
   paint(tab);
   hints();
   save();
@@ -309,7 +327,7 @@ function back() {
   const dlg = $('dialog[open]');
   if (dlg) return dlg.close();
   if (os?.isOpen()) return os.close();
-  const item = S.tab !== 'contact' && itemsOf(S.tab)[S[S.tab]];
+  const item = S.tab !== 'contact' ? itemsOf(S.tab)[S[S.tab]] : null;
   if (item?.classList.contains('is-more')) return details();
   if (S.tab !== 'games') {
     audio.blip('back');
@@ -404,6 +422,7 @@ const audio = createAudio({ musicBtn: $('#music'), sfxBtn: $('#sfx'), toast });
 // ---- the player ----
 
 let stage = null;
+let ticker = null;
 const player = createPlayer({
   glyph: (n) => input.glyph(n),
   paintGlyphs: (el) => input.paintGlyphs(el),
@@ -415,6 +434,7 @@ const player = createPlayer({
     screen.classList.add('is-away');
     screen.inert = true;
     stage?.pause();
+    ticker?.pause();
     audio.duck(true);
   },
   onClose(p) {
@@ -426,6 +446,7 @@ const player = createPlayer({
     if (i >= 0) S[tab] = i;
     show(tab, { sound: false });
     stage?.resume();
+    ticker?.resume();
     // back on the same cartridge
     controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
   },
@@ -544,22 +565,37 @@ function load() {
 }
 
 // ---- hints in the strip, in the glyphs of whatever was used last ----
+// Each has a rank: when the strip is short, the lowest go first, so "play" and "back" stay.
 
 function hints() {
+  const hintsEl = $('#hints');
   const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
   const pad = input.scheme !== 'kb';
   const verb = { games: 'play', crew: 'get model', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
+  const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   const out = [
-    `<span class="hint">${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select</span>`,
-    `<span class="hint">${k('a')} ${verb}</span>`,
-    `<span class="hint">${k('lb')}${k('rb')} sections</span>`,
-    S.tab === 'games' || S.tab === 'sites' ? `<span class="hint">${k('y')} details</span>` : '',
-    `<span class="hint hint--wide">${k('x')} wave</span>`,
-    `<span class="hint hint--wide">${k('select')} full screen</span>`,
-    pad ? `<span class="hint">${k('b')} back</span>` : `<span class="hint hint--wide"><span class="g">M</span> music</span><span class="hint hint--wide"><span class="g">/</span> terminal</span>`,
+    hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
+    hint(9, `${k('a')} ${verb}`),
+    pad ? hint(8, `${k('b')} back`) : '',
+    hint(6, `${k('lb')}${k('rb')} sections`),
+    S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} details`) : '',
+    hint(2, `${k('x')} wave`),
+    hint(3, `${k('select')} full screen`),
+    pad ? '' : hint(1, '<span class="g">M</span> music'),
+    pad ? '' : hint(0, '<span class="g">/</span> terminal'),
   ];
-  $('#hints').innerHTML = out.join('');
+  hintsEl.innerHTML = out.join('');
+  fitHints();
+}
+// the strip gives the hints what the ticker leaves; drop the lowest ranks until the rest fit whole
+function fitHints() {
+  const hintsEl = $('#hints');
+  const all = $$('.hint', hintsEl);
+  for (const el of all) el.hidden = false;
+  if (!hintsEl.clientWidth) return;
+  const order = all.slice().sort((a, b) => a.dataset.rank - b.dataset.rank);
+  while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) order.shift().hidden = true;
 }
 
 // ---- the stage: the waterline, where the duo stands, what the water mirrors ----
@@ -584,12 +620,25 @@ function framing(w, h) {
 }
 const box = { wl: 0, feet: 0, b: null };
 const m0 = () => (duoEl.classList.contains('duo--side') ? 'side' : null);
+// a long name (RetardioPayne) comes down in size to fit its column instead of running off it
+function fitWm() {
+  const wm = $('.item.on .wm', panelOf(S.tab));
+  if (!wm) return;
+  wm.style.fontSize = '';
+  const r = document.createRange();
+  r.selectNodeContents(wm);
+  const tw = r.getBoundingClientRect().width;
+  const cw = wm.clientWidth;
+  if (cw > 0 && tw > cw) wm.style.fontSize = `${Math.floor((parseFloat(getComputedStyle(wm).fontSize) * cw) / tw)}px`;
+}
 function layout() {
+  fitWm();
   const W = screen.clientWidth;
   const H = innerHeight;
   const ph = phone.matches;
   box.wl = ph ? $('#backdrops').offsetHeight : Math.round(H * 0.655);
   screen.style.setProperty('--wl', `${box.wl}px`);
+  for (const img of $$('.bd--lettered')) cutLettered(img);
   const m = duoMode();
   const vis = $('.item.on .visual--crew', panelOf('crew'));
   $$('.visual--crew').forEach((v) => v.classList.toggle('is-duo', m === 'stage' && v === vis));
@@ -666,7 +715,8 @@ function scene() {
       figure = { kind: 'img', el: bro, feet: r.y + r.h * 0.985 };
     }
   }
-  return { water: box.wl, art, soft: art?.classList.contains('bd--soft'), lights, ink, figure, halo };
+  const lettered = art && !phone.matches ? +art.dataset.lettered || 0 : 0;
+  return { water: box.wl, art, soft: art?.classList.contains('bd--soft'), lettered, lights, ink, figure, halo };
 }
 let emitT = 0;
 function emit() {
@@ -775,7 +825,10 @@ for (const t of $$('.tab')) t.setAttribute('role', 'tab');
 for (const p of $$('.panel')) p.setAttribute('role', 'tabpanel');
 load();
 hints();
-createTicker($('#ticker-host'));
+if ('ResizeObserver' in window) new ResizeObserver(() => fitHints()).observe($('#hints'));
+document.fonts?.ready.then(fitHints);
+ticker = createTicker($('#ticker-host'));
+if (player.current) ticker.pause();
 setTimeout(() => screen.classList.remove('boot'), 1800);
 
 // The rain, the puddle and the duo: their own chunks, started right after the first paint.
