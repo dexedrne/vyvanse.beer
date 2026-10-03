@@ -445,7 +445,8 @@ export const crew = {
       },
     },
     // The Retardios (Retardio Cousin #555 and Retardio Classic #85): built on the Radbro rig, not part of the
-    // radbros-3d repo (`repo: false`), so their download is the web model the site serves.
+    // radbros-3d repo (`repo: false`). Their download is a package like the Radbros' (static, rigged and
+    // animated .glb, a preview, README and the license) on the same radbros-3d release.
     {
       num: '555',
       slug: 'retardio-555',
@@ -454,10 +455,10 @@ export const crew = {
       name: 'Retardio #555',
       line: 'Long brown hair, heart blush, BRITISH FOOD tee.',
       repo: false,
-      download: { href: '/models/retardio555-hero.glb', label: '3D model .glb', size: '0.6 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '16 MB' },
       image: {
         src: '/img/retardios/retardio-555.webp',
-        width: 340,
+        width: 350,
         height: 500,
         alt: 'Retardio #555 in 3D, waving: long straight brown hair, grey-green anime eyes, a double ring piercing at the end of his right brow, pink heart blush, a :3 mouth, a white BRITISH FOOD tee with a vomiting emoji, light-blue jeans and white sneakers.',
       },
@@ -470,10 +471,10 @@ export const crew = {
       name: 'Retardio #85',
       line: 'Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
       repo: false,
-      download: { href: '/models/retardio85-hero.glb', label: '3D model .glb', size: '0.6 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio85-3d-model.zip', label: '3D model .zip', size: '18 MB' },
       image: {
         src: '/img/retardios/retardio-85.webp',
-        width: 233,
+        width: 237,
         height: 500,
         alt: 'Retardio #85 in 3D, both arms up in a cheer: long black hair with blunt bangs, blue eyes with pink paint around his right eye and blue around his left, purple freckles, a white NEED MONEY FOR PORSCHE tee, black jeans and black sneakers.',
       },
