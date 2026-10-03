@@ -235,6 +235,35 @@ export const projects = [
     },
   },
   {
+    cmd: 'zombietardio',
+    boot: 'retardios vs the dead, their own boards', // the hero's boot log line
+    slug: 'zombietardio',
+    group: 'games',
+    name: 'ZombieTardio',
+    kind: 'RadZombies with only the Retardio boys #555 and #85',
+    blurb:
+      'The same zombies game, both maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85, the bot teammate and a friend online too. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
+    url: 'https://zombietardio.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://zombietardio.vyvanse.beer' }],
+    thumb: '/img/thumb/zombietardio.webp',
+    shell: '#2a1c3c',
+    accent: '#f2899a',
+    cast: ['555', '85'],
+    image: {
+      src: '/img/art/zombietardio.webp',
+      width: 1600,
+      height: 900,
+      alt: 'ZombieTardio: Retardio Cousin #555 and Retardio Cousin Classic #85 back to back in the auditorium of a derelict neon picture palace, holding off zombie Radbros with a fire gun and a lightning gun.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth. Gun models by Quaternius.',
+    },
+  },
+  {
     cmd: 'solscape',
     boot: 'rev254 server on Solana', // the hero's boot log line
     slug: 'solscape',
