@@ -133,11 +133,9 @@ export const projects = [
     cast: ['555', '85'],
     image: {
       src: '/img/art/retardiopayne.webp',
-      width: 1200,
-      height: 630,
-      alt: 'RetardioPayne, the harder cut: Retardio #555 and Retardio #85 with pistols, on two snapshots over a rainy neon street, beside the blue and pink RETARDIO PAYNE wordmark.',
-      position: '78% 50%', // keep the two of them in view (object-position)
-      lettered: 0.505, // a share card: its wordmark and lines fill the left half, where the menu's words go (faded out there)
+      width: 1600,
+      height: 900,
+      alt: 'RetardioPayne, the harder cut: Retardio #85 and Retardio #555 dive through the rain in bullet time outside a neon nightclub, pistols blazing, shell casings in the air.',
     },
     credit: {
       before: 'Built on',
