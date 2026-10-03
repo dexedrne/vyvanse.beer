@@ -457,7 +457,7 @@ export const crew = {
       download: { href: '/models/retardio555-hero.glb', label: '3D model .glb', size: '0.6 MB' },
       image: {
         src: '/img/retardios/retardio-555.webp',
-        width: 340,
+        width: 350,
         height: 500,
         alt: 'Retardio #555 in 3D, waving: long straight brown hair, grey-green anime eyes, a double ring piercing at the end of his right brow, pink heart blush, a :3 mouth, a white BRITISH FOOD tee with a vomiting emoji, light-blue jeans and white sneakers.',
       },
@@ -473,7 +473,7 @@ export const crew = {
       download: { href: '/models/retardio85-hero.glb', label: '3D model .glb', size: '0.6 MB' },
       image: {
         src: '/img/retardios/retardio-85.webp',
-        width: 233,
+        width: 237,
         height: 500,
         alt: 'Retardio #85 in 3D, both arms up in a cheer: long black hair with blunt bangs, blue eyes with pink paint around his right eye and blue around his left, purple freckles, a white NEED MONEY FOR PORSCHE tee, black jeans and black sneakers.',
       },
