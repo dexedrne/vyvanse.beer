@@ -218,7 +218,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       'sites',
       g.sites.title,
       `<div class="items">${sites.map(siteItem).join('\n')}</div>
-    ${row(`sites I built<span class="cap-long"> for other people’s projects</span>`, sites.map(cart).join(''), 'carts--sites')}`,
+    ${row(`sites I built<span class="cap-long">: my own, and for other people’s projects</span>`, sites.map(cart).join(''), 'carts--sites')}`,
     )}
     ${panel(
       'contact',

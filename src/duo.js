@@ -53,6 +53,17 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
   // x: where he stands (m). turn: how far he faces the other one. beat: his lag behind the beat.
   const crew = [rig(g4764, -0.62, 0.17, 0, 1), rig(g85, 0.62, -0.17, 0.55, 0.85)];
   for (const c of crew) scene.add(c.root);
+  // one of them alone (Crew, his own card): he stands in the middle facing out, the other one is away
+  let only = null;
+  function solo(i) {
+    only = i === 0 || i === 1 ? i : null;
+    crew.forEach((c, k) => {
+      c.root.visible = only === null || k === only;
+      c.x = only === null ? c.x0 : 0;
+      c.base = only === null ? c.base0 : 0;
+      if (!c.waving) c.look = c.base;
+    });
+  }
 
   function rig(gltf, x, turn, beat, energy) {
     const root = gltf.scene;
@@ -79,7 +90,7 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
     const clean = groovy.map((b) => ({ b, q: b.quaternion.clone(), p: b.position.clone() }));
     // the clips walk the hips sideways (the wave leans a long way out); keep them where they stand
     const rest = bones.Hips ? bones.Hips.position.clone() : null;
-    const c = { root, bones, mixer, idle, wave, x, base: turn, turn, look: turn, beat, energy, waving: false, clean, rest };
+    const c = { root, bones, mixer, idle, wave, x, x0: x, base: turn, base0: turn, turn, look: turn, beat, energy, waving: false, clean, rest };
     mixer.addEventListener('finished', (e) => {
       if (e.action !== wave) return;
       idle.reset().fadeIn(0.45).play();
@@ -126,9 +137,9 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
 
   function wave(i, at = 'viewer') {
     const c = crew[i];
-    if (!c || c.waving) return false;
+    if (!c || c.waving || !c.root.visible) return false;
     c.waving = true;
-    c.look = at === 'other' ? c.base * 2.6 : 0;
+    c.look = at === 'other' && only === null ? c.base * 2.6 : 0;
     c.wave.reset().setEffectiveWeight(1).fadeIn(0.3).play();
     c.idle.fadeOut(0.3);
     onWave?.(i, at);
@@ -142,7 +153,7 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
     if (!still) {
       t += dt;
       if (auto && t > nextWave) {
-        const i = Math.random() < 0.5 ? 0 : 1;
+        const i = only ?? (Math.random() < 0.5 ? 0 : 1);
         wave(i, Math.random() < 0.45 ? 'other' : 'viewer');
         nextWave = t + WAVE_EVERY[0] + Math.random() * (WAVE_EVERY[1] - WAVE_EVERY[0]);
       }
@@ -197,5 +208,5 @@ export async function createDuo(box, { calm, onWave, auto = true, vibe = true } 
   }
 
   box.append(canvas);
-  return { canvas, tick, resize, wave, spots, renderer, crew };
+  return { canvas, tick, resize, wave, solo, spots, renderer, crew };
 }

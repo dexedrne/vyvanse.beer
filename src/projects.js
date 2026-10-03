@@ -38,11 +38,13 @@ export const site = {
 
 export const groups = [
   { id: 'games', title: 'Games', line: 'Games I make. Free, in the browser, keyboard or controller.' },
-  { id: 'sites', title: 'Sites I built', line: 'Websites I made for other people’s projects.' },
+  { id: 'sites', title: 'Sites I built', line: 'Websites I made: my own Solscape, and sites for other people’s projects.' },
 ];
 
 // Everyone in the crew. Most games let you play as all six.
 const ALL = ['652', '4764', '2564', '723', '555', '85'];
+// RadPayne's own roster: the four Radbros (its Retardios moved to RetardioPayne)
+const RADBROS = ['652', '4764', '2564', '723'];
 
 export const projects = [
   {
@@ -97,7 +99,7 @@ export const projects = [
     thumb: '/img/thumb/radpayne.webp',
     shell: '#1e2a3b',
     accent: '#7cc4ff',
-    cast: ALL,
+    cast: RADBROS,
     image: {
       src: '/img/art/radpayne.webp',
       width: 1600,
@@ -236,7 +238,7 @@ export const projects = [
     cmd: 'solscape',
     boot: 'rev254 server on Solana', // the hero's boot log line
     slug: 'solscape',
-    group: 'games',
+    group: 'sites',
     name: 'Solscape',
     kind: 'My open-source, copyright-free rev254 private server, on Solana',
     blurb:
@@ -444,7 +446,8 @@ export const crew = {
         alt: 'Radbro #723 in 3D, tipping his hat: a brown wide-brim cowboy hat over shaggy brown hair, one big amber anime eye open and the other winking, and a black plate carrier with a HOT TOPIC BRO name patch and a TempleOS patch over a black shirt, dark jeans and brown boots.',
       },
     },
-    // The Retardios (Retardio Cousin #555 and Retardio Classic #85): built on the Radbro rig, not part of the
+    // The Retardios (Retardio Cousin #555, the original collection, now Candy Labs' programmable one; and
+    // Retardio Cousin Classic #85, the original artist's true-to-the-original relaunch): built on the Radbro rig, not part of the
     // radbros-3d repo (`repo: false`). Their download is a package like the Radbros' (static, rigged and
     // animated .glb, a preview, README and the license) on the same radbros-3d release.
     {
@@ -452,8 +455,8 @@ export const crew = {
       slug: 'retardio-555',
       kind: 'Retardio Cousin',
       face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
-      name: 'Retardio #555',
-      line: 'Long brown hair, heart blush, BRITISH FOOD tee.',
+      name: 'Retardio Cousin #555',
+      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee.',
       repo: false,
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '16 MB' },
       image: {
@@ -466,10 +469,10 @@ export const crew = {
     {
       num: '85',
       slug: 'retardio-85',
-      kind: 'Retardio Classic',
+      kind: 'Retardio Cousin Classic',
       face: '/img/faces/retardio-85.webp', // 200x200 crop for the character-select tile
-      name: 'Retardio #85',
-      line: 'Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
+      name: 'Retardio Cousin Classic #85',
+      line: 'Retardio Cousin Classic: the original artist’s true-to-the-original relaunch. Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
       repo: false,
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio85-3d-model.zip', label: '3D model .zip', size: '18 MB' },
       image: {

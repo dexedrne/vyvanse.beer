@@ -12,6 +12,7 @@ export function createStage(shell, { screen, duoBox }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const calm = () => reduced.matches;
   let duo = null;
+  let only = null;
   let water = null;
 
   // ---- the water ----
@@ -88,6 +89,7 @@ export function createStage(shell, { screen, duoBox }) {
       .then((m) => m.createDuo(duoBox, { calm }))
       .then((d) => {
         duo = d;
+        duo.solo(only);
         resizeDuo();
         duo.tick(0); // a first frame before it shows
         shell.setDuoLive(true);
@@ -126,6 +128,11 @@ export function createStage(shell, { screen, duoBox }) {
 
   return {
     wave: (i, at) => duo?.wave(i, at) ?? false,
+    // one of the two alone (null: both)
+    solo(i) {
+      only = i;
+      duo?.solo(i);
+    },
     get live() {
       return !!duo;
     },

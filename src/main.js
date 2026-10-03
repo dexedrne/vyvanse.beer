@@ -18,6 +18,7 @@ const phone = matchMedia('(max-width: 760px)');
 const screen = $('#screen');
 const duoEl = $('#duo');
 const hint = $('#duo-hint');
+let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 
 const TABS = ['games', 'crew', 'sites', 'contact'];
 const LISTS = {
@@ -421,7 +422,6 @@ const audio = createAudio({ musicBtn: $('#music'), sfxBtn: $('#sfx'), toast });
 
 // ---- the player ----
 
-let stage = null;
 let ticker = null;
 const player = createPlayer({
   glyph: (n) => input.glyph(n),
@@ -612,11 +612,18 @@ function duoMode() {
   if (S.tab === 'crew' && duoLive && DUO.includes(LISTS.crew[S.crew].num)) return 'stage';
   return null;
 }
-// the same framing as src/duo.js: where each one stands across the box, and how tall
+// on Crew, #4764's or #85's own card shows him alone (src/duo.js solo); null: the two together
+function soloIdx() {
+  return duoMode() === 'stage' ? DUO.indexOf(LISTS.crew[S.crew].num) : null;
+}
+// the same framing as src/duo.js: where each one stands across the box, and how tall (alone: the
+// middle; the other one off the canvas)
 function framing(w, h) {
   const a = w / h;
   const half = Math.max(1.06, 1.6 / a);
-  return { spots: [0.5 - 0.62 / (2 * half * a), 0.5 + 0.62 / (2 * half * a)], tall: 1.7 / (2 * half) };
+  const one = soloIdx();
+  const spots = one === 0 || one === 1 ? [one === 0 ? 0.5 : -9, one === 1 ? 0.5 : -9] : [0.5 - 0.62 / (2 * half * a), 0.5 + 0.62 / (2 * half * a)];
+  return { spots, tall: 1.7 / (2 * half) };
 }
 const box = { wl: 0, feet: 0, b: null };
 const m0 = () => (duoEl.classList.contains('duo--side') ? 'side' : null);
@@ -657,6 +664,7 @@ function layout() {
     b = { x: ph ? W - w : W - w - pad * 0.4, y: feet - h * FEET, w, h };
   }
   box.b = b;
+  stage?.solo?.(soloIdx());
   if (b) {
     Object.assign(duoEl.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
     box.feet = b.y + b.h * FEET;
