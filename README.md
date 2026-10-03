@@ -133,10 +133,10 @@ hero's boot log. All four are SIL Open Font License and bundled from Fontsource.
 
 ## Share card and icons
 
-- `public/og3.jpg` is the share card: a painted 1200×630 of the six (Radbros #4764, #652, #723,
-  #2564 and Retardios #555 and #85) on a rainy neon rooftop under the vyvanse.beer sign. The older
-  cards, `public/og2.jpg` and `public/og.png` (a screenshot of `scripts/og-card.html`), stay so old
-  links keep their preview.
+- `public/og4.jpg` is the share card: a painted 1200×630 of Radbro #4764 and Retardio #85 hanging
+  out on a rainy neon rooftop under the vyvanse.beer sign. The older cards, `public/og3.jpg` (the
+  six on the same rooftop), `public/og2.jpg` and `public/og.png` (a screenshot of
+  `scripts/og-card.html`), stay so old links keep their preview.
 - `public/apple-touch-icon.png` is a 180×180 screenshot of `scripts/touch-icon.html`.
 - `public/favicon.svg` is hand-drawn SVG.
 
