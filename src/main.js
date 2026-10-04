@@ -270,6 +270,9 @@ function labels() {
     slot.style.setProperty('--accent', eds[k].accent);
     slot.style.setProperty('--accent2', eds[(k + 1) % eds.length].accent);
     for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
+    // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
+    const name = $('.cart__name', slot);
+    if (name) name.textContent = eds[k].name;
     $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
   });
 }
