@@ -76,7 +76,7 @@ The glyphs on screen follow whatever was used last: keys, Xbox buttons, or PlayS
 | | Keyboard | Controller | Mouse / touch |
 | --- | --- | --- | --- |
 | Move | ← → (A D); ↑ ↓ on Contact | D-pad or left stick (held: repeats) | click a cartridge; swipe the art |
-| Edition (RadPayne, RadZombies) | ↑ ↓ (W S) | LT / RT (L2 / R2), or the d-pad ↑ ↓ | the pills under the name |
+| Edition (RadPayne, RadZombies) | ↑ ↓ (W S) flip it | LT / RT (L2 / R2) pick the left / right one; the d-pad ↑ ↓ flips it | the pills under the name |
 | Play / pick | Enter | A (✕), or Start | click it again, or PLAY |
 | Back | Esc | B (○) | |
 | Sections | Q / E | LB / RB (L1 / R1) | the tabs (a bottom bar on phones) |

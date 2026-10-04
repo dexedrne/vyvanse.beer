@@ -1638,11 +1638,6 @@ html:not(.js) .js-only {
   display: none;
 }
 
-/* there, but nothing to do for this one (a game with no editions): the strip keeps its shape */
-.hint.is-off {
-  opacity: 0.38;
-}
-
 .hint .g + .g {
   margin-left: -1px;
 }
@@ -2183,8 +2178,15 @@ a.ticker__tok:hover .ticker__k {
     margin-bottom: 12px;
   }
 
+  /* a game with editions fits the switch in by showing a line less of its blurb ("details" has
+     the rest), so its cartridges stay clear of the ticker and the page doesn't scroll */
+  .item--eds .pitch {
+    --clamp: 2;
+    margin-top: 6px;
+  }
+
   .eds {
-    margin-top: 10px;
+    margin: 8px 0 0;
   }
 
   .eds__seg {
@@ -2198,8 +2200,8 @@ a.ticker__tok:hover .ticker__k {
   }
 
   .ed img {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
   }
 
   .act {

@@ -8,7 +8,7 @@
 //   start                Start / Menu: play (on release, and not held with View)
 //   back                 B / Esc: close what's open, else back to Games
 //   prev next            LB RB / Q E: the tabs
-//   edprev ednext        LT RT: the selected game's edition (on a keyboard, up / down do it)
+//   edprev ednext        LT RT: the selected game's first / last edition (up / down flip it too)
 //   details              Y / I: the whole blurb and every link
 //   wave                 X / G: one of the duo waves
 //   fullscreen           View / Select / F (on a pad: on release, and not held with Menu)

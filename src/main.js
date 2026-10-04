@@ -285,13 +285,18 @@ function crossfade(was, now) {
   was.fadeT = setTimeout(() => was.classList.remove('is-out'), 300);
 }
 
-// flip the picked game to another edition: a step (+1 / -1, round and round) or an edition's cmd
+// flip the picked game to another edition: a step (+1 / -1, round and round), an edition's cmd,
+// or a side ('first' / 'last': the pad's triggers, which flank the switch, point at its ends)
 function edition(to) {
   if (S.tab !== 'games') return false;
   const eds = SHELF[S.games];
   if (eds.length < 2) return false;
   const cur = edOf(S.games);
-  const k = typeof to === 'string' ? eds.findIndex((e) => e.cmd === to) : (cur + to + eds.length) % eds.length;
+  const k =
+    to === 'first' ? 0
+    : to === 'last' ? eds.length - 1
+    : typeof to === 'string' ? eds.findIndex((e) => e.cmd === to)
+    : (cur + to + eds.length) % eds.length;
   if (k < 0 || k === cur) return;
   // focus was on the switch: it goes along to the same pill on the new card
   const pill = document.activeElement?.closest?.('.ed');
@@ -356,7 +361,7 @@ function select(i, { sound = true } = {}) {
   save();
   layout();
   if (S.tab === 'crew') hello(want());
-  if (S.tab === 'games') edHint();
+  if (S.tab === 'games') hints(); // the edition hint comes and goes with the game
   if (sound) audio.blip('move');
   if (carry) controlsOf(S.tab)[next]?.focus({ preventScroll: true });
   announce(label(S.tab, next));
@@ -491,9 +496,9 @@ function act(name, info = {}) {
     case 'down':
       return vert ? move(1) : flip(1);
     case 'edprev':
-      return flip(-1);
+      return flip('first');
     case 'ednext':
-      return flip(1);
+      return flip('last');
     case 'ok':
     case 'start':
       return activate(info);
@@ -684,8 +689,8 @@ function hints() {
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   const out = [
     hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
-    // (low: the switch shows its own buttons, right by it)
-    S.tab === 'games' ? hint(3.5, `${k('lt')}${k('rt')} edition`) : '',
+    // only on a game with editions, and low: the switch shows its own buttons, right by it
+    S.tab === 'games' && SHELF[S.games].length > 1 ? hint(2.5, `${k('lt')}${k('rt')} edition`) : '',
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
@@ -696,12 +701,7 @@ function hints() {
     pad ? '' : hint(0, '<span class="g">/</span> terminal'),
   ];
   hintsEl.innerHTML = out.join('');
-  edHint();
   fitHints();
-}
-// on Games the edition hint stays put, faint on a game that has only the one
-function edHint() {
-  $('.hint[data-rank="3.5"]', $('#hints'))?.classList.toggle('is-off', SHELF[S.games].length < 2);
 }
 // the strip gives the hints what the ticker leaves; drop the lowest ranks until the rest fit whole
 function fitHints() {

@@ -74,7 +74,7 @@ function editionSwitch(p, eds, faces) {
 
 function gameItem(p, i, eds, faces) {
   const line = p.frame ? p.boot || p.kind : 'opens in a new tab: it can’t run inside this page';
-  return `<article class="item item--game" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" data-game="${esc(eds[0].cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
+  return `<article class="item item--game${eds.length > 1 ? ' item--eds' : ''}" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" data-game="${esc(eds[0].cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
   <div class="info">
     <p class="kindline">${esc(p.kind)}</p>
     <h3 class="wm" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
@@ -229,7 +229,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
     ${panel(
       'games',
       g.games.title,
-      `<div class="items">${games.map((p, i) => gameItem(p, i, edsOf(p), faces)).join('\n')}</div>
+      `<div class="items">${games.map((p) => gameItem(p, carts.indexOf(edsOf(p)), edsOf(p), faces)).join('\n')}</div>
     ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, carts.map((eds, i) => cart(eds[0], i, eds)).join(''), 'carts--games')}`,
     )}
     ${panel(
