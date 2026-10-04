@@ -19,6 +19,8 @@ const screen = $('#screen');
 const duoEl = $('#duo');
 const hint = $('#duo-hint');
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
+let fresh = false; // a crew model has just come in (shell.castReady)
+let freshT = 0;
 
 const TABS = ['games', 'crew', 'sites', 'contact'];
 const LISTS = {
@@ -655,7 +657,10 @@ function layout() {
   const m = duoMode();
   screen.classList.toggle('duo-live', live());
   const vis = $('.item.on .visual--crew', panelOf('crew'));
-  $$('.visual--crew').forEach((v) => v.classList.toggle('is-duo', m === 'stage' && v === vis));
+  $$('.visual--crew').forEach((v) => {
+    v.classList.toggle('is-duo', m === 'stage' && v === vis);
+    v.classList.toggle('is-fresh', fresh && v === vis);
+  });
   duoEl.classList.toggle('duo--off', !m);
   duoEl.classList.toggle('duo--side', m === 'side');
   let b = null;
@@ -760,6 +765,14 @@ const shell = {
   layout,
   // the models just asked for are in: they take over from the renders (and say hello)
   castReady() {
+    // (his render lingers a moment only now, as his model first comes in; switching between cards whose
+    // models are in already swaps at once, so he is never there twice)
+    fresh = true;
+    clearTimeout(freshT);
+    freshT = setTimeout(() => {
+      fresh = false;
+      $$('.visual--crew.is-fresh').forEach((v) => v.classList.remove('is-fresh'));
+    }, 400);
     layout();
     const g = greet;
     if (g && g.every((n) => want().includes(n))) hello(g);
@@ -829,7 +842,7 @@ function openOS(opts = {}) {
               layout();
             } else if (TABS.includes(slug)) show(slug, { sound: false });
           },
-          wave: () => (live() ? (want().forEach((n, k) => setTimeout(() => waveDuo(n), 600 * k)), 'ok') : stage?.live ? 'loading' : 'missing'),
+          wave: () => (!want().length ? 'none' : live() ? (want().forEach((n, k) => setTimeout(() => waveDuo(n), 600 * k)), 'ok') : stage?.live ? 'loading' : 'missing'),
         },
       });
       os.open(opts);

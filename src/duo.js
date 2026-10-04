@@ -25,7 +25,7 @@ export const FEET = 0.976; // where y = 0 sits, as a share of the canvas height
 const FOV = 18;
 const BPM = 92;
 const WAVE_EVERY = [7, 12]; // seconds between waves they do on their own
-const KEEP = 4; // models kept loaded; past that, the ones off screen for STALE ms are let go
+const KEEP = 6; // models kept loaded (the whole crew); past that, the ones off screen for STALE ms are let go
 const STALE = 30000;
 // a pair: where each stands (m), how far he faces the other one, his lag behind the beat, his energy
 const PAIR = [
