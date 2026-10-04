@@ -724,7 +724,15 @@ function rel(el) {
 }
 // who stands on the water in 3D: #4764 and #85 on Games and Contact, on Crew the picked one alone
 function want() {
-  if (S.tab === 'games' || S.tab === 'contact') return DUO;
+  // a game shown in one of its editions: that edition's own (RadPayne's and RadZombies' Radbros edition
+  // #4764 alone, their Retardios edition the two Retardios); every other game, and Contact, the pair
+  if (S.tab === 'games') {
+    const ed = at('games', S.games)?.edition?.label;
+    if (ed === 'Radbros') return ['4764'];
+    if (ed === 'Retardios') return ['555', '85'];
+    return DUO;
+  }
+  if (S.tab === 'contact') return DUO;
   if (S.tab === 'crew') return [LISTS.crew[S.crew].num];
   return [];
 }

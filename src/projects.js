@@ -112,7 +112,7 @@ export const projects = [
       src: '/img/art/radpayne.webp',
       width: 1600,
       height: 900,
-      alt: 'RadPayne, bullet-time noir: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 dive through the rain with pistols blazing on a neon-lit street.',
+      alt: 'RadPayne: Radbros #4764, #652, #723 and #2564 dive through the rain in bullet time outside a neon nightclub, pistols blazing, shell casings in the air, the Milady gang shooting back.',
     },
     credit: {
       before: 'Built on',
@@ -236,7 +236,7 @@ export const projects = [
       src: '/img/art/radzombies.webp',
       width: 1600,
       height: 900,
-      alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
+      alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
     },
     credit: {
       before: 'Built on',
