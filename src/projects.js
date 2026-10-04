@@ -278,14 +278,14 @@ export const projects = [
   },
   {
     cmd: 'shitbox',
-    boot: 'a tired old four-door with a real manual', // the hero's boot log line
+    boot: 'odd jobs in a tired old four-door', // the hero's boot log line
     aliases: ['beater', 'car'],
     slug: 'shitbox',
     group: 'games',
     name: 'SHITBOX',
-    kind: 'Driving game, a tired old four-door with a real manual',
+    kind: 'Odd jobs in a tired old four-door with a real manual',
     blurb:
-      'A 1991 four-door with 231,472 miles on it, faded red paint and a five-speed manual. Work the clutch, stall it, bump-start it, grind a gear, and feel the cams change over at 5,500. A small town at dusk, a supermarket lot and a hill road up to the lookout. An early build: odd jobs and keeping it running come next. Keyboard, controller or touch.',
+      "A 1991 four-door with 231,472 miles, a real manual and $25. Your phone fills up with odd jobs: lifts for people who are online too much, a couch on the roof, a cold wallet that can't take a bump, the airport before the flight. The clutch is going. The junkyard has one. Fix it, or don't. Keyboard, controller or touch.",
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
@@ -296,31 +296,31 @@ export const projects = [
       src: '/img/art/shitbox.webp',
       width: 1600,
       height: 900,
-      alt: 'SHITBOX: a faded red early-90s four-door with a grey primer fender, headlights on, parked at a gas station at dusk with lit shop signs behind.',
+      alt: 'SHITBOX: a faded red early-90s four-door with its headlights on at night, pulling off the ring road past the pines.',
     },
   },
   {
     cmd: 'radtap',
-    boot: 'four lanes, the crew on stage', // the hero's boot log line
+    boot: 'four lanes or seven, the crew on stage', // the hero's boot log line
     aliases: ['rhythm'],
     slug: 'radtap',
     group: 'games',
     name: 'RADTAP',
-    kind: 'Four-lane rhythm game',
+    kind: 'Rhythm game, four lanes or seven',
     blurb:
-      'Four lanes, three original songs and the Radbros playing them on stage behind the notes. Taps and holds from Easy to Hard, timing judged against the sound itself, calibration for your screen and speakers, and a chart editor for new songs. Keyboard, controller or touch.',
+      'Notes fall, you hit them on the line, and the crew plays behind the lanes. Seven original songs, from lo-fi and jungle to guitar rock and an 8-bit level theme, Easy to Expert, in four lanes or seven. Mods, practice loops for the hard parts, bests and a few achievements. Keyboard, controller or touch.',
     url: 'https://radtap.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radtap.vyvanse.beer' }],
     thumb: '/img/thumb/radtap.webp',
     shell: '#23163f',
     accent: '#b98cff',
-    cast: RADBROS,
+    cast: ALL,
     image: {
       src: '/img/art/radtap.webp',
       width: 1600,
       height: 900,
-      alt: 'RADTAP: Radbros #4764, #652, #723 and #2564 on a neon stage on keys, drums, decks and the mic, under a glowing RADTAP sign.',
+      alt: 'RADTAP: the crew on a neon stage under coloured spotlights: #723 in his cowboy hat on keys, a Retardio on drums, a Radbro at the mic and #2564 on the decks.',
     },
   },
   {
