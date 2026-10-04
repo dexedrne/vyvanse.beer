@@ -296,7 +296,7 @@ export const projects = [
       src: '/img/art/shitbox.webp',
       width: 1600,
       height: 900,
-      alt: 'SHITBOX: a faded red 1993 four-door with its headlights on at night, pulling off the ring road past the pines.',
+      alt: 'SHITBOX: a faded red 1993 four-door with a primer-grey fender parked at a mountain lookout over the town lights at night, Radbro #4764 leaning on the fender and Retardio #85 sitting on the bonnet with a coffee.',
     },
   },
   {
@@ -320,7 +320,7 @@ export const projects = [
       src: '/img/art/radtap.webp',
       width: 1600,
       height: 900,
-      alt: 'RADTAP: the crew on a neon stage under coloured spotlights: #723 in his cowboy hat on keys, a Retardio on drums, a Radbro at the mic and #2564 on the decks.',
+      alt: 'RADTAP: the whole crew as a band on a neon stage, #4764 on keys, #555 on bass, #652 on drums, #2564 at the mic, #85 beside him and #723 on the decks, with four glowing note lanes running toward you.',
     },
   },
   {
