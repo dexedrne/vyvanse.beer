@@ -23,6 +23,12 @@
 //   thumb     optional cartridge label in public/img/thumb/ (420x236 webp)
 //   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
 //   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
+//   of        games only: the cmd of the game this is an edition of. An edition is its own site,
+//             with its own entry here (name, blurb, url, art…), but it shares that game's
+//             cartridge: the switch under the wordmark flips between them (RetardioPayne is
+//             RadPayne's Retardios edition)
+//   edition   a game with editions, on each of them: { label, face } for that switch, `face`
+//             being the crew `num` whose face is on its pill
 //   credit    optional { before, label, href, after } rendered as one line
 //   note      optional plain-text line
 
@@ -101,11 +107,12 @@ export const projects = [
     shell: '#1e2a3b',
     accent: '#7cc4ff',
     cast: RADBROS,
+    edition: { label: 'Radbros', face: '4764' },
     image: {
       src: '/img/art/radpayne.webp',
       width: 1600,
       height: 900,
-      alt: 'RadPayne, bullet-time noir: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 dive through the rain with pistols blazing on a neon-lit street.',
+      alt: 'RadPayne: Radbros #4764, #652, #723 and #2564 dive through the rain in bullet time outside a neon nightclub, pistols blazing, shell casings in the air, the Milady gang shooting back.',
     },
     credit: {
       before: 'Built on',
@@ -120,8 +127,10 @@ export const projects = [
     aliases: ['retardio-payne', 'rpayne'],
     slug: 'retardiopayne',
     group: 'games',
+    of: 'radpayne',
+    edition: { label: 'Retardios', face: '85' },
     name: 'RetardioPayne',
-    kind: 'The harder cut of RadPayne, only the Retardio boys #555 and #85',
+    kind: 'Bullet-time noir shooter, the harder cut',
     blurb:
       'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555 and #85 to play: the same rainy Manhattan night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
     url: 'https://retardiopayne.vyvanse.beer',
@@ -222,11 +231,12 @@ export const projects = [
     shell: '#3c1838',
     accent: '#ff8a3d',
     cast: ALL,
+    edition: { label: 'Radbros', face: '4764' },
     image: {
       src: '/img/art/radzombies.webp',
       width: 1600,
       height: 900,
-      alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
+      alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
     },
     credit: {
       before: 'Built on',
@@ -240,8 +250,10 @@ export const projects = [
     boot: 'retardios vs the dead, their own boards', // the hero's boot log line
     slug: 'zombietardio',
     group: 'games',
+    of: 'radzombies',
+    edition: { label: 'Retardios', face: '85' },
     name: 'ZombieTardio',
-    kind: 'RadZombies with only the Retardio boys #555 and #85',
+    kind: 'First-person zombies, Retardios only',
     blurb:
       'The same zombies game, both maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85, the bot teammate and a friend online too. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
     url: 'https://zombietardio.vyvanse.beer',
@@ -543,6 +555,22 @@ export const mascot = {
   alt: 'Radbro #4764 in 3D, waving hello: violet bob, black sunglasses with skull-print lenses, a white hoodie covered in blue graffiti scribbles, black jeans, and a long katana sheathed at his left hip.',
   model: '/models/radbro4764-hero.glb',
 };
+
+// The games as the menu shows them: one cartridge per game, each the list of its editions (the
+// game's own entry first, then every entry whose `of` is its cmd; most games have just the one).
+export function shelf(projects) {
+  const games = projects.filter((p) => p.group === 'games');
+  return games.filter((g) => !g.of).map((g) => [g, ...games.filter((e) => e.of === g.cmd)]);
+}
+
+// The games one of the crew is in, one per game: of a game's editions, the one made for him (the
+// smallest cast he's in). Retardio #85 is in RetardioPayne and ZombieTardio, Radbro #4764 in
+// RadPayne and RadZombies.
+export function playsIn(projects, num) {
+  return shelf(projects)
+    .map((eds) => eds.filter((e) => e.cast?.includes(num)).sort((a, b) => a.cast.length - b.cast.length)[0])
+    .filter(Boolean);
+}
 
 // Host shown in lists and window title bars: "radrun.vyvanse.beer", "bulked.lol/os".
 export function shortUrl(href) {

@@ -2,7 +2,7 @@
 // `help` lists every entry that isn't hidden, in this order.
 
 import { h } from '../dom.js';
-import { shortUrl } from '../projects.js';
+import { shortUrl, playsIn } from '../projects.js';
 import { neofetch } from './fetch.js';
 import { openTip } from '../tip/open.js';
 
@@ -119,7 +119,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           {},
           line(strong(b.name), b.featured ? muted('  the mascot') : null),
           line(muted(b.line)),
-          line('playable in ', ...projects.filter((g) => g.cast?.includes(b.num)).flatMap((g, i) => [i ? ' ' : '', run(`open ${g.cmd}`, g.cmd)])),
+          line('playable in ', ...playsIn(projects, b.num).flatMap((g, i) => [i ? ' ' : '', run(`open ${g.cmd}`, g.cmd)])),
           b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
           crew.repo && b.repo !== false ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
           crew.repo && b.repo === false ? line(muted('free to use  '), link(crew.repo.license.href, crew.repo.license.label)) : null,

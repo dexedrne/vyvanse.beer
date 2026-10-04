@@ -3,7 +3,7 @@
 // keyboard or a controller (src/input.js), plays the games inside the page (src/player.js),
 // and starts the rain, the puddle and the crew in 3D after the first paint (src/stage.js).
 
-import { site, groups, projects, crew, contact, duo as DUO } from './projects.js';
+import { site, groups, projects, crew, contact, duo as DUO, shelf } from './projects.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
@@ -23,8 +23,10 @@ let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
 
 const TABS = ['games', 'crew', 'sites', 'contact'];
+// Games: one cartridge per game, each a list of its editions (src/projects.js, `of`)
+const SHELF = shelf(projects);
 const LISTS = {
-  games: projects.filter((p) => p.group === 'games'),
+  games: SHELF,
   crew: crew.members,
   sites: projects.filter((p) => p.group === 'sites'),
   contact: $$('#contact .mi'),
@@ -36,7 +38,39 @@ const S = {
   sites: 0,
   contact: 0,
 };
-const idOf = (tab, i) => (tab === 'crew' ? LISTS.crew[i]?.num : tab === 'contact' ? '' : LISTS[tab][i]?.cmd);
+
+// ---- editions: which one of each game is showing, remembered per game ----
+
+const ED_KEY = 'vyv-editions';
+const ED = {}; // game cmd -> the cmd of its edition last shown
+try {
+  Object.assign(ED, JSON.parse(localStorage.getItem(ED_KEY)));
+} catch {
+  /* blocked or broken storage: every game starts on its first edition */
+}
+const edOf = (i) => Math.max(0, SHELF[i].findIndex((e) => e.cmd === ED[SHELF[i][0].cmd]));
+function setEd(i, k) {
+  ED[SHELF[i][0].cmd] = SHELF[i][k].cmd;
+  try {
+    localStorage.setItem(ED_KEY, JSON.stringify(ED));
+  } catch {
+    /* it just won't be remembered */
+  }
+}
+// what a tab's item i shows: on Games, that game's edition
+const at = (tab, i) => (tab === 'games' ? SHELF[i]?.[edOf(i)] : LISTS[tab][i]);
+const idOf = (tab, i) => (tab === 'crew' ? LISTS.crew[i]?.num : tab === 'contact' ? '' : at(tab, i)?.cmd);
+// put the cursor on a game (its cartridge, and that edition) or a site; returns its tab
+function locate(p) {
+  if (p.group !== 'games') {
+    S[p.group] = LISTS[p.group].indexOf(p);
+    return p.group;
+  }
+  const i = SHELF.findIndex((eds) => eds.includes(p));
+  S.games = i;
+  if (SHELF[i].length > 1) setEd(i, SHELF[i].indexOf(p));
+  return 'games';
+}
 
 // ---- little helpers: a toast, the announcer, new tabs ----
 
@@ -113,8 +147,9 @@ const BD = {};
 for (const img of $$('#backdrops .bd')) BD[img.dataset.bd] = img;
 function bdFor(tab, i) {
   if (tab === 'games') {
-    const { src, position: pos, lettered, width: w, height: h } = LISTS.games[i].image;
-    return { key: `games:${LISTS.games[i].cmd}`, src, pos, lettered, w, h };
+    const p = at('games', i);
+    const { src, position: pos, lettered, width: w, height: h } = p.image;
+    return { key: `games:${p.cmd}`, src, pos, lettered, w, h };
   }
   if (tab === 'sites') return { key: `sites:${LISTS.sites[i].cmd}`, src: LISTS.sites[i].image.src, soft: true };
   if (tab === 'crew') return { key: 'crew', src: '/img/art/vyvanse.webp', soft: true };
@@ -148,10 +183,14 @@ function warm(tab, i) {
   nextUp();
   const n = LISTS[tab]?.length;
   if (!n || tab === 'contact') return;
-  const go = () => [i - 1, i + 1].forEach((j) => {
-    const b = bdFor(tab, (j + n) % n);
-    if (!BD[b.key]) new Image().src = b.src;
-  });
+  const go = () => {
+    [i - 1, i + 1].forEach((j) => {
+      const b = bdFor(tab, (j + n) % n);
+      if (!BD[b.key]) new Image().src = b.src;
+    });
+    // and this game's other editions, so a flip has its art at hand
+    if (tab === 'games') for (const e of SHELF[i]) if (!BD[`games:${e.cmd}`]) new Image().src = e.image.src;
+  };
   (window.requestIdleCallback || setTimeout)(go);
 }
 // on Crew, the 3D models of the cards either side (the stage fetches them once his is in)
@@ -187,6 +226,7 @@ function typeOut(item) {
 
 const panelOf = (tab) => $(`#${tab}`);
 const itemsOf = (tab) => $$('.item', panelOf(tab));
+const onItem = (tab) => $('.item.on', panelOf(tab));
 const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
 const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
 
@@ -196,22 +236,77 @@ function paint(tab) {
   if (tab === 'contact') {
     LISTS.contact.forEach((el, j) => el.classList.toggle('sel', j === i));
   } else {
-    itemsOf(tab).forEach((el, j) => {
-      el.classList.toggle('on', j === i);
-      if (j !== i) {
-        el.classList.remove('is-more');
+    const id = idOf(tab, i);
+    const was = onItem(tab);
+    itemsOf(tab).forEach((el) => {
+      const on = el.dataset.id === id;
+      el.classList.toggle('on', on);
+      if (!on) {
+        el.classList.remove('is-more', 'is-swap');
         $('[data-more]', el)?.setAttribute('aria-expanded', 'false');
       }
     });
+    const now = onItem(tab);
+    // the same game, another edition: crossfade instead of the wipe a new game gets
+    if (was && now && was !== now && was.dataset.game && was.dataset.game === now.dataset.game) crossfade(was, now);
     slotsOf(tab).forEach((el, j) => el.classList.toggle('sel', j === i));
+    if (tab === 'games') labels();
     controlsOf(tab).forEach((el, j) => (j === i ? el.setAttribute('aria-current', 'true') : el.removeAttribute('aria-current')));
     const count = $('.count', panel);
     if (count) count.textContent = `${i + 1} of ${LISTS[tab].length}`;
     keepInView(controlsOf(tab)[i]);
-    typeOut(itemsOf(tab)[i]);
+    typeOut(now);
   }
   backdrop(tab, i);
   warm(tab, i);
+}
+
+// a cartridge with editions wears the shown one's label and glow, the next one's edge behind it
+function labels() {
+  slotsOf('games').forEach((slot, j) => {
+    const eds = SHELF[j];
+    if (eds.length < 2) return;
+    const k = edOf(j);
+    slot.style.setProperty('--accent', eds[k].accent);
+    slot.style.setProperty('--accent2', eds[(k + 1) % eds.length].accent);
+    for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
+    $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
+  });
+}
+
+// (the new card keeps is-swap while it's showing: taking it off would start the wipe again)
+function crossfade(was, now) {
+  clearTimeout(now.fadeT);
+  now.classList.remove('is-out');
+  if (reduced.matches) return;
+  was.classList.add('is-out');
+  now.classList.add('is-swap');
+  clearTimeout(was.fadeT);
+  was.fadeT = setTimeout(() => was.classList.remove('is-out'), 300);
+}
+
+// flip the picked game to another edition: a step (+1 / -1, round and round), an edition's cmd,
+// or a side ('first' / 'last': the pad's triggers, which flank the switch, point at its ends)
+function edition(to) {
+  if (S.tab !== 'games') return false;
+  const eds = SHELF[S.games];
+  if (eds.length < 2) return false;
+  const cur = edOf(S.games);
+  const k =
+    to === 'first' ? 0
+    : to === 'last' ? eds.length - 1
+    : typeof to === 'string' ? eds.findIndex((e) => e.cmd === to)
+    : (cur + to + eds.length) % eds.length;
+  if (k < 0 || k === cur) return;
+  // focus was on the switch: it goes along to the same pill on the new card
+  const pill = document.activeElement?.closest?.('.ed');
+  setEd(S.games, k);
+  paint('games');
+  save();
+  layout();
+  audio.blip('move');
+  if (pill) $(`.ed[data-ed="${eds[k].cmd}"]`, onItem('games'))?.focus({ preventScroll: true });
+  announce(`${eds[k].name}, the ${eds[k].edition?.label || eds[k].name} edition`);
 }
 
 // keep the picked cartridge in view in the phone's swipe row (scroll the row, not the page)
@@ -248,7 +343,9 @@ const tabStep = (d) => show(TABS[(TABS.indexOf(S.tab) + d + TABS.length) % TABS.
 function label(tab, i) {
   if (tab === 'crew') return `${LISTS.crew[i].name}, ${i + 1} of ${LISTS.crew.length}`;
   if (tab === 'contact') return LISTS.contact[i].querySelector('.mi__label').textContent;
-  return `${LISTS[tab][i].name}, ${i + 1} of ${LISTS[tab].length}`;
+  const p = at(tab, i);
+  const ed = tab === 'games' && SHELF[i].length > 1 ? `, the ${p.edition?.label || p.name} edition` : '';
+  return `${p.name}${ed}, ${i + 1} of ${LISTS[tab].length}`;
 }
 
 // focus was on the row: carry it along (keyboard users see the focus move with the cursor)
@@ -264,6 +361,7 @@ function select(i, { sound = true } = {}) {
   save();
   layout();
   if (S.tab === 'crew') hello(want());
+  if (S.tab === 'games') hints(); // the edition hint comes and goes with the game
   if (sound) audio.blip('move');
   if (carry) controlsOf(S.tab)[next]?.focus({ preventScroll: true });
   announce(label(S.tab, next));
@@ -273,7 +371,7 @@ const move = (d) => select(S[S.tab] + d);
 // ---- doing things ----
 
 function current() {
-  if (S.tab === 'games' || S.tab === 'sites') return LISTS[S.tab][S[S.tab]];
+  if (S.tab === 'games' || S.tab === 'sites') return at(S.tab, S[S.tab]);
   return null;
 }
 
@@ -302,7 +400,7 @@ function activate({ from, pad } = {}) {
     else if (from !== 'pad') el.click();
     return;
   }
-  const item = itemsOf(S.tab)[S[S.tab]];
+  const item = onItem(S.tab);
   const btn = $('[data-act]', item);
   btn?.classList.remove('is-hit');
   void btn?.offsetWidth;
@@ -318,7 +416,7 @@ function activate({ from, pad } = {}) {
 
 function details() {
   if (S.tab === 'crew') return waveDuo(LISTS.crew[S.crew].num);
-  const item = itemsOf(S.tab)[S[S.tab]];
+  const item = onItem(S.tab);
   if (!item) return;
   const open = item.classList.toggle('is-more');
   $('[data-more]', item)?.setAttribute('aria-expanded', String(open));
@@ -331,7 +429,7 @@ function back() {
   const dlg = $('dialog[open]');
   if (dlg) return dlg.close();
   if (os?.isOpen()) return os.close();
-  const item = S.tab !== 'contact' ? itemsOf(S.tab)[S[S.tab]] : null;
+  const item = S.tab !== 'contact' ? onItem(S.tab) : null;
   if (item?.classList.contains('is-more')) return details();
   if (S.tab !== 'games') {
     audio.blip('back');
@@ -386,15 +484,21 @@ function act(name, info = {}) {
     return;
   }
   const vert = S.tab === 'contact';
+  // up / down on Games flip the edition, once per press (held, they don't run round and round)
+  const flip = (d) => (S.tab !== 'games' ? false : info.repeat || info.event?.repeat ? undefined : edition(d));
   switch (name) {
     case 'left':
       return move(-1);
     case 'right':
       return move(1);
     case 'up':
-      return vert ? move(-1) : false;
+      return vert ? move(-1) : flip(-1);
     case 'down':
-      return vert ? move(1) : false;
+      return vert ? move(1) : flip(1);
+    case 'edprev':
+      return flip('first');
+    case 'ednext':
+      return flip('last');
     case 'ok':
     case 'start':
       return activate(info);
@@ -446,9 +550,7 @@ const player = createPlayer({
     screen.classList.remove('is-away');
     screen.inert = false;
     audio.duck(false);
-    const tab = p.group === 'sites' ? 'sites' : 'games';
-    const i = LISTS[tab].indexOf(p);
-    if (i >= 0) S[tab] = i;
+    const tab = locate(p);
     show(tab, { sound: false });
     stage?.resume();
     ticker?.resume();
@@ -472,8 +574,14 @@ document.addEventListener('click', (e) => {
   const go = e.target.closest('[data-goto]');
   if (go) {
     e.preventDefault();
-    S.games = LISTS.games.findIndex((g) => g.cmd === go.dataset.goto);
+    const p = projects.find((g) => g.cmd === go.dataset.goto);
+    if (p) locate(p);
     return show('games');
+  }
+  const ed = e.target.closest('[data-ed]');
+  if (ed) {
+    e.preventDefault();
+    return edition(ed.dataset.ed);
   }
   const c = e.target.closest('.cart, .tile');
   if (c) {
@@ -543,28 +651,28 @@ function load() {
   // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
   const bySlug = projects.find((p) => p.slug === t || p.cmd === t || p.aliases?.includes(t));
   const bro = crew.members.find((m) => m.slug === t);
+  const named = (x) => x.cmd === id || x.aliases?.includes(id);
   let tab = TABS.includes(t) ? t : 'games';
-  if (bySlug) {
-    tab = bySlug.group;
-    S[tab] = LISTS[tab].indexOf(bySlug);
-  } else if (bro) {
+  // (a game's edition, #games/retardiopayne or #retardiopayne, lands on its game, that edition)
+  if (bySlug) tab = locate(bySlug);
+  else if (bro) {
     tab = 'crew';
     S.crew = LISTS.crew.indexOf(bro);
-  } else if (id && TABS.includes(t) && t !== 'contact') {
-    const j = LISTS[t].findIndex((x) => (t === 'crew' ? x.num === id : x.cmd === id || x.aliases?.includes(id)));
-    if (j >= 0) S[t] = j;
+  } else if (id && t === 'crew') {
+    const j = LISTS.crew.findIndex((x) => x.num === id);
+    if (j >= 0) S.crew = j;
+  } else if (id && (t === 'games' || t === 'sites')) {
+    const p = projects.find((x) => x.group === t && named(x));
+    if (p) locate(p);
   }
   if (t === 'play' && id) {
-    const p = projects.find((x) => x.cmd === id || x.aliases?.includes(id));
-    if (p) {
-      tab = p.group;
-      S[tab] = LISTS[tab].indexOf(p);
-    }
+    const p = projects.find(named);
+    if (p) tab = locate(p);
   }
   show(tab, { sound: false });
   if (t === 'tip') openTipJar();
   if (t === 'play' && id) {
-    const p = projects.find((x) => x.cmd === id || x.aliases?.includes(id));
+    const p = projects.find(named);
     if (p?.frame) player.open(p);
   }
 }
@@ -581,6 +689,8 @@ function hints() {
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   const out = [
     hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
+    // only on a game with editions, and low: the switch shows its own buttons, right by it
+    S.tab === 'games' && SHELF[S.games].length > 1 ? hint(2.5, `${k('lt')}${k('rt')} edition`) : '',
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
@@ -614,7 +724,15 @@ function rel(el) {
 }
 // who stands on the water in 3D: #4764 and #85 on Games and Contact, on Crew the picked one alone
 function want() {
-  if (S.tab === 'games' || S.tab === 'contact') return DUO;
+  // a game shown in one of its editions: that edition's own (RadPayne's and RadZombies' Radbros edition
+  // #4764 alone, their Retardios edition the two Retardios); every other game, and Contact, the pair
+  if (S.tab === 'games') {
+    const ed = at('games', S.games)?.edition?.label;
+    if (ed === 'Radbros') return ['4764'];
+    if (ed === 'Retardios') return ['555', '85'];
+    return DUO;
+  }
+  if (S.tab === 'contact') return DUO;
   if (S.tab === 'crew') return [LISTS.crew[S.crew].num];
   return [];
 }
@@ -832,9 +950,9 @@ function openOS(opts = {}) {
             const p = projects.find((x) => x.slug === slug);
             const b = crew.members.find((x) => x.slug === slug);
             if (p) {
-              S[p.group] = LISTS[p.group].indexOf(p);
-              show(p.group, { sound: false });
-              paint(p.group);
+              const tab = locate(p);
+              show(tab, { sound: false });
+              paint(tab);
             } else if (b) {
               S.crew = LISTS.crew.indexOf(b);
               show('crew', { sound: false });

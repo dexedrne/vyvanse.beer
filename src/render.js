@@ -6,7 +6,7 @@
 // becomes one full-screen menu: one panel at a time, one item of each panel at a time, picked
 // from the cartridge row along the bottom.
 
-import { shortUrl } from './projects.js';
+import { shortUrl, shelf, playsIn } from './projects.js';
 
 const esc = (s) =>
   String(s).replace(
@@ -60,12 +60,25 @@ function status(cmd, line, ok = '[ OK ]') {
   return `<p class="status"><span class="cmd">&gt; ${esc(cmd)}</span> <span class="ok">${esc(ok)}</span><span class="status__more"><br><span data-type>${esc(line)}</span></span></p>`;
 }
 
-function gameItem(p, i) {
+// A game with editions (RadPayne and RetardioPayne): a switch under the wordmark, one pill per
+// edition, the shown one marked. Each pill is a plain link to that edition's own card, so without
+// JS it jumps down the page to it; with JS it flips the edition in place (src/main.js).
+function editionSwitch(p, eds, faces) {
+  if (eds.length < 2) return '';
+  const pills = eds.map((e) => {
+    const face = faces[e.edition?.face];
+    return `<a class="ed" href="#${esc(e.slug)}" data-ed="${esc(e.cmd)}" style="--accent:${esc(e.accent)}"${e === p ? ' aria-current="true"' : ''}>${face ? `<img src="${esc(face)}" width="200" height="200" alt="" loading="lazy" decoding="async">` : ''}<span>${esc(e.edition?.label || e.name)}</span><span class="vh">: ${esc(e.name)}</span></a>`;
+  });
+  return `<div class="eds" role="group" aria-label="${esc(eds[0].name)}: ${eds.length} editions">${glyph('lt', '↑')}<span class="eds__seg">${pills.join('')}</span>${glyph('rt', '↓')}</div>`;
+}
+
+function gameItem(p, i, eds, faces) {
   const line = p.frame ? p.boot || p.kind : 'opens in a new tab: it can’t run inside this page';
-  return `<article class="item item--game" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
+  return `<article class="item item--game${eds.length > 1 ? ' item--eds' : ''}" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" data-game="${esc(eds[0].cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
   <div class="info">
     <p class="kindline">${esc(p.kind)}</p>
     <h3 class="wm" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
+    ${editionSwitch(p, eds, faces)}
     <p class="pitch">${esc(p.blurb)}</p>
     ${moreButton}
     <div class="act">
@@ -101,8 +114,8 @@ function siteItem(p, i) {
 </article>`;
 }
 
-function crewItem(b, i, { crew, games }) {
-  const plays = games.filter((g) => g.cast?.includes(b.num));
+function crewItem(b, i, { crew, projects, shell }) {
+  const plays = playsIn(projects, b.num);
   const own = b.repo === false;
   const file = b.download.href.split('/').pop();
   const fine = own
@@ -118,7 +131,7 @@ function crewItem(b, i, { crew, games }) {
     <h3 class="wm" id="${esc(b.slug)}-name"><span class="vh">${esc(b.kind)} </span>#${esc(b.num)}</h3>
     <p class="pitch">${esc(b.line)} Rigged and animated.</p>
     <div class="plays"><span class="plays__label">in</span>${plays
-      .map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(g.shell)};--accent:${esc(g.accent)}">${esc(g.name)}</a>`)
+      .map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(shell(g))};--accent:${esc(g.accent)}">${esc(g.name)}</a>`)
       .join('')}</div>
     <div class="act">
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
@@ -129,9 +142,16 @@ function crewItem(b, i, { crew, games }) {
 </article>`;
 }
 
-function cart(p, i) {
-  return `<li class="slot" style="--i:${i};--shell:${esc(p.shell || '#4b4855')};--accent:${esc(p.accent)}" data-i="${i}">
-      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"><span class="cart__label">${p.thumb ? `<img src="${esc(p.thumb)}" width="420" height="236" alt="" loading="lazy" decoding="async">` : ''}</span><span class="cart__name">${esc(p.name)}</span></button></li>`;
+// One cartridge per game. A game with editions has one label per edition (the shown one on top,
+// src/main.js) and the next one's edge peeking out behind it, so it reads as a two-in-one.
+function cart(p, i, eds = [p]) {
+  const two = eds.length > 1;
+  const labels = eds
+    .filter((e) => e.thumb)
+    .map((e, k) => `<img${two ? ` class="${k ? '' : 'on'}" data-label="${esc(e.cmd)}"` : ''} src="${esc(e.thumb)}" width="420" height="236" alt="" loading="lazy" decoding="async">`)
+    .join('');
+  return `<li class="slot${two ? ' slot--eds' : ''}" style="--i:${i};--shell:${esc(p.shell || '#4b4855')};--accent:${esc(p.accent)}${two ? `;--accent2:${esc(eds[1].accent)}` : ''}" data-i="${i}">
+      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"><span class="cart__label">${labels}</span><span class="cart__name">${esc(p.name)}</span>${two ? `<span class="vh">, ${eds.length} editions</span>` : ''}</button></li>`;
 }
 
 function tile(b, i) {
@@ -154,6 +174,11 @@ function panel(id, title, body) {
 
 export function renderShell({ site, groups, projects, crew, contact, duo }) {
   const games = projects.filter((p) => p.group === 'games');
+  const carts = shelf(projects);
+  const edsOf = (p) => carts.find((eds) => eds.includes(p));
+  const faces = Object.fromEntries(crew.members.map((m) => [m.num, m.face]));
+  // an edition's spine on Crew is its cartridge's plastic, with its own glow
+  const shell = (p) => edsOf(p)?.[0].shell || p.shell;
   const sites = projects.filter((p) => p.group === 'sites');
   const g = Object.fromEntries(groups.map((x) => [x.id, x]));
   const [host, ...tld] = site.name.split('.');
@@ -204,21 +229,21 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
     ${panel(
       'games',
       g.games.title,
-      `<div class="items">${games.map(gameItem).join('\n')}</div>
-    ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, games.map(cart).join(''), 'carts--games')}`,
+      `<div class="items">${games.map((p) => gameItem(p, carts.indexOf(edsOf(p)), edsOf(p), faces)).join('\n')}</div>
+    ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, carts.map((eds, i) => cart(eds[0], i, eds)).join(''), 'carts--games')}`,
     )}
     ${panel(
       'crew',
       crew.title,
       `<p class="panel__line">${esc(crew.line)}</p>
-    <div class="items">${crew.members.map((m, i) => crewItem(m, i, { crew, games })).join('\n')}</div>
+    <div class="items">${crew.members.map((m, i) => crewItem(m, i, { crew, projects, shell })).join('\n')}</div>
     <div class="row js-only"><div class="tgroups">${tiles}</div></div>`,
     )}
     ${panel(
       'sites',
       g.sites.title,
       `<div class="items">${sites.map(siteItem).join('\n')}</div>
-    ${row(`sites I built<span class="cap-long">: my own, and for other people’s projects</span>`, sites.map(cart).join(''), 'carts--sites')}`,
+    ${row(`sites I built<span class="cap-long">: my own, and for other people’s projects</span>`, sites.map((p, i) => cart(p, i)).join(''), 'carts--sites')}`,
     )}
     ${panel(
       'contact',

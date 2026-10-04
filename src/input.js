@@ -8,6 +8,7 @@
 //   start                Start / Menu: play (on release, and not held with View)
 //   back                 B / Esc: close what's open, else back to Games
 //   prev next            LB RB / Q E: the tabs
+//   edprev ednext        LT RT: the selected game's first / last edition (up / down flip it too)
 //   details              Y / I: the whole blurb and every link
 //   wave                 X / G: one of the duo waves
 //   fullscreen           View / Select / F (on a pad: on release, and not held with Menu)
@@ -23,6 +24,8 @@ const STANDARD = {
   3: 'details',
   4: 'prev',
   5: 'next',
+  6: 'edprev',
+  7: 'ednext',
 };
 // View and Menu act when they're let go, and only if the other one wasn't held with them: held
 // together they're the player's way back to the menu, not full screen plus play
@@ -31,9 +34,9 @@ const DIRS = { 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
 
 // what each glyph reads as, per input
 export const GLYPHS = {
-  kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc' },
-  xbox: { a: 'A', b: 'B', x: 'X', y: 'Y', lb: 'LB', rb: 'RB', start: 'Menu', select: 'View', move: '✚', vmove: '✚', hold: 'View + Menu' },
-  ps: { a: '✕', b: '○', x: '□', y: '△', lb: 'L1', rb: 'R1', start: 'Options', select: 'Create', move: '✚', vmove: '✚', hold: 'Create + Options' },
+  kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', lt: '↑', rt: '↓', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc' },
+  xbox: { a: 'A', b: 'B', x: 'X', y: 'Y', lb: 'LB', rb: 'RB', lt: 'LT', rt: 'RT', start: 'Menu', select: 'View', move: '✚', vmove: '✚', hold: 'View + Menu' },
+  ps: { a: '✕', b: '○', x: '□', y: '△', lb: 'L1', rb: 'R1', lt: 'L2', rt: 'R2', start: 'Options', select: 'Create', move: '✚', vmove: '✚', hold: 'Create + Options' },
 };
 
 // Sony pads report as "Wireless Controller" (vendor 054c); Xbox ones can say "Wireless Controller" too
