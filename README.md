@@ -49,6 +49,16 @@ cartridge label in `public/img/thumb/` (420×236 webp), a `shell` colour for the
 `accent` for the glow. A game's `cast` lists who you can play as (by crew `num`); Crew reads it
 for each one's "in" list.
 
+A game can have editions: RadPayne and RetardioPayne (the harder cut, Retardios only), RadZombies
+and ZombieTardio. Each edition is its own site and its own entry, with its own name, blurb, art,
+links and `cmd`; the second one says `of: 'radpayne'`, and both carry `edition: { label, face }`
+(`face` a crew `num`). They share one cartridge on Games, wearing the shown edition's label with
+the other one's edge peeking out behind it, and a switch under the wordmark ("Radbros |
+Retardios") flips between them: the art, wordmark, blurb, PLAY, links and status line crossfade
+to that edition. Each game's last edition is remembered in `localStorage`. On Crew, each one's
+"in" list names the edition made for him (of a game's editions, the smallest cast he's in), so
+the Retardios are in RetardioPayne and ZombieTardio, the Radbros in RadPayne and RadZombies.
+
 Set `frame: true` only if the site allows being shown in an iframe:
 
 ```sh
@@ -66,6 +76,7 @@ The glyphs on screen follow whatever was used last: keys, Xbox buttons, or PlayS
 | | Keyboard | Controller | Mouse / touch |
 | --- | --- | --- | --- |
 | Move | ← → (A D); ↑ ↓ on Contact | D-pad or left stick (held: repeats) | click a cartridge; swipe the art |
+| Edition (RadPayne, RadZombies) | ↑ ↓ (W S) | LT / RT (L2 / R2), or the d-pad ↑ ↓ | the pills under the name |
 | Play / pick | Enter | A (✕), or Start | click it again, or PLAY |
 | Back | Esc | B (○) | |
 | Sections | Q / E | LB / RB (L1 / R1) | the tabs (a bottom bar on phones) |
@@ -84,7 +95,8 @@ the ones for picking and going back always show whole.
 A pad gives a small rumble on select where it can. The address bar keeps your place
 (`#games/rbgo`, `#crew/85`, `#sites/sanic`, `#contact`), `#tip` opens the tip jar, `#play/radrun`
 starts a game, and the old page's anchors (`#radrun`, `#radbro-4764`, `#bulk-os`) still land on
-the right item.
+the right item. An edition's own name lands on its game, on that edition: `#games/retardiopayne`,
+`#zombietardio`, `#play/retardiopayne`, and `open rpayne` in the terminal.
 
 ## Games in the player
 

@@ -237,6 +237,13 @@ html:not(.js) .js-only {
   border-radius: 8px 8px 3px 3px;
 }
 
+[data-input='xbox'] .g--lt,
+[data-input='xbox'] .g--rt,
+[data-input='ps'] .g--lt,
+[data-input='ps'] .g--rt {
+  border-radius: 4px 4px 10px 10px;
+}
+
 [data-input='xbox'] .g--a { color: #8be08b; }
 [data-input='xbox'] .g--b { color: #ff8c8c; }
 [data-input='xbox'] .g--x { color: #8cc3ff; }
@@ -594,6 +601,7 @@ html:not(.js) .js-only {
 
 .row {
   grid-row: 2;
+  justify-self: start; /* as wide as its cartridges, so the head's count ends where they do */
   position: relative;
   z-index: 2;
   padding: 0 var(--pad) 14px;
@@ -625,6 +633,133 @@ html:not(.js) .js-only {
 
 .wm--contact {
   --accent: var(--amber);
+}
+
+/* ---------- a game's editions: the switch under the wordmark ---------- */
+
+.eds {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 2px;
+  animation: fade 0.4s var(--ease) 0.05s both;
+}
+
+.eds__seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 999px;
+  background: rgb(12 8 22 / 0.66);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.35);
+}
+
+.ed {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 15px 3px 3px;
+  border-radius: 999px;
+  color: var(--muted);
+  font: 400 21px/1 var(--word);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    box-shadow 0.25s;
+}
+
+.ed span {
+  padding-top: 2px;
+}
+
+.ed img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+  filter: grayscale(0.7) brightness(0.62);
+  transition: filter 0.25s;
+}
+
+.ed:hover {
+  color: var(--text);
+}
+
+.ed:hover img {
+  filter: grayscale(0.2) brightness(0.85);
+}
+
+/* the edition showing: lit in its own colour, ringed in amber like everything selected */
+.ed[aria-current='true'] {
+  background: color-mix(in srgb, var(--accent) 30%, var(--surface));
+  color: #fff;
+  box-shadow:
+    inset 0 0 0 1.5px var(--amber),
+    0 0 14px rgb(233 196 126 / 0.28);
+}
+
+.ed[aria-current='true'] img {
+  filter: none;
+}
+
+.ed:focus-visible {
+  outline: 2px solid #fff4dc;
+  outline-offset: 2px;
+}
+
+.eds .g {
+  height: 22px;
+  background: rgb(12 8 22 / 0.7);
+}
+
+/* the keys (up / down) sit together after it; a pad's triggers flank it, left and right */
+[data-input='kb'] .eds .g--lt,
+[data-input='mouse'] .eds .g--lt {
+  order: 2;
+}
+
+[data-input='kb'] .eds .g--rt,
+[data-input='mouse'] .eds .g--rt {
+  order: 3;
+  margin-left: -5px;
+}
+
+[data-input='touch'] .eds .g {
+  display: none;
+}
+
+/* flipping the edition: the card crossfades instead of wiping in like a new game */
+.js .item.is-out {
+  display: grid;
+  z-index: 0;
+  pointer-events: none;
+  animation: fade-out 0.26s var(--ease) both;
+}
+
+.js .item--game.on {
+  z-index: 1;
+}
+
+.js .item.is-out .info > *,
+.js .item.is-out .info > * > * {
+  animation: none;
+}
+
+.item.is-swap .kindline,
+.item.is-swap .wm,
+.item.is-swap .pitch,
+.item.is-swap .eds {
+  animation: fade 0.36s var(--ease) both;
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes wm-in {
@@ -839,6 +974,7 @@ html:not(.js) .js-only {
 .row__head {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: 18px;
   margin: 0 0 4px;
   color: var(--muted);
@@ -907,6 +1043,7 @@ html:not(.js) .js-only {
 }
 
 .cart__label {
+  position: relative;
   display: block;
   flex: none;
   width: 100%;
@@ -924,6 +1061,27 @@ html:not(.js) .js-only {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* a two-in-one: one label per edition, the one showing on top, the next one's edge behind it */
+.slot--eds .cart__label {
+  overflow: visible;
+  box-shadow:
+    0 0 0 2px rgb(0 0 0 / 0.45),
+    0 0 0 3px rgb(255 255 255 / 0.08),
+    4px -4px 0 1px color-mix(in srgb, var(--accent2) 78%, #000);
+}
+
+.slot--eds .cart__label img {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+
+.slot--eds .cart__label img.on {
+  opacity: 1;
 }
 
 .cart__name {
@@ -1480,6 +1638,11 @@ html:not(.js) .js-only {
   display: none;
 }
 
+/* there, but nothing to do for this one (a game with no editions): the strip keeps its shape */
+.hint.is-off {
+  opacity: 0.38;
+}
+
 .hint .g + .g {
   margin-left: -1px;
 }
@@ -2020,6 +2183,25 @@ a.ticker__tok:hover .ticker__k {
     margin-bottom: 12px;
   }
 
+  .eds {
+    margin-top: 10px;
+  }
+
+  .eds__seg {
+    padding: 2px;
+  }
+
+  .ed {
+    gap: 7px;
+    padding: 2px 14px 2px 2px;
+    font-size: 19px;
+  }
+
+  .ed img {
+    width: 30px;
+    height: 30px;
+  }
+
   .act {
     flex-wrap: wrap;
     gap: 10px 16px;
@@ -2051,6 +2233,7 @@ a.ticker__tok:hover .ticker__k {
   }
 
   .row {
+    justify-self: auto; /* the whole width: its cartridges scroll */
     padding: 0;
   }
 
