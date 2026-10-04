@@ -285,7 +285,7 @@ export const projects = [
     name: 'SHITBOX',
     kind: 'Odd jobs in a tired old four-door with a real manual',
     blurb:
-      "A 1991 four-door with 231,472 miles, a real manual and $25. Your phone fills up with odd jobs: lifts for people who are online too much, a couch on the roof, a cold wallet that can't take a bump, the airport before the flight. The clutch is going. The junkyard has one. Fix it, or don't. Keyboard, controller or touch.",
+      "A 1993 four-door with 218,578 miles, a real manual and $25. Your phone fills up with odd jobs: lifts for people who are online too much, a couch on the roof, a cold wallet that can't take a bump, the airport before the flight. The clutch is going. The junkyard has one. Fix it, or don't. Keyboard, controller or touch.",
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
@@ -296,7 +296,7 @@ export const projects = [
       src: '/img/art/shitbox.webp',
       width: 1600,
       height: 900,
-      alt: 'SHITBOX: a faded red early-90s four-door with its headlights on at night, pulling off the ring road past the pines.',
+      alt: 'SHITBOX: a faded red 1993 four-door with its headlights on at night, pulling off the ring road past the pines.',
     },
   },
   {
