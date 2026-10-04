@@ -1066,6 +1066,10 @@ html:not(.js) .js-only {
 .visual--crew.is-duo .bro {
   visibility: hidden;
 }
+/* when his model has just come in, the render stays a moment while the 3D fades in over it */
+.visual--crew.is-duo.is-fresh .bro {
+  transition: visibility 0s 0.3s;
+}
 
 .plays {
   display: flex;

@@ -5,9 +5,9 @@ Live at https://vyvanse.beer. To get in touch, DM [@dexedrne on X](https://x.com
 
 A game-select screen on a rainy rooftop. Four tabs (**Games, Crew, Sites, Contact**), the selected
 game's key art filling the screen over a puddle that mirrors it, Radbro #4764 and Retardio #85
-standing in the water in 3D, and the cartridges along the bottom. Pick a game and it plays right
-here, full screen, with a keyboard, a mouse, touch or a controller, like a console's big-screen
-menu.
+standing in the water in 3D (on Crew, each of the crew alone), and the cartridges along the
+bottom. Pick a game and it plays right here, full screen, with a keyboard, a mouse, touch or a
+controller, like a console's big-screen menu.
 
 ```sh
 npm install
@@ -32,9 +32,9 @@ down the page. With JS the same markup becomes one screen with no page scroll.
 | `src/input.js` | Keyboard and gamepads, turned into menu actions, and the on-screen glyphs. |
 | `src/player.js` | Games inside the page: the iframe, the loading card, getting back to the menu. |
 | `src/audio.js` | The background music and the menu blips. |
-| `src/stage.js` | One animation loop for the water and the duo; pauses while a game is open. |
+| `src/stage.js` | One animation loop for the water and the crew in 3D; pauses while a game is open. |
 | `src/water.js` | The rain and the puddle (WebGL2). |
-| `src/duo.js` | #4764 and #85 in 3D (three.js). |
+| `src/duo.js` | The crew in 3D (three.js): #4764 and #85 as a pair, or any one alone; each model loaded when first wanted. |
 | `src/ticker.js` | UTC clock and live BTC / ETH / SOL / XRP / RETARDIO prices in the bottom strip. |
 | `src/tip/` | The tip jar. |
 | `src/os/` | Radbro OS, the terminal. |
@@ -148,13 +148,16 @@ mirrors the art upside down, the neon of the cartridges and buttons standing in 
 heavy drops that splash, the pointer's wake and clicks. Under text the water is held dark enough
 for every pair to meet WCAG AA.
 
-**The duo** ([`src/duo.js`](src/duo.js)): `public/models/radbro4764-hero.glb` and
-`retardio85-hero.glb`, each with `Idle` and `Big_Wave_Hello`, plus a small groove on one shared
-beat (a head nod, a shoulder bounce, a hip sway), #85 a beat-fraction behind. Every 7 to 12
-seconds one of them waves, at you or at the other one; click or tap one (or press X / G) and he
-waves. They stand on the right of Games and Contact, and centre stage on Crew when #4764 or #85
-is picked. Until three.js and the models load (and without WebGL) their renders stand there
-instead.
+**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the six web
+models (`public/models/*-hero.glb`, each with `Idle` and `Big_Wave_Hello`) and shows a pair or
+one alone, with a small groove on one shared beat (a head nod, a shoulder bounce, a hip sway).
+On Games and Contact, #4764 and #85 stand on the right, #85 a beat-fraction behind; every 7 to 12
+seconds one of them waves, at you or at the other one. On Crew, whoever is picked stands alone,
+centre stage, and waves hello; he waves again on a click or tap (or X / G). Each model is
+fetched the first time it's wanted, and on Crew the cards either side are fetched once his is
+in and the page is idle. Until a model is in (and without WebGL, or if it fails) his render
+stands there instead. Past four models loaded, the ones off screen for 30 seconds give their GPU
+memory back.
 
 ## Performance
 
@@ -162,6 +165,8 @@ instead.
   menu's JS (about 18 KB), the fonts and the first key art. Everything else waits.
 - After the first paint: the stage (water and loop, about 8 KB) and then three.js with the two
   models (about 155 KB gzipped plus 1.4 MB of models), skipped with Save-Data.
+- On Crew: each one's model (0.6 to 0.75 MB) the first time his card is picked, and the cards
+  either side when idle.
 - On demand: the tip jar (about 10 KB), its wallet code (1 to 2 KB), Radbro OS (about 9 KB with
   its CSS), the music (1.4 MB).
 - One loop draws both, at 60 fps while you're doing something and 30 after a few idle seconds.
@@ -169,7 +174,7 @@ instead.
   when frames run long. Nothing runs while the tab is hidden or a game is open.
 - Reduced motion: no rain, ripples, groove or automatic waves (a wave only when asked), and no
   flicker or slides.
-- No WebGL2, or a failure: the plain backdrops and the duo's renders stay; everything works.
+- No WebGL2, or a failure: the plain backdrops and the crew's renders stay; everything works.
 
 ## Phone
 
@@ -220,13 +225,13 @@ completion, and `hidden: true` leaves it out of `help`.
 
 `public/img/radbros/` and `public/img/retardios/` hold flat renders of the rigged models on
 transparent backgrounds (the crew renders, 500 px tall), `public/img/faces/` their 200×200 crops
-for the character-select tiles. The web models in `public/models/` (#4764, #555 and #85) are the
-mesh plus `Idle` and `Big_Wave_Hello`, unlit, textures at 1024 in WebP, Draco-compressed. The
-Retardios' crew downloads are packages like the Radbros' (`retardio555-3d-model.zip` and
-`retardio85-3d-model.zip` on the `radbros-3d` release: static, rigged and animated `.glb`, a
-preview, a README and the license). `public/draco/` is the Draco decoder from
-`three/examples/jsm/libs/draco/gltf/`, served from this site; copy those two files again if you
-update `three` (pinned to an exact version).
+for the character-select tiles. The web models in `public/models/` (all six, each crew member's
+`model` in `src/projects.js`) are the mesh plus `Idle` and `Big_Wave_Hello`, unlit, textures at
+1024 in WebP, Draco-compressed. The Retardios' crew downloads are packages like the Radbros'
+(`retardio555-3d-model.zip` and `retardio85-3d-model.zip` on the `radbros-3d` release: static,
+rigged and animated `.glb`, a preview, a README and the license). `public/draco/` is the Draco
+decoder from `three/examples/jsm/libs/draco/gltf/`, served from this site; copy those two files
+again if you update `three` (pinned to an exact version).
 
 ## License
 

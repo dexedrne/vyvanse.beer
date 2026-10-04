@@ -243,11 +243,12 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       },
     },
     wave: {
-      desc: 'make #4764 and #85 wave',
+      desc: 'make whoever is on the water wave',
       run() {
         const how = shell.wave();
         if (how === 'ok') term.print(line('gm. ', muted('click them on the water to make one wave.')));
         else if (how === 'loading') term.print(line(muted("they're still warming up. try again in a second.")));
+        else if (how === 'none') term.print(line(muted('nobody is on the water here. try it on games, crew or contact.')))
         else term.print(line(muted("they're pictures right now (no 3d in this browser), so they can't wave.")));
       },
     },
