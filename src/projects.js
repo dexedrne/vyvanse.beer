@@ -324,6 +324,30 @@ export const projects = [
     },
   },
   {
+    cmd: 'radbrawl',
+    boot: 'one on one on a wet roof', // the hero's boot log line
+    aliases: ['brawl', 'fight'],
+    slug: 'radbrawl',
+    group: 'games',
+    name: 'RADBRAWL',
+    kind: 'Fighting game, one on one, early build',
+    blurb:
+      "A one-on-one fighter on a rain-wet rooftop. #4764 with the katana at mid range, a slash he can throw and a counter stance; #85 up close, rushing in, and a command grab that shakes the coins out of your pockets. Motion inputs or a one-button scheme, combos, supers, best of three, a CPU on three levels and a training mode with frame data. The rest of the crew comes later. Keyboard or controller.",
+    url: 'https://radbrawl.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://radbrawl.vyvanse.beer' }],
+    thumb: '/img/thumb/radbrawl.webp',
+    shell: '#2a1e3a',
+    accent: '#ff5f9e',
+    cast: ['4764', '85'],
+    image: {
+      src: '/img/art/radbrawl.webp',
+      width: 1600,
+      height: 900,
+      alt: 'RADBRAWL: Radbro #4764 launches Retardio #85 with a rising katana cut on a rain-wet neon rooftop at night.',
+    },
+  },
+  {
     cmd: 'solscape',
     boot: 'rev254 server on Solana', // the hero's boot log line
     slug: 'solscape',
