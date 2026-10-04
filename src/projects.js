@@ -308,7 +308,7 @@ export const projects = [
     name: 'RADTAP',
     kind: 'Rhythm game, four lanes or seven',
     blurb:
-      'Notes fall, you hit them on the line, and the crew plays behind the lanes. Seven original songs, from lo-fi and jungle to guitar rock and an 8-bit level theme, Easy to Expert, in four lanes or seven. Mods, practice loops for the hard parts, bests and a few achievements. Keyboard, controller or touch.',
+      'Notes fall, you hit them on the line, and the crew plays behind the lanes on a real stage. Eight original songs, from lo-fi and jungle to guitar rock, shoegaze and an 8-bit level theme, charted on the beat from Easy to Expert, in four lanes or seven, or two thumbs on a phone. Mods, practice loops for the hard parts, bests and a few achievements. Keyboard, controller or touch.',
     url: 'https://radtap.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radtap.vyvanse.beer' }],
