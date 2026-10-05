@@ -199,7 +199,8 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
     `<li><a class="mi" data-i="0" ${ext(contact.dm.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('x')}${esc(contact.dm.label)}</span><span class="det">${esc(contact.dm.handle)}</span>${newTab}</a></li>`,
     `<li><a class="mi" data-i="1" ${ext(contact.code.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('github')}${esc(contact.code.label)}</span><span class="det">${esc(shortUrl(contact.code.href))}: source and the 3D models</span>${newTab}</a></li>`,
     `<li class="js-only"><button class="mi" type="button" data-i="2" data-tip aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('coin')}Tip jar</span><span class="det">SOL to vyvanse.sol, or ETH</span></button></li>`,
-    `<li class="js-only"><button class="mi" type="button" data-i="3" data-os aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('term')}Radbro OS</span><span class="det">the terminal, or <kbd>/</kbd></span></button></li>`,
+    `<li><a class="mi" data-i="3" ${ext(contact.axiom.href, 'noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('chart')}${esc(contact.axiom.label)}</span><span class="det">${esc(shortUrl(contact.axiom.href))}: ${esc(contact.axiom.note)}</span>${newTab}</a></li>`,
+    `<li class="js-only"><button class="mi" type="button" data-i="4" data-os aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('term')}Radbro OS</span><span class="det">the terminal, or <kbd>/</kbd></span></button></li>`,
   ].join('');
 
   return `<div class="screen boot" id="screen">

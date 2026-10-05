@@ -612,6 +612,7 @@ export const contact = {
   line: 'DMs are open on X. Questions about the models, a site for your project, or anything else.',
   dm: { label: 'DM me on X', href: 'https://x.com/dexedrne', handle: '@dexedrne' },
   code: { label: 'GitHub', href: 'https://github.com/dexedrne' },
+  axiom: { label: 'Axiom', href: 'https://axiom.trade/@vyvanse', note: 'trade with my referral' },
 };
 
 // #4764 and #85 stand on the puddle together on Games and Contact, live in 3D (src/duo.js).

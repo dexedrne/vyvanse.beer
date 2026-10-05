@@ -277,6 +277,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       run() {
         term.print(line('dms are open on x: ', link(contact.dm.href, shortUrl(contact.dm.href), 'me noopener'), muted(`  ${contact.dm.handle}`)));
         term.print(line(muted('code and models: '), link(contact.code.href, shortUrl(contact.code.href), 'me noopener')));
+        if (contact.axiom) term.print(line(muted('trade on axiom: '), link(contact.axiom.href, shortUrl(contact.axiom.href), 'noopener'), muted(`  ${contact.axiom.note}`)));
         shell.reveal('contact');
       },
     },
