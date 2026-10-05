@@ -223,7 +223,7 @@ export const projects = [
     name: 'RadZombies',
     kind: 'First-person zombies survival, early preview',
     blurb:
-      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Two maps: a derelict picture palace, nine rooms on one loop (the power, eight perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets), or a sandbagged bunker on a dead air base at night, now with a crash-site yard and a cellar. A leaderboard for each. Solo, with a bot, with a friend online (quick play or a room code) or on split screen. Keyboard and mouse or a controller.',
+      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Two maps: a derelict picture palace, nine rooms on one loop (the power, eight perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets), or a sandbagged bunker on a dead air base at night, now with a crash-site yard and a cellar. A third map, Radcension, is in early: a launch base on the steppe, black and white until you find the power. A leaderboard for each, and a way out at first light for anyone who lasts. Solo, with a bot, with a friend online (quick play or a room code) or on split screen. Keyboard and mouse or a controller.',
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
