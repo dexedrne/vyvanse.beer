@@ -285,7 +285,7 @@ export const projects = [
     name: 'SHITBOX',
     kind: 'Odd jobs in a tired old four-door with a real manual',
     blurb:
-      "A 1993 four-door with 218,578 miles on it, a real five-speed and a cracked phone full of odd jobs. The town rains in the evening and dries by morning, the puddles holding the neon. Five old cars in the garage to take out any time: the Cadence, the Tegel, the Sechs, the Pitch and the Skiff. Clutch, gears and stalls, the way it came. Keyboard or controller.",
+      "You're #85 and you want a Porsche. What you have is a 1993 four-door with 218,578 miles, a real five-speed and $25. Get out and walk round it, climb back in with your hands on the wheel. The five in the group chat live around town and each is good at exactly one thing; knock on the wrong door and the strut comes back worse. A short comic opens it. Keyboard or controller.",
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
