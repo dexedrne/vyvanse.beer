@@ -324,6 +324,30 @@ export const projects = [
     },
   },
   {
+    cmd: 'pokerbros',
+    boot: 'the crew deal you in', // the hero's boot log line
+    aliases: ['poker', 'holdem'],
+    slug: 'pokerbros',
+    group: 'games',
+    name: 'PokerBros',
+    kind: "Texas hold'em with the crew, play chips",
+    blurb:
+      "Hold'em at the back-room table with the crew. Solo against all six, who talk, sweat and give themselves away (one tell in five is a lie), or online with friends and the crew filling the empty chairs. The Radbro deck, three tables, play chips only and a free refill every day. Keyboard and mouse or a controller.",
+    url: 'https://pokerbros.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://pokerbros.vyvanse.beer' }],
+    thumb: '/img/thumb/pokerbros.webp',
+    shell: '#16251c',
+    accent: '#e8c27a',
+    cast: ALL,
+    image: {
+      src: '/img/art/pokerbros.webp',
+      width: 1600,
+      height: 900,
+      alt: "PokerBros: the whole crew round a green felt table in a back room at night under a hanging lamp, cards in hand, chips stacked, #723 winking under his hat and #652 sweating.",
+    },
+  },
+  {
     cmd: 'radbrawl',
     boot: 'up to four on one roof', // the hero's boot log line
     aliases: ['brawl', 'fight', 'smash'],
