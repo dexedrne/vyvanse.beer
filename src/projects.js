@@ -325,26 +325,53 @@ export const projects = [
   },
   {
     cmd: 'radbrawl',
-    boot: 'one on one on a wet roof', // the hero's boot log line
-    aliases: ['brawl', 'fight'],
+    boot: 'up to four on one roof', // the hero's boot log line
+    aliases: ['brawl', 'fight', 'smash'],
     slug: 'radbrawl',
     group: 'games',
     name: 'RADBRAWL',
-    kind: 'Anime fighting game, one on one, early build',
+    kind: 'Platform fighter, up to four on one screen',
     blurb:
-      "A fast one-on-one fighter on a rain-wet rooftop, drawn like an anime fighter. #4764 with the katana, a slash he can throw and a counter stance; #85 up close, a double jump and a command grab that shakes the coins out of your pockets. Six buttons, chains, launchers and air combos, supers, best of three, a CPU on three levels and a training mode with frame data. Keyboard or controller.",
+      'A platform fighter with the crew on a wet neon rooftop. Up to four on one screen, any mix of keyboards, controllers and CPUs. Damage percent and stocks, launches off the edge, ledges, shields and dodges. #4764 with a katana, #85 with his fists, #723 with a revolver and a lasso, and #652. Training has an input display.',
     url: 'https://radbrawl.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radbrawl.vyvanse.beer' }],
     thumb: '/img/thumb/radbrawl.webp',
     shell: '#2a1e3a',
     accent: '#ff5f9e',
-    cast: ['4764', '85'],
+    cast: ['4764', '85', '723', '652'],
+    edition: { label: 'Platform', face: '723' },
     image: {
       src: '/img/art/radbrawl.webp',
       width: 1600,
       height: 900,
       alt: 'RADBRAWL: Radbro #4764 swings his katana as Retardio #85 throws a punch, sparks where they meet, on a rain-wet neon rooftop at night.',
+    },
+  },
+  {
+    cmd: 'radfighter',
+    boot: 'one on one on a wet roof', // the hero's boot log line
+    aliases: ['fighter', 'rad-fighter'],
+    slug: 'radfighter',
+    group: 'games',
+    of: 'radbrawl',
+    edition: { label: 'One on one', face: '4764' },
+    name: 'RAD FIGHTER',
+    kind: 'Anime fighting game, one on one, early build',
+    blurb:
+      'The first fighter: one on one on a rain-wet rooftop, drawn like an anime fighter. #4764 with the katana and a slash he can throw, #85 up close with a command grab. Six buttons, chains, launchers and air combos, supers, best of three, a CPU on three levels and training with frame data. Keyboard or controller.',
+    url: 'https://radfighter.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://radfighter.vyvanse.beer' }],
+    thumb: '/img/thumb/radfighter.webp',
+    shell: '#1e2240',
+    accent: '#5fd0ea',
+    cast: ['4764', '85'],
+    image: {
+      src: '/img/art/radfighter.webp',
+      width: 1600,
+      height: 900,
+      alt: 'RAD FIGHTER: in the game, Radbro #4764 raises his katana and sends a crescent of light at Retardio #85 on a rain-wet rooftop under the moon.',
     },
   },
   {
