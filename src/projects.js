@@ -285,7 +285,7 @@ export const projects = [
     name: 'SHITBOX',
     kind: 'Odd jobs in a tired old four-door with a real manual',
     blurb:
-      "A tired 1993 four-door with a real five-speed and $25 to your name. Odd jobs in a small town with fourteen-day months and proper winters: frost on the glass, snow, winter tyres or not. Every car keeps a book. Time trials up the mountain road on Saturdays, a bar for Radbros only. Save for a coupe. Keyboard or controller.",
+      "A tired 1993 four-door with a real five-speed and $25 to your name. Odd jobs in a small town with proper winters; the crew drive hatchbacks and think yours is a joke. A mountain pass for time trials, night battles and a rally stage. An inspection station, a cop with radar, an engine stand. The city is nine minutes up the highway. Keyboard or controller.",
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
