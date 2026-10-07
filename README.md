@@ -14,6 +14,7 @@ npm install
 npm run dev      # local dev server
 npm run build    # -> dist/
 node test/ticker.js
+node test/order.js
 ```
 
 ## How it's put together
@@ -31,6 +32,8 @@ down the page. With JS the same markup becomes one screen with no page scroll.
 | `src/main.js` | The menu: tabs, the cursor, the address bar, the duo's spot, what the water mirrors. |
 | `src/input.js` | Keyboard and gamepads, turned into menu actions, and the on-screen glyphs. |
 | `src/player.js` | Games inside the page: the iframe, the loading card, getting back to the menu. |
+| `src/sort.js` | Rearranging the cartridges by hand: drag, long-press on touch, the slide and the drop. |
+| `src/order.js` | The viewer's own cartridge order in `localStorage`, and fitting new games into it. |
 | `src/audio.js` | The background music and the menu blips. |
 | `src/stage.js` | One animation loop for the water and the crew in 3D; pauses while a game is open. |
 | `src/water.js` | The rain and the puddle (WebGL2). |
@@ -82,9 +85,21 @@ The glyphs on screen follow whatever was used last: keys, Xbox buttons, or PlayS
 | Sections | Q / E | LB / RB (L1 / R1) | the tabs (a bottom bar on phones) |
 | Details | I | Y (△) | "details" |
 | Make one wave | G | X (□) | click or tap one of them |
+| Rearrange | R, then ← → and Enter (Esc puts it back, I resets) | hold Menu (Options), then the d-pad and A (B puts it back, Y resets) | drag a cartridge; on touch, hold it, then drag |
 | Full screen | F | View / Select | ⛶ |
 | Music, menu sounds | M, N | | ♪ and the speaker |
 | Radbro OS | / or ` | | Contact → Radbro OS |
+
+**Your own order.** The cartridges on Games and Sites can be put in any order. With a mouse,
+drag one: it lifts off the row, the others slide out of its way, and it drops into the gap. On
+a touch screen, hold one for a moment until it lifts, then drag (a quick swipe still scrolls the
+row). With a controller, hold Menu (Options) on the selected cartridge: it lifts, with arrows
+either side, the d-pad moves it along, A or Menu again drops it, B puts it back, and Y resets the
+whole row; R does the same on a keyboard. A game with editions is one cartridge, so RadPayne and
+RetardioPayne move together. The order is kept in this browser (`localStorage`, key `vyv-order`,
+only while it differs from the default), and "reset order" in the row's head brings the default
+back. A game added later shows up in its default place in a saved order: right after the game
+before it in `src/projects.js`. Without storage the rows keep the default order.
 
 View and Start act when they're let go, and only on their own: pressed together they're the
 player's way back to the menu (below), so in the menu that combo does nothing. The pad is read on

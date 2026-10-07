@@ -13,6 +13,8 @@
 //   wave                 X / G: one of the duo waves
 //   fullscreen           View / Select / F (on a pad: on release, and not held with Menu)
 //   music sfx os         M, N, / (keyboard only)
+//   grab                 hold Menu (Options) / R: pick up the selected cartridge to move it
+//                        (src/main.js); a tap on Menu is still 'start'
 //
 // While a game is open (`mode() === 'play'`) the menu gets nothing; the player reads the pad
 // itself through `pads()` for its hold-to-leave combo.
@@ -34,9 +36,9 @@ const DIRS = { 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
 
 // what each glyph reads as, per input
 export const GLYPHS = {
-  kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', lt: '↑', rt: '↓', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc' },
-  xbox: { a: 'A', b: 'B', x: 'X', y: 'Y', lb: 'LB', rb: 'RB', lt: 'LT', rt: 'RT', start: 'Menu', select: 'View', move: '✚', vmove: '✚', hold: 'View + Menu' },
-  ps: { a: '✕', b: '○', x: '□', y: '△', lb: 'L1', rb: 'R1', lt: 'L2', rt: 'R2', start: 'Options', select: 'Create', move: '✚', vmove: '✚', hold: 'Create + Options' },
+  kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', lt: '↑', rt: '↓', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc', grab: 'R' },
+  xbox: { a: 'A', b: 'B', x: 'X', y: 'Y', lb: 'LB', rb: 'RB', lt: 'LT', rt: 'RT', start: 'Menu', select: 'View', move: '✚', vmove: '✚', hold: 'View + Menu', grab: 'Menu' },
+  ps: { a: '✕', b: '○', x: '□', y: '△', lb: 'L1', rb: 'R1', lt: 'L2', rt: 'R2', start: 'Options', select: 'Create', move: '✚', vmove: '✚', hold: 'Create + Options', grab: 'Options' },
 };
 
 // Sony pads report as "Wireless Controller" (vendor 054c); Xbox ones can say "Wireless Controller" too
@@ -90,6 +92,7 @@ export function createInput({ act, mode, onScheme }) {
     f: 'fullscreen',
     m: 'music',
     n: 'sfx',
+    r: 'grab',
     '/': 'os',
     '`': 'os',
   };
@@ -122,6 +125,8 @@ export function createInput({ act, mode, onScheme }) {
   // start-up), and a tap that comes and goes between two reads is lost.
   const prev = new Map(); // pad index -> pressed buttons last read
   const pair = new Map(); // pad index -> View and Menu were held together since both were up
+  const menuHold = new Map(); // pad index -> { t: when Menu went down, done: the hold was used }
+  const GRAB_MS = 450; // Menu held this long (alone) picks the cartridge up instead of playing it
   let held = { dir: null, next: 0 };
   let timer = 0;
   let rumbleOk = true;
@@ -158,9 +163,15 @@ export function createInput({ act, mode, onScheme }) {
         setDevice(isPs(gp.id) ? 'ps' : 'xbox');
         dispatchEvent(new Event('vyv:input'));
       }
+      if (pressed(9)) menuHold.set(gp.index, { t: now, done: false });
+      const mh = menuHold.get(gp.index);
       if (m === 'play') continue;
       for (const [i, name] of Object.entries(STANDARD)) if (pressed(+i)) act(name, { from: 'pad', pad: gp });
-      for (const [i, name] of Object.entries(PAIR)) if (was[i] && !now2[i] && !both) act(name, { from: 'pad', pad: gp });
+      // Menu held on its own: 'grab' (and its release is then not a 'start', if grab was taken)
+      if (mh && now2[9] && !both && !mh.done && now - mh.t > GRAB_MS) mh.done = act('grab', { from: 'pad', pad: gp }) === false ? 'no' : 'yes';
+      for (const [i, name] of Object.entries(PAIR)) {
+        if (was[i] && !now2[i] && !both && !(+i === 9 && mh?.done === 'yes')) act(name, { from: 'pad', pad: gp });
+      }
       for (const [i, name] of Object.entries(DIRS)) if (now2[i]) dir = name;
       dir ||= stick(gp);
     }

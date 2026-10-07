@@ -9,6 +9,8 @@ import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
 import { createTicker } from './ticker.js';
 import { openTip, loadTip } from './tip/open.js';
+import { readOrder, writeOrder, arrange } from './order.js';
+import { createSort, flip } from './sort.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -38,6 +40,15 @@ const S = {
   sites: 0,
   contact: 0,
 };
+
+// The rows a viewer can rearrange, each in its default order (src/projects.js) by key: a game by
+// its first edition's cmd, so a cartridge with editions is one key and moves as one.
+const ROWS = ['games', 'sites'];
+const keyOf = (tab, x) => (tab === 'games' ? x[0].cmd : x.cmd);
+const keysOf = (tab) => LISTS[tab].map((x) => keyOf(tab, x));
+const DEFAULT = { games: keysOf('games'), sites: keysOf('sites') };
+const ORDER = readOrder(); // this browser's own order, if it has one (src/order.js)
+const custom = (tab) => keysOf(tab).some((k, j) => k !== DEFAULT[tab][j]);
 
 // ---- editions: which one of each game is showing, remembered per game ----
 
@@ -230,9 +241,21 @@ const onItem = (tab) => $('.item.on', panelOf(tab));
 const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
 const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
 
-function paint(tab) {
+// the row's marks: the cursor, the labels, "3 of 9", and "reset order" when the order is yours
+function rowMarks(tab) {
   const i = S[tab];
   const panel = panelOf(tab);
+  slotsOf(tab).forEach((el, j) => el.classList.toggle('sel', j === i));
+  if (tab === 'games') labels();
+  controlsOf(tab).forEach((el, j) => (j === i ? el.setAttribute('aria-current', 'true') : el.removeAttribute('aria-current')));
+  const count = $('.count', panel);
+  if (count) count.textContent = `${i + 1} of ${LISTS[tab].length}`;
+  const reset = $('.row__reset', panel);
+  if (reset) reset.hidden = !custom(tab);
+}
+
+function paint(tab) {
+  const i = S[tab];
   if (tab === 'contact') {
     LISTS.contact.forEach((el, j) => el.classList.toggle('sel', j === i));
   } else {
@@ -249,11 +272,7 @@ function paint(tab) {
     const now = onItem(tab);
     // the same game, another edition: crossfade instead of the wipe a new game gets
     if (was && now && was !== now && was.dataset.game && was.dataset.game === now.dataset.game) crossfade(was, now);
-    slotsOf(tab).forEach((el, j) => el.classList.toggle('sel', j === i));
-    if (tab === 'games') labels();
-    controlsOf(tab).forEach((el, j) => (j === i ? el.setAttribute('aria-current', 'true') : el.removeAttribute('aria-current')));
-    const count = $('.count', panel);
-    if (count) count.textContent = `${i + 1} of ${LISTS[tab].length}`;
+    rowMarks(tab);
     keepInView(controlsOf(tab)[i]);
     typeOut(now);
   }
@@ -323,6 +342,7 @@ function keepInView(el) {
 
 function show(tab, { sound = true, focus = false } = {}) {
   if (!TABS.includes(tab)) tab = 'games';
+  if (moving && tab !== moving.tab) dropMove();
   const changed = tab !== S.tab;
   S.tab = tab;
   for (const t of $$('.tab')) {
@@ -370,6 +390,125 @@ function select(i, { sound = true } = {}) {
   announce(label(S.tab, next));
 }
 const move = (d) => select(S[S.tab] + d);
+
+// ---- rearranging the cartridges: the viewer's own order, kept in this browser ----
+// Games and Sites. With the mouse, drag one; on a touch screen, long-press it, then drag
+// (src/sort.js). With a pad, hold Menu (Options) on the selected one, or R on a keyboard: it
+// lifts, the d-pad (arrows) moves it along, A (Enter) or Menu again drops it, B (Esc) puts it
+// back, Y (I) resets the row. "reset order" in the row's head does that too.
+
+// lay a row out in the order of `keys` (src/order.js keys); the selected one stays selected
+function arrangeRow(tab, keys) {
+  const list = LISTS[tab];
+  const slots = slotsOf(tab);
+  const by = new Map(list.map((x, j) => [keyOf(tab, x), [x, slots[j]]]));
+  const next = keys.map((k) => by.get(k)).filter(Boolean);
+  if (next.length !== list.length || !slots.length) return;
+  const cur = list[S[tab]];
+  const had = document.activeElement;
+  const ul = slots[0].parentElement;
+  list.splice(0, list.length, ...next.map(([x]) => x));
+  next.forEach(([, slot], j) => {
+    if (ul.children[j] !== slot) ul.insertBefore(slot, ul.children[j]);
+    slot.dataset.i = j;
+    slot.style.setProperty('--i', j);
+    $('.cart', slot).dataset.i = j;
+  });
+  S[tab] = Math.max(0, list.indexOf(cur));
+  // (moving a focused cartridge in the DOM drops its focus: give it back)
+  if (had?.isConnected && had !== document.activeElement && ul.contains(had)) had.focus({ preventScroll: true });
+}
+function moveItem(tab, from, to) {
+  const keys = keysOf(tab);
+  keys.splice(to, 0, ...keys.splice(from, 1));
+  arrangeRow(tab, keys);
+}
+// remembered only when it differs from the default, so a row left as it is follows any change to it
+function keep(tab) {
+  if (custom(tab)) ORDER[tab] = keysOf(tab);
+  else delete ORDER[tab];
+  writeOrder(ORDER);
+}
+const nameAt = (tab, i) => at(tab, i)?.name || '';
+
+function resetOrder(tab = S.tab) {
+  if (!ROWS.includes(tab)) return false;
+  if (moving) endMove();
+  if (!custom(tab)) {
+    keep(tab);
+    rowMarks(tab);
+    hints();
+    return toast('already in the default order');
+  }
+  flip(slotsOf(tab), () => arrangeRow(tab, DEFAULT[tab]), { reduced: reduced.matches, ms: 320 });
+  keep(tab);
+  rowMarks(tab);
+  hints();
+  keepInView(controlsOf(tab)[S[tab]]);
+  emit();
+  audio.blip('back');
+  toast(`${tab === 'games' ? 'games' : 'sites'} back in the default order`);
+  announce(`Default order. ${label(tab, S[tab])}`);
+}
+
+// move mode (pad, keyboard): the selected cartridge is in hand; left / right move it along
+let moving = null; // { tab, keys: the order before, for putting it back }
+const nudge = Object.assign(document.createElement('span'), { className: 'nudge', innerHTML: '<i>◀</i><i>▶</i>' });
+nudge.setAttribute('aria-hidden', 'true');
+function grab() {
+  if (moving) return dropMove();
+  if (!ROWS.includes(S.tab) || mode() !== 'menu' || sorter.active) return false;
+  const tab = S.tab;
+  const i = S[tab];
+  moving = { tab, keys: keysOf(tab) };
+  const slot = slotsOf(tab)[i];
+  slot.classList.add('is-moving');
+  slot.append(nudge);
+  $('.row', panelOf(tab)).classList.add('is-moving');
+  hints();
+  keepInView(controlsOf(tab)[i]);
+  emit();
+  audio.blip('ok');
+  const kb = input.scheme === 'kb';
+  announce(`Moving ${nameAt(tab, i)}. ${kb ? 'Left and right arrows' : 'Left and right'} move it, ${kb ? 'Enter' : 'A'} drops it, ${kb ? 'Escape' : 'B'} puts it back.`);
+}
+function nudgeMove(d) {
+  const { tab } = moving;
+  const i = S[tab];
+  const j = i + d;
+  const slots = slotsOf(tab);
+  if (j < 0 || j >= slots.length) {
+    // the end of the row: a little bump against it
+    if (!reduced.matches) slots[i].animate([{ transform: 'none' }, { transform: `translateX(${d * 7}px)` }, { transform: 'none' }], { duration: 180, easing: 'ease-out' });
+    return;
+  }
+  flip(slots, () => moveItem(tab, i, j), { reduced: reduced.matches, ms: 170 });
+  rowMarks(tab);
+  keepInView(controlsOf(tab)[S[tab]]);
+  emit();
+  audio.blip('move');
+  announce(`${S[tab] + 1} of ${slots.length}`);
+}
+function endMove() {
+  const { tab } = moving;
+  moving = null;
+  for (const el of $$('.is-moving', panelOf(tab))) el.classList.remove('is-moving');
+  nudge.remove();
+  return tab;
+}
+// drop it where it is, or (put) back where it was
+function dropMove({ put = false } = {}) {
+  if (!moving) return false;
+  const { keys } = moving;
+  const tab = endMove();
+  if (put) flip(slotsOf(tab), () => arrangeRow(tab, keys), { reduced: reduced.matches });
+  keep(tab);
+  rowMarks(tab);
+  hints();
+  emit();
+  audio.blip(put ? 'back' : 'ok');
+  announce(put ? `Put back. ${label(tab, S[tab])}` : `Dropped. ${label(tab, S[tab])}`);
+}
 
 // ---- doing things ----
 
@@ -486,6 +625,14 @@ function act(name, info = {}) {
     else if (name === 'back') back();
     return;
   }
+  if (moving) {
+    if (name === 'left' || name === 'right') return nudgeMove(name === 'left' ? -1 : 1);
+    if (['up', 'down', 'edprev', 'ednext'].includes(name)) return;
+    if (name === 'ok' || name === 'start' || name === 'grab') return dropMove();
+    if (name === 'back') return dropMove({ put: true });
+    if (name === 'details') return resetOrder(moving.tab);
+    dropMove(); // anything else (sections, the terminal…): it's dropped here first
+  }
   const vert = S.tab === 'contact';
   // up / down on Games flip the edition, once per press (held, they don't run round and round)
   const flip = (d) => (S.tab !== 'games' ? false : info.repeat || info.event?.repeat ? undefined : edition(d));
@@ -525,6 +672,8 @@ function act(name, info = {}) {
       return audio.toggleSfx();
     case 'os':
       return openOS({ focus: 'input' });
+    case 'grab':
+      return grab();
   }
   return false;
 }
@@ -541,6 +690,8 @@ const player = createPlayer({
   pads: () => input.pads(),
   blip: (k) => audio.blip(k),
   onOpen() {
+    if (moving) dropMove();
+    sorter.cancel();
     os?.close();
     closeAsk();
     screen.classList.add('is-away');
@@ -567,6 +718,14 @@ addEventListener('message', (e) => player.message(e.data, e.origin));
 
 document.addEventListener('click', (e) => {
   if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  if (moving) {
+    // a click (or Enter on the focused cartridge) while one is in hand drops it
+    const onCart = e.target.closest('.cart');
+    dropMove();
+    if (onCart) return e.preventDefault();
+  }
+  const reset = e.target.closest('.row__reset');
+  if (reset) return resetOrder(reset.closest('.panel').dataset.panel);
   const t = e.target.closest('.tab');
   if (t) {
     e.preventDefault();
@@ -690,6 +849,11 @@ function hints() {
   const verb = { games: 'play', crew: 'get model', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
+  if (moving) {
+    const arrows = pad ? k('move') : '<span class="g">←</span><span class="g">→</span>';
+    hintsEl.innerHTML = [hint(9, `${arrows} move it`), hint(8, `${k('a')} drop`), hint(7, `${k('b')} put back`), hint(5, `${k('y')} reset order`)].join('');
+    return fitHints();
+  }
   const out = [
     hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
     // only on a game with editions, and low: the switch shows its own buttons, right by it
@@ -698,6 +862,7 @@ function hints() {
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
     S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} details`) : '',
+    ROWS.includes(S.tab) ? hint(3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
     hint(2, `${k('x')} wave`),
     hint(3, `${k('select')} full screen`),
     pad ? '' : hint(1, '<span class="g">M</span> music'),
@@ -978,6 +1143,44 @@ $('.tabs__list').setAttribute('role', 'tablist');
 $('.tabs__list').setAttribute('aria-label', 'Sections');
 for (const t of $$('.tab')) t.setAttribute('role', 'tab');
 for (const p of $$('.panel')) p.setAttribute('role', 'tabpanel');
+// each rearrangeable row: this browser's order (games added since land in their default place),
+// "reset order" and the move mode's buttons in its head, and the first cartridge picked
+for (const tab of ROWS) {
+  if (Array.isArray(ORDER[tab])) {
+    arrangeRow(tab, arrange(DEFAULT[tab], ORDER[tab]));
+    S[tab] = 0;
+  }
+  const count = $('.row__head .count', panelOf(tab));
+  count?.insertAdjacentHTML(
+    'beforebegin',
+    `<span class="row__tip" aria-hidden="true"><span class="g" data-g="move">✚</span>move<span class="g g--a" data-g="a">A</span>drop<span class="g g--b" data-g="b">B</span>put back<span class="g g--y" data-g="y">Y</span>reset</span><button class="row__reset" type="button" hidden>reset order</button>`,
+  );
+}
+input.paintGlyphs();
+const sorter = createSort({
+  rows: ROWS.map((tab) => ({ tab, el: $('.carts', panelOf(tab)) })),
+  reduced: () => reduced.matches,
+  begin(tab) {
+    if (mode() !== 'menu' || tab !== S.tab) return false;
+    if (moving) dropMove();
+    return true;
+  },
+  pick(tab, i) {
+    audio.blip('ok');
+    announce(`Picked up ${nameAt(tab, i)}`);
+  },
+  over: () => audio.blip('move'),
+  moved: () => dispatchEvent(new Event('vyv:scene')),
+  commit(tab, from, to) {
+    moveItem(tab, from, to);
+    keep(tab);
+    rowMarks(tab);
+  },
+  drop(tab, moved) {
+    emit();
+    if (moved) announce(`${label(tab, S[tab])}. Order saved.`);
+  },
+});
 load();
 hints();
 if ('ResizeObserver' in window) new ResizeObserver(() => fitHints()).observe($('#hints'));

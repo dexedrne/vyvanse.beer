@@ -1167,6 +1167,139 @@ html:not(.js) .js-only {
   }
 }
 
+/* ---------- rearranging the cartridges (src/sort.js, src/main.js) ----------
+   Dragged (mouse), long-pressed then dragged (touch), or picked up with the pad or keyboard.
+   The one in hand lifts off the row; the others slide out of its way. */
+
+.carts {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.carts img {
+  -webkit-user-drag: none;
+}
+
+.carts.is-sorting,
+.carts.is-sorting .cart {
+  cursor: grabbing;
+}
+
+.carts.is-sorting .slot:not(.is-held) {
+  transition: transform 0.2s var(--ease);
+}
+
+/* the one in hand: src/sort.js moves it (translate, lift, tilt) */
+.slot.is-held {
+  z-index: 5;
+  filter: drop-shadow(0 20px 16px rgb(0 0 0 / 0.55)) drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 50%, transparent));
+}
+
+.slot.is-held .cart,
+.slot.is-moving .cart {
+  filter: none;
+}
+
+/* move mode (the pad or keyboard): lifted higher, tilted, the brackets breathing, arrows either side */
+.slot.is-moving {
+  z-index: 4;
+  filter: drop-shadow(0 16px 14px rgb(0 0 0 / 0.5)) drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 45%, transparent));
+}
+
+.carts .slot.is-moving .cart {
+  transform: translateY(-26px) scale(1.06) rotate(-2deg);
+}
+
+.slot.is-moving::before {
+  --c: #fff4dc;
+  top: -34px;
+  animation: breathe 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes breathe {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.nudge {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 30px;
+  left: -16px;
+  right: -16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  color: var(--amber);
+  font: 400 22px/1 var(--pixel);
+  filter: drop-shadow(0 0 5px rgb(233 196 126 / 0.8));
+}
+
+.nudge i {
+  --d: -1;
+  font-style: normal;
+  animation: nudge 0.55s ease-in-out infinite alternate;
+}
+
+.nudge i + i {
+  --d: 1;
+}
+
+@keyframes nudge {
+  to {
+    transform: translateX(calc(var(--d) * 4px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot.is-moving::before,
+  .nudge i {
+    animation: none !important;
+  }
+
+  .carts .slot.is-moving .cart {
+    transform: translateY(-26px);
+  }
+}
+
+/* the row's head: "reset order" once it's yours (by the label, clear of the duo's hint on the
+   right), and the move mode's buttons in place of the label while it's on */
+.row__reset {
+  margin-right: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.row__reset:hover {
+  color: var(--amber);
+}
+
+.row__reset[hidden],
+.row.is-moving .row__reset,
+.row__tip,
+.row.is-moving .row__head > :first-child {
+  display: none;
+}
+
+.row.is-moving .row__tip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--amber);
+}
+
+.row__tip .g {
+  margin-left: 6px;
+}
+
 /* third-party cartridges (Sites): grey plastic, a coloured sticker */
 .carts--sites .cart {
   --sh: #4b4855;
