@@ -124,7 +124,6 @@ export function createStage(shell, { screen, duoBox, models }) {
     if (lastDraw && now - lastDraw < 1000 / target - 2) return;
     const dt = lastDraw ? Math.min(0.1, (now - lastDraw) / 1000) : 1 / 60;
     lastDraw = now;
-    shell.heroStep(now);
     if (cast?.live && !duoBox.classList.contains('duo--off')) cast.tick(dt);
     if (water && !water.dead) water.frame(dt, now, target);
   }

@@ -1,4 +1,4 @@
-// Whoever stands on the water, live in 3D: the rotating pair on Games and Contact, and each
+// Whoever stands on the water, live in 3D: #4764 and #85 together on Games and Contact, and each
 // of the crew alone, centre stage, on his own Crew card.
 //
 // One renderer, one scene, any number of characters. show([a, b]) puts two of them on the water,

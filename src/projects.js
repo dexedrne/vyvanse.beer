@@ -595,7 +595,7 @@ export const crew = {
       line: 'Golden yellow hair, amber eyes, green rings on a black tee and olive cargo trousers.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3704-3d-model.zip', label: '3D model .zip', size: '37 MB' },
       image: {
-        src: '/img/radbros/radbro-3704.webp', width: 242, height: 500,
+        src: '/img/radbros/radbro-3704.webp', width: 295, height: 500,
         alt: 'Radbro #3704 in 3D: golden yellow bob, amber eyes, a black green-ring tee, olive cargo trousers and black boots, waving hello.',
       },
     },
@@ -609,8 +609,8 @@ export const crew = {
       line: 'Mint green hair, amber eyes, the Nobody picture tee and dark trousers.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3710-3d-model.zip', label: '3D model .zip', size: '21 MB' },
       image: {
-        src: '/img/radbros/radbro-3710.webp', width: 242, height: 500,
-        alt: 'Radbro #3710 in 3D: mint green bob, amber eyes, a black Nobody picture tee, dark trousers and white-black sneakers, waving hello.',
+        src: '/img/radbros/radbro-3710.webp', width: 307, height: 500,
+        alt: 'Radbro #3710 in 3D: mint green bob, amber eyes, a black Nobody picture tee, blue jeans and white sneakers, waving hello.',
       },
     },
     {
@@ -695,17 +695,9 @@ export const contact = {
   axiom: { label: 'Axiom', href: 'https://axiom.trade/@vyvanse', note: 'trade with my referral' },
 };
 
-// The main four take most turns; supporting pairs and the ghost get occasional slots.
-const MAIN_PAIRS = [[0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2]];
-/** @param {number} turn @returns {string[]} */
-export function heroPair(turn) {
-  const step = turn % 20;
-  if (step === 19) return ['2564', MAIN_CAST[turn % 4]];
-  if (step === 7) return ['555', '85'];
-  if (step === 13) return ['723', '555'];
-  return MAIN_PAIRS[turn % MAIN_PAIRS.length].map(i => MAIN_CAST[i]);
-}
-export const duo = heroPair(0);
+// #4764 and #85 stand on the puddle together on Games and Contact, live in 3D (src/duo.js).
+// Their renders are the poster pair until the models load (and all there is without WebGL).
+export const duo = ['4764', '85'];
 
 // #4764's big render: the share card's alt and the terminal's neofetch use it.
 export const mascot = {
