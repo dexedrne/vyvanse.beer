@@ -223,7 +223,7 @@ export const projects = [
     name: 'RadZombies',
     kind: 'First-person zombies survival, early preview',
     blurb:
-      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Three maps: a derelict picture palace, nine rooms on one loop (the power, eight perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets), or a sandbagged bunker on a dead air base at night, now with a crash-site yard and a cellar. And Radcension, a launch base on the steppe, black and white until you find the power, with toy rockets, old tapes and someone to bring home. A leaderboard for each, and a way out at first light for anyone who lasts. Solo, with a bot, with a friend online (quick play or a room code) or on split screen. Keyboard and mouse or a controller.',
+      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Three maps: a derelict picture palace, nine rooms on one loop (the power, eight perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets), or a sandbagged bunker on a dead air base at night, now with a crash-site yard and a cellar. And Radcension, a launch base on the steppe, black and white until you find the power, with toy rockets, old tapes and someone to bring home. A leaderboard for each, and a way out at first light for anyone who lasts. Solo, with bots, up to four online (quick play or a room code), or two on split screen with two controllers. Keyboard and mouse or a controller.',
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
@@ -255,7 +255,7 @@ export const projects = [
     name: 'ZombieTardio',
     kind: 'First-person zombies, Retardios only',
     blurb:
-      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85, the bot teammate and a friend online too. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
+      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85, with bots, up to four online or two on split screen. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
     url: 'https://zombietardio.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://zombietardio.vyvanse.beer' }],
