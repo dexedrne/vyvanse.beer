@@ -4,7 +4,7 @@ Projects by dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com
 Live at https://vyvanse.beer. To get in touch, DM [@dexedrne on X](https://x.com/dexedrne).
 
 A game-select screen on a rainy rooftop. Four tabs (**Games, Crew, Sites, Contact**), the selected
-game's key art filling the screen over a puddle that mirrors it, Radbro #4764 and Retardio #85
+game's key art filling the screen over a puddle that mirrors it, the crew taking turns
 standing in the water in 3D (on Crew, each of the crew alone), and the cartridges along the
 bottom. Pick a game and it plays right here, full screen, with a keyboard, a mouse, touch or a
 controller, like a console's big-screen menu.
@@ -13,8 +13,8 @@ controller, like a console's big-screen menu.
 npm install
 npm run dev      # local dev server
 npm run build    # -> dist/
-node test/ticker.js
-node test/order.js
+npm run check    # syntax checks for every JavaScript source
+npm test         # order, ticker and cast checks
 ```
 
 ## How it's put together
@@ -37,7 +37,7 @@ down the page. With JS the same markup becomes one screen with no page scroll.
 | `src/audio.js` | The background music and the menu blips. |
 | `src/stage.js` | One animation loop for the water and the crew in 3D; pauses while a game is open. |
 | `src/water.js` | The rain and the puddle (WebGL2). |
-| `src/duo.js` | The crew in 3D (three.js): #4764 and #85 as a pair, or any one alone; each model loaded when first wanted. |
+| `src/duo.js` | The crew in 3D (three.js): the rotating pair, or any one alone; each model loaded when first wanted. |
 | `src/ticker.js` | UTC clock and live BTC / ETH / SOL / XRP / RETARDIO prices in the bottom strip. |
 | `src/tip/` | The tip jar. |
 | `src/os/` | Radbro OS, the terminal. |
@@ -175,15 +175,18 @@ mirrors the art upside down, the neon of the cartridges and buttons standing in 
 heavy drops that splash, the pointer's wake and clicks. Under text the water is held dark enough
 for every pair to meet WCAG AA.
 
-**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the six web
+**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the eight web
 models (`public/models/*-hero.glb`, each with `Idle` and `Big_Wave_Hello`) and shows a pair or
 one alone, with a small groove on one shared beat (a head nod, a shoulder bounce, a hip sway).
-On Games and Contact, #4764 and #85 stand on the right, #85 a beat-fraction behind; every 7 to 12
+On Games and Contact, the pair on the right changes on 24-second turns using the existing stage loop.
+#4764, #652, yellow-haired #3704 and green-haired #3710 take 17 of each 20 turns; the two Retardios,
+#555 with cowboy-hat truck driver #723, and a rare #2564 pair take one each. Edition-specific rosters stay
+as before. Reduced motion holds the pair still, and opening a game pauses the loop. Every 7 to 12
 seconds one of them waves, at you or at the other one. On Crew, whoever is picked stands alone,
 centre stage, and waves hello; he waves again on a click or tap (or X / G). Each model is
 fetched the first time it's wanted, and on Crew the cards either side are fetched once his is
 in and the page is idle. Until a model is in (and without WebGL, or if it fails) his render
-stands there instead. Past four models loaded, the ones off screen for 30 seconds give their GPU
+stands there instead. Past six models loaded, the ones off screen for 30 seconds give their GPU
 memory back.
 
 ## Performance
@@ -241,10 +244,11 @@ completion, and `hidden: true` leaves it out of `help`.
 
 ## Share card and icons
 
-- `public/og4.jpg` is the share card: a painted 1200×630 of Radbro #4764 and Retardio #85 hanging
-  out on a rainy neon rooftop under the vyvanse.beer sign. The older cards, `public/og3.jpg`,
-  `public/og2.jpg` and `public/og.png` (a screenshot of `scripts/og-card.html`), stay so old links
-  keep their preview.
+- `public/og4.jpg` is the share card: a painted 1200×630 of the main four, #4764, #652, #3704 and #3710,
+  hanging out on a rainy neon rooftop with their supporting crew. The older URLs, `public/og3.jpg`,
+  `public/og2.jpg` and `public/og.png`, also show the new four. The PNG keeps the terminal-card layout
+  in `scripts/og-card.html`. Previous images sit beside each replacement as `.prev` and are excluded
+  from builds. See [the full art inventory](docs/ART.md).
 - `public/apple-touch-icon.png` is a 180×180 screenshot of `scripts/touch-icon.html`.
 - `public/favicon.svg` is hand-drawn SVG.
 
@@ -252,13 +256,19 @@ completion, and `hidden: true` leaves it out of `help`.
 
 `public/img/radbros/` and `public/img/retardios/` hold flat renders of the rigged models on
 transparent backgrounds (the crew renders, 500 px tall), `public/img/faces/` their 200×200 crops
-for the character-select tiles. The web models in `public/models/` (all six, each crew member's
+for the character-select tiles. The web models in `public/models/` (all eight, each crew member's
 `model` in `src/projects.js`) are the mesh plus `Idle` and `Big_Wave_Hello`, unlit, textures at
 1024 in WebP, Draco-compressed. The Retardios' crew downloads are packages like the Radbros'
 (`retardio555-3d-model.zip` and `retardio85-3d-model.zip` on the `radbros-3d` release: static,
 rigged and animated `.glb`, a preview, a README and the license). `public/draco/` is the Draco
 decoder from `three/examples/jsm/libs/draco/gltf/`, served from this site; copy those two files
 again if you update `three` (pinned to an exact version).
+
+#3704 and #3710 use the same 24-joint hero rig, WebP / Draco optimisation, Idle and wave clips, grounding,
+groove and loading budget as the others. Their Crew cards list PokerBros and RADTAP, and those two games'
+launcher art and cartridge labels match their new group paintings. PokerBros's cast excludes #2564.
+The new model download links use the existing `radbros-3d` release on this site's repository; attach
+`radbro3704-3d-model.zip` and `radbro3710-3d-model.zip` there before publishing the site.
 
 ## License
 

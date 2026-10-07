@@ -1,4 +1,4 @@
-// Whoever stands on the water, live in 3D: #4764 and #85 together on Games and Contact, and each
+// Whoever stands on the water, live in 3D: the rotating pair on Games and Contact, and each
 // of the crew alone, centre stage, on his own Crew card.
 //
 // One renderer, one scene, any number of characters. show([a, b]) puts two of them on the water,
@@ -25,7 +25,7 @@ export const FEET = 0.976; // where y = 0 sits, as a share of the canvas height
 const FOV = 18;
 const BPM = 92;
 const WAVE_EVERY = [7, 12]; // seconds between waves they do on their own
-const KEEP = 6; // models kept loaded (the whole crew); past that, the ones off screen for STALE ms are let go
+const KEEP = 6; // models kept loaded; past that, the ones off screen for STALE ms are let go
 const STALE = 30000;
 // a pair: where each stands (m), how far he faces the other one, his lag behind the beat, his energy
 const PAIR = [

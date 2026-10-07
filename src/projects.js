@@ -47,10 +47,11 @@ export const groups = [
   { id: 'sites', title: 'Sites I built', line: 'Websites I made: my own Solscape, and sites for other people’s projects.' },
 ];
 
-// Everyone in the crew. Most games let you play as all six.
+// The older games' cast; each updated game lists its own crew below.
 const ALL = ['652', '4764', '2564', '723', '555', '85'];
 // RadPayne's own roster: the four Radbros (its Retardios moved to RetardioPayne)
 const RADBROS = ['652', '4764', '2564', '723'];
+const MAIN_CAST = ['4764', '652', '3704', '3710'];
 
 export const projects = [
   {
@@ -315,12 +316,12 @@ export const projects = [
     thumb: '/img/thumb/radtap.webp',
     shell: '#23163f',
     accent: '#b98cff',
-    cast: ALL,
+    cast: [...MAIN_CAST, '555', '85', '723', '2564'],
     image: {
       src: '/img/art/radtap.webp',
       width: 1600,
       height: 900,
-      alt: 'RADTAP: the whole crew as a band on a neon stage, #4764 on keys, #555 on bass, #652 on drums, #2564 at the mic, #85 beside him and #723 on the decks, with four glowing note lanes running toward you.',
+      alt: 'RADTAP: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 lead the band on a neon stage, with #555, #85 and cowboy #723 supporting behind four glowing note lanes.',
     },
   },
   {
@@ -332,19 +333,19 @@ export const projects = [
     name: 'PokerBros',
     kind: "Texas hold'em with the crew, play chips",
     blurb:
-      "Hold'em at the back-room table with the crew. Solo against all six, who talk, sweat and give themselves away (one tell in five is a lie), or online with friends and the crew filling the empty chairs. The Radbro deck, three tables, play chips only and a free refill every day. Keyboard and mouse or a controller.",
+      "Hold'em at the back-room table with the crew. Solo against all seven, who talk, sweat and give themselves away (one tell in five is a lie), or online with friends and the crew filling the empty chairs. The Radbro deck, three tables, play chips only and a free refill every day. Keyboard and mouse or a controller.",
     url: 'https://pokerbros.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://pokerbros.vyvanse.beer' }],
     thumb: '/img/thumb/pokerbros.webp',
     shell: '#16251c',
     accent: '#e8c27a',
-    cast: ALL,
+    cast: [...MAIN_CAST, '555', '85', '723'],
     image: {
       src: '/img/art/pokerbros.webp',
       width: 1600,
       height: 900,
-      alt: "PokerBros: the whole crew round a green felt table in a back room at night under a hanging lamp, cards in hand, chips stacked, #723 winking under his hat and #652 sweating.",
+      alt: 'PokerBros: #4764, #652, yellow-haired #3704 and green-haired #3710 lead the crew round a green felt table under a hanging lamp, with #555 and #85 at the sides and cowboy #723 behind. Play chips only.',
     },
   },
   {
@@ -540,9 +541,9 @@ export const projects = [
 // `image` is his render, shown until then (and without WebGL).
 export const crew = {
   title: 'The crew',
-  line: 'Radbros #652, #4764, #2564 and #723, and Retardios #555 and #85, built in 3D. You play as them in the games.',
+  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardios #555 and #85, cowboy #723 and an occasional ghost #2564, built in 3D.',
   playIn: 'spidertag',
-  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'all four, one .zip', size: '81 MB' },
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'the original four, one .zip', size: '81 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
   repo: {
     href: 'https://github.com/dexedrne/radbros-3d',
@@ -585,6 +586,34 @@ export const crew = {
       },
     },
     {
+      num: '3704',
+      slug: 'radbro-3704',
+      kind: 'Radbro',
+      face: '/img/faces/radbro-3704.webp',
+      model: '/models/radbro3704-hero.glb',
+      name: 'Radbro #3704',
+      line: 'Golden yellow hair, amber eyes, green rings on a black tee and olive cargo trousers.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3704-3d-model.zip', label: '3D model .zip', size: '37 MB' },
+      image: {
+        src: '/img/radbros/radbro-3704.webp', width: 242, height: 500,
+        alt: 'Radbro #3704 in 3D: golden yellow bob, amber eyes, a black green-ring tee, olive cargo trousers and black boots, waving hello.',
+      },
+    },
+    {
+      num: '3710',
+      slug: 'radbro-3710',
+      kind: 'Radbro',
+      face: '/img/faces/radbro-3710.webp',
+      model: '/models/radbro3710-hero.glb',
+      name: 'Radbro #3710',
+      line: 'Mint green hair, amber eyes, the Nobody picture tee and dark trousers.',
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3710-3d-model.zip', label: '3D model .zip', size: '21 MB' },
+      image: {
+        src: '/img/radbros/radbro-3710.webp', width: 242, height: 500,
+        alt: 'Radbro #3710 in 3D: mint green bob, amber eyes, a black Nobody picture tee, dark trousers and white-black sneakers, waving hello.',
+      },
+    },
+    {
       num: '2564',
       slug: 'radbro-2564',
       kind: 'Radbro',
@@ -607,7 +636,7 @@ export const crew = {
       face: '/img/faces/radbro-723.webp', // 200x200 crop for the character-select tile
       model: '/models/radbro723-hero.glb',
       name: 'Radbro #723',
-      line: 'The new guy. Cowboy hat, a wink, HOT TOPIC BRO vest.',
+      line: 'The truck guy. Cowboy hat, a wink, a black vest and an old pickup.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro723-3d-model.zip', label: '3D model .zip', size: '21 MB' },
       image: {
         src: '/img/radbros/radbro-723.webp',
@@ -627,7 +656,7 @@ export const crew = {
       face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
       model: '/models/retardio555-hero.glb',
       name: 'Retardio Cousin #555',
-      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee.',
+      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee, and a red pop-up roadster.',
       repo: false,
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '13 MB' },
       image: {
@@ -666,9 +695,17 @@ export const contact = {
   axiom: { label: 'Axiom', href: 'https://axiom.trade/@vyvanse', note: 'trade with my referral' },
 };
 
-// #4764 and #85 stand on the puddle together on Games and Contact, live in 3D (src/duo.js).
-// Their renders are the poster pair until the models load (and all there is without WebGL).
-export const duo = ['4764', '85'];
+// The main four take most turns; supporting pairs and the ghost get occasional slots.
+const MAIN_PAIRS = [[0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2]];
+/** @param {number} turn @returns {string[]} */
+export function heroPair(turn) {
+  const step = turn % 20;
+  if (step === 19) return ['2564', MAIN_CAST[turn % 4]];
+  if (step === 7) return ['555', '85'];
+  if (step === 13) return ['723', '555'];
+  return MAIN_PAIRS[turn % MAIN_PAIRS.length].map(i => MAIN_CAST[i]);
+}
+export const duo = heroPair(0);
 
 // #4764's big render: the share card's alt and the terminal's neofetch use it.
 export const mascot = {

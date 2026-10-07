@@ -3,7 +3,7 @@
 // keyboard or a controller (src/input.js), plays the games inside the page (src/player.js),
 // and starts the rain, the puddle and the crew in 3D after the first paint (src/stage.js).
 
-import { site, groups, projects, crew, contact, duo as DUO, shelf } from './projects.js';
+import { site, groups, projects, crew, contact, duo as DUO, heroPair, shelf } from './projects.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
@@ -23,6 +23,7 @@ const hint = $('#duo-hint');
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
+let heroDuo = DUO, heroTurn = 0, nextHeroAt = 0;
 
 const TABS = ['games', 'crew', 'sites', 'contact'];
 // Games: one cartridge per game, each a list of its editions (src/projects.js, `of`)
@@ -356,7 +357,7 @@ function show(tab, { sound = true, focus = false } = {}) {
   hints();
   save();
   layout();
-  if (changed) hello(tab === 'contact' ? [DUO[1], DUO[0]] : tab === 'crew' ? want() : []);
+  if (changed) hello(tab === 'contact' ? [...want()].reverse() : tab === 'crew' ? want() : []);
   if (sound && changed) audio.blip('tab');
   if (focus) controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
   announce(`${tab}: ${label(tab, S[tab])}`);
@@ -890,7 +891,7 @@ function rel(el) {
   const r = el.getBoundingClientRect();
   return { x: r.left - h.left, y: r.top - h.top, w: r.width, h: r.height };
 }
-// who stands on the water in 3D: #4764 and #85 on Games and Contact, on Crew the picked one alone
+// The rotating pair on Games and Contact; on Crew, the picked one alone.
 function want() {
   // a game shown in one of its editions: that edition's own (RadPayne's and RadZombies' Radbros edition
   // #4764 alone, their Retardios edition the two Retardios); every other game, and Contact, the pair
@@ -898,9 +899,9 @@ function want() {
     const ed = at('games', S.games)?.edition?.label;
     if (ed === 'Radbros') return ['4764'];
     if (ed === 'Retardios') return ['555', '85'];
-    return DUO;
+    return heroDuo;
   }
-  if (S.tab === 'contact') return DUO;
+  if (S.tab === 'contact') return heroDuo;
   if (S.tab === 'crew') return [LISTS.crew[S.crew].num];
   return [];
 }
@@ -1049,6 +1050,22 @@ function hello(nums) {
 const shell = {
   scene,
   layout,
+  heroStep(now) {
+    if (reduced.matches || !['games', 'contact'].includes(S.tab) || (S.tab === 'games' && at('games', S.games)?.edition)) {
+      nextHeroAt = now + 24000; return;
+    }
+    if (!nextHeroAt) nextHeroAt = now + 24000;
+    if (now < nextHeroAt) return;
+    nextHeroAt = now + 24000;
+    heroDuo = heroPair(++heroTurn);
+    $('.duo__poster', duoEl).replaceChildren(...heroDuo.map(num => {
+      const member = crew.members.find(m => m.num === num), img = new Image();
+      img.src = member.image.src; img.width = member.image.width; img.height = member.image.height;
+      img.alt = ''; img.decoding = 'async'; img.onload = emit;
+      return img;
+    }));
+    layout();
+  },
   // the models just asked for are in: they take over from the renders (and say hello)
   castReady() {
     // (his render lingers a moment only now, as his model first comes in; switching between cards whose

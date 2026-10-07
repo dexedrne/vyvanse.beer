@@ -120,7 +120,7 @@ function crewItem(b, i, { crew, projects, shell }) {
   const file = b.download.href.split('/').pop();
   const fine = own
     ? `<p class="credit">My own Retardio, built on the Radbro rig. Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>, like the Radbros: use him, remix him, put him in your game.</p>`
-    : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>${crew.downloadAll ? `, or all four in <a href="${esc(crew.downloadAll.href)}" download>one .zip</a> (${esc(crew.downloadAll.size)})` : ''}. ${esc(crew.repo.line)}</p>`;
+    : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>${crew.downloadAll ? `, or the original four in <a href="${esc(crew.downloadAll.href)}" download>one .zip</a> (${esc(crew.downloadAll.size)})` : ''}. ${esc(crew.repo.line)}</p>`;
   return `<article class="item item--crew" id="${esc(b.slug)}" data-i="${i}" data-id="${esc(b.num)}" aria-labelledby="${esc(b.slug)}-name">
   <div class="visual visual--crew">
     <div class="bignum" aria-hidden="true">${esc(b.num)}</div>
