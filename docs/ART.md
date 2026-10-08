@@ -9,9 +9,16 @@ the rare automatic hero turn, using the same fallback as everyone else.
 `public/og3.jpg` is the share-size export of `public/img/art/vyvanse.webp`, as before. The older solo-style
 `og2.jpg` and terminal-style `og.png` now show the main four. The PokerBros background is the new game's
 painting with its footer typography removed; RADTAP uses its new landscape title painting. Their 420 × 236
-cartridge labels are smaller exports of the corresponding 1600 × 900 paintings. Other games' cards are
-unchanged. The two new 200 × 200 portraits match the existing NFT bust style; their transparent full-body
+cartridge labels are smaller exports of the corresponding 1600 × 900 paintings. The two new 200 × 200 portraits match the existing NFT bust style; their transparent full-body
 Crew fallbacks are 242 × 500 WebP.
+
+SPIDERTAG, RadPayne, RBGO, RadOps and RadZombies now use their games' main-four paintings at fresh
+`*-cast2.webp` URLs. Their 1600 × 900 backdrops retain the prior size and lossy WebP format. Their new
+512 × 512 cartridge labels come from the textless keys, with the whole wide illustration contained
+in the centre square: no wordmark, title or tagline. NFT shirt prints remain. #555 stays by the roadster
+where present; the background cowboy is the truck driver. Each old backdrop and cartridge label is
+kept beside the new files as `*.prev.webp`, excluded by the existing build rule. The two Retardios-only
+editions retain their images and Crew membership.
 
 Every replaced image is preserved byte-for-byte beside the new one as `.prev`. The build removes those
 archives. Pixel dimensions and RGB / RGBA modes match the replaced assets: lossy WebP remains WebP, JPEG
@@ -31,7 +38,7 @@ node --input-type=module -e 'import { globSync } from "node:fs"; import assert f
 ```
 
 
-Every 2D file in this checkout (72 files), including archives and documentation captures. Loading screens use the title art or code; there is no separate raster loading illustration.
+Every 2D file in this checkout (82 files), including archives and documentation captures. Loading screens use the title art or code; there is no separate raster loading illustration.
 
 | File | Size | Format | Use |
 | --- | --- | --- | --- |
@@ -41,13 +48,18 @@ Every 2D file in this checkout (72 files), including archives and documentation 
 | `public/img/art/pokerbros.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radbrawl.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radfighter.webp` | 1600 × 900 | WEBP | launcher game / site art |
-| `public/img/art/radops.webp` | 1600 × 900 | WEBP | launcher game / site art |
-| `public/img/art/radpayne.webp` | 1600 × 900 | WEBP | launcher game / site art |
-| `public/img/art/radrun.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radops-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radops.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
+| `public/img/art/radpayne-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radpayne.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
+| `public/img/art/radrun-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radrun.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
 | `public/img/art/radtap.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
 | `public/img/art/radtap.webp` | 1600 × 900 | WEBP | launcher game / site art |
-| `public/img/art/radzombies.webp` | 1600 × 900 | WEBP | launcher game / site art |
-| `public/img/art/rbgo.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radzombies-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radzombies.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
+| `public/img/art/rbgo-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/rbgo.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
 | `public/img/art/retardiopayne.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/shitbox.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/solscape.webp` | 1600 × 840 | WEBP | launcher game / site art |
@@ -67,8 +79,8 @@ Every 2D file in this checkout (72 files), including archives and documentation 
 | `public/img/faces/retardio-85.webp` | 200 × 200 | WEBP | character portrait |
 | `public/img/hog.webp` | 800 × 420 | WEBP | UI / room / deck texture |
 | `public/img/radbros/radbro-2564.webp` | 265 × 500 | WEBP | character portrait |
-| `public/img/radbros/radbro-3704.webp` | 242 × 500 | WEBP | character portrait |
-| `public/img/radbros/radbro-3710.webp` | 242 × 500 | WEBP | character portrait |
+| `public/img/radbros/radbro-3704.webp` | 295 × 500 | WEBP | character portrait |
+| `public/img/radbros/radbro-3710.webp` | 307 × 500 | WEBP | character portrait |
 | `public/img/radbros/radbro-4764-hero.webp` | 719 × 1100 | WEBP | character portrait |
 | `public/img/radbros/radbro-4764.webp` | 285 × 500 | WEBP | character portrait |
 | `public/img/radbros/radbro-652.webp` | 267 × 500 | WEBP | character portrait |
@@ -86,13 +98,18 @@ Every 2D file in this checkout (72 files), including archives and documentation 
 | `public/img/thumb/pokerbros.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radbrawl.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radfighter.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/radops.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/radpayne.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/radrun.webp` | 420 × 236 | WEBP | launcher game / site art |
+| `public/img/thumb/radops-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radops.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
+| `public/img/thumb/radpayne-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radpayne.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
+| `public/img/thumb/radrun-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radrun.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/radtap.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/radtap.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/radzombies.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/rbgo.webp` | 420 × 236 | WEBP | launcher game / site art |
+| `public/img/thumb/radzombies-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radzombies.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
+| `public/img/thumb/rbgo-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/rbgo.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/retardiopayne.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/sanic.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/shitbox.webp` | 420 × 236 | WEBP | launcher game / site art |

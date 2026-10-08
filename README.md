@@ -48,7 +48,7 @@ down the page. With JS the same markup becomes one screen with no page scroll.
 Add an entry to `projects` in `src/projects.js`. `group: 'games'` gets a cartridge on Games and
 its key art fills the screen (`image`, 1600×900 webp in `public/img/art/`); `group: 'sites'` gets
 a grey cartridge on Sites and its 800×420 screenshot in the preview monitor. Both want a
-cartridge label in `public/img/thumb/` (420×236 webp), a `shell` colour for the plastic and an
+textless cartridge label in `public/img/thumb/`, composed for a centre-square crop, a `shell` colour for the plastic and an
 `accent` for the glow. A game's `cast` lists who you can play as (by crew `num`); Crew reads it
 for each one's "in" list.
 

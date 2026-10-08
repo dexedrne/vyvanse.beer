@@ -20,7 +20,7 @@
 //   links     [{ label, href }]; the first one is the main action and should match `url`
 //   image     optional { src, width, height, alt } in public/img/: a game's key art (it fills
 //             the screen behind the menu) or a site's 800x420 screenshot (its preview monitor)
-//   thumb     optional cartridge label in public/img/thumb/ (420x236 webp)
+//   thumb     optional cartridge label in public/img/thumb/ (textless, safe for a centre-square crop)
 //   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
 //   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
 //   of        games only: the cmd of the game this is an edition of. An edition is its own site,
@@ -47,11 +47,10 @@ export const groups = [
   { id: 'sites', title: 'Sites I built', line: 'Websites I made: my own Solscape, and sites for other people’s projects.' },
 ];
 
-// The older games' cast; each updated game lists its own crew below.
-const ALL = ['652', '4764', '2564', '723', '555', '85'];
-// RadPayne's own roster: the four Radbros (its Retardios moved to RetardioPayne)
-const RADBROS = ['652', '4764', '2564', '723'];
 const MAIN_CAST = ['4764', '652', '3704', '3710'];
+// The runner and shooters' Crew cards; RadPayne's Retardios are in its own edition.
+const RADBROS = [...MAIN_CAST, '723', '2564'];
+const ALL = [...RADBROS, '555', '85'];
 
 export const projects = [
   {
@@ -63,7 +62,7 @@ export const projects = [
     name: 'SPIDERTAG',
     kind: 'Web-slinger tag on the rooftops, the Robinhood Chain game',
     blurb:
-      'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Five Radbros and the two Retardios to play as. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
+      'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Seven Radbros and the two Retardios to play as. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://spidertag.vyvanse.beer',
     frame: true,
     links: [
@@ -71,15 +70,15 @@ export const projects = [
       { label: '$SPIDERTAG token', href: 'https://token.spidertag.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
-    thumb: '/img/thumb/radrun.webp',
+    thumb: '/img/thumb/radrun-cast2.webp',
     shell: '#3d2263',
     accent: '#ff5fd2',
     cast: ALL,
     image: {
-      src: '/img/art/radrun.webp',
+      src: '/img/art/radrun-cast2.webp',
       width: 1600,
       height: 900,
-      alt: 'SPIDERTAG: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Cousin Classic #85 web-swing and wingsuit-glide over rain-slick neon rooftops at dusk.',
+      alt: 'SPIDERTAG: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 swing over neon rooftops, with #555 and #85 behind them, a roadster and the cowboy\'s truck below.',
     },
     credit: {
       before: 'Built on',
@@ -104,16 +103,16 @@ export const projects = [
       { label: 'Play', href: 'https://radpayne.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radpayne' },
     ],
-    thumb: '/img/thumb/radpayne.webp',
+    thumb: '/img/thumb/radpayne-cast2.webp',
     shell: '#1e2a3b',
     accent: '#7cc4ff',
     cast: RADBROS,
     edition: { label: 'Radbros', face: '4764' },
     image: {
-      src: '/img/art/radpayne.webp',
+      src: '/img/art/radpayne-cast2.webp',
       width: 1600,
       height: 900,
-      alt: 'RadPayne: Radbros #4764, #652, #723 and #2564 dive through the rain in bullet time outside a neon nightclub, pistols blazing, shell casings in the air, the Milady gang shooting back.',
+      alt: 'RadPayne: #4764, #652, yellow-haired #3704 and green-haired #3710 dive through neon rain in bullet time, pistols blazing as the Milady gang shoots back.',
     },
     credit: {
       before: 'Built on',
@@ -166,19 +165,19 @@ export const projects = [
     name: 'RBGO',
     kind: 'First-person bomb-defusal shooter, early preview',
     blurb:
-      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Four Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
+      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Six Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
-    thumb: '/img/thumb/rbgo.webp',
+    thumb: '/img/thumb/rbgo-cast2.webp',
     shell: '#5c4228',
     accent: '#f2b45c',
     cast: ALL,
     image: {
-      src: '/img/art/rbgo.webp',
+      src: '/img/art/rbgo-cast2.webp',
       width: 1600,
       height: 900,
-      alt: 'RBGO: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 plant the bomb in a sunlit desert bazaar under big painted A and B signs.',
+      alt: 'RBGO: #4764, #652, yellow-haired #3704 and green-haired #3710 plant and defend the bomb in a sunlit bazaar, with #555 by a red roadster and the cowboy by his truck behind.',
     },
     credit: {
       before: 'Built on',
@@ -195,19 +194,19 @@ export const projects = [
     name: 'RadOps',
     kind: 'First-person team deathmatch, early preview',
     blurb:
-      'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Four Radbros and two Retardios, a gun picked at every spawn, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
+      'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Six Radbros and two Retardios, a gun picked at every spawn, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
-    thumb: '/img/thumb/radops.webp',
+    thumb: '/img/thumb/radops-cast2.webp',
     shell: '#1d4746',
     accent: '#ff8fb1',
     cast: ALL,
     image: {
-      src: '/img/art/radops.webp',
+      src: '/img/art/radops-cast2.webp',
       width: 1600,
       height: 900,
-      alt: 'RadOps: Radbros #4764, #652, #723 and #2564 with the Retardio boys Cousin #555 and Classic #85 trade fire across a pastel cul-de-sac, a school bus, a box truck and a water tower behind.',
+      alt: 'RadOps: #4764, #652, yellow-haired #3704 and green-haired #3710 trade fire across a pastel cul-de-sac, with #555 and #85 behind, a school bus, a roadster and the cowboy\'s truck.',
     },
     credit: {
       before: 'Built on',
@@ -228,16 +227,16 @@ export const projects = [
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
-    thumb: '/img/thumb/radzombies.webp',
+    thumb: '/img/thumb/radzombies-cast2.webp',
     shell: '#3c1838',
     accent: '#ff8a3d',
     cast: ALL,
     edition: { label: 'Radbros', face: '4764' },
     image: {
-      src: '/img/art/radzombies.webp',
+      src: '/img/art/radzombies-cast2.webp',
       width: 1600,
       height: 900,
-      alt: 'RadZombies: Radbros #4764, #652, #723 and #2564 stand back to back in the auditorium of a derelict neon picture palace, zombie Radbros closing in, their guns crackling fire orange, ice blue and lightning violet.',
+      alt: 'RadZombies: #4764, #652, yellow-haired #3704 and green-haired #3710 stand back to back in a derelict neon picture palace, zombies closing in, their guns crackling orange, blue and violet.',
     },
     credit: {
       before: 'Built on',
