@@ -12,11 +12,13 @@ painting with its footer typography removed; RADTAP uses its new landscape title
 cartridge labels are smaller exports of the corresponding 1600 × 900 paintings. The two new 200 × 200 portraits match the existing NFT bust style; their transparent full-body
 Crew fallbacks are 242 × 500 WebP.
 
-SPIDERTAG, RadPayne, RBGO, RadOps and RadZombies now use their games' main-four paintings at fresh
-`*-cast2.webp` URLs. Their 1600 × 900 backdrops retain the prior size and lossy WebP format. Their new
-512 × 512 cartridge labels come from the textless keys, with the whole wide illustration contained
-in the centre square: no wordmark, title or tagline. NFT shirt prints remain. #555 stays by the roadster
-where present; the background cowboy is the truck driver. Each old backdrop and cartridge label is
+SPIDERTAG, RadPayne, RBGO, RadOps and RadZombies use their games' main-four paintings at
+`*-cast2.webp` backdrop URLs. Their 1600 × 900 backdrops retain the prior size and lossy WebP format.
+Their 512 × 512 cartridge labels at fresh `*-square.webp` URLs recompose each scene into a square,
+with all four characters centred and fully in frame. The scene fills every edge, with no bars or words.
+The cartridge label is 4:3 with `object-fit: cover`, so the square's top and bottom 12.5% are cropped;
+the characters fit inside that area. Labels retain the original lossy WebP quality 90, method 6.
+The previous `*-cast2.webp` labels remain byte-for-byte beside them. Each earlier backdrop and label is
 kept beside the new files as `*.prev.webp`, excluded by the existing build rule. The two Retardios-only
 editions retain their images and Crew membership.
 
@@ -38,7 +40,7 @@ node --input-type=module -e 'import { globSync } from "node:fs"; import assert f
 ```
 
 
-Every 2D file in this checkout (82 files), including archives and documentation captures. Loading screens use the title art or code; there is no separate raster loading illustration.
+Every 2D file in this checkout (87 files), including archives and documentation captures. Loading screens use the title art or code; there is no separate raster loading illustration.
 
 | File | Size | Format | Use |
 | --- | --- | --- | --- |
@@ -98,17 +100,22 @@ Every 2D file in this checkout (82 files), including archives and documentation 
 | `public/img/thumb/pokerbros.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radbrawl.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radfighter.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/radops-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radops-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
+| `public/img/thumb/radops-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
 | `public/img/thumb/radops.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
-| `public/img/thumb/radpayne-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radpayne-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
+| `public/img/thumb/radpayne-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
 | `public/img/thumb/radpayne.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
-| `public/img/thumb/radrun-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radrun-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
+| `public/img/thumb/radrun-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
 | `public/img/thumb/radrun.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/radtap.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/radtap.webp` | 420 × 236 | WEBP | launcher game / site art |
-| `public/img/thumb/radzombies-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/radzombies-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
+| `public/img/thumb/radzombies-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
 | `public/img/thumb/radzombies.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
-| `public/img/thumb/rbgo-cast2.webp` | 512 × 512 | WEBP | launcher game / site art |
+| `public/img/thumb/rbgo-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
+| `public/img/thumb/rbgo-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
 | `public/img/thumb/rbgo.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/retardiopayne.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/sanic.webp` | 420 × 221 | WEBP | launcher game / site art |

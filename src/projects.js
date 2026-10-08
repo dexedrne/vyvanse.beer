@@ -20,7 +20,7 @@
 //   links     [{ label, href }]; the first one is the main action and should match `url`
 //   image     optional { src, width, height, alt } in public/img/: a game's key art (it fills
 //             the screen behind the menu) or a site's 800x420 screenshot (its preview monitor)
-//   thumb     optional cartridge label in public/img/thumb/ (textless, safe for a centre-square crop)
+//   thumb     optional cartridge label in public/img/thumb/ (textless, safe for a centred 4:3 crop)
 //   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
 //   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
 //   of        games only: the cmd of the game this is an edition of. An edition is its own site,
@@ -70,7 +70,7 @@ export const projects = [
       { label: '$SPIDERTAG token', href: 'https://token.spidertag.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
     ],
-    thumb: '/img/thumb/radrun-cast2.webp',
+    thumb: '/img/thumb/radrun-square.webp',
     shell: '#3d2263',
     accent: '#ff5fd2',
     cast: ALL,
@@ -103,7 +103,7 @@ export const projects = [
       { label: 'Play', href: 'https://radpayne.vyvanse.beer' },
       { label: 'Source', href: 'https://github.com/dexedrne/radpayne' },
     ],
-    thumb: '/img/thumb/radpayne-cast2.webp',
+    thumb: '/img/thumb/radpayne-square.webp',
     shell: '#1e2a3b',
     accent: '#7cc4ff',
     cast: RADBROS,
@@ -169,7 +169,7 @@ export const projects = [
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
-    thumb: '/img/thumb/rbgo-cast2.webp',
+    thumb: '/img/thumb/rbgo-square.webp',
     shell: '#5c4228',
     accent: '#f2b45c',
     cast: ALL,
@@ -198,7 +198,7 @@ export const projects = [
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
-    thumb: '/img/thumb/radops-cast2.webp',
+    thumb: '/img/thumb/radops-square.webp',
     shell: '#1d4746',
     accent: '#ff8fb1',
     cast: ALL,
@@ -227,7 +227,7 @@ export const projects = [
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
-    thumb: '/img/thumb/radzombies-cast2.webp',
+    thumb: '/img/thumb/radzombies-square.webp',
     shell: '#3c1838',
     accent: '#ff8a3d',
     cast: ALL,
