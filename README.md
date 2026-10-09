@@ -116,7 +116,7 @@ the right item. An edition's own name lands on its game, on that edition: `#game
 ## Games in the player
 
 PLAY runs a game in a full-screen iframe
-(`allow="gamepad; fullscreen; autoplay; clipboard-write; xr-spatial-tracking"`) behind a loading
+(`allow="gamepad; fullscreen; autoplay; accelerometer; clipboard-write; xr-spatial-tracking"`) behind a loading
 card: its art, its wordmark, and how to get back. While it's open the menu draws nothing at all
 (no water, no duo, no rain), the ticker's clock and price checks stop, the music fades out, and
 the menu is inert, so the game has the whole machine. Leaving unloads the game and puts the
@@ -140,7 +140,7 @@ Getting back to the menu, without clashing with the games' own pause (Esc / Star
 **An optional hook for the games.** A game can send the player back itself, which gives the
 keyboard a way back from inside the game (say, a "Back to the menu" line in its pause menu, shown
 only when it's framed). The menu already listens for it, and only from the playing game's own
-origin:
+origin and iframe window:
 
 ```js
 if (window.top !== window) window.parent.postMessage({ type: 'vyvanse:menu' }, 'https://vyvanse.beer');
@@ -150,6 +150,39 @@ Some browsers only open new tabs (and allow full screen and sound) after a click
 don't count a pad press as one. Chromium-based ones do count it. Where a `frame: false` game
 picked with a pad can't get its tab, the menu asks instead: open it in this tab (Back in the
 browser returns here) or click New tab.
+
+### iPhone / installed PWA
+
+In Safari, use **Share → Add to Home Screen → Open as Web App**. The same game shelf fills the
+screen, with the existing rooftop, puddle duo, music and tip jar. Pair the DualSense in iOS
+Bluetooth settings, press a pad button to expose it to Safari, and use ✕ to play, ○ to go back,
+L1/R1 for sections and the d-pad/stick to select. L3 toggles music (M on a keyboard); the music
+button also starts audio after the first tap. Create + Options held for one second unloads the
+game and returns to the shelf. Touch supports cartridge taps, swiping the artwork, swiping the
+section bar, and safe-area back buttons. Portrait works for browsing; games ask for landscape.
+
+The production build generates `sw.js` from an exact list of launcher files: scripts, fonts,
+art, the menu's models, music and install assets. Games, APIs and wallets are never cached.
+Offline starts the installed shelf and shows a card; games need a connection. Navigation uses
+the network with a short fallback timeout, keeping installed HTML with its own art until a new
+complete shell activates. Each content change gets a new shell cache; an
+update waits until the visitor clicks **update** in the menu or closes old launcher windows.
+Installing an update never reloads an active game. Other open launcher windows also pick up
+the new shell, deferring their reload until play ends.
+
+Games receive `?device=phone` only on phone hardware and an authenticated live device message.
+The launcher also relays pad snapshots to the selected game's exact origin for WebKit versions
+that do not expose pads inside cross-site iframes. Phase 2 games must include the tiny shim and
+disable split screen on phones. See [the device/pad contract](docs/device-flag.md).
+
+`scripts/smoke-pwa.mjs` checks the production build with the Playwright iPhone 16 Pro portrait
+and landscape WebKit descriptors plus desktop Chromium. It uses a cross-origin fixture for
+device/relay checks, tests offline launch and installed landscape geometry, and writes at most
+three screenshots. Phone UI checks use WPE's existing poster fallback; Chromium renders the
+live water/duo. Physical Bluetooth input and iOS compositor insets still require a real device. Provide a
+Playwright installation via `PLAYWRIGHT_MODULE` if it is not in the local dependencies. Run
+with the owner smoke TMPDIR, `nice -n 10`, and ports 5960–5964; browsers are headless, audio is
+muted, and processes are stopped by their recorded PIDs.
 
 ## Music and sounds
 

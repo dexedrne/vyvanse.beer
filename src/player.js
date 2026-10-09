@@ -16,6 +16,8 @@
 
 import { h, icon } from './dom.js';
 import { shortUrl } from './projects.js';
+import { gameUrl, deviceFlags, isPhone } from './device.js';
+import { createPadRelay } from './pad-relay.js';
 
 const HOLD_MS = 1000;
 const SHOW_AFTER = 160; // the ring only shows once it's clearly a hold
@@ -26,6 +28,8 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
   let current = null;
   let hold = { t: 0, by: null };
   let timer = 0;
+  let relay = null;
+  let relayFrame = 0;
   let readyTimer = 0;
   let lastFocus = null;
 
@@ -43,6 +47,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
         <button class="player__btn player__back" type="button"></button>
         <a class="player__btn player__btn--tab" target="_blank" rel="noopener"></a>
       </div>
+      <p class="player__rotate">Turn your phone to play<br><span>landscape · controller ready</span></p>
       <div class="player__hold" hidden><span class="player__ring"></span><span>back to the menu</span></div>`;
     el.querySelector('.player__back').append(icon('back'), 'menu');
     el.querySelector('.player__btn--tab').append(icon('ext'));
@@ -82,7 +87,8 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     card.querySelector('.cmd').textContent = `> ${p.cmd}.exe`;
     card.querySelector('.player__how').innerHTML = how();
     const tab = el.querySelector('.player__btn--tab');
-    tab.href = p.url;
+    const url = gameUrl(p.url);
+    tab.href = url;
     tab.title = `Open ${shortUrl(p.url)} in a new tab instead`;
     tab.setAttribute('aria-label', tab.title);
     el.querySelector('.player__back').setAttribute('aria-label', 'Back to the menu');
@@ -92,8 +98,8 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     frame = h('iframe', {
       class: 'player__frame',
       title: p.name,
-      src: p.url,
-      allow: 'gamepad; fullscreen; autoplay; clipboard-write; xr-spatial-tracking',
+      src: url,
+      allow: 'gamepad; fullscreen; autoplay; accelerometer; clipboard-write; xr-spatial-tracking',
       allowfullscreen: true,
       referrerpolicy: 'strict-origin-when-cross-origin',
     });
@@ -102,14 +108,26 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     frame.addEventListener('load', () => {
       if (loaded || frame?.src === 'about:blank') return;
       loaded = true;
+      relay?.refresh();
       // keep the card up for a beat so it can be read, then hand the game the focus
       readyTimer = setTimeout(ready, Math.max(0, 1400 - (performance.now() - t0)));
     });
     el.prepend(frame);
+    // contentWindow exists only after attachment on WebKit.
+    relay = createPadRelay({ target: frame.contentWindow, url, pads, device: live => deviceFlags(navigator, live) });
+    const relayPads = () => {
+      if (!current) return;
+      relay.tick();
+      relayFrame = requestAnimationFrame(relayPads);
+    };
+    relayFrame = requestAnimationFrame(relayPads);
+    el.classList.toggle('player--phone', isPhone());
     el.hidden = false;
     paintGlyphs?.(el);
     el.querySelector('.player__back').focus({ preventScroll: true });
     onOpen?.(p);
+    // iOS may decline orientation locking; the portrait player supplies a rotate hint.
+    if (isPhone()) screen.orientation?.lock?.('landscape').catch(() => {});
     timer = setInterval(watchPads, 50);
     // an entry of its own, so the browser's Back (or a phone's back gesture) leaves the game
     // for the menu instead of leaving the site
@@ -141,6 +159,9 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     // take the game's entry back off the history (Back did that already when it closed it)
     if (!quiet && !popped && history.state?.vyvPlay) history.back();
     clearInterval(timer);
+    cancelAnimationFrame(relayFrame);
+    relay = null;
+    if (isPhone()) screen.orientation?.unlock?.();
     clearTimeout(readyTimer);
     stopHold();
     // unload the game for real: its loop, its sound and its WebGL all go with the document
@@ -193,9 +214,10 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
       return current;
     },
     // what the games can't do yet: ask to go back (see README, "Games in the player")
-    message(data, origin) {
-      if (!current || new URL(current.url).origin !== origin) return;
-      if (data?.type === 'vyvanse:menu') close();
+    message(e) {
+      if (!current || !relay?.accepts(e)) return;
+      if (e.data?.type === 'vyvanse:menu') close();
+      else if (e.data?.type === 'vyvanse:ready') relay.refresh();
     },
   };
 }

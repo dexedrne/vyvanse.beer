@@ -5,6 +5,7 @@ import { h } from '../dom.js';
 import { shortUrl, playsIn } from '../projects.js';
 import { neofetch } from './fetch.js';
 import { openTip } from '../tip/open.js';
+import { gameUrl } from '../device.js';
 
 const norm = (s) => s.toLowerCase().replace(/^[#$]+/, '').trim();
 
@@ -77,13 +78,15 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
 
   // Games (and sites) that allow framing play right here, in the player; the rest get a new tab.
   function launch(p, ctx, want = null) {
+    if (shell.canPlay?.() === false) return;
     if (howFor(p, want) === 'here') {
       term.print(line('loading ', strong(p.name), muted(` (${shortUrl(p.url)}). hold esc, or view + menu on a pad, to come back.`)));
       setTimeout(() => shell.play(p), ctx.source === 'terminal' ? 350 : 0);
       return;
     }
-    const ok = openTab(p.url);
-    if (!ok) term.print(line('your browser blocked the new tab. open it here: ', link(p.url)));
+    const url = gameUrl(p.url);
+    const ok = openTab(url);
+    if (!ok) term.print(line('your browser blocked the new tab. open it here: ', link(url)));
     else if (want === 'here') term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't play here.`));
     else term.print(line('opened ', strong(p.name), ' in a new tab ', muted(`(${shortUrl(p.url)})`)));
   }

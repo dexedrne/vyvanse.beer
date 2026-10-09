@@ -12,7 +12,8 @@
 //   details              Y / I: the whole blurb and every link
 //   wave                 X / G: one of the duo waves
 //   fullscreen           View / Select / F (on a pad: on release, and not held with Menu)
-//   music sfx os         M, N, / (keyboard only)
+//   music sfx            M / L3, N / R3
+//   os                   / (keyboard only)
 //   grab                 hold Menu (Options) / R: pick up the selected cartridge to move it
 //                        (src/main.js); a tap on Menu is still 'start'
 //
@@ -28,6 +29,8 @@ const STANDARD = {
   5: 'next',
   6: 'edprev',
   7: 'ednext',
+  10: 'music',
+  11: 'sfx',
 };
 // View and Menu act when they're let go, and only if the other one wasn't held with them: held
 // together they're the player's way back to the menu, not full screen plus play
@@ -36,6 +39,7 @@ const DIRS = { 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
 
 // what each glyph reads as, per input
 export const GLYPHS = {
+  touch: { a: 'tap', b: 'back', x: 'tap', y: 'details', lb: 'swipe', rb: 'swipe', lt: '↑', rt: '↓', start: 'play', select: '⛶', move: 'swipe', vmove: 'tap', hold: 'Create + Options', grab: 'hold' },
   kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', lt: '↑', rt: '↓', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc', grab: 'R' },
   xbox: { a: 'A', b: 'B', x: 'X', y: 'Y', lb: 'LB', rb: 'RB', lt: 'LT', rt: 'RT', start: 'Menu', select: 'View', move: '✚', vmove: '✚', hold: 'View + Menu', grab: 'Menu' },
   ps: { a: '✕', b: '○', x: '□', y: '△', lb: 'L1', rb: 'R1', lt: 'L2', rt: 'R2', start: 'Options', select: 'Create', move: '✚', vmove: '✚', hold: 'Create + Options', grab: 'Options' },
@@ -46,14 +50,14 @@ const isPs = (id = '') => /054c|playstation|dualshock|dualsense|ps[345]/i.test(i
 
 export function createInput({ act, mode, onScheme }) {
   const root = document.documentElement;
-  let scheme = 'kb';
   let device = matchMedia('(pointer: coarse)').matches ? 'touch' : 'kb'; // kb | mouse | touch | xbox | ps
+  let scheme = device;
 
   function setDevice(d) {
     if (d === device) return;
     device = d;
     root.dataset.input = d;
-    const s = d === 'xbox' || d === 'ps' ? d : 'kb';
+    const s = ['xbox', 'ps', 'touch'].includes(d) ? d : 'kb';
     if (s !== scheme) {
       scheme = s;
       paintGlyphs();
@@ -130,9 +134,12 @@ export function createInput({ act, mode, onScheme }) {
   let held = { dir: null, next: 0 };
   let timer = 0;
   let rumbleOk = true;
-  const EVERY = 8;
+  const EVERY = 16;
 
-  const list = () => [...(navigator.getGamepads?.() || [])].filter((p) => p && p.connected !== false);
+  const list = () => {
+    try { return [...(navigator.getGamepads?.() || [])].filter(p => p && p.connected !== false); }
+    catch { return []; } // policy denial or older WebKit: keyboard/touch keep working
+  };
 
   function stick(gp) {
     const [x = 0, y = 0] = gp.axes;
@@ -144,9 +151,14 @@ export function createInput({ act, mode, onScheme }) {
 
   function poll() {
     const pads = list();
+    for (const i of prev.keys()) if (!pads.some(p => p.index === i)) {
+      prev.delete(i);
+      pair.delete(i);
+      menuHold.delete(i);
+    }
     if (!pads.length) {
-      clearInterval(timer);
-      timer = 0;
+      held = { dir: null, next: 0 };
+      if (device === 'ps' || device === 'xbox') setDevice(matchMedia('(pointer: coarse)').matches ? 'touch' : 'kb');
       return;
     }
     const now = performance.now();
@@ -192,8 +204,10 @@ export function createInput({ act, mode, onScheme }) {
     timer = setInterval(poll, EVERY);
   }
   addEventListener('gamepadconnected', start);
-  addEventListener('gamepaddisconnected', () => list().length || setDevice('kb'));
-  if (list().length) start();
+  addEventListener('gamepaddisconnected', poll);
+  // A paired pad may only become visible after its first press, without a fresh connection
+  // event. Keep discovering it; never stop permanently after an empty WebKit snapshot.
+  start();
 
   return {
     get scheme() {

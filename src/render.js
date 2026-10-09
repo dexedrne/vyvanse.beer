@@ -213,6 +213,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   <p class="duo__hint js-only" id="duo-hint" hidden><span class="duo__hint-mouse">click them to wave</span><span class="duo__hint-pad">${glyph('x', 'G')} wave</span></p>
 
   <header class="top">
+    <button class="tog menu-back js-only" id="menu-back" type="button" aria-label="Back to Games">${icon('back')}</button>
     <h1 class="sign"><a href="/" aria-label="${esc(site.name)}, games, 3D Radbros and websites by ${esc(site.handle)}"><span class="host">${esc(host)}</span><span class="tld">.${esc(tld.join('.'))}</span></a></h1>
     <nav class="tabs" aria-label="Sections">
       <button class="bump js-only" type="button" data-step="-1" aria-label="Previous section" tabindex="-1">${glyph('lb', 'Q')}</button>
@@ -220,8 +221,8 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       <button class="bump js-only" type="button" data-step="1" aria-label="Next section" tabindex="-1">${glyph('rb', 'E')}</button>
     </nav>
     <div class="top__right js-only">
-      <button class="tog" id="music" type="button" aria-pressed="false" title="Music (M)">${icon('note', 'on')}${icon('note-off', 'off')}<span class="tog__label">music</span></button>
-      <button class="tog" id="sfx" type="button" aria-pressed="false" title="Menu sounds (N)">${icon('sfx', 'on')}${icon('sfx-off', 'off')}<span class="tog__label">sfx</span></button>
+      <button class="tog" id="music" type="button" aria-pressed="false" aria-label="Music (M, L3 on a controller)" title="Music (M, L3)">${icon('note', 'on')}${icon('note-off', 'off')}<span class="tog__label">music</span></button>
+      <button class="tog" id="sfx" type="button" aria-pressed="false" aria-label="Menu sounds (N, R3 on a controller)" title="Menu sounds (N, R3)">${icon('sfx', 'on')}${icon('sfx-off', 'off')}<span class="tog__label">sfx</span></button>
       <button class="tog tog--fs" id="fs" type="button" aria-pressed="false" title="Full screen (F)">${icon('fs')}<span class="vh">Full screen</span></button>
       <button class="tip-pill" type="button" data-tip aria-haspopup="dialog"><span class="coin" aria-hidden="true">◎</span><span><span class="tip-pill__what">tip </span><b>vyvanse.sol</b></span></button>
     </div>

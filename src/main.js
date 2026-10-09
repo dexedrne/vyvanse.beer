@@ -11,11 +11,13 @@ import { createTicker } from './ticker.js';
 import { openTip, loadTip } from './tip/open.js';
 import { readOrder, writeOrder, arrange } from './order.js';
 import { createSort, flip } from './sort.js';
+import { createPwa } from './pwa.js';
+import { gameUrl } from './device.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const phone = matchMedia('(max-width: 760px)');
+const phone = matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse) and (max-width: 960px) and (max-height: 500px)');
 
 const screen = $('#screen');
 const duoEl = $('#duo');
@@ -270,6 +272,7 @@ function paint(tab) {
       }
     });
     const now = onItem(tab);
+    if (tab === 'games' || tab === 'sites') for (const link of $$('a[data-act="play"], a[data-newtab]', now)) link.href = gameUrl(at(tab, i).url);
     // the same game, another edition: crossfade instead of the wipe a new game gets
     if (was && now && was !== now && was.dataset.game && was.dataset.game === now.dataset.game) crossfade(was, now);
     rowMarks(tab);
@@ -519,14 +522,16 @@ function current() {
 
 function play(p, { from } = {}) {
   if (!p) return;
+  if (!pwa.canPlay()) return;
   audio.blip('ok');
   if (p.frame) return player.open(p);
   // it can't run inside the page: a new tab, which a pad press may not be allowed to open
-  if (!openTab(p.url) && from === 'pad') {
+  const url = gameUrl(p.url);
+  if (!openTab(url) && from === 'pad') {
     askTab({
       title: p.name,
       text: `${p.name} can’t run inside this page, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
-      url: p.url,
+      url,
     });
   }
 }
@@ -567,6 +572,7 @@ function details() {
 }
 
 function back() {
+  if (!pwa.card.hidden) return pwa.dismiss();
   if (closeAsk()) return;
   const dlg = $('dialog[open]');
   if (dlg) return dlg.close();
@@ -595,7 +601,7 @@ document.addEventListener('fullscreenchange', () => fsBtn?.setAttribute('aria-pr
 // ---- the modal walk: arrows (or the d-pad) move through a dialog's buttons ----
 
 function openModal() {
-  return (ask && !ask.hidden && ask) || $('dialog[open]') || (os?.isOpen() && os.el) || null;
+  return (ask && !ask.hidden && ask) || (!pwa.card.hidden && pwa.card) || $('dialog[open]') || (os?.isOpen() && os.el) || null;
 }
 function walk(dir) {
   const m = openModal();
@@ -703,16 +709,20 @@ const player = createPlayer({
   onClose(p) {
     screen.classList.remove('is-away');
     screen.inert = false;
-    audio.duck(false);
     const tab = locate(p);
     show(tab, { sound: false });
+    // history.back() is asynchronous. Save the menu URL before a deferred update reloads.
+    if (pwa.resume()) return;
+    audio.duck(false);
     stage?.resume();
     ticker?.resume();
     // back on the same cartridge
     controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
   },
 });
-addEventListener('message', (e) => player.message(e.data, e.origin));
+addEventListener('message', (e) => player.message(e));
+const pwa = createPwa({ playing: () => !!player.current, toast });
+$('#menu-back').addEventListener('click', back);
 
 // ---- mouse and touch ----
 
@@ -756,6 +766,7 @@ document.addEventListener('click', (e) => {
   if (more) return details();
   const playLink = e.target.closest('.panel a[data-act="play"]');
   if (playLink) {
+    if (!pwa.canPlay()) return e.preventDefault();
     const p = current();
     if (p?.frame) {
       e.preventDefault();
@@ -763,7 +774,10 @@ document.addEventListener('click', (e) => {
     } else audio.blip('ok'); // the link opens the new tab itself
     return;
   }
-  if (e.target.closest('[data-newtab]')) return;
+  if (e.target.closest('[data-newtab]')) {
+    if (!pwa.canPlay()) e.preventDefault();
+    return;
+  }
   const tip = e.target.closest('[data-tip]');
   if (tip) {
     e.preventDefault();
@@ -790,16 +804,31 @@ document.addEventListener('focusin', (e) => {
 // swipe the art (phones) to move along the row
 let sx = 0;
 let sy = 0;
+let swipeTab = false;
+let swipeBlocked = false;
 screen.addEventListener('touchstart', (e) => {
+  swipeBlocked = e.touches.length !== 1 || mode() !== 'menu' || !!e.target.closest('dialog, .ask, .offline-card');
+  swipeTab = !!e.target.closest('.tabs');
   sx = e.touches[0].clientX;
   sy = e.touches[0].clientY;
 }, { passive: true });
 screen.addEventListener('touchend', (e) => {
-  if (e.target.closest('.row, .tabs, .menu, .tgroups, a, button')) return;
+  if (swipeBlocked || sorter.active || !e.changedTouches.length) return;
+  if (!swipeTab && e.target.closest('.row, .menu, .tgroups, a, button')) return;
   const dx = e.changedTouches[0].clientX - sx;
   const dy = e.changedTouches[0].clientY - sy;
-  if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4 && S.tab !== 'contact') move(dx < 0 ? 1 : -1);
+  if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+    if (swipeTab) tabStep(dx < 0 ? 1 : -1);
+    else if (S.tab !== 'contact') move(dx < 0 ? 1 : -1);
+  }
 }, { passive: true });
+screen.addEventListener('touchcancel', () => { swipeBlocked = true; }, { passive: true });
+// Only the menu suppresses pinch/double-tap/callouts; the game's document owns its gestures.
+for (const ev of ['touchstart', 'touchmove']) screen.addEventListener(ev, e => {
+  if (mode() === 'menu' && e.touches.length > 1 && e.cancelable) e.preventDefault();
+}, { passive: false });
+screen.addEventListener('gesturestart', e => mode() === 'menu' && e.preventDefault());
+screen.addEventListener('contextmenu', e => mode() === 'menu' && !e.target.closest('input, textarea') && e.preventDefault());
 
 // ---- the address bar keeps your place: #games/rbgo, #crew/85, #sites/sanic, #contact, #tip ----
 
@@ -835,7 +864,7 @@ function load() {
   if (t === 'tip') openTipJar();
   if (t === 'play' && id) {
     const p = projects.find(named);
-    if (p?.frame) player.open(p);
+    if (p?.frame && pwa.canPlay()) player.open(p);
   }
 }
 
@@ -845,10 +874,14 @@ function load() {
 function hints() {
   const hintsEl = $('#hints');
   const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
-  const pad = input.scheme !== 'kb';
+  const pad = input.scheme === 'ps' || input.scheme === 'xbox';
   const verb = { games: 'play', crew: 'get model', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
+  if (input.scheme === 'touch' && !moving) {
+    hintsEl.innerHTML = [hint(9, `tap to ${verb}`), hint(6, 'swipe to select'), hint(4, 'swipe tabs for sections')].join('');
+    return fitHints();
+  }
   if (moving) {
     const arrows = pad ? k('move') : '<span class="g">←</span><span class="g">→</span>';
     hintsEl.innerHTML = [hint(9, `${arrows} move it`), hint(8, `${k('a')} drop`), hint(7, `${k('b')} put back`), hint(5, `${k('y')} reset order`)].join('');
@@ -937,7 +970,8 @@ function layout() {
   const W = screen.clientWidth;
   const H = innerHeight;
   const ph = phone.matches;
-  box.wl = ph ? $('#backdrops').offsetHeight : Math.round(H * 0.655);
+  const compact = ph && W > H;
+  box.wl = compact ? Math.round(H * 0.61) : ph ? $('#backdrops').offsetHeight : Math.round(H * 0.655);
   screen.style.setProperty('--wl', `${box.wl}px`);
   for (const img of $$('.bd--lettered')) cutLettered(img);
   const m = duoMode();
@@ -954,12 +988,13 @@ function layout() {
     b = rel(vis);
   } else if (m === 'side') {
     const big = S.tab === 'contact';
-    const w = ph ? Math.round(W * 0.56) : Math.round(Math.min(W * (big ? 0.38 : 0.34), big ? 560 : 500));
-    const h = ph ? Math.round(w * 0.98) : Math.round(Math.min(H * (big ? 0.56 : 0.48), big ? 520 : 430));
+    const w = compact ? Math.round(W * 0.28) : ph ? Math.round(W * 0.56) : Math.round(Math.min(W * (big ? 0.38 : 0.34), big ? 560 : 500));
+    const h = compact ? Math.round(H * 0.48) : ph ? Math.round(w * 0.98) : Math.round(Math.min(H * (big ? 0.56 : 0.48), big ? 520 : 430));
     // feet just past the waterline, so there's floor below them for the whole reflection
     const feet = ph ? box.wl + 16 : box.wl + H * (big ? 0.05 : 0.045);
     const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 48;
-    b = { x: ph ? W - w : W - w - pad * 0.4, y: feet - h * FEET, w, h };
+    const safeRight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0;
+    b = { x: (ph ? W - w : W - w - pad * 0.4) - safeRight, y: feet - h * FEET, w, h };
   }
   box.b = b;
   if (b) {
@@ -1111,6 +1146,7 @@ function openOS(opts = {}) {
         contact,
         shell: {
           play: (p) => play(p),
+          canPlay: () => pwa.canPlay(),
           playing: () => player.current,
           stop: () => player.close(),
           go: (tab) => show(tab || 'games', { sound: false }),
