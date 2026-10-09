@@ -71,6 +71,8 @@ curl -sI https://example.com | grep -iE 'x-frame-options|frame-ancestors'
 
 No output means `frame: true` is fine and PLAY runs it inside the page. With `frame: false` it
 opens in a new tab, and the button and status line say so (Solscape, bitcorn and sanic).
+Phone games default to landscape; set `orientation: 'any'` for a game that also supports portrait,
+such as PokerBros. That skips the orientation lock and the player's rotate hint.
 
 ## Controls
 
@@ -161,7 +163,9 @@ Bluetooth settings, press a pad button to expose it to Safari, and use ✕ to pl
 L1/R1 for sections and the d-pad/stick to select. L3 toggles music (M on a keyboard); the music
 button also starts audio after the first tap. Create + Options held for one second unloads the
 game and returns to the shelf. Touch supports cartridge taps, swiping the artwork, swiping the
-section bar, and safe-area back buttons. Portrait works for browsing; games ask for landscape.
+section bar, and safe-area back buttons. Portrait works for browsing and PokerBros; other games
+ask for landscape. The manifest permits either orientation, and each game's player controls its
+landscape lock and rotate hint.
 
 The production build generates `sw.js` from an exact list of launcher files: scripts, fonts,
 art, the menu's models, music and install assets. Games, APIs and wallets are never cached.

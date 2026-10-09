@@ -14,7 +14,7 @@ test('manifest installs the launcher with full-size, maskable icons and stable s
   assert.equal(new URL(m.start_url, 'https://vyvanse.beer').pathname, '/');
   assert.equal(m.display, 'fullscreen');
   assert.deepEqual(m.display_override, ['fullscreen', 'standalone']);
-  assert.equal(m.orientation, 'landscape');
+  assert.equal(m.orientation, 'any');
   assert.equal(m.theme_color, '#120c20');
   assert.equal(m.background_color, '#120c20');
   for (const size of [192, 512]) for (const purpose of ['any', 'maskable']) {
