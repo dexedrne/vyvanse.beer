@@ -62,7 +62,7 @@ export const projects = [
     name: 'SPIDERTAG',
     kind: 'Web-slinger tag on the rooftops, the Robinhood Chain game',
     blurb:
-      'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Seven Radbros and the two Retardios to play as. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
+      'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Play as the main four, cowboy #723, ghost #2564 or the two Retardios. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://spidertag.vyvanse.beer',
     frame: true,
     links: [
@@ -255,7 +255,7 @@ export const projects = [
     name: 'ZombieTardio',
     kind: 'First-person zombies, Retardios only',
     blurb:
-      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85, with bots, up to four online or two on split screen. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
+      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85. Solo with the other as your bot teammate, or two players online or on split screen. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
     url: 'https://zombietardio.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://zombietardio.vyvanse.beer' }],
@@ -285,13 +285,14 @@ export const projects = [
     name: 'SHITBOX',
     kind: 'Odd jobs in a tired old four-door with a real manual',
     blurb:
-      "A tired 1993 four-door with a real five-speed and $25 to your name. Odd jobs in a small town with proper winters; the crew drive hatchbacks and think yours is a joke. A mountain pass for time trials, night battles and a rally stage, a county past the town line, and every season ends in a final. The city is nine minutes up the highway. Now online: bring your own build and cruise with up to eight. Keyboard or controller.",
+      "A tired 1993 four-door with a real five-speed and $25 to your name. Odd jobs in a small town with proper winters; the crew drive hatchbacks and think yours is a joke. A mountain pass for time trials, night battles and a rally stage, a county past the town line, and every season ends in a final. The city is nine minutes up the highway. Now online: bring your own build and cruise with up to ten, each in their own career. Play as Retardio Cousin Classic #85 in the career, or pick any of the eight crew drivers in online casual rooms. Keyboard or controller.",
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
     thumb: '/img/thumb/shitbox.webp',
     shell: '#3a1418',
     accent: '#ffb12a',
+    cast: ALL,
     image: {
       src: '/img/art/shitbox.webp',
       width: 1600,
@@ -356,14 +357,14 @@ export const projects = [
     name: 'RADBRAWL',
     kind: 'Platform fighter, up to four on one screen',
     blurb:
-      'A platform fighter with the crew on a wet neon rooftop. Up to four on one screen, any mix of keyboards, controllers and CPUs. Damage percent and stocks, launches off the edge, ledges, shields and dodges. #4764 with a katana, #85 with his fists, #723 with a revolver and a lasso, and #652. Training has an input display.',
+      'A platform fighter with the crew on a wet neon rooftop. Up to four on one screen, any mix of keyboards, controllers and CPUs. Damage percent and stocks, launches off the edge, ledges, shields and dodges. #4764 with a katana, #85 with his fists, #723 with a revolver and a lasso, #652, yellow-haired #3704 with a launcher and green-haired #3710 with fan gusts. Training has an input display.',
     url: 'https://radbrawl.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radbrawl.vyvanse.beer' }],
     thumb: '/img/thumb/radbrawl.webp',
     shell: '#2a1e3a',
     accent: '#ff5f9e',
-    cast: ['4764', '85', '723', '652'],
+    cast: ['4764', '85', '723', '652', '3704', '3710'],
     edition: { label: 'Platform', face: '723' },
     image: {
       src: '/img/art/radbrawl.webp',
@@ -540,15 +541,15 @@ export const projects = [
 // `image` is his render, shown until then (and without WebGL).
 export const crew = {
   title: 'The crew',
-  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardios #555 and #85, cowboy #723 and an occasional ghost #2564, built in 3D.',
+  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85, truck guy #723 and rare ghost #2564. All eight built in 3D, rigged and animated.',
   playIn: 'spidertag',
-  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbros-3d-all.zip', label: 'the original four, one .zip', size: '81 MB' },
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-eight.zip', label: 'all eight, one .zip', size: '161.8 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
   repo: {
     href: 'https://github.com/dexedrne/radbros-3d',
     label: 'Free to use: models on GitHub',
     license: { label: 'Viral Public License', href: 'https://viralpubliclicense.org/VPL.txt' },
-    line: 'Rigged and animated. Use them, remix them, put them in your game.',
+    line: 'Six Radbros in the repo; the two Retardios are built on the Radbro rig. Rigged and animated. Use them, remix them, put them in your game.',
   },
   members: [
     {
@@ -619,7 +620,7 @@ export const crew = {
       face: '/img/faces/radbro-2564.webp', // 200x200 crop for the character-select tile
       model: '/models/radbro2564-hero.glb',
       name: 'Radbro #2564',
-      line: 'The ghost. Foil hat, aviators, RAD RESPONSE vest.',
+      line: 'The rare ghost. Foil hat, aviators, RAD RESPONSE vest.',
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro2564-3d-model.zip', label: '3D model .zip', size: '20 MB' },
       image: {
         src: '/img/radbros/radbro-2564.webp',
@@ -655,7 +656,7 @@ export const crew = {
       face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
       model: '/models/retardio555-hero.glb',
       name: 'Retardio Cousin #555',
-      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee, and a red pop-up roadster.',
+      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee, and a red Miata.',
       repo: false,
       download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '13 MB' },
       image: {

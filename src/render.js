@@ -118,9 +118,10 @@ function crewItem(b, i, { crew, projects, shell }) {
   const plays = playsIn(projects, b.num);
   const own = b.repo === false;
   const file = b.download.href.split('/').pop();
+  const all = crew.downloadAll ? `<p class="fine"><a class="more-link" href="${esc(crew.downloadAll.href)}" download>${esc(crew.downloadAll.label)} (${esc(crew.downloadAll.size)})</a></p>` : '';
   const fine = own
     ? `<p class="credit">My own Retardio, built on the Radbro rig. Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>, like the Radbros: use him, remix him, put him in your game.</p>`
-    : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>${crew.downloadAll ? `, or the original four in <a href="${esc(crew.downloadAll.href)}" download>one .zip</a> (${esc(crew.downloadAll.size)})` : ''}. ${esc(crew.repo.line)}</p>`;
+    : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>. ${esc(crew.repo.line)}</p>`;
   return `<article class="item item--crew" id="${esc(b.slug)}" data-i="${i}" data-id="${esc(b.num)}" aria-labelledby="${esc(b.slug)}-name">
   <div class="visual visual--crew">
     <div class="bignum" aria-hidden="true">${esc(b.num)}</div>
@@ -137,7 +138,7 @@ function crewItem(b, i, { crew, projects, shell }) {
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
       ${status(file, `${b.download.size}, rigged and animated`)}
     </div>
-    <div class="extra">${fine}</div>
+    <div class="extra">${fine}${all}</div>
   </div>
 </article>`;
 }
