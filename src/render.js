@@ -228,6 +228,12 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
     </div>
   </header>
 
+  <form class="menu-ask js-only" id="menu-ask" autocomplete="off">
+    <label class="vh" for="menu-ask-text">Ask for a game or about the crew</label>
+    <input id="menu-ask-text" name="text" type="text" maxlength="200" placeholder="ask in plain words…" enterkeyhint="go">
+    <button type="submit" class="tog" aria-haspopup="dialog" aria-label="Ask (touchpad click on PS5)">ask<span class="menu-ask__pad" aria-hidden="true"> · touchpad</span></button>
+  </form>
+
   <main id="main" class="panels">
     ${panel(
       'games',

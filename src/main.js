@@ -13,6 +13,8 @@ import { readOrder, writeOrder, arrange } from './order.js';
 import { createSort, flip } from './sort.js';
 import { createPwa } from './pwa.js';
 import { gameUrl } from './device.js';
+import { launchUrl } from './ask/actions.js';
+import { createAsk } from './ask/menu.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -25,6 +27,7 @@ const hint = $('#duo-hint');
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
+let askUI = null;
 
 const TABS = ['games', 'crew', 'sites', 'contact'];
 // Games: one cartridge per game, each a list of its editions (src/projects.js, `of`)
@@ -520,14 +523,14 @@ function current() {
   return null;
 }
 
-function play(p, { from } = {}) {
+function play(p, { from, as } = {}) {
   if (!p) return;
   if (!pwa.canPlay()) return;
   audio.blip('ok');
-  if (p.frame) return player.open(p);
+  if (p.frame) return player.open(p, { as });
   // it can't run inside the page: a new tab, which a pad press may not be allowed to open
-  const url = gameUrl(p.url);
-  if (!openTab(url) && from === 'pad') {
+  const url = launchUrl(p, as);
+  if (!openTab(url)) {
     askTab({
       title: p.name,
       text: `${p.name} can’t run inside this page, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
@@ -678,13 +681,18 @@ function act(name, info = {}) {
       return audio.toggleSfx();
     case 'os':
       return openOS({ focus: 'input' });
+    case 'ask':
+      return askUI.open({ from: info.from });
     case 'grab':
       return grab();
   }
   return false;
 }
 
-const input = createInput({ act, mode, onScheme: () => hints() });
+const input = createInput({ act, mode, onScheme: scheme => {
+  hints();
+  askUI?.setPad(scheme === 'ps' || scheme === 'xbox');
+} });
 const audio = createAudio({ musicBtn: $('#music'), sfxBtn: $('#sfx'), toast });
 
 // ---- the player ----
@@ -700,6 +708,7 @@ const player = createPlayer({
     sorter.cancel();
     os?.close();
     closeAsk();
+    askUI?.close();
     screen.classList.add('is-away');
     screen.inert = true;
     stage?.pause();
@@ -723,6 +732,35 @@ const player = createPlayer({
 addEventListener('message', (e) => player.message(e));
 const pwa = createPwa({ playing: () => !!player.current, toast });
 $('#menu-back').addEventListener('click', back);
+
+const launcher = {
+  play,
+  canPlay: () => pwa.canPlay(),
+  playing: () => player.current,
+  stop: () => player.close(),
+  go: tab => show(tab || 'games', { sound: false }),
+  tip: openTipJar,
+  music: on => audio.setMusic(on),
+  reveal(slug) {
+    const p = projects.find(x => x.slug === slug);
+    const b = crew.members.find(x => x.slug === slug);
+    if (p) show(locate(p), { sound: false });
+    else if (b) {
+      S.crew = LISTS.crew.indexOf(b);
+      show('crew', { sound: false });
+    } else if (TABS.includes(slug)) show(slug, { sound: false });
+  },
+  wave: () => (!want().length ? 'none' : live() ? (want().forEach((n, k) => setTimeout(() => waveDuo(n), 600 * k)), 'ok') : stage?.live ? 'loading' : 'missing'),
+};
+askUI = createAsk({ shell: launcher, pad: () => input.scheme === 'ps' || input.scheme === 'xbox' });
+$('#menu-ask').addEventListener('submit', e => {
+  e.preventDefault();
+  os?.close();
+  const field = $('#menu-ask-text');
+  const text = field.value.trim();
+  askUI.open({ text, typing: !text });
+  if (text) { field.blur(); askUI.submit(text); }
+});
 
 // ---- mouse and touch ----
 
@@ -814,7 +852,7 @@ screen.addEventListener('touchstart', (e) => {
 }, { passive: true });
 screen.addEventListener('touchend', (e) => {
   if (swipeBlocked || sorter.active || !e.changedTouches.length) return;
-  if (!swipeTab && e.target.closest('.row, .menu, .tgroups, a, button')) return;
+  if (!swipeTab && e.target.closest('.row, .menu, .tgroups, a, button, input')) return;
   const dx = e.changedTouches[0].clientX - sx;
   const dy = e.changedTouches[0].clientY - sy;
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
@@ -1144,28 +1182,7 @@ function openOS(opts = {}) {
         projects,
         crew,
         contact,
-        shell: {
-          play: (p) => play(p),
-          canPlay: () => pwa.canPlay(),
-          playing: () => player.current,
-          stop: () => player.close(),
-          go: (tab) => show(tab || 'games', { sound: false }),
-          reveal(slug) {
-            const p = projects.find((x) => x.slug === slug);
-            const b = crew.members.find((x) => x.slug === slug);
-            if (p) {
-              const tab = locate(p);
-              show(tab, { sound: false });
-              paint(tab);
-            } else if (b) {
-              S.crew = LISTS.crew.indexOf(b);
-              show('crew', { sound: false });
-              paint('crew');
-              layout();
-            } else if (TABS.includes(slug)) show(slug, { sound: false });
-          },
-          wave: () => (!want().length ? 'none' : live() ? (want().forEach((n, k) => setTimeout(() => waveDuo(n), 600 * k)), 'ok') : stage?.live ? 'loading' : 'missing'),
-        },
+        shell: launcher,
       });
       os.open(opts);
     })

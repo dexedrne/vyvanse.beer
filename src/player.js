@@ -16,7 +16,8 @@
 
 import { h, icon } from './dom.js';
 import { shortUrl } from './projects.js';
-import { gameUrl, deviceFlags, isPhone } from './device.js';
+import { deviceFlags, isPhone } from './device.js';
+import { launchUrl } from './ask/actions.js';
 import { createPadRelay } from './pad-relay.js';
 
 const HOLD_MS = 1000;
@@ -72,7 +73,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     return `Back to the menu: ${pad}, <b>◀ menu</b> in the corner, the browser’s <b>Back</b>, or hold <b>Esc</b> here. Esc and Start in the game are the game's own.`;
   }
 
-  function open(p) {
+  function open(p, { as } = {}) {
     if (!el) build();
     if (current) close({ quiet: true });
     current = p;
@@ -87,7 +88,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     card.querySelector('.cmd').textContent = `> ${p.cmd}.exe`;
     card.querySelector('.player__how').innerHTML = how();
     const tab = el.querySelector('.player__btn--tab');
-    const url = gameUrl(p.url);
+    const url = launchUrl(p, as);
     tab.href = url;
     tab.title = `Open ${shortUrl(p.url)} in a new tab instead`;
     tab.setAttribute('aria-label', tab.title);

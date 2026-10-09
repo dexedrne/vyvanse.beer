@@ -21,7 +21,7 @@ function saveHistory(list) {
   }
 }
 
-export function createTerminal(root, { exec, complete, onInputFocus }) {
+export function createTerminal(root, { exec, complete, onInputFocus, onCancel }) {
   const out = root.querySelector('.term__out');
   const form = root.querySelector('.term__line');
   const input = root.querySelector('.term__input');
@@ -45,7 +45,7 @@ export function createTerminal(root, { exec, complete, onInputFocus }) {
     return el;
   }
 
-  function submit(raw, ctx = {}) {
+  async function submit(raw, ctx = {}) {
     print(h('div', { class: 't-line t-echo' }, h('span', { class: 't-prompt', 'aria-hidden': 'true' }, prompt), ' ', raw));
     const cmd = raw.trim();
     if (cmd && hist[hist.length - 1] !== cmd) {
@@ -55,9 +55,9 @@ export function createTerminal(root, { exec, complete, onInputFocus }) {
     cursor = hist.length;
     draft = '';
     try {
-      exec(cmd, ctx);
+      await exec(cmd, ctx);
     } catch (e) {
-      print(h('div', { class: 't-line t-err' }, `something broke: ${e.message}`));
+      if (e.name !== 'AbortError') print(h('div', { class: 't-line t-err' }, 'couldn’t finish that. try help or a suggestion.'));
     }
   }
 
@@ -97,6 +97,7 @@ export function createTerminal(root, { exec, complete, onInputFocus }) {
       out.replaceChildren();
     } else if (e.key === 'c' && e.ctrlKey && input.selectionStart === input.selectionEnd) {
       e.preventDefault();
+      onCancel?.();
       print(h('div', { class: 't-line t-echo' }, h('span', { class: 't-prompt', 'aria-hidden': 'true' }, prompt), ' ', input.value, '^C'));
       input.value = '';
       cursor = hist.length;
@@ -123,7 +124,7 @@ export function createTerminal(root, { exec, complete, onInputFocus }) {
     type(raw, ctx = {}) {
       queue = queue.then(async () => {
         if (ctx.instant || media.reduced.matches) {
-          submit(raw, ctx);
+          await submit(raw, ctx);
           return;
         }
         typing = true;
@@ -136,7 +137,7 @@ export function createTerminal(root, { exec, complete, onInputFocus }) {
         await sleep(110);
         input.value = kept;
         typing = false;
-        submit(raw, ctx);
+        await submit(raw, ctx);
       });
       return queue;
     },

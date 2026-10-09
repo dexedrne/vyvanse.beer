@@ -5,28 +5,10 @@ import { h } from '../dom.js';
 import { shortUrl, playsIn } from '../projects.js';
 import { neofetch } from './fetch.js';
 import { openTip } from '../tip/open.js';
-import { gameUrl } from '../device.js';
+import { BY_ID, plainAction, runAction, launchUrl } from '../ask/actions.js';
+import { requestAsk } from '../ask/client.js';
 
 const norm = (s) => s.toLowerCase().replace(/^[#$]+/, '').trim();
-
-function distance(a, b) {
-  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++)
-    for (let j = 1; j <= b.length; j++)
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  return d[a.length][b.length];
-}
-
-function closest(word, options) {
-  let best = null;
-  let bestD = 3;
-  for (const o of options) {
-    const dd = distance(word, o);
-    if (dd < bestD) [best, bestD] = [o, dd];
-  }
-  return best;
-}
 
 // Output building blocks.
 const line = (...kids) => h('div', { class: 't-line' }, ...kids);
@@ -77,14 +59,14 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
   const playIn = projects.find((p) => p.cmd === crew.playIn);
 
   // Games (and sites) that allow framing play right here, in the player; the rest get a new tab.
-  function launch(p, ctx, want = null) {
+  function launch(p, ctx, want = null, as) {
     if (shell.canPlay?.() === false) return;
     if (howFor(p, want) === 'here') {
       term.print(line('loading ', strong(p.name), muted(` (${shortUrl(p.url)}). hold esc, or view + menu on a pad, to come back.`)));
-      setTimeout(() => shell.play(p), ctx.source === 'terminal' ? 350 : 0);
+      setTimeout(() => shell.play(p, { as }), ctx.source === 'terminal' ? 350 : 0);
       return;
     }
-    const url = gameUrl(p.url);
+    const url = launchUrl(p, as);
     const ok = openTab(url);
     if (!ok) term.print(line('your browser blocked the new tab. open it here: ', link(url)));
     else if (want === 'here') term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't play here.`));
@@ -186,8 +168,9 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           term.print(line('usage: open <name> [--tab]. try ', run('ls'), ' to see names.'));
           return;
         }
-        const p = findProject(args);
-        if (p) return launch(p, ctx, want);
+        const a = BY_ID.get(plainAction(args.join(' ')));
+        const p = a?.kind === 'play' ? projects.find(p => p.cmd === a.project) : findProject(args);
+        if (p) return launch(p, ctx, want, a?.as);
         const social = site.links.find((l) => l.cmd === norm(args[0]));
         if (social) return table[social.cmd].run([], ctx);
         const bro = findBro(args);
@@ -195,9 +178,8 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           term.print(line('crew models have their own cards. try ', run(`info ${bro.num}`), '.'));
           return;
         }
-        const guess = closest(norm(args.join('')), [...byName.keys()]);
         term.print(err(`open: no such project: ${args.join(' ')}`));
-        term.print(line(guess ? ['did you mean ', run(`open ${byName.get(guess).cmd}`), '? '] : '', 'try ', run('ls'), '.'));
+        term.print(line('try ', run('ls'), '.'));
       },
     },
     win: {
@@ -206,6 +188,18 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       run(args, ctx) {
         table.open.run(args, { ...ctx, want: 'here' });
       },
+    },
+    play: {
+      usage: 'play <name> [as <number>]',
+      desc: 'play a game or edition as a crew member',
+      args: () => projects.map(p => p.cmd),
+      run: (args, ctx) => table.open.run(args, ctx),
+    },
+    music: {
+      usage: 'music <on|off>',
+      desc: 'set the background music',
+      args: () => ['on', 'off'],
+      run(args) { shell.music(args[0] === 'on'); term.print(line(`music ${args[0]}`)); },
     },
     info: {
       usage: 'info <name>',
@@ -404,22 +398,58 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
   }
 
   const names = Object.keys(table);
+  let pending;
+  function cancel() { pending?.abort(); pending = null; }
+
+  function exact(name, args) {
+    if (['open', 'play', 'win'].includes(name)) {
+      if (!args.length) return true;
+      const { names } = parseOpen(args);
+      return !!findProject(names) || BY_ID.get(plainAction(names.join(' ')))?.kind === 'play'
+        || (names.length === 1 && (!!site.links.find(l => l.cmd === norm(names[0])) || !!findBro(names)));
+    }
+    if (name === 'info') return !args.length || !!findProject(args) || !!findBro(args);
+    if (name === 'music') return args.length === 1 && ['on', 'off'].includes(args[0]);
+    if (name === 'cd' || name === 'ls') return args.length <= 1
+      && (!args.length || [...(name === 'cd' ? places : sections), '~', '.', '/', '..'].includes(norm(args[0]).replace(/\/$/, '')));
+    if (name === 'echo' || name === 'sudo') return true;
+    return !args.length;
+  }
+
+  async function understand(raw) {
+    const request = new AbortController();
+    pending = request;
+    term.print(line(muted('one moment…')));
+    const result = await requestAsk(raw, { signal: request.signal });
+    if (pending !== request) return;
+    pending = null;
+    term.print(line(result.line));
+    if (result.action && result.action !== 'none') runAction(result.action, shell);
+    else if (result.suggestions) term.print(line(...result.suggestions.map(s =>
+      h('button', { type: 'button', class: 't-cmd', 'data-action': s.action }, BY_ID.get(s.action).label))));
+  }
 
   return {
     names,
+    cancel,
+    action(id) {
+      cancel();
+      if (!BY_ID.has(id)) return;
+      term.print(line(BY_ID.get(id).line));
+      runAction(id, shell);
+    },
     run(raw, ctx = {}) {
+      cancel();
       const [first, ...args] = raw.trim().split(/\s+/);
       if (!first) return;
       const name = first.toLowerCase();
-      const c = table[name];
-      if (c) return c.run(args, ctx);
+      const c = Object.hasOwn(table, name) ? table[name] : null;
+      if (c && exact(name, args)) return c.run(args, ctx);
       // A bare project name opens it.
       const { names: bare, want } = parseOpen([first, ...args]);
       const p = bare.length ? findProject(bare) : null;
       if (p) return launch(p, ctx, want);
-      const guess = closest(name, names.filter((n) => !table[n].hidden));
-      term.print(err(`command not found: ${first}`));
-      term.print(line(guess ? ['did you mean ', run(guess), '? '] : '', 'type ', run('help'), ' for commands.'));
+      return understand(raw);
     },
     // Tab completion: returns { value, options }.
     complete(value) {
