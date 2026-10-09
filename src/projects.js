@@ -23,6 +23,7 @@
 //   thumb     optional cartridge label in public/img/thumb/ (textless, safe for a centred 4:3 crop)
 //   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
 //   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
+//   asParam   true only when the game supports ?as=<crew num> for character preselection
 //   of        games only: the cmd of the game this is an edition of. An edition is its own site,
 //             with its own entry here (name, blurb, url, art…), but it shares that game's
 //             cartridge: the switch under the wordmark flips between them (RetardioPayne is

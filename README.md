@@ -41,6 +41,7 @@ down the page. With JS the same markup becomes one screen with no page scroll.
 | `src/ticker.js` | UTC clock and live BTC / ETH / SOL / XRP / RETARDIO prices in the bottom strip. |
 | `src/tip/` | The tip jar. |
 | `src/os/` | Radbro OS, the terminal. |
+| `src/ask/`, `api/ask.js` | Plain words and controller chips; guarded server routing. See [Ask setup](docs/ask.md). |
 | `src/style.css` | The look. Colour tokens at the top. |
 
 ## Add a project
@@ -89,6 +90,7 @@ The glyphs on screen follow whatever was used last: keys, Xbox buttons, or PlayS
 | Full screen | F | View / Select | ⛶ |
 | Music, menu sounds | M, N | | ♪ and the speaker |
 | Radbro OS | / or ` | | Contact → Radbro OS |
+| Ask | | PS5 touchpad click | Ask → native text field; the iOS keyboard supplies dictation |
 
 **Your own order.** The cartridges on Games and Sites can be put in any order. With a mouse,
 drag one: it lifts off the row, the others slide out of its way, and it drops into the gap. On

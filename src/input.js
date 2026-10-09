@@ -31,6 +31,7 @@ const STANDARD = {
   7: 'ednext',
   10: 'music',
   11: 'sfx',
+  17: 'ask', // DualSense touchpad click
 };
 // View and Menu act when they're let go, and only if the other one wasn't held with them: held
 // together they're the player's way back to the menu, not full screen plus play

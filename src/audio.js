@@ -125,7 +125,10 @@ export function createAudio({ musicBtn, sfxBtn, toast }) {
   const api = {
     blip,
     toggleMusic() {
-      wantMusic = !wantMusic;
+      api.setMusic(!wantMusic);
+    },
+    setMusic(on) {
+      wantMusic = on;
       store.set(MUSIC_KEY, wantMusic ? 'on' : 'off');
       unlock();
       update();

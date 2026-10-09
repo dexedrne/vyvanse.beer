@@ -31,7 +31,7 @@ export function createOS({ site, groups, projects, crew, contact, shell }) {
       <div class="term__out" role="log" aria-live="polite" aria-label="Terminal output"></div>
       <form class="term__line" autocomplete="off">
         <span class="term__prompt" aria-hidden="true">vyvanse:~$</span>
-        <input class="term__input" type="text" name="cmd" aria-label="Terminal command. Type help for a list." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+        <input class="term__input" type="text" name="cmd" maxlength="200" aria-label="Command or plain words. Type help for a list." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
       </form>
     </div>`;
   const closeBtn = el.querySelector('.term__close');
@@ -45,6 +45,7 @@ export function createOS({ site, groups, projects, crew, contact, shell }) {
   const term = createTerminal(el, {
     exec: (cmd, ctx) => commands.run(cmd, ctx),
     complete: (value) => commands.complete(value),
+    onCancel: () => commands.cancel(),
   });
   commands = createCommands({ site, groups, projects, crew, contact, term, shell, close: () => api.close() });
 
@@ -71,9 +72,11 @@ export function createOS({ site, groups, projects, crew, contact, shell }) {
 
   // clicks on commands in the output (and the chips) type them in
   el.addEventListener('click', (e) => {
-    const c = e.target.closest('[data-cmd], [data-fill]');
+    const c = e.target.closest('[data-cmd], [data-fill], [data-action]');
     if (!c || e.button !== 0) return;
     e.preventDefault();
+    commands.cancel();
+    if (c.dataset.action != null) return commands.action(c.dataset.action);
     if (c.dataset.fill != null) return term.fill(c.dataset.fill);
     term.type(c.dataset.cmd, { source: 'click' });
   });
@@ -101,6 +104,7 @@ export function createOS({ site, groups, projects, crew, contact, shell }) {
     },
     close() {
       if (!open) return;
+      commands.cancel();
       open = false;
       el.hidden = true;
       if (back?.isConnected && back !== document.body) back.focus({ preventScroll: true });
