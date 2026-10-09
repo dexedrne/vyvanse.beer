@@ -187,8 +187,9 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         if (p) return launch(p, ctx, want);
         const social = site.links.find((l) => l.cmd === norm(args[0]));
         if (social) return table[social.cmd].run([], ctx);
-        if (findBro(args)) {
-          term.print(line("radbros aren't websites, but they're playable in every game. try ", run('open spidertag'), '.'));
+        const bro = findBro(args);
+        if (bro) {
+          term.print(line('crew models have their own cards. try ', run(`info ${bro.num}`), '.'));
           return;
         }
         const guess = closest(norm(args.join('')), [...byName.keys()]);
@@ -434,4 +435,3 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     },
   };
 }
-
