@@ -35,15 +35,18 @@ return {'ok', 0}
 `;
 
 export async function reserveBudget({ env, network, inputTokens, now = Date.now(), fetch: send = globalThis.fetch }) {
-  if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN || !network) return { reason: 'unavailable' };
+  // Upstash's own names, or the names Vercel's Upstash marketplace integration sets.
+  const redisUrl = env.UPSTASH_REDIS_REST_URL || env.KV_REST_API_URL;
+  const redisToken = env.UPSTASH_REDIS_REST_TOKEN || env.KV_REST_API_TOKEN;
+  if (!redisUrl || !redisToken || !network) return { reason: 'unavailable' };
   const bucket = createHmac('sha256', env.TYPESAFE_API_KEY).update(network).digest('hex');
   const prefix = 'vyv:{ask}:';
   const minute = Math.floor(now / MINUTE), day = Math.floor(now / DAY);
   const minuteTTL = Math.ceil(((minute + 1) * MINUTE - now) / 1000);
   const dayTTL = Math.ceil(((day + 1) * DAY - now) / 1000);
   try {
-    const response = await send(env.UPSTASH_REDIS_REST_URL, { method: 'POST',
-      headers: { Authorization: 'Bearer ' + env.UPSTASH_REDIS_REST_TOKEN, 'Content-Type': 'application/json' },
+    const response = await send(redisUrl, { method: 'POST',
+      headers: { Authorization: 'Bearer ' + redisToken, 'Content-Type': 'application/json' },
       body: JSON.stringify(['EVAL', RESERVE_SCRIPT, 4,
         `${prefix}net:${bucket}:m:${minute}`, `${prefix}net:${bucket}:d:${day}`, `${prefix}calls:${day}`, `${prefix}tokens:${day}`,
         LIMITS.minute, LIMITS.networkDay, LIMITS.dailyCalls, LIMITS.dailyInputTokens, inputTokens, minuteTTL, dayTTL]),

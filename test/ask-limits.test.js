@@ -37,3 +37,12 @@ test('real Redis atomically enforces network and global limits across callers, f
     const tokenKeys = await redis.command(['KEYS', 'vyv:{ask}:*']);
     for (const key of tokenKeys) assert.ok(Number(await redis.command(['TTL', key])) > 0, 'counters expire without a cleanup cron');
   });
+
+test("Vercel's Upstash integration env names (KV_REST_API_URL / KV_REST_API_TOKEN) are accepted", async () => {
+  const env = { TYPESAFE_API_KEY: 'test-key', KV_REST_API_URL: 'https://kv.example', KV_REST_API_TOKEN: 'kv-token' };
+  let seen;
+  const fetch = async (url, { headers }) => { seen = { url, auth: headers.Authorization }; return Response.json({ result: ['ok', 0] }); };
+  const r = await reserveBudget({ env, network: 'v4:192.0.2.9', now: 1000, inputTokens: 10, fetch });
+  assert.equal(r.reason, 'ok');
+  assert.deepEqual(seen, { url: 'https://kv.example', auth: 'Bearer kv-token' });
+});
