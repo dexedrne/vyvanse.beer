@@ -23,6 +23,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 export const FEET = 0.976; // where y = 0 sits, as a share of the canvas height
 const FOV = 18;
+const PHONE_HEIGHT = 1.85; // include the models' head depth in the phone's perspective framing
 const BPM = 92;
 const WAVE_EVERY = [7, 12]; // seconds between waves they do on their own
 const KEEP = 6; // models kept loaded; past that, the ones off screen for STALE ms are let go
@@ -47,7 +48,7 @@ const YAW_KEEP = 0.4; // how much of the clips' own body turn is kept (Idle look
 const GROOVY = ['Hips', 'Spine01', 'Spine02', 'neck', 'Head', 'LeftShoulder', 'RightShoulder', 'LeftArm', 'RightArm'];
 
 // models: { num: '/models/….glb' }. onReady(): everyone asked for by show() is now standing there.
-export function createCast(box, { calm, models, onReady }) {
+export function createCast(box, { calm, models, onReady, framing }) {
   const canvas = document.createElement('canvas');
   canvas.className = 'duo__gl';
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: true, powerPreference: 'low-power' });
@@ -136,6 +137,8 @@ export function createCast(box, { calm, models, onReady }) {
       const s = on.length > 1 ? PAIR[k] : ALONE;
       c.root.visible = true;
       Object.assign(c, { x: s.x, base: s.turn, beat: s.beat, energy: s.energy, seen: now });
+      const f = framing?.();
+      if (f) c.x = (f.spots[k] - 0.5) * (PHONE_HEIGHT / f.tall) * camera.aspect;
       if (c.waving) return;
       c.look = c.base;
       if (!was.includes(c)) c.turn = c.base; // just stepped on: already facing the right way
@@ -315,12 +318,14 @@ export function createCast(box, { calm, models, onReady }) {
     renderer.setSize(w, h, false);
     const aspect = w / h;
     camera.aspect = aspect;
-    const half = Math.max(1.06, 1.6 / aspect); // half the visible height at the duo (m); wide enough for a wave's lean
-    const cy = half * (1 - (1 - FEET) * 2); // camera height that puts y = 0 at FEET
+    const f = framing?.();
+    const half = f ? PHONE_HEIGHT / (2 * f.tall) : Math.max(1.06, 1.6 / aspect);
+    const cy = half * (1 - (1 - (f?.feet ?? FEET)) * 2); // camera height that puts y = 0 at the waterline
     const d = half / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     camera.position.set(0, cy, d);
     camera.lookAt(0, cy, 0);
     camera.updateProjectionMatrix();
+    if (f) on.forEach((c, k) => { c.x = (f.spots[k] - 0.5) * 2 * half * aspect; });
   }
 
   box.append(canvas);

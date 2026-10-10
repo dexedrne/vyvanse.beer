@@ -11,6 +11,8 @@
 //   group     'games' or 'sites' (see `groups`)
 //   name      display name
 //   kind      one line saying what it is
+//   kindPhone shorter panel kindline on phones; blurbPhone: approved phone-only copy
+//   phone     phone art position, keeping the desktop image.position
 //   blurb     plain-text description
 //   url       what `open` launches (also the card's main link)
 //   frame     true if the site allows being shown in an iframe: PLAY then runs it inside this
@@ -63,6 +65,7 @@ export const projects = [
     group: 'games',
     name: 'SPIDERTAG',
     kind: 'Web-slinger tag on the rooftops, the Robinhood Chain game',
+    kindPhone: "Rooftop web-slinger tag on Robinhood Chain",
     blurb:
       'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Play as the main four, cowboy #723, ghost #2564 or the two Retardios. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://spidertag.vyvanse.beer',
@@ -76,6 +79,7 @@ export const projects = [
     shell: '#3d2263',
     accent: '#ff5fd2',
     cast: ALL,
+    phone: '50% 18%',
     image: {
       src: '/img/art/radrun-cast2.webp',
       width: 1600,
@@ -110,6 +114,7 @@ export const projects = [
     accent: '#7cc4ff',
     cast: RADBROS,
     edition: { label: 'Radbros', face: '4764' },
+    phone: '50% 24%',
     image: {
       src: '/img/art/radpayne-cast2.webp',
       width: 1600,
@@ -133,6 +138,8 @@ export const projects = [
     edition: { label: 'Retardios', face: '85' },
     name: 'RetardioPayne',
     kind: 'Bullet-time noir shooter, the harder cut',
+    kindPhone: "Noir shooter, the harder cut",
+    blurbPhone: "The harder cut: Retardios only, the same bullet-time noir, meaner rooms.",
     blurb:
       'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555 and #85 to play: the same rainy Manhattan night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
     url: 'https://retardiopayne.vyvanse.beer',
@@ -145,6 +152,7 @@ export const projects = [
     shell: '#1f2a44',
     accent: '#ff7ab6',
     cast: ['555', '85'],
+    phone: '50% 22%',
     image: {
       src: '/img/art/retardiopayne.webp',
       width: 1600,
@@ -166,6 +174,7 @@ export const projects = [
     group: 'games',
     name: 'RBGO',
     kind: 'First-person bomb-defusal shooter, early preview',
+    kindPhone: "Bomb-defusal shooter, early preview",
     blurb:
       'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Six Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://rbgo.vyvanse.beer',
@@ -175,6 +184,7 @@ export const projects = [
     shell: '#5c4228',
     accent: '#f2b45c',
     cast: ALL,
+    phone: '50% 20%',
     image: {
       src: '/img/art/rbgo-cast2.webp',
       width: 1600,
@@ -195,6 +205,7 @@ export const projects = [
     group: 'games',
     name: 'RadOps',
     kind: 'First-person team deathmatch, early preview',
+    kindPhone: "Team deathmatch, early preview",
     blurb:
       'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Six Radbros and two Retardios, a gun picked at every spawn, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://radops.vyvanse.beer',
@@ -204,6 +215,7 @@ export const projects = [
     shell: '#1d4746',
     accent: '#ff8fb1',
     cast: ALL,
+    phone: '50% 22%',
     image: {
       src: '/img/art/radops-cast2.webp',
       width: 1600,
@@ -224,6 +236,7 @@ export const projects = [
     group: 'games',
     name: 'RadZombies',
     kind: 'First-person zombies survival, early preview',
+    kindPhone: "Zombies survival, early preview",
     blurb:
       'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Three maps: a derelict picture palace, nine rooms on one loop (the power, eight perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets), or a sandbagged bunker on a dead air base at night, now with a crash-site yard and a cellar. And Radcension, a launch base on the steppe, black and white until you find the power, with toy rockets, old tapes and someone to bring home. A leaderboard for each, and a way out at first light for anyone who lasts. Solo, with bots, up to four online (quick play or a room code), or two on split screen with two controllers. Keyboard and mouse or a controller.',
     url: 'https://radzombies.vyvanse.beer',
@@ -234,6 +247,7 @@ export const projects = [
     accent: '#ff8a3d',
     cast: ALL,
     edition: { label: 'Radbros', face: '4764' },
+    phone: '50% 22%',
     image: {
       src: '/img/art/radzombies-cast2.webp',
       width: 1600,
@@ -286,6 +300,8 @@ export const projects = [
     group: 'games',
     name: 'SHITBOX',
     kind: 'Odd jobs in a tired old four-door with a real manual',
+    kindPhone: "Odd jobs in a tired old four-door",
+    blurbPhone: "Deliveries, rides, towing and the crew on the phone, in a car with a real manual. Keep it running, keep it fuelled, keep the lights on.",
     blurb:
       "A tired 1993 four-door with a real five-speed and $25 to your name. Odd jobs in a small town with proper winters; the crew drive hatchbacks and think yours is a joke. A mountain pass for time trials, night battles and a rally stage, a county past the town line, and every season ends in a final. The city is nine minutes up the highway. Now online: bring your own build and cruise with up to ten, each in their own career. Play as Retardio Cousin Classic #85 in the career, or pick any of the eight crew drivers in online casual rooms. Keyboard or controller.",
     url: 'https://shitbox.vyvanse.beer',
@@ -295,6 +311,7 @@ export const projects = [
     shell: '#3a1418',
     accent: '#ffb12a',
     cast: ALL,
+    phone: '50% 40%',
     image: {
       src: '/img/art/shitbox.webp',
       width: 1600,
@@ -334,6 +351,8 @@ export const projects = [
     group: 'games',
     name: 'PokerBros',
     kind: "Texas hold'em with the crew, play chips",
+    kindPhone: "Hold'em with the crew, play chips",
+    blurbPhone: "Texas hold'em with the crew for play chips: sit down at the felt, read the table, and take the pot. Touch, keyboard or controller; plays upright on a phone.",
     blurb:
       "Hold'em at the back-room table with the crew. Solo against all seven, who talk, sweat and give themselves away (one tell in five is a lie), or online with friends and the crew filling the empty chairs. The Radbro deck, three tables, play chips only and a free refill every day. Keyboard and mouse or a controller.",
     url: 'https://pokerbros.vyvanse.beer',
@@ -344,6 +363,7 @@ export const projects = [
     shell: '#16251c',
     accent: '#e8c27a',
     cast: [...MAIN_CAST, '555', '85', '723'],
+    phone: '50% 35%',
     image: {
       src: '/img/art/pokerbros.webp',
       width: 1600,
@@ -359,6 +379,7 @@ export const projects = [
     group: 'games',
     name: 'RADBRAWL',
     kind: 'Platform fighter, up to four on one screen',
+    kindPhone: "Platform fighter, four on one screen",
     blurb:
       'A platform fighter with the crew on a wet neon rooftop. Up to four on one screen, any mix of keyboards, controllers and CPUs. Damage percent and stocks, launches off the edge, ledges, shields and dodges. #4764 with a katana, #85 with his fists, #723 with a revolver and a lasso, #652, yellow-haired #3704 with a launcher and green-haired #3710 with fan gusts. Training has an input display.',
     url: 'https://radbrawl.vyvanse.beer',
@@ -369,6 +390,7 @@ export const projects = [
     accent: '#ff5f9e',
     cast: ['4764', '85', '723', '652', '3704', '3710'],
     edition: { label: 'Platform', face: '723' },
+    phone: '50% 22%',
     image: {
       src: '/img/art/radbrawl.webp',
       width: 1600,
@@ -409,6 +431,7 @@ export const projects = [
     group: 'sites',
     name: 'Solscape',
     kind: 'My open-source, copyright-free rev254 private server, on Solana',
+    kindPhone: "Open-source rev254 server on Solana",
     blurb:
       'An open-source, copyright-free rev254 private server with a Solana twist. Create an account, train skills, take on quests and explore with other players.',
     url: 'https://play.solscape.fun',
@@ -422,6 +445,8 @@ export const projects = [
     thumb: '/img/thumb/solscape.webp',
     shell: '#262046',
     accent: '#5fe3d0',
+    phone: '50% 42%',
+    phoneImage: '/img/solscape.webp',
     image: {
       src: '/img/art/solscape.webp',
       width: 1600,

@@ -28,6 +28,122 @@ let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
 let askUI = null;
+let phoneNodes = null;
+let phoneZone = 'shelf';
+let phoneButton = 0;
+let sheet = null;
+let dim = null;
+let sheetBack = null;
+let probe = null;
+
+// Move the existing controls, so desktop and the no-JS document retain their original markup.
+function phoneMarkup() {
+  if (phone.matches === !!phoneNodes) return;
+  if (!phone.matches) {
+    closeSheet();
+    for (const entry of phoneNodes.items) {
+      entry.info.replaceChildren(...entry.children);
+      if (entry.act) entry.act.replaceChildren(...entry.actions);
+      if (entry.kind) entry.kind.innerHTML = entry.kindHTML;
+      if (entry.pitch) entry.pitch.textContent = entry.pitchText;
+      if (entry.playLabel) entry.playLabel.textContent = entry.playText;
+      if (entry.shot) entry.shot.src = entry.shotSrc;
+      if (entry.monitorLabel) entry.monitorLabel.textContent = entry.monitorText;
+    }
+    for (const entry of phoneNodes.contact) {
+      entry.label.replaceChildren(...entry.labelChildren);
+      entry.mi.replaceChildren(...entry.children);
+    }
+    const { ask, parent, next, html, askLabel } = phoneNodes;
+    parent.insertBefore(ask, next);
+    $('button', ask).innerHTML = html;
+    if (askLabel) $('button', ask).setAttribute('aria-label', askLabel);
+    else $('button', ask).removeAttribute('aria-label');
+    for (const node of phoneNodes.added) node.remove();
+    $$('.row').forEach(row => row.classList.remove('shelf'));
+    phoneNodes = null;
+    screen.style.removeProperty('--view-height');
+    return;
+  }
+  const ask = $('#menu-ask');
+  phoneNodes = { items: [], contact: [], added: [], ask, parent: ask.parentElement,
+    next: ask.nextSibling, html: $('button', ask).innerHTML, askLabel: $('button', ask).getAttribute('aria-label') };
+  $('.top__right').prepend(ask);
+  $('button', ask).innerHTML = '<svg class="i" aria-hidden="true"><use href="#i-ask"/></svg>';
+  $('button', ask).setAttribute('aria-label', 'ask');
+  for (const item of $$('.item')) {
+    const info = $('.info', item);
+    if (!info) continue;
+    const kind = $('.kindline', info);
+    const wm = $('.wm', info);
+    const pitch = $('.pitch', info);
+    const act = $('.act', info);
+    phoneNodes.items.push({ info, children: [...info.childNodes], act, actions: act && [...act.childNodes],
+      kind, kindHTML: kind?.innerHTML, pitch, pitchText: pitch?.textContent,
+      playLabel: $('.play__label', info), playText: $('.play__label', info)?.textContent,
+      shot: $('.visual--site img', item), shotSrc: $('.visual--site img', item)?.getAttribute('src'),
+      monitorLabel: $('.monitor__bar span', item), monitorText: $('.monitor__bar span', item)?.textContent });
+    const words = Object.assign(document.createElement('div'), { className: 'words' });
+    const body = Object.assign(document.createElement('div'), { className: 'body' });
+    if (kind) words.append(kind);
+    words.append(wm);
+    const p = projects.find(p => p.cmd === item.dataset.id);
+    if (kind && p?.kindPhone) {
+      kind.replaceChildren(...p.kindPhone.split(/(\S+-\S+)/g).map(text => {
+        if (!/\S+-\S+/.test(text)) return document.createTextNode(text);
+        return Object.assign(document.createElement('span'), { className: 'nb', textContent: text });
+      }));
+    }
+    if (pitch && p?.blurbPhone) pitch.textContent = p.blurbPhone;
+    const eds = $('.eds', info);
+    const plays = $('.plays', info);
+    if (eds) body.append(eds);
+    if (pitch) body.append(pitch);
+    if (plays) body.append(plays);
+    if (act) {
+      const status = $('.status', act);
+      const more = $('[data-more]', info);
+      if (more) act.append(more);
+      body.append(act);
+      if (status) body.append(status);
+    }
+    info.prepend(words, body);
+    if (item.classList.contains('item--contact')) {
+      const shelf = Object.assign(document.createElement('div'), { className: 'shelf' });
+      shelf.append($('.menu', info), $('.fine', info));
+      info.append(shelf);
+    }
+    if (p?.group === 'sites') {
+      if (p.phoneImage) $('.visual--site img', item).src = p.phoneImage;
+      if (p.boot) $('.monitor__bar span', item).textContent = p.boot;
+      $('[data-act] .play__label', item).textContent = 'Open';
+      const cap = Object.assign(document.createElement('p'), { className: 'site-cap' });
+      const url = new URL(p.url);
+      cap.innerHTML = '<b></b><span></span><span class="site-cap__tap">tap to open ↗</span>';
+      $('b', cap).textContent = url.host + (url.pathname === '/' ? '' : url.pathname);
+      $('span', cap).textContent = p.cmd === 'solscape' ? 'rev254 on Solana' : p.boot || p.kindPhone || p.kind;
+      item.append(cap);
+      phoneNodes.added.push(cap);
+    }
+  }
+  for (const mi of LISTS.contact) {
+    const label = $('.mi__label', mi);
+    phoneNodes.contact.push({ mi, children: [...mi.childNodes], label, labelChildren: [...label.childNodes] });
+    const icon = $('.i', label);
+    const text = Object.assign(document.createElement('span'), { textContent: label.textContent });
+    const phoneLabel = Object.assign(document.createElement('span'), { className: 'mi__label' });
+    const detail = mi.hasAttribute('data-os')
+      ? Object.assign(document.createElement('span'), { className: 'det', textContent: 'the terminal' })
+      : $('.det', mi);
+    phoneLabel.append(text, detail);
+    mi.replaceChildren($('.cur', mi), icon, phoneLabel);
+  }
+  $$('.row').forEach(row => row.classList.add('shelf'));
+  const floor = Object.assign(document.createElement('div'), { className: 'phone-floor' });
+  floor.setAttribute('aria-hidden', 'true');
+  screen.prepend(floor);
+  phoneNodes.added.push(floor);
+}
 
 const TABS = ['games', 'crew', 'sites', 'contact'];
 // Games: one cartridge per game, each a list of its editions (src/projects.js, `of`)
@@ -165,11 +281,15 @@ function bdFor(tab, i) {
   if (tab === 'games') {
     const p = at('games', i);
     const { src, position: pos, lettered, width: w, height: h } = p.image;
-    return { key: `games:${p.cmd}`, src, pos, lettered, w, h };
+    return { key: `games:${p.cmd}`, src, pos: phone.matches ? p.phone || '50% 22%' : pos, lettered, w, h };
   }
-  if (tab === 'sites') return { key: `sites:${LISTS.sites[i].cmd}`, src: LISTS.sites[i].image.src, soft: true };
-  if (tab === 'crew') return { key: 'crew', src: '/img/art/vyvanse.webp', soft: true };
-  return { key: 'contact', src: '/img/art/vyvanse.webp', pos: '60% 6%' };
+  if (tab === 'sites') {
+    const p = LISTS.sites[i];
+    const portrait = phone.matches && screen.clientWidth < screen.clientHeight;
+    return { key: `sites:${p.cmd}`, src: portrait ? p.phoneImage || p.image.src : p.image.src, soft: !portrait, pos: phone.matches ? '50% 42%' : undefined };
+  }
+  if (tab === 'crew') return { key: 'crew', src: phone.matches ? '/img/art/radrun-cast2.webp' : '/img/art/vyvanse.webp', soft: true };
+  return { key: 'contact', src: '/img/art/vyvanse.webp', pos: phone.matches ? screen.clientWidth > screen.clientHeight ? '50% 100%' : '50% 30%' : '60% 6%' };
 }
 function backdrop(tab, i) {
   const b = bdFor(tab, i);
@@ -186,6 +306,9 @@ function backdrop(tab, i) {
     BD[b.key] = img;
     cutLettered(img);
   }
+  if (img.getAttribute('src') !== b.src) img.src = b.src;
+  img.style.objectPosition = b.pos || '';
+  img.classList.toggle('bd--soft', !!b.soft);
   const show = () => {
     for (const k in BD) BD[k].classList.toggle('on', k === b.key);
     emit();
@@ -346,10 +469,12 @@ function keepInView(el) {
 }
 
 function show(tab, { sound = true, focus = false } = {}) {
+  closeSheet();
   if (!TABS.includes(tab)) tab = 'games';
   if (moving && tab !== moving.tab) dropMove();
   const changed = tab !== S.tab;
   S.tab = tab;
+  if (changed) { phoneZone = 'shelf'; phoneButton = 0; }
   for (const t of $$('.tab')) {
     const on = t.dataset.tab === tab;
     t.setAttribute('aria-selected', String(on));
@@ -383,6 +508,7 @@ function select(i, { sound = true } = {}) {
   const n = LISTS[S.tab].length;
   const next = ((i % n) + n) % n;
   if (next === S[S.tab]) return;
+  closeSheet();
   const carry = focusInRow();
   S[S.tab] = next;
   paint(S.tab);
@@ -565,6 +691,7 @@ function activate({ from, pad } = {}) {
 
 function details() {
   if (S.tab === 'crew') return waveDuo(LISTS.crew[S.crew].num);
+  if (phone.matches) return sheet && !sheet.hidden ? closeSheet() : openSheet();
   const item = onItem(S.tab);
   if (!item) return;
   const open = item.classList.toggle('is-more');
@@ -573,7 +700,76 @@ function details() {
   emit();
 }
 
+function sheetMore() {
+  if (!sheet || sheet.hidden) return;
+  const body = $('.sheet__body', sheet);
+  sheet.classList.toggle('is-more', body.scrollHeight - body.scrollTop - body.clientHeight > 8);
+}
+function closeSheet() {
+  if (!sheet || sheet.hidden) return false;
+  sheet.hidden = dim.hidden = true;
+  for (const el of $$('.panels, .top, .strip', screen)) el.inert = false;
+  $('[data-more]', onItem(S.tab))?.setAttribute('aria-expanded', 'false');
+  sheetBack?.focus({ preventScroll: true });
+  return true;
+}
+function openSheet() {
+  const p = current();
+  if (!p) return;
+  if (!sheet) {
+    dim = Object.assign(document.createElement('div'), { className: 'dim', hidden: true });
+    sheet = Object.assign(document.createElement('aside'), { className: 'sheet', hidden: true });
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+    sheet.setAttribute('aria-labelledby', 'sheet-title');
+    sheet.innerHTML = '<div class="sheet__head"><h3 id="sheet-title"></h3><span class="kind">details</span></div><div class="sheet__body"></div><span class="sheet__more">▽ more</span><div class="sheet__foot"></div>';
+    screen.append(dim, sheet);
+    dim.addEventListener('click', closeSheet);
+    $('.sheet__body', sheet).addEventListener('scroll', sheetMore, { passive: true });
+    let startY = 0;
+    sheet.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+    sheet.addEventListener('touchend', e => {
+      if (e.changedTouches[0].clientY - startY > 64 && $('.sheet__body', sheet).scrollTop <= 0) closeSheet();
+    }, { passive: true });
+    sheet.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeSheet(); }
+      if (e.key !== 'Tab') return;
+      const list = $$('a[href], button', sheet);
+      if (e.shiftKey && document.activeElement === list[0]) { e.preventDefault(); list.at(-1).focus(); }
+      else if (!e.shiftKey && document.activeElement === list.at(-1)) { e.preventDefault(); list[0].focus(); }
+    });
+  }
+  sheetBack = document.activeElement;
+  $('#sheet-title', sheet).textContent = p.name;
+  const body = $('.sheet__body', sheet);
+  const pitch = Object.assign(document.createElement('p'), { textContent: p.blurbPhone || p.blurb });
+  const credit = $('.credit', onItem(S.tab))?.cloneNode(true);
+  const links = Object.assign(document.createElement('ul'), { className: 'links' });
+  for (const link of p.links.slice(1).concat({ label: `${new URL(p.url).host} in a new tab`, href: gameUrl(p.url), main: true })) {
+    const li = document.createElement('li');
+    const a = Object.assign(document.createElement('a'), { href: link.href, target: '_blank', rel: 'noopener', textContent: link.label });
+    a.append(Object.assign(document.createElement('span'), { textContent: '↗', ariaHidden: 'true' }));
+    if (!link.main) a.append(Object.assign(document.createElement('span'), { className: 'url', textContent: new URL(link.href).host + new URL(link.href).pathname.replace(/\/$/, '') }));
+    li.append(a); links.append(li);
+  }
+  body.replaceChildren(pitch, ...(credit ? [credit] : []), links);
+  const playBtn = $('[data-act]', onItem(S.tab)).cloneNode(true);
+  playBtn.addEventListener('click', e => { e.preventDefault(); if (!pwa.canPlay()) return; closeSheet(); play(p); });
+  const close = Object.assign(document.createElement('button'), { className: 'ghost', type: 'button', innerHTML: '<span class="g g--b" data-g="b">○</span>close' });
+  close.addEventListener('click', closeSheet);
+  $('.sheet__foot', sheet).replaceChildren(playBtn, close);
+  input.paintGlyphs(sheet);
+  sheet.hidden = dim.hidden = false;
+  for (const el of $$('.panels, .top, .strip', screen)) el.inert = true;
+  $('[data-more]', onItem(S.tab))?.setAttribute('aria-expanded', 'true');
+  playBtn.focus({ preventScroll: true });
+  body.scrollTop = 0;
+  sheetMore();
+  audio.blip('ok');
+}
+
 function back() {
+  if (closeSheet()) return;
   if (!pwa.card.hidden) return pwa.dismiss();
   if (closeAsk()) return;
   const dlg = $('dialog[open]');
@@ -603,11 +799,24 @@ document.addEventListener('fullscreenchange', () => fsBtn?.setAttribute('aria-pr
 // ---- the modal walk: arrows (or the d-pad) move through a dialog's buttons ----
 
 function openModal() {
-  return (ask && !ask.hidden && ask) || (!pwa.card.hidden && pwa.card) || $('dialog[open]') || (os?.isOpen() && os.el) || null;
+  return (sheet && !sheet.hidden && sheet) || (ask && !ask.hidden && ask) || (!pwa.card.hidden && pwa.card) || $('dialog[open]') || (os?.isOpen() && os.el) || null;
 }
 function walk(dir) {
   const m = openModal();
   if (!m) return;
+  if (m === sheet) {
+    const links = $$('a[href]', $('.sheet__body', sheet));
+    const buttons = $$('a, button', $('.sheet__foot', sheet));
+    const focused = document.activeElement;
+    if (dir === 'left' || dir === 'right') {
+      if (buttons.includes(focused)) buttons[1 - buttons.indexOf(focused)].focus();
+    } else {
+      const zones = [...links, buttons[0]];
+      const at = buttons.includes(focused) ? zones.length - 1 : zones.indexOf(focused);
+      zones[(at + (dir === 'up' ? -1 : 1) + zones.length) % zones.length]?.focus();
+    }
+    return;
+  }
   const list = $$('a[href], button:not([disabled]), input:not([disabled]), [tabindex="0"]', m).filter((el) => el.offsetParent || el.getClientRects().length);
   if (!list.length) return;
   const at = list.indexOf(document.activeElement);
@@ -625,6 +834,7 @@ function mode() {
 }
 
 function act(name, info = {}) {
+  if (phone.matches && info.from === 'pad' && name === 'music') return audio.toggleMusic();
   const m = mode();
   if (m === 'modal' || m === 'os') {
     if (['left', 'right', 'up', 'down'].includes(name)) return walk(name);
@@ -640,6 +850,32 @@ function act(name, info = {}) {
     if (name === 'back') return dropMove({ put: true });
     if (name === 'details') return resetOrder(moving.tab);
     dropMove(); // anything else (sections, the terminal…): it's dropped here first
+  }
+  if (phone.matches && info.from === 'pad') {
+    const zones = S.tab === 'games' && SHELF[S.games].length > 1 ? ['editions', 'actions', 'shelf'] : ['actions', 'shelf'];
+    if (S.tab === 'contact') {
+      if (name === 'up' || name === 'down') return move(name === 'up' ? -1 : 1);
+      if (name === 'left' || name === 'right') return screen.clientWidth > screen.clientHeight ? move(name === 'left' ? -1 : 1) : undefined;
+      if (name === 'back') return;
+    } else {
+      if (!zones.includes(phoneZone)) phoneZone = 'shelf';
+      if (name === 'up' || name === 'down') {
+        phoneZone = zones[(zones.indexOf(phoneZone) + (name === 'up' ? -1 : 1) + zones.length) % zones.length];
+        phoneButton = 0; phoneFocus(); hints(); return;
+      }
+      if (name === 'left' || name === 'right') {
+        const d = name === 'left' ? -1 : 1;
+        if (phoneZone === 'editions') return edition(d);
+        if (phoneZone === 'actions') {
+          if (S.tab === 'crew') {
+            if (info.repeat) $('.plays', onItem('crew')).scrollBy({ left: d * 100, behavior: 'smooth' });
+          } else phoneButton = 1 - phoneButton;
+          phoneFocus(); return;
+        }
+      }
+      if (name === 'ok' && phoneZone === 'editions') return edition(1);
+      if (name === 'ok' && phoneZone === 'actions' && phoneButton && S.tab !== 'crew') return details();
+    }
   }
   const vert = S.tab === 'contact';
   // up / down on Games flip the edition, once per press (held, they don't run round and round)
@@ -688,9 +924,22 @@ function act(name, info = {}) {
   return false;
 }
 
-const input = createInput({ act, mode, onScheme: scheme => {
+function phoneFocus() {
+  if (!phone.matches) return;
+  screen.dataset.zone = phoneZone;
+  screen.dataset.button = String(phoneButton);
+  $$('.panel .play, .panel .more-btn').forEach(el => el.classList.remove('is-focus'));
+  if (input.scheme !== 'ps' && input.scheme !== 'xbox') return;
+  const item = onItem(S.tab);
+  if (!item || S.tab === 'contact') return;
+  if (phoneZone === 'actions' || phoneZone === 'shelf') (phoneButton && phoneZone === 'actions' ? $('[data-more]', item) : $('[data-act]', item))?.classList.add('is-focus');
+}
+
+const input = createInput({ act, mode, phone: () => phone.matches, onScheme: scheme => {
   hints();
+  phoneFocus();
   askUI?.setPad(scheme === 'ps' || scheme === 'xbox');
+  dispatchEvent(new Event('vyv:input'));
 } });
 const audio = createAudio({ musicBtn: $('#music'), sfxBtn: $('#sfx'), toast });
 
@@ -703,6 +952,7 @@ const player = createPlayer({
   pads: () => input.pads(),
   blip: (k) => audio.blip(k),
   onOpen() {
+    closeSheet();
     if (moving) dropMove();
     sorter.cancel();
     os?.close();
@@ -823,6 +1073,11 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-os]')) return openOS();
   const mi = e.target.closest('.mi');
   if (mi) select(LISTS.contact.indexOf(mi), { sound: false });
+  if (phone.matches && S.tab === 'sites' && mode() === 'menu' && !e.target.closest('a, button, .body, .shelf, .top, .tabs, .strip')) {
+    if (performance.now() - swipedAt < 500) return;
+    const y = e.clientY - screen.getBoundingClientRect().top;
+    if (y >= $('.top').getBoundingClientRect().bottom && y < $('.words', onItem('sites')).getBoundingClientRect().top) play(current());
+  }
 });
 // hovering a contact line moves the cursor, like a pause menu
 $('#contact').addEventListener('pointerover', (e) => {
@@ -843,6 +1098,7 @@ let sx = 0;
 let sy = 0;
 let swipeTab = false;
 let swipeBlocked = false;
+let swipedAt = -Infinity;
 screen.addEventListener('touchstart', (e) => {
   swipeBlocked = e.touches.length !== 1 || mode() !== 'menu' || !!e.target.closest('dialog, .ask, .offline-card');
   swipeTab = !!e.target.closest('.tabs');
@@ -855,6 +1111,7 @@ screen.addEventListener('touchend', (e) => {
   const dx = e.changedTouches[0].clientX - sx;
   const dy = e.changedTouches[0].clientY - sy;
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+    swipedAt = performance.now();
     if (swipeTab) tabStep(dx < 0 ? 1 : -1);
     else if (S.tab !== 'contact') move(dx < 0 ? 1 : -1);
   }
@@ -915,6 +1172,15 @@ function hints() {
   const verb = { games: 'play', crew: 'get model', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
+  if (phone.matches && !moving) {
+    const landscape = screen.clientWidth > screen.clientHeight;
+    hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
+      ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} details`) : '',
+      hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
+      ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
+      landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
+    return fitHints();
+  }
   if (input.scheme === 'touch' && !moving) {
     hintsEl.innerHTML = [hint(9, `tap to ${verb}`), hint(6, 'swipe to select'), hint(4, 'swipe tabs for sections')].join('');
     return fitHints();
@@ -965,6 +1231,7 @@ function want() {
   // a game shown in one of its editions: that edition's own (RadPayne's and RadZombies' Radbros edition
   // #4764 alone, their Retardios edition the two Retardios); every other game, and Contact, the pair
   if (S.tab === 'games') {
+    if (phone.matches) return DUO;
     const ed = at('games', S.games)?.edition?.label;
     if (ed === 'Radbros') return ['4764'];
     if (ed === 'Retardios') return ['555', '85'];
@@ -984,6 +1251,13 @@ function duoMode() {
 // the same framing as src/duo.js: where each one stands across the box (a pair, or one in the
 // middle), and how tall
 function framing(w, h) {
+  if (phone.matches) {
+    if (S.tab === 'crew') return { spots: [screen.clientWidth > screen.clientHeight ? 0.5 : 0.62], tall: (h - 16) / h, feet: (h - 4) / h };
+    const imgs = $$('.duo__poster img', duoEl);
+    const widths = imgs.map((img, i) => h * (i ? 0.94 : 1) * (+img.getAttribute('width') / +img.getAttribute('height')));
+    const left = w - widths[0] - widths[1] - 6;
+    return { spots: [(left + widths[0] / 2) / w, (left + widths[0] + 6 + widths[1] / 2) / w], tall: FEET, feet: FEET, width: widths[0] + widths[1] + 6 };
+  }
   const a = w / h;
   const half = Math.max(1.06, 1.6 / a);
   const spots = want().length > 1 ? [0.5 - 0.62 / (2 * half * a), 0.5 + 0.62 / (2 * half * a)] : [0.5];
@@ -997,18 +1271,32 @@ function fitWm() {
   if (!wm) return;
   wm.style.fontSize = '';
   const r = document.createRange();
-  r.selectNodeContents(wm);
+  if (phone.matches && wm.lastChild.nodeType === Node.TEXT_NODE) r.selectNode(wm.lastChild);
+  else r.selectNodeContents(wm);
   const tw = r.getBoundingClientRect().width;
-  const cw = wm.clientWidth;
-  if (cw > 0 && tw > cw) wm.style.fontSize = `${Math.floor((parseFloat(getComputedStyle(wm).fontSize) * cw) / tw)}px`;
+  let cw = wm.clientWidth;
+  if (phone.matches) {
+    const row = wm.closest('.words');
+    const style = getComputedStyle(row);
+    const inner = row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    // The 1.5:1 canvas includes transparent space; fit to the pair drawn at its right edge.
+    const left = box.b && duoMode() === 'side' ? box.b.x + box.b.w - framing(box.b.w, box.b.h).width : Infinity;
+    cw = screen.clientWidth > screen.clientHeight ? inner : Math.min(inner * 0.64, left - rel(row).x - parseFloat(style.paddingLeft) - 12);
+  }
+  if (cw > 0 && tw > cw) wm.style.fontSize = `${Math.max(phone.matches ? 40 : 0, Math.floor((parseFloat(getComputedStyle(wm).fontSize) * cw) / tw))}px`;
 }
 function layout() {
-  fitWm();
+  phoneMarkup();
+  if (phone.matches) screen.style.setProperty('--view-height', `${globalThis.visualViewport?.height || innerHeight}px`);
   const W = screen.clientWidth;
-  const H = innerHeight;
+  const H = phone.matches ? screen.clientHeight : innerHeight;
   const ph = phone.matches;
   const compact = ph && W > H;
-  box.wl = compact ? Math.round(H * 0.61) : ph ? $('#backdrops').offsetHeight : Math.round(H * 0.655);
+  screen.classList.toggle('short', ph && H < 760);
+  screen.classList.toggle('short-land', compact && H < 380);
+  const panel = panelOf(S.tab);
+  box.wl = ph ? Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2) : Math.round(H * 0.655);
+  screen.style.setProperty('--band', `${box.wl}px`);
   screen.style.setProperty('--wl', `${box.wl}px`);
   for (const img of $$('.bd--lettered')) cutLettered(img);
   const m = duoMode();
@@ -1025,19 +1313,55 @@ function layout() {
     b = rel(vis);
   } else if (m === 'side') {
     const big = S.tab === 'contact';
-    const w = compact ? Math.round(W * 0.28) : ph ? Math.round(W * 0.56) : Math.round(Math.min(W * (big ? 0.38 : 0.34), big ? 560 : 500));
-    const h = compact ? Math.round(H * 0.48) : ph ? Math.round(w * 0.98) : Math.round(Math.min(H * (big ? 0.56 : 0.48), big ? 520 : 430));
+    let w = Math.round(Math.min(W * (big ? 0.38 : 0.34), big ? 560 : 500));
+    let h = Math.round(Math.min(H * (big ? 0.56 : 0.48), big ? 520 : 430));
     // feet just past the waterline, so there's floor below them for the whole reflection
-    const feet = ph ? box.wl + 16 : box.wl + H * (big ? 0.05 : 0.045);
+    const feet = ph ? box.wl : box.wl + H * (big ? 0.05 : 0.045);
     const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 48;
     const safeRight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0;
-    b = { x: (ph ? W - w : W - w - pad * 0.4) - safeRight, y: feet - h * FEET, w, h };
+    if (ph) {
+      const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
+      h = Math.min(compact ? 136 : H < 760 ? 124 : 150, Math.max(0, feet - top));
+      w = h * 1.5;
+      if (!compact) {
+        const wm = $('.wm', onItem(S.tab));
+        wm.style.fontSize = '40px';
+        const range = document.createRange(); range.selectNodeContents(wm);
+        if (range.getBoundingClientRect().width > W - safeRight - 16 - framing(w, h).width - 28) {
+          h = Math.min(h, 110); w = h * 1.5;
+        }
+      }
+      b = { x: W - 16 - safeRight - w, y: Math.max(top + h * (1 - FEET), feet - h * FEET), w, h };
+    } else b = { x: W - w - pad * 0.4 - safeRight, y: feet - h * FEET, w, h };
   }
   box.b = b;
+  fitWm();
+  if (ph) {
+    const band = Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2);
+    if (b && m === 'side') {
+      const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
+      if (band - top < b.h) { b.h = Math.max(0, band - top); b.w = b.h * 1.5; b.x = W - 16 - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0) - b.w; }
+      b.y = band - b.h * FEET;
+    }
+    box.wl = band;
+    screen.style.setProperty('--band', `${band}px`);
+    screen.style.setProperty('--wl', `${band}px`);
+    screen.style.setProperty('--floor-art', `url("${bdFor(S.tab, S[S.tab]).src}")`);
+    phoneFocus();
+    sheetMore();
+  }
+  backdrop(S.tab, S[S.tab]);
+  if (probe) {
+    const style = getComputedStyle(document.documentElement);
+    probe.textContent = JSON.stringify({ ih: innerHeight, iw: innerWidth,
+      vv: [visualViewport.width, visualViewport.height], sb: style.getPropertyValue('--safe-bottom'),
+      st: style.getPropertyValue('--safe-top'), standalone: !!navigator.standalone });
+  }
   if (b) {
     Object.assign(duoEl.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
     box.feet = b.y + b.h * FEET;
     const f = framing(b.w, b.h);
+    if (ph) duoEl.style.setProperty('--pair-left', `${f.width ? b.w - f.width : 0}px`);
     f.spots.forEach((x, k) => duoEl.style.setProperty(`--s${k}`, `${x * 100}%`));
     duoEl.style.setProperty('--ph', `${f.tall * 100}%`);
   }
@@ -1121,6 +1445,7 @@ function hello(nums) {
 const shell = {
   scene,
   layout,
+  framing: () => phone.matches && box.b ? framing(box.b.w, box.b.h) : null,
   // the models just asked for are in: they take over from the renders (and say hello)
   castReady() {
     // (his render lingers a moment only now, as his model first comes in; switching between cards whose
@@ -1137,6 +1462,9 @@ const shell = {
   },
 };
 addEventListener('resize', () => requestAnimationFrame(layout));
+globalThis.visualViewport?.addEventListener('resize', () => requestAnimationFrame(layout));
+globalThis.visualViewport?.addEventListener('scroll', () => requestAnimationFrame(layout));
+phone.addEventListener('change', () => { layout(); hints(); });
 document.fonts?.ready.then(() => layout());
 
 // click (or tap) one of them: he waves
@@ -1235,6 +1563,13 @@ const sorter = createSort({
 });
 load();
 hints();
+if (new URLSearchParams(location.search).has('probe')) {
+  probe = Object.assign(document.createElement('span'), { className: 'viewport-probe' });
+  $('.strip').append(probe);
+  screen.classList.add('is-probe');
+  layout();
+  setTimeout(() => { probe.remove(); probe = null; screen.classList.remove('is-probe'); }, 5000);
+}
 if ('ResizeObserver' in window) new ResizeObserver(() => fitHints()).observe($('#hints'));
 document.fonts?.ready.then(fitHints);
 ticker = createTicker($('#ticker-host'));

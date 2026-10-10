@@ -11,7 +11,8 @@ export function createAsk({ shell, pad }) {
   const choices = h('div', { class: 'ask-choices', role: 'group', 'aria-label': 'Suggestions' });
   const dismiss = h('button', { type: 'button', class: 'play play--ghost', onclick: () => close() }, 'back');
   const el = h('dialog', { class: 'ask-dialog', 'aria-labelledby': 'ask-heading' },
-    h('p', { id: 'ask-heading', class: 'ask__title' }, 'ask'), form, status, choices, dismiss);
+    h('p', { id: 'ask-heading', class: 'ask__title' }, 'ask'), form, status, choices,
+    h('p', { class: 'ask__phone-help' }, 'touchpad · ask · Options · music'), dismiss);
   document.body.append(el);
   let controller, version = 0;
 
