@@ -286,14 +286,13 @@ function paint(tab) {
   warm(tab, i);
 }
 
-// a cartridge with editions wears the shown one's label and glow, the next one's edge behind it
+// a cartridge with editions wears the shown one's label and glow
 function labels() {
   slotsOf('games').forEach((slot, j) => {
     const eds = SHELF[j];
     if (eds.length < 2) return;
     const k = edOf(j);
     slot.style.setProperty('--accent', eds[k].accent);
-    slot.style.setProperty('--accent2', eds[(k + 1) % eds.length].accent);
     for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
     // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
     const name = $('.cart__name', slot);

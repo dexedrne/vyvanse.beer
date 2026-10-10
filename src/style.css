@@ -1072,13 +1072,10 @@ html:not(.js) .js-only {
   object-fit: cover;
 }
 
-/* a two-in-one: one label per edition, the one showing on top, the next one's edge behind it */
+/* a two-in-one: one label per edition, the one showing on top; it looks like any other cartridge
+   (the owner didn't want the next edition's coloured edge showing behind it) */
 .slot--eds .cart__label {
   overflow: visible;
-  box-shadow:
-    0 0 0 2px rgb(0 0 0 / 0.45),
-    0 0 0 3px rgb(255 255 255 / 0.08),
-    4px -4px 0 1px color-mix(in srgb, var(--accent2) 78%, #000);
 }
 
 .slot--eds .cart__label img {
