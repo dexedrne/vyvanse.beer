@@ -78,7 +78,7 @@ Create + Options (standard buttons 8 + 9) held for one second returns to the lau
 1. Load the shim before input code; keep native pads primary and use the relay if needed.
 2. Apply `device=phone` before restoring state. Hide split-screen choices and reject split-screen entry through settings, saved state, hotkeys, extra pads or URLs. Use a single viewport and one local player on phones.
 3. Listen for the device message/shim event. Show usable touch controls when a phone has no pad; hide them after a controller connects; restore them on disconnect. Keep pause/restart reachable.
-4. Fit play in landscape, honor safe areas in direct Safari launches, and avoid double-padding when embedded (the launcher already insets the iframe). Keep menus readable when the phone is portrait.
+4. Fit play in landscape (PokerBros also supports portrait), honor safe areas in direct Safari launches, and avoid double-padding when embedded (the launcher already insets the iframe). Keep menus readable when the phone is portrait. The launcher defaults to a landscape lock/rotate hint; `orientation: 'any'` in its project entry skips both.
 5. Test Bluetooth DualSense input both directly and in the iframe, Safari and Add to Home Screen. Test reconnect, background/resume and hold Create + Options. Test iPad and desktop multiplayer separately.
 
 | Game / edition | Phase 2 work |

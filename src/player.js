@@ -122,13 +122,15 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
       relayFrame = requestAnimationFrame(relayPads);
     };
     relayFrame = requestAnimationFrame(relayPads);
+    const landscape = (p.orientation ?? 'landscape') === 'landscape';
     el.classList.toggle('player--phone', isPhone());
+    el.classList.toggle('player--landscape', landscape);
     el.hidden = false;
     paintGlyphs?.(el);
     el.querySelector('.player__back').focus({ preventScroll: true });
     onOpen?.(p);
     // iOS may decline orientation locking; the portrait player supplies a rotate hint.
-    if (isPhone()) screen.orientation?.lock?.('landscape').catch(() => {});
+    if (isPhone() && landscape) screen.orientation?.lock?.('landscape').catch(() => {});
     timer = setInterval(watchPads, 50);
     // an entry of its own, so the browser's Back (or a phone's back gesture) leaves the game
     // for the menu instead of leaving the site

@@ -17,6 +17,7 @@
 //             page, full screen, in the player (src/player.js). false = it sends
 //             X-Frame-Options / frame-ancestors, so it opens in a new tab (and says so).
 //             Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
+//   orientation games only: 'landscape' by default; 'any' permits portrait without a lock or hint
 //   links     [{ label, href }]; the first one is the main action and should match `url`
 //   image     optional { src, width, height, alt } in public/img/: a game's key art (it fills
 //             the screen behind the menu) or a site's 800x420 screenshot (its preview monitor)
@@ -337,6 +338,7 @@ export const projects = [
       "Hold'em at the back-room table with the crew. Solo against all seven, who talk, sweat and give themselves away (one tell in five is a lie), or online with friends and the crew filling the empty chairs. The Radbro deck, three tables, play chips only and a free refill every day. Keyboard and mouse or a controller.",
     url: 'https://pokerbros.vyvanse.beer',
     frame: true,
+    orientation: 'any',
     links: [{ label: 'Play', href: 'https://pokerbros.vyvanse.beer' }],
     thumb: '/img/thumb/pokerbros.webp',
     shell: '#16251c',

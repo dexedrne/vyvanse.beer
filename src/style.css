@@ -2037,7 +2037,7 @@ a.ticker__tok:hover .ticker__k {
 .player__rotate { display: none; }
 
 @media (orientation: portrait) {
-  .player--phone .player__rotate {
+  .player--phone.player--landscape .player__rotate {
     position: absolute;
     z-index: 1;
     inset: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
