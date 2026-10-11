@@ -84,7 +84,7 @@ export const projects = [
       src: '/img/art/radrun-cast2.webp',
       width: 1600,
       height: 900,
-      alt: 'SPIDERTAG: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 swing over neon rooftops, with #555 and #85 behind them, a roadster and the cowboy\'s truck below.',
+      alt: 'SPIDERTAG: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 swing over neon rooftops, with a roadster and cowboy #723 by his truck below.',
     },
     credit: {
       before: 'Built on',
