@@ -1,5 +1,7 @@
 # vyvanse.beer
 
+Phone game integrations: [viewport and menu contract](docs/player-viewport.md).
+
 Projects by dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com/dexedrne).
 Live at https://vyvanse.beer. To get in touch, DM [@dexedrne on X](https://x.com/dexedrne).
 

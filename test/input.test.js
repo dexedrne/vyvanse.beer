@@ -3,18 +3,18 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 
-async function harness() {
+async function harness(phone = false) {
   const events = new Map();
   let timer;
   let pads = [];
   const root = { dataset: {} };
   const acts = [];
   const source = (await readFile(new URL('../src/input.js', import.meta.url), 'utf8')).replaceAll('export ', '');
-  const context = vm.createContext({ acts, document: { documentElement: root, querySelectorAll: () => [] },
+  const context = vm.createContext({ acts, phone, document: { documentElement: root, querySelectorAll: () => [] },
     navigator: { getGamepads: () => pads }, matchMedia: () => ({ matches: true }), performance: { now: () => 100 }, Event,
     addEventListener: (n, fn) => events.set(n, fn), dispatchEvent() {},
     setInterval: fn => { timer = fn; return 1; }, clearInterval: () => { timer = null; } });
-  vm.runInContext(`${source}\nglobalThis.input = createInput({ act: n => acts.push(n), mode: () => 'menu' });`, context);
+  vm.runInContext(`${source}\nglobalThis.input = createInput({ act: n => acts.push(n), mode: () => 'menu', phone: () => phone });`, context);
   const pad = { id: 'DualSense Wireless Controller', index: 0, connected: true, axes: [0, 0],
     buttons: Array.from({ length: 18 }, () => ({ pressed: false, touched: false, value: 0 })) };
   return { root, acts, input: context.input, pad, setPads: p => { pads = p; }, poll: () => timer?.(), touch: () => events.get('pointerdown')({ pointerType: 'touch' }) };
@@ -49,4 +49,26 @@ test('Gamepad API policy errors leave the menu usable', async () => {
   h.setPads({ [Symbol.iterator]() { throw new DOMException('Blocked', 'SecurityError'); } });
   assert.doesNotThrow(h.poll);
   assert.equal(h.input.pads().length, 0);
+});
+
+test('Options toggles music on a phone, while desktop retains Start', async () => {
+  for (const phone of [true, false]) {
+    const h = await harness(phone);
+    h.setPads([h.pad]);
+    h.pad.buttons[9] = { pressed: true, value: 1 };
+    h.poll();
+    h.pad.buttons[9] = { pressed: false, value: 0 };
+    h.poll();
+    assert.deepEqual(h.acts, [phone ? 'music' : 'start']);
+  }
+});
+
+test('Create + Options never also toggles phone music', async () => {
+  const h = await harness(true);
+  h.setPads([h.pad]);
+  h.pad.buttons[8] = h.pad.buttons[9] = { pressed: true, value: 1 };
+  h.poll();
+  h.pad.buttons[8] = h.pad.buttons[9] = { pressed: false, value: 0 };
+  h.poll();
+  assert.deepEqual(h.acts, []);
 });

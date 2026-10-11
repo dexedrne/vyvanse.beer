@@ -49,7 +49,7 @@ export const GLYPHS = {
 // Sony pads report as "Wireless Controller" (vendor 054c); Xbox ones can say "Wireless Controller" too
 const isPs = (id = '') => /054c|playstation|dualshock|dualsense|ps[345]/i.test(id) || (/wireless controller/i.test(id) && !/xbox|045e/i.test(id));
 
-export function createInput({ act, mode, onScheme }) {
+export function createInput({ act, mode, onScheme, phone = () => false }) {
   const root = document.documentElement;
   let device = matchMedia('(pointer: coarse)').matches ? 'touch' : 'kb'; // kb | mouse | touch | xbox | ps
   let scheme = device;
@@ -181,9 +181,9 @@ export function createInput({ act, mode, onScheme }) {
       if (m === 'play') continue;
       for (const [i, name] of Object.entries(STANDARD)) if (pressed(+i)) act(name, { from: 'pad', pad: gp });
       // Menu held on its own: 'grab' (and its release is then not a 'start', if grab was taken)
-      if (mh && now2[9] && !both && !mh.done && now - mh.t > GRAB_MS) mh.done = act('grab', { from: 'pad', pad: gp }) === false ? 'no' : 'yes';
+      if (!phone() && mh && now2[9] && !both && !mh.done && now - mh.t > GRAB_MS) mh.done = act('grab', { from: 'pad', pad: gp }) === false ? 'no' : 'yes';
       for (const [i, name] of Object.entries(PAIR)) {
-        if (was[i] && !now2[i] && !both && !(+i === 9 && mh?.done === 'yes')) act(name, { from: 'pad', pad: gp });
+        if (was[i] && !now2[i] && !both && !(+i === 9 && mh?.done === 'yes')) act(phone() && +i === 9 ? 'music' : name, { from: 'pad', pad: gp });
       }
       for (const [i, name] of Object.entries(DIRS)) if (now2[i]) dir = name;
       dir ||= stick(gp);

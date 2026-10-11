@@ -7,8 +7,10 @@ class Element {
   className = '';
   children = [];
   selectors = new Map();
+  events = new Map();
   style = { setProperty() {} };
-  contentWindow = { postMessage() {}, focus() {} };
+  messages = [];
+  contentWindow = { postMessage: (data, origin) => this.messages.push({ data, origin }), focus() {} };
   classList = {
     contains: name => this.className.split(' ').includes(name),
     toggle: (name, on) => {
@@ -20,7 +22,7 @@ class Element {
     remove: name => this.classList.toggle(name, false),
   };
   setAttribute(name, value) { this[name] = value; }
-  addEventListener() {}
+  addEventListener(name, fn) { this.events.set(name, fn); }
   append(...kids) {
     this.children.push(...kids);
     for (const kid of kids) if (kid instanceof Element) kid.parent = this;
@@ -41,9 +43,19 @@ function harness(t, userAgent = 'iPhone') {
   const locks = [];
   let unlocks = 0;
   const body = new Element();
-  globalThis.document = { body, activeElement: null, createElement: () => new Element(),
+  const root = { dataset: { input: 'touch' } };
+  globalThis.document = { body, documentElement: root, activeElement: null, createElement: () => new Element(),
     createElementNS: () => new Element(), createTextNode: text => text };
-  globalThis.addEventListener = () => {};
+  const events = new Map();
+  globalThis.addEventListener = (name, fn) => events.set(name, fn);
+  globalThis.innerWidth = 402;
+  globalThis.innerHeight = 874;
+  const safe = { top: 62, right: 0, bottom: 34, left: 0 };
+  globalThis.getComputedStyle = () => ({ getPropertyValue: name => `${safe[name.replace('--safe-', '')] || 0}px` });
+  globalThis.localStorage = { getItem: () => null, setItem() {} };
+  const timeouts = [];
+  t.mock.method(globalThis, 'setTimeout', (fn, ms) => { const entry = { fn, ms, cleared: false }; timeouts.push(entry); return entry; });
+  t.mock.method(globalThis, 'clearTimeout', entry => { if (entry) entry.cleared = true; });
   globalThis.requestAnimationFrame = () => 1;
   globalThis.cancelAnimationFrame = () => {};
   globalThis.history = { state: null, pushState(state) { this.state = state; },
@@ -56,7 +68,7 @@ function harness(t, userAgent = 'iPhone') {
   t.mock.method(globalThis, 'clearInterval', () => {});
   const player = createPlayer({ glyph: () => 'Esc', pads: () => [] });
   t.after(() => player.close({ popped: true }));
-  return { player, locks, get unlocks() { return unlocks; }, get el() { return body.children[0]; } };
+  return { player, locks, safe, root, events, timeouts, get unlocks() { return unlocks; }, get el() { return body.children[0]; } };
 }
 const poker = projects.find(p => p.cmd === 'pokerbros');
 const landscapeGames = projects.filter(p => p.group === 'games' && p.frame && p.cmd !== 'pokerbros');
@@ -130,4 +142,98 @@ test('desktop and tablet games never request phone orientation locks', t => {
   }
   assert.deepEqual(h.locks, []);
   assert.equal(h.unlocks, 0);
+});
+
+test('phone iframe keeps the launch URL and receives geometry excluding already-inset hardware', t => {
+  const h = harness(t);
+  navigator.standalone = true;
+  h.player.open({ ...poker, url: `${poker.url}/?existing=1#table` });
+  const frame = h.el.children[0];
+  const url = new URL(frame.src);
+  assert.equal(url.searchParams.get('existing'), '1');
+  assert.equal(url.hash, '#table');
+  assert.equal(url.searchParams.get('device'), 'phone');
+  assert.equal(url.searchParams.get('vb'), '1');
+  assert.equal(url.searchParams.get('safe'), '0,0,0,0');
+  assert.equal(url.searchParams.get('menu'), '8,8,32,32');
+  assert.equal(url.searchParams.get('standalone'), '1');
+  frame.events.get('load')();
+  assert.deepEqual(frame.messages.find(m => m.data.type === 'vyvanse:viewport')?.data, {
+    type: 'vyvanse:viewport', safe: { top: 0, right: 0, bottom: 0, left: 0 },
+    menu: { x: 8, y: 8, w: 32, h: 32 }, standalone: true, orientation: 'portrait', input: 'touch',
+  });
+  innerWidth = 874; innerHeight = 402;
+  Object.assign(h.safe, { top: 0, right: 62, bottom: 21, left: 62 });
+  h.root.dataset.input = 'ps';
+  h.events.get('resize')();
+  const last = frame.messages.filter(m => m.data.type === 'vyvanse:viewport').at(-1).data;
+  assert.deepEqual(last.safe, { top: 0, right: 0, bottom: 21, left: 0 });
+  assert.equal(last.orientation, 'landscape');
+  assert.equal(last.input, 'ps');
+  delete navigator.standalone;
+});
+
+test('ready is accepted only from this game; a legacy load still hides the card after 2.5 seconds', t => {
+  const h = harness(t);
+  h.player.open(poker);
+  const frame = h.el.children[0];
+  h.player.message({ source: {}, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  assert.equal(h.el.classList.contains('is-ready'), false);
+  frame.events.get('load')();
+  const fallback = h.timeouts.find(entry => entry.ms === 2500);
+  assert.ok(fallback, 'legacy game needs a readiness fallback after load');
+  h.player.message({ source: frame.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  assert.equal(h.el.classList.contains('is-ready'), true);
+  assert.equal(fallback.cleared, true);
+  h.player.close({ popped: true });
+  h.player.open(poker);
+  h.el.children[0].events.get('load')();
+  h.timeouts.findLast(entry => entry.ms === 2500).fn();
+  assert.equal(h.el.classList.contains('is-ready'), true, 'game that ignores the new contract works');
+});
+
+test('nub reveals controls for three seconds and timers cannot affect a later game', t => {
+  const h = harness(t);
+  h.player.open(poker);
+  const frame = h.el.children[0];
+  frame.events.get('load')();
+  h.player.message({ source: frame.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.el.querySelector('.player__nub').events.get('click')();
+  assert.equal(h.el.classList.contains('is-controls'), true);
+  const collapse = h.timeouts.findLast(entry => entry.ms === 3000);
+  assert.ok(collapse);
+  collapse.fn();
+  assert.equal(h.el.classList.contains('is-controls'), false);
+  h.el.querySelector('.player__nub').events.get('click')();
+  const pending = h.timeouts.at(-1);
+  h.player.close({ popped: true });
+  assert.equal(pending.cleared, true);
+});
+
+test('readiness retries belong to their iframe and only one remains pending', t => {
+  const h = harness(t);
+  h.player.open(poker);
+  const first = h.el.children[0];
+  first.events.get('load')();
+  h.events.get('keydown')({ key: 'Escape', repeat: false, preventDefault() {} });
+  h.player.message({ source: first.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  const retry = h.timeouts.findLast(entry => entry.ms === 200);
+  first.events.get('load')();
+  h.player.message({ source: first.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  assert.equal(retry.cleared, true, 'later readiness replaces the earlier retry');
+  h.player.open(landscapeGames[0]);
+  retry.fn();
+  assert.equal(h.el.classList.contains('is-ready'), false, 'old iframe cannot mark a replacement ready');
+});
+
+test('legacy pad acknowledgement before load does not bypass the phone loading card', t => {
+  const h = harness(t);
+  h.player.open(poker);
+  const frame = h.el.children[0];
+  h.player.message({ source: frame.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  assert.equal(h.el.classList.contains('is-ready'), false);
+  frame.events.get('load')();
+  assert.equal(h.el.classList.contains('is-ready'), false);
+  h.timeouts.findLast(entry => entry.ms === 2500).fn();
+  assert.equal(h.el.classList.contains('is-ready'), true);
 });

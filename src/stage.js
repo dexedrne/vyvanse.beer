@@ -92,6 +92,7 @@ export function createStage(shell, { screen, duoBox, models }) {
         cast = m.createCast(duoBox, {
           calm,
           models,
+          framing: shell.framing,
           // everyone the page asked for is in: it swaps the renders out for them
           onReady() {
             shell.castReady();
