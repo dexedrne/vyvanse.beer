@@ -156,7 +156,7 @@ const LISTS = {
 };
 const S = {
   tab: 'games',
-  games: 0,
+  games: Math.max(0, SHELF.findIndex((eds) => eds.some((p) => p.featured))),
   crew: Math.max(0, crew.members.findIndex((m) => m.featured)),
   sites: 0,
   contact: 0,

@@ -26,6 +26,7 @@
 //   thumb     optional cartridge label in public/img/thumb/ (textless, safe for a centred 4:3 crop)
 //   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
 //   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
+//   featured  games only, on one game: the menu starts on it and its art is painted first
 //   asParam   true only when the game supports ?as=<crew num> for character preselection
 //   of        games only: the cmd of the game this is an edition of. An edition is its own site,
 //             with its own entry here (name, blurb, url, art…), but it shares that game's
@@ -294,6 +295,7 @@ export const projects = [
   },
   {
     cmd: 'shitbox',
+    featured: true, // the flagship: the menu opens on it
     boot: 'odd jobs in a tired old four-door', // the hero's boot log line
     aliases: ['beater', 'car'],
     slug: 'shitbox',

@@ -183,7 +183,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   const sites = projects.filter((p) => p.group === 'sites');
   const g = Object.fromEntries(groups.map((x) => [x.id, x]));
   const [host, ...tld] = site.name.split('.');
-  const lead = games[0];
+  const lead = games.find((p) => p.featured) || games[0];
   const pair = duo.map((n) => crew.members.find((m) => m.num === n));
 
   const tabs = TABS.map(
