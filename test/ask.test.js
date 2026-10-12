@@ -54,6 +54,22 @@ test('confidence and winning probability both gate execution; uncertainty return
   assert.equal(routeAnswer(injected).line, ACTIONS.find(a => a.id === 'contact').line);
 });
 
+test('Ask can identify #268 and #85’s cousin without offering a game launch', () => {
+  for (const text of ['who is 268', "85's cousin"]) {
+    const payload = makePayload(text);
+    const member = payload.state.crew.find(m => m.num === '268');
+    assert.equal(member?.name, 'Retardio Classic #268');
+    assert.match(member.description, /#85.*cousin/);
+    assert.ok(payload.questions.action.criteria['crew:268']);
+  }
+  assert.ok(!ACTIONS.some(a => a.kind === 'play' && a.as === '268'));
+  assert.equal(ACTIONS.find(a => a.id === 'crew-games:268')?.line, 'not in a game yet');
+  assert.equal(routeAnswer(answer('crew:268', 1))?.action, 'crew:268');
+  const revealed = [];
+  assert.equal(runAction('crew:268', { reveal: slug => revealed.push(slug) }), true);
+  assert.deepEqual(revealed, ['retardio-268']);
+});
+
 test('input strips control and markup characters, rejects empty, oversize and nontext bodies', () => {
   assert.equal(parseInput({ text: '  zombies\n as\u0000 <85>\u202e ' }), 'zombies as 85');
   assert.equal(parseInput({ text: 'a'.repeat(200) }).length, 200);

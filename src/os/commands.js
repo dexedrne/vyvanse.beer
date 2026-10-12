@@ -94,6 +94,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
   }
 
   function describeBro(b) {
+    const plays = playsIn(projects, b.num);
     term.print(
       h(
         'div',
@@ -104,7 +105,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           {},
           line(strong(b.name), b.featured ? muted('  the mascot') : null),
           line(muted(b.line)),
-          line('playable in ', ...playsIn(projects, b.num).flatMap((g, i) => [i ? ' ' : '', run(`open ${g.cmd}`, g.cmd)])),
+          plays.length ? line('playable in ', ...plays.flatMap((g, i) => [i ? ' ' : '', run(`open ${g.cmd}`, g.cmd)])) : line(muted('not in a game yet')),
           b.download ? line(muted('3d model  '), link(b.download.href, `${b.download.label} (${b.download.size})`)) : null,
           crew.repo && b.repo !== false ? line(muted('free to use  '), link(crew.repo.href), muted(` (${crew.repo.license.label})`)) : null,
           crew.repo && b.repo === false ? line(muted('free to use  '), link(crew.repo.license.href, crew.repo.license.label)) : null,
@@ -235,7 +236,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
             ),
           ),
         );
-        if (playIn) term.print(line('play them: ', run(`open ${playIn.cmd}`)));
+        if (playIn) term.print(line('play: ', run(`open ${playIn.cmd}`)));
         if (crew.repo) term.print(line('free to use: ', link(crew.repo.href), muted(` (${crew.repo.license.label})`)));
         shell.reveal('crew');
       },

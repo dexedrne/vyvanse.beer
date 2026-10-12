@@ -22,9 +22,9 @@ export const ACTIONS = [
   ]),
   ...crew.members.flatMap(m => [
     { id: `crew:${m.num}`, kind: 'crew', member: m.num, label: m.name, line: m.line,
-      criterion: `Meet, identify or ask about ${m.name}, their appearance, clothes or car.` },
+      criterion: `Meet, identify or ask about ${m.name}, their appearance, clothes, car, family or belongings.` },
     { id: `crew-games:${m.num}`, kind: 'crew', member: m.num, label: `games with #${m.num}`,
-      line: playsIn(projects, m.num).map(p => p.name).join(', '),
+      line: playsIn(projects, m.num).map(p => p.name).join(', ') || 'not in a game yet',
       criterion: `Which games can I play as #${m.num}?` },
     { id: `crew-model:${m.num}`, kind: 'crew', member: m.num, label: `model for #${m.num}`,
       line: `${m.download.label} (${m.download.size})`,

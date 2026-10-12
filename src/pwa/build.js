@@ -7,7 +7,7 @@ export function shellFile(file) {
   if (file.includes('.prev.')) return false;
   return ['index.html', 'offline.html', 'manifest.webmanifest', 'apple-touch-icon.png', 'favicon.svg', 'vyvanse-pad.js'].includes(file) ||
     /^assets\/[^/]+\.(js|css|woff2)$/.test(file) || /^img\/.*\.(webp|jpg|png)$/.test(file) || /^pwa\/[^/]+\.png$/.test(file) ||
-    /^models\/(radbro(?:2564|3704|3710|4764|652|723)|retardio(?:555|85))-hero\.glb$/.test(file) ||
+    /^models\/(radbro(?:2564|3704|3710|4764|652|723)|retardio(?:268|555|85))-hero\.glb$/.test(file) ||
     /^audio\/vyvanse-bg\.(m4a|webm)$/.test(file) || /^draco\/draco_(decoder\.wasm|wasm_wrapper\.js)$/.test(file);
 }
 

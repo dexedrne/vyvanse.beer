@@ -131,9 +131,9 @@ function crewItem(b, i, { crew, projects, shell }) {
     <p class="kindline">${esc(b.kind)}</p>
     <h3 class="wm" id="${esc(b.slug)}-name"><span class="vh">${esc(b.kind)} </span>#${esc(b.num)}</h3>
     <p class="pitch">${esc(b.line)} Rigged and animated.</p>
-    <div class="plays"><span class="plays__label">in</span>${plays
+    <div class="plays">${plays.length ? '<span class="plays__label">in</span>' + plays
       .map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(shell(g))};--accent:${esc(g.accent)}">${esc(g.name)}</a>`)
-      .join('')}</div>
+      .join('') : '<span class="fine">not in a game yet</span>'}</div>
     <div class="act">
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
       ${status(file, `${b.download.size}, rigged and animated`)}

@@ -216,7 +216,7 @@ mirrors the art upside down, the neon of the cartridges and buttons standing in 
 heavy drops that splash, the pointer's wake and clicks. Under text the water is held dark enough
 for every pair to meet WCAG AA.
 
-**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the eight web
+**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the nine web
 models (`public/models/*-hero.glb`, each with `Idle` and `Big_Wave_Hello`) and shows a pair or
 one alone, with a small groove on one shared beat (a head nod, a shoulder bounce, a hip sway).
 On Games and Contact, the pair on the right changes on 24-second turns using the existing stage loop.
@@ -297,13 +297,16 @@ completion, and `hidden: true` leaves it out of `help`.
 
 `public/img/radbros/` and `public/img/retardios/` hold flat renders of the rigged models on
 transparent backgrounds (the crew renders, 500 px tall), `public/img/faces/` their 200×200 crops
-for the character-select tiles. The web models in `public/models/` (all eight, each crew member's
+for the character-select tiles. The web models in `public/models/` (all nine, each crew member's
 `model` in `src/projects.js`) are the mesh plus `Idle` and `Big_Wave_Hello`, unlit, textures at
 1024 in WebP, Draco-compressed. The Retardios' crew downloads are packages like the Radbros'
-(`retardio555-3d-model.zip` and `retardio85-3d-model.zip` on the `radbros-3d` release: static,
+(`retardio555-3d-model.zip`, `retardio85-3d-model.zip` and `retardio268-3d-model.zip` on the `radbros-3d` release: static,
 rigged and animated `.glb`, a preview, a README and the license). `public/draco/` is the Draco
 decoder from `three/examples/jsm/libs/draco/gltf/`, served from this site; copy those two files
 again if you update `three` (pinned to an exact version).
+
+#268 is #85's cousin and keeps a FREE MITCH poster. His Crew card and download are available;
+he is not in a game yet. `crew-3d-all-nine.zip` includes all nine characters.
 
 #3704 and #3710 use the same 24-joint hero rig, WebP / Draco optimisation, Idle and wave clips, grounding,
 groove and loading budget as the others. Their Crew cards list PokerBros and RADTAP, and those two games'
@@ -321,7 +324,7 @@ The new model download links use the existing `radbros-3d` release on this site'
   a game. Anything made from them keeps the same license. The source models are also at
   [dexedrne/radbros-3d](https://github.com/dexedrne/radbros-3d).
 - `public/draco/` is the Draco decoder that ships with three.js (Apache-2.0).
-- Retardio #555 and #85 (`public/img/retardios/`, `public/models/retardio*`) are dexedrne's own Retardios.
+- Retardio #555, #85 and #268 (`public/img/retardios/`, `public/models/retardio*`) are dexedrne's own Retardios.
   Their 3D model packages on the `radbros-3d` release are under the same Viral Public License as the Radbros'.
 - The background music (`public/audio/`) was made for this site and isn't covered by either
   license above.

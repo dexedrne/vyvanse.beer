@@ -54,7 +54,7 @@ export const groups = [
 const MAIN_CAST = ['4764', '652', '3704', '3710'];
 // The runner and shooters' Crew cards; RadPayne's Retardios are in its own edition.
 const RADBROS = [...MAIN_CAST, '723', '2564'];
-const ALL = [...RADBROS, '555', '85'];
+const ALL = [...RADBROS, '555', '85']; // current game casts; #268 is Crew only
 
 export const projects = [
   {
@@ -569,15 +569,15 @@ export const projects = [
 // `image` is his render, shown until then (and without WebGL).
 export const crew = {
   title: 'The crew',
-  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85, truck guy #723 and rare ghost #2564. All eight built in 3D, rigged and animated.',
+  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85 and his cousin #268, truck guy #723 and rare ghost #2564. All nine built in 3D, rigged and animated.',
   playIn: 'spidertag',
-  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-eight.zip', label: 'all eight, one .zip', size: '161.8 MB' },
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-nine.zip', label: 'all nine, one .zip', size: '185.4 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
   repo: {
     href: 'https://github.com/dexedrne/radbros-3d',
     label: 'Free to use: models on GitHub',
     license: { label: 'Viral Public License', href: 'https://viralpubliclicense.org/VPL.txt' },
-    line: 'Six Radbros in the repo; the two Retardios are built on the Radbro rig. Rigged and animated. Use them, remix them, put them in your game.',
+    line: 'Six Radbros in the repo; the three Retardios are built on the Radbro rig. Rigged and animated. Use them, remix them, put them in your game.',
   },
   members: [
     {
@@ -709,6 +709,23 @@ export const crew = {
         width: 186,
         height: 500,
         alt: 'Retardio #85 in 3D, both arms up in a cheer: long black hair with blunt bangs, blue eyes with pink paint around his right eye and blue around his left, purple freckles, a white NEED MONEY FOR PORSCHE tee, black jeans and black sneakers.',
+      },
+    },
+    {
+      num: '268',
+      slug: 'retardio-268',
+      kind: 'Retardio Classic',
+      face: '/img/faces/retardio-268.webp',
+      model: '/models/retardio268-hero.glb',
+      name: 'Retardio Classic #268',
+      line: '#85’s cousin. He keeps a FREE MITCH poster.',
+      repo: false,
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio268-3d-model.zip', label: '3D model .zip', size: '23 MB' },
+      image: {
+        src: '/img/retardios/retardio-268.webp',
+        width: 310,
+        height: 500,
+        alt: 'Retardio Classic #268 in 3D, waving hello: black hair with blunt bangs, olive green eyes with blue tears, a lit cigarette, a white NEED MONEY FOR PORSCHE tee, black trousers and black sneakers with white soles.',
       },
     },
   ],
