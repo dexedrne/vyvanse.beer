@@ -1,5 +1,5 @@
 import { h } from '../dom.js';
-import { BY_ID, CHIPS, LINES, runAction } from './actions.js';
+import { BY_ID, CHIPS, LINES, actionOf, runAction } from './actions.js';
 import { requestAsk } from './client.js';
 
 export function createAsk({ shell, pad }) {
@@ -21,7 +21,7 @@ export function createAsk({ shell, pad }) {
       'data-action': c.action, onclick: () => choose(c.action) }, c.label || BY_ID.get(c.action).label)));
   }
   function choose(id) {
-    const action = BY_ID.get(id);
+    const action = actionOf(id);
     if (!action) return;
     controller?.abort(); version++;
     form.removeAttribute('aria-busy');

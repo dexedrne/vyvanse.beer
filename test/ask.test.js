@@ -25,7 +25,7 @@ test('the closed catalogue covers projects, editions and only their real cast', 
     assert.ok(ACTIONS.some(a => a.id === `play:${p.cmd}`));
     for (const num of p.cast || []) assert.ok(ACTIONS.some(a => a.id === `play:${p.cmd}:${num}`));
   }
-  assert.ok(!ACTIONS.some(a => a.id === 'play:pokerbros:2564'));
+  assert.ok(!ACTIONS.some(a => a.id === 'play:saloon:2564'));
   assert.equal(ACTIONS.find(a => a.id === 'crew:555').line, crew.members.find(m => m.num === '555').line);
   assert.equal(plainAction('zombies as 85'), 'play:zombietardio:85');
   assert.equal(plainAction('the one with the miata'), 'crew:555');
@@ -85,7 +85,7 @@ test('launches keep the original project and append as only when supported, pres
   assert.equal(calls[0][1].as, '85');
   runAction('crew:555', shell);
   assert.equal(calls[1], 'retardio-555');
-  assert.equal(runAction('play:pokerbros:2564', shell), false);
+  assert.equal(runAction('play:saloon:2564', shell), false);
   const phone = { userAgent: 'iPhone', maxTouchPoints: 5 };
   const supported = { url: 'https://game.example/?mode=coop#menu', asParam: true, cast: ['85'] };
   const url = new URL(launchUrl(supported, '85', phone));

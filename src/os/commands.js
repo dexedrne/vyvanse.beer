@@ -5,7 +5,7 @@ import { h } from '../dom.js';
 import { shortUrl, playsIn } from '../projects.js';
 import { neofetch } from './fetch.js';
 import { openTip } from '../tip/open.js';
-import { BY_ID, plainAction, runAction, launchUrl } from '../ask/actions.js';
+import { BY_ID, actionOf, plainAction, runAction, launchUrl } from '../ask/actions.js';
 import { requestAsk } from '../ask/client.js';
 
 const norm = (s) => s.toLowerCase().replace(/^[#$]+/, '').trim();
@@ -435,8 +435,9 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     cancel,
     action(id) {
       cancel();
-      if (!BY_ID.has(id)) return;
-      term.print(line(BY_ID.get(id).line));
+      const a = actionOf(id);
+      if (!a) return;
+      term.print(line(a.line));
       runAction(id, shell);
     },
     run(raw, ctx = {}) {

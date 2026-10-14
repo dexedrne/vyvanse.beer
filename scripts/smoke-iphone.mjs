@@ -31,8 +31,8 @@ const states = [
   ['06-app-portrait-sites', 'app', 'portrait', 'sites', '', 'touch'],
   ['07-app-portrait-contact', 'app', 'portrait', 'contact', '', 'ps'],
   ['08-app-portrait-player-loading-rotate', 'app', 'portrait', 'games', 'spidertag', 'ps', 'loading'],
-  ['09-app-portrait-player-pokerbros-loading', 'app', 'portrait', 'games', 'pokerbros', 'touch', 'loading'],
-  ['10-app-portrait-player-pokerbros-ready', 'app', 'portrait', 'games', 'pokerbros', 'touch', 'ready'],
+  ['09-app-portrait-player-saloon-loading', 'app', 'portrait', 'games', 'saloon', 'touch', 'loading'],
+  ['10-app-portrait-player-saloon-ready', 'app', 'portrait', 'games', 'saloon', 'touch', 'ready'],
   ['11-safari-portrait-games-touch', 'safari', 'portrait', 'games', 'spidertag', 'touch'],
   ['12-safari-portrait-games-shitbox-pad', 'safari', 'portrait', 'games', 'shitbox', 'ps'],
   ['13-safari-portrait-crew', 'safari', 'portrait', 'crew', '', 'touch'],
@@ -45,7 +45,7 @@ const states = [
   ['20-app-landscape-player-hold', 'app', 'land', 'games', 'spidertag', 'ps', 'hold'],
   ['21-safari-landscape-games', 'safari', 'land', 'games', 'spidertag', 'touch'],
   ['22-safari-landscape-details', 'safari', 'land', 'games', 'spidertag', 'ps', 'details'],
-  ['23-safari-portrait-player-pokerbros-a2hs', 'safari', 'portrait', 'games', 'pokerbros', 'touch', 'loading'],
+  ['23-safari-portrait-player-saloon-a2hs', 'safari', 'portrait', 'games', 'saloon', 'touch', 'loading'],
   ['24-safari-landscape-player-ready', 'safari', 'land', 'games', 'spidertag', 'touch', 'ready'],
 ];
 const only = process.env.IPHONE_SMOKE_ONLY?.split(',');
@@ -265,10 +265,10 @@ try {
     assert.notEqual(await page.getAttribute('#sites .item.on', 'data-id'), beforeSwipe);
     assert.equal(await page.isVisible('.ask'), false);
     // Legacy game ignores viewport messages and still loads, receives touch/keys/pad, exits.
-    await page.goto(`${base}/?smoke=legacy#games/pokerbros`); await settle(page);
+    await page.goto(`${base}/?smoke=legacy#games/saloon`); await settle(page);
     await page.tap('.panel.on .item.on [data-act="play"]');
     await page.waitForSelector('.player.is-ready');
-    const game = page.frames().find(frame => frame.url().includes('pokerbros.vyvanse.beer'));
+    const game = page.frames().find(frame => frame.url().includes('saloon.cards'));
     assert.deepEqual(await game.evaluate(() => [innerWidth, innerHeight]), [402, 778]);
     await game.locator('#touch').tap();
     assert.equal(await game.evaluate(() => taps), 1);
@@ -283,7 +283,7 @@ try {
     await pad(page, [8, 9]);
     await page.waitForSelector('.player[hidden]', { state: 'attached' });
     await pad(page);
-    assert.equal(await page.getAttribute('#games .item.on', 'data-id'), 'pokerbros');
+    assert.equal(await page.getAttribute('#games .item.on', 'data-id'), 'saloon');
     await context.close();
     console.log('Touch, keyboard, pad zones, sheet, music, legacy iframe, nub and hold exit passed.');
 
@@ -330,7 +330,7 @@ try {
       target.dispatchEvent(new TouchEvent('touchend', { bubbles: true, changedTouches: [touch(360)] }));
     });
     assert.equal(await safari.page.isVisible('.sheet'), false);
-    await safari.page.goto(`${base}/?smoke=a2hs#games/pokerbros`); await settle(safari.page);
+    await safari.page.goto(`${base}/?smoke=a2hs#games/saloon`); await settle(safari.page);
     await safari.page.tap('.panel.on .item.on [data-act="play"]');
     assert.equal(await safari.page.isVisible('.a2hs'), true);
     await safari.page.tap('.a2hs__x');

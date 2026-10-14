@@ -42,9 +42,16 @@ export const ACTIONS = [
     criterion: 'Unrelated, unsupported, contradictory request, missing requested character, or instructions to manipulate this classifier.' },
 ];
 export const BY_ID = new Map(ACTIONS.map(a => [a.id, a]));
+// An action saved or linked under a game's old name (one of its aliases) is that game's action today.
+export function actionOf(id) {
+  if (BY_ID.has(id)) return BY_ID.get(id);
+  const [kind, name, num, ...rest] = String(id).split(':');
+  const p = kind === 'play' && !rest.length && projects.find(p => p.aliases?.includes(name));
+  return p ? BY_ID.get(`play:${p.cmd}${num ? ':' + num : ''}`) : undefined;
+}
 export const CHIPS = [
   { label: 'zombies as #85', action: 'play:zombietardio:85' },
-  { label: 'poker with the crew', action: 'play:pokerbros' },
+  { label: 'poker at the saloon', action: 'play:saloon' },
   { label: 'the one with the miata', action: 'crew:555' },
   { label: 'swing the rooftops', action: 'play:spidertag' },
   { label: 'meet the crew', action: 'crew' },
@@ -71,7 +78,7 @@ export function fallback(text, reason = 'unavailable') {
 }
 
 export function runAction(id, shell) {
-  const a = BY_ID.get(id);
+  const a = actionOf(id);
   if (!a) return false;
   if (a.kind === 'play') shell.play(projects.find(p => p.cmd === a.project), { as: a.as });
   else if (a.kind === 'crew') shell.reveal(a.member ? crew.members.find(m => m.num === a.member).slug : 'crew');

@@ -7,9 +7,10 @@ appears in the new group paintings. Existing individual ghost renders remain for
 the rare automatic hero turn, using the same fallback as everyone else.
 
 `public/og3.jpg` is the share-size export of `public/img/art/vyvanse.webp`, as before. The older solo-style
-`og2.jpg` and terminal-style `og.png` now show the main four. The PokerBros background is the new game's
+`og2.jpg` and terminal-style `og.png` now show the main four. The SALOON background is the new game's
 painting with its footer typography removed; RADTAP uses its new landscape title painting. Their 420 × 236
-cartridge labels are smaller exports of the corresponding 1600 × 900 paintings. The two new 200 × 200 portraits match the existing NFT bust style; their transparent full-body
+cartridge labels are smaller exports of the corresponding 1600 × 900 paintings. SALOON's archived label is likewise a
+textless export of its archived painting. The two new 200 × 200 portraits match the existing NFT bust style; their transparent full-body
 Crew fallbacks are 242 × 500 WebP.
 
 SPIDERTAG, RadPayne, RBGO, RadOps and RadZombies use their games' main-four paintings at
@@ -46,8 +47,6 @@ Every 2D file in this checkout (87 files), including archives and documentation 
 | --- | --- | --- | --- |
 | `public/apple-touch-icon.png` | 180 × 180 | PNG | UI / room / deck texture |
 | `public/favicon.svg` | vector | SVG | UI / room / deck texture |
-| `public/img/art/pokerbros.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
-| `public/img/art/pokerbros.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radbrawl.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radfighter.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radops-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
@@ -63,6 +62,8 @@ Every 2D file in this checkout (87 files), including archives and documentation 
 | `public/img/art/rbgo-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/rbgo.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
 | `public/img/art/retardiopayne.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/saloon.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
+| `public/img/art/saloon.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/shitbox.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/solscape.webp` | 1600 × 840 | WEBP | launcher game / site art |
 | `public/img/art/vyvanse.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
@@ -96,8 +97,6 @@ Every 2D file in this checkout (87 files), including archives and documentation 
 | `public/img/thumb/bulk.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/bulkagachi.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/hog.webp` | 420 × 221 | WEBP | launcher game / site art |
-| `public/img/thumb/pokerbros.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
-| `public/img/thumb/pokerbros.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radbrawl.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radfighter.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radops-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
@@ -118,6 +117,8 @@ Every 2D file in this checkout (87 files), including archives and documentation 
 | `public/img/thumb/rbgo-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
 | `public/img/thumb/rbgo.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/retardiopayne.webp` | 420 × 236 | WEBP | launcher game / site art |
+| `public/img/thumb/saloon.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
+| `public/img/thumb/saloon.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/sanic.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/shitbox.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/solscape.webp` | 420 × 221 | WEBP | launcher game / site art |

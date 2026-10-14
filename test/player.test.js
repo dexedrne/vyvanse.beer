@@ -70,13 +70,13 @@ function harness(t, userAgent = 'iPhone') {
   t.after(() => player.close({ popped: true }));
   return { player, locks, safe, root, events, timeouts, get unlocks() { return unlocks; }, get el() { return body.children[0]; } };
 }
-const poker = projects.find(p => p.cmd === 'pokerbros');
-const landscapeGames = projects.filter(p => p.group === 'games' && p.frame && p.cmd !== 'pokerbros');
+const saloon = projects.find(p => p.cmd === 'saloon');
+const landscapeGames = projects.filter(p => p.group === 'games' && p.frame && p.cmd !== 'saloon');
 
-test('PokerBros opens on a phone without a landscape lock or rotate-hint class', t => {
+test('SALOON opens on a phone without a landscape lock or rotate-hint class', t => {
   const h = harness(t);
-  h.player.open(poker);
-  assert.equal(h.player.current, poker);
+  h.player.open(saloon);
+  assert.equal(h.player.current, saloon);
   assert.equal(h.el.hidden, false);
   assert.equal(h.el.classList.contains('player--phone'), true);
   assert.equal(h.el.classList.contains('player--landscape'), false);
@@ -101,11 +101,11 @@ test('every other framed game keeps landscape locking and the phone rotate-hint 
   }
 });
 
-test('switching through PokerBros clears and restores landscape behavior', t => {
+test('switching through SALOON clears and restores landscape behavior', t => {
   const h = harness(t);
   h.player.open(landscapeGames[0]);
   assert.deepEqual(h.locks, ['landscape']);
-  h.player.open(poker);
+  h.player.open(saloon);
   assert.equal(h.el.classList.contains('player--landscape'), false);
   assert.deepEqual(h.locks, ['landscape']);
   assert.equal(h.unlocks, 1, 'release the previous game lock');
@@ -133,7 +133,7 @@ test('desktop and tablet games never request phone orientation locks', t => {
   const h = harness(t);
   for (const userAgent of ['Desktop', 'iPad', 'Android Tablet']) {
     t.mock.getter(globalThis.navigator, 'userAgent', () => userAgent);
-    for (const p of [poker, landscapeGames[0]]) {
+    for (const p of [saloon, landscapeGames[0]]) {
       h.player.open(p);
       assert.equal(h.el.classList.contains('player--phone'), false, userAgent);
       assert.equal(new URL(h.el.children[0].src).searchParams.has('device'), false, userAgent);
@@ -147,7 +147,7 @@ test('desktop and tablet games never request phone orientation locks', t => {
 test('phone iframe keeps the launch URL and receives geometry excluding already-inset hardware', t => {
   const h = harness(t);
   navigator.standalone = true;
-  h.player.open({ ...poker, url: `${poker.url}/?existing=1#table` });
+  h.player.open({ ...saloon, url: `${saloon.url}/?existing=1#table` });
   const frame = h.el.children[0];
   const url = new URL(frame.src);
   assert.equal(url.searchParams.get('existing'), '1');
@@ -175,18 +175,18 @@ test('phone iframe keeps the launch URL and receives geometry excluding already-
 
 test('ready is accepted only from this game; a legacy load still hides the card after 2.5 seconds', t => {
   const h = harness(t);
-  h.player.open(poker);
+  h.player.open(saloon);
   const frame = h.el.children[0];
-  h.player.message({ source: {}, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.player.message({ source: {}, origin: new URL(saloon.url).origin, data: { type: 'vyvanse:ready' } });
   assert.equal(h.el.classList.contains('is-ready'), false);
   frame.events.get('load')();
   const fallback = h.timeouts.find(entry => entry.ms === 2500);
   assert.ok(fallback, 'legacy game needs a readiness fallback after load');
-  h.player.message({ source: frame.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.player.message({ source: frame.contentWindow, origin: new URL(saloon.url).origin, data: { type: 'vyvanse:ready' } });
   assert.equal(h.el.classList.contains('is-ready'), true);
   assert.equal(fallback.cleared, true);
   h.player.close({ popped: true });
-  h.player.open(poker);
+  h.player.open(saloon);
   h.el.children[0].events.get('load')();
   h.timeouts.findLast(entry => entry.ms === 2500).fn();
   assert.equal(h.el.classList.contains('is-ready'), true, 'game that ignores the new contract works');
@@ -194,10 +194,10 @@ test('ready is accepted only from this game; a legacy load still hides the card 
 
 test('nub reveals controls for three seconds and timers cannot affect a later game', t => {
   const h = harness(t);
-  h.player.open(poker);
+  h.player.open(saloon);
   const frame = h.el.children[0];
   frame.events.get('load')();
-  h.player.message({ source: frame.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.player.message({ source: frame.contentWindow, origin: new URL(saloon.url).origin, data: { type: 'vyvanse:ready' } });
   h.el.querySelector('.player__nub').events.get('click')();
   assert.equal(h.el.classList.contains('is-controls'), true);
   const collapse = h.timeouts.findLast(entry => entry.ms === 3000);
@@ -212,14 +212,14 @@ test('nub reveals controls for three seconds and timers cannot affect a later ga
 
 test('readiness retries belong to their iframe and only one remains pending', t => {
   const h = harness(t);
-  h.player.open(poker);
+  h.player.open(saloon);
   const first = h.el.children[0];
   first.events.get('load')();
   h.events.get('keydown')({ key: 'Escape', repeat: false, preventDefault() {} });
-  h.player.message({ source: first.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.player.message({ source: first.contentWindow, origin: new URL(saloon.url).origin, data: { type: 'vyvanse:ready' } });
   const retry = h.timeouts.findLast(entry => entry.ms === 200);
   first.events.get('load')();
-  h.player.message({ source: first.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.player.message({ source: first.contentWindow, origin: new URL(saloon.url).origin, data: { type: 'vyvanse:ready' } });
   assert.equal(retry.cleared, true, 'later readiness replaces the earlier retry');
   h.player.open(landscapeGames[0]);
   retry.fn();
@@ -228,9 +228,9 @@ test('readiness retries belong to their iframe and only one remains pending', t 
 
 test('legacy pad acknowledgement before load does not bypass the phone loading card', t => {
   const h = harness(t);
-  h.player.open(poker);
+  h.player.open(saloon);
   const frame = h.el.children[0];
-  h.player.message({ source: frame.contentWindow, origin: new URL(poker.url).origin, data: { type: 'vyvanse:ready' } });
+  h.player.message({ source: frame.contentWindow, origin: new URL(saloon.url).origin, data: { type: 'vyvanse:ready' } });
   assert.equal(h.el.classList.contains('is-ready'), false);
   frame.events.get('load')();
   assert.equal(h.el.classList.contains('is-ready'), false);

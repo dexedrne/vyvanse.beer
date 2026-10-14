@@ -8,9 +8,9 @@ test('the new pair have full Crew cards and their updated games list them', () =
     const member = crew.members.find(m => m.num === num);
     assert.ok(member?.model && member?.face && member?.image && member?.download);
     const games = playsIn(projects, num).map(p => p.cmd);
-    assert.ok(games.includes('pokerbros') && games.includes('radtap') && games.includes('radbrawl'));
+    assert.ok(games.includes('saloon') && games.includes('radtap') && games.includes('radbrawl'));
   }
-  assert.ok(!projects.find(p => p.cmd === 'pokerbros').cast.includes('2564'));
+  assert.ok(!projects.find(p => p.cmd === 'saloon').cast.includes('2564'));
 });
 
 test('Games and Contact keep #4764 and #85 on the puddle; the new pair are on their own Crew cards', () => {
@@ -28,7 +28,7 @@ test('the nine Crew members keep the existing eight SHITBOX drivers and all game
   }
 });
 
-test('Crew links pick the Retardio editions and keep the ghost out of PokerBros', () => {
+test('Crew links pick the Retardio editions and keep the ghost out of SALOON', () => {
   for (const num of ['555', '85']) {
     const games = playsIn(projects, num).map(p => p.cmd);
     assert.ok(games.includes('retardiopayne') && games.includes('zombietardio'));
@@ -36,7 +36,7 @@ test('Crew links pick the Retardio editions and keep the ghost out of PokerBros'
   }
   const ghost = playsIn(projects, '2564').map(p => p.cmd);
   assert.ok(ghost.includes('shitbox') && ghost.includes('radtap'));
-  assert.ok(!ghost.includes('pokerbros') && !ghost.includes('radfighter'));
+  assert.ok(!ghost.includes('saloon') && !ghost.includes('radfighter'));
 });
 
 test('#268 has a full Crew card beside #85 without advertising a game', () => {

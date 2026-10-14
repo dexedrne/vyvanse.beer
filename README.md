@@ -74,7 +74,7 @@ curl -sI https://example.com | grep -iE 'x-frame-options|frame-ancestors'
 No output means `frame: true` is fine and PLAY runs it inside the page. With `frame: false` it
 opens in a new tab, and the button and status line say so (Solscape, bitcorn and sanic).
 Phone games default to landscape; set `orientation: 'any'` for a game that also supports portrait,
-such as PokerBros. That skips the orientation lock and the player's rotate hint.
+such as SALOON. That skips the orientation lock and the player's rotate hint.
 
 ## Controls
 
@@ -105,7 +105,9 @@ whole row; R does the same on a keyboard. A game with editions is one cartridge,
 RetardioPayne move together. The order is kept in this browser (`localStorage`, key `vyv-order`,
 only while it differs from the default), and "reset order" in the row's head brings the default
 back. A game added later shows up in its default place in a saved order: right after the game
-before it in `src/projects.js`. Without storage the rows keep the default order.
+before it in `src/projects.js`. A renamed game keeps its old `cmd` in its `aliases`, so a saved
+order, a link or a command with the old name still finds it. Without storage the rows keep the
+default order.
 
 View and Start act when they're let go, and only on their own: pressed together they're the
 player's way back to the menu (below), so in the menu that combo does nothing. The pad is read on
@@ -165,7 +167,7 @@ Bluetooth settings, press a pad button to expose it to Safari, and use ✕ to pl
 L1/R1 for sections and the d-pad/stick to select. L3 toggles music (M on a keyboard); the music
 button also starts audio after the first tap. Create + Options held for one second unloads the
 game and returns to the shelf. Touch supports cartridge taps, swiping the artwork, swiping the
-section bar, and safe-area back buttons. Portrait works for browsing and PokerBros; other games
+section bar, and safe-area back buttons. Portrait works for browsing and SALOON; other games
 ask for landscape. The manifest permits either orientation, and each game's player controls its
 landscape lock and rotate hint.
 
@@ -309,8 +311,8 @@ again if you update `three` (pinned to an exact version).
 he is not in a game yet. `crew-3d-all-nine.zip` includes all nine characters.
 
 #3704 and #3710 use the same 24-joint hero rig, WebP / Draco optimisation, Idle and wave clips, grounding,
-groove and loading budget as the others. Their Crew cards list PokerBros and RADTAP, and those two games'
-launcher art and cartridge labels match their new group paintings. PokerBros's cast excludes #2564.
+groove and loading budget as the others. Their Crew cards list SALOON and RADTAP, and those two games'
+launcher art and cartridge labels match their new group paintings. SALOON's cast excludes #2564.
 The new model download links use the existing `radbros-3d` release on this site's repository; attach
 `radbro3704-3d-model.zip` and `radbro3710-3d-model.zip` there before publishing the site.
 

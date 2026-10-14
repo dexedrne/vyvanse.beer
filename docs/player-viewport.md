@@ -1,7 +1,7 @@
 # Phone viewport contract
 
 The launcher still fits every game into its iframe. Adoption of this contract is optional;
-existing games, including PokerBros, keep their own responsive layout and input handling.
+existing games, including SALOON, keep their own responsive layout and input handling.
 There is no iframe scaling, fixed game resolution, or dependency on a ready reply.
 
 On phones, the iframe URL preserves existing query parameters and fragments and adds:

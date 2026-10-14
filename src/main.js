@@ -9,7 +9,7 @@ import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
 import { createTicker } from './ticker.js';
 import { openTip, loadTip } from './tip/open.js';
-import { readOrder, writeOrder, arrange } from './order.js';
+import { readOrder, writeOrder, arrange, renamed } from './order.js';
 import { createSort, flip } from './sort.js';
 import { createPwa } from './pwa.js';
 import { gameUrl } from './device.js';
@@ -168,6 +168,8 @@ const ROWS = ['games', 'sites'];
 const keyOf = (tab, x) => (tab === 'games' ? x[0].cmd : x.cmd);
 const keysOf = (tab) => LISTS[tab].map((x) => keyOf(tab, x));
 const DEFAULT = { games: keysOf('games'), sites: keysOf('sites') };
+// a game's old names (its aliases) still find its place in an order saved before it was renamed
+const OLD = { games: renamed(LISTS.games, (x) => keyOf('games', x)), sites: renamed(LISTS.sites, (x) => keyOf('sites', x)) };
 const ORDER = readOrder(); // this browser's own order, if it has one (src/order.js)
 const custom = (tab) => keysOf(tab).some((k, j) => k !== DEFAULT[tab][j]);
 
@@ -1527,7 +1529,7 @@ for (const p of $$('.panel')) p.setAttribute('role', 'tabpanel');
 // "reset order" and the move mode's buttons in its head, and the first cartridge picked
 for (const tab of ROWS) {
   if (Array.isArray(ORDER[tab])) {
-    arrangeRow(tab, arrange(DEFAULT[tab], ORDER[tab]));
+    arrangeRow(tab, arrange(DEFAULT[tab], ORDER[tab], OLD[tab]));
     S[tab] = 0;
   }
   const count = $('.row__head .count', panelOf(tab));

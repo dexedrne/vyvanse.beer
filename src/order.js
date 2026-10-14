@@ -25,13 +25,22 @@ export function writeOrder(o) {
   }
 }
 
+// A row's old names for its keys: each item's aliases (a game renamed keeps its old cmd as one),
+// mapped to that item's key today. `items` are a row's entries, or on Games its editions' lists.
+export function renamed(items, keyOf) {
+  const out = {};
+  for (const x of items) for (const e of [x].flat()) for (const a of e.aliases || []) out[a] = keyOf(x);
+  return out;
+}
+
 // Today's keys (the default order) laid out in a saved order. What was saved and still exists
-// keeps its saved place; anything new since (a game added later) goes where it sits by default:
-// right after the one before it in the default order, or first if it's first there. Keys that
-// no longer exist are dropped.
-export function arrange(keys, saved) {
+// keeps its saved place, as does a key saved under an old name (`old`, from renamed()); anything
+// new since (a game added later) goes where it sits by default: right after the one before it in
+// the default order, or first if it's first there. Keys that no longer exist are dropped.
+export function arrange(keys, saved, old = {}) {
   if (!Array.isArray(saved)) return keys.slice();
-  const out = saved.filter((k, j) => keys.includes(k) && saved.indexOf(k) === j);
+  const now = saved.map((k) => (!keys.includes(k) && Object.hasOwn(old, k) ? old[k] : k));
+  const out = now.filter((k, j) => keys.includes(k) && now.indexOf(k) === j);
   keys.forEach((k, j) => {
     if (out.includes(k)) return;
     let at = 0;
