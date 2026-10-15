@@ -371,7 +371,7 @@ export const projects = [
       src: '/img/art/saloon.webp',
       width: 1600,
       height: 900,
-      alt: 'SALOON: #4764, #652, yellow-haired #3704 and green-haired #3710 lead the crew round a green felt table under a hanging lamp, with #555 and #85 at the sides and cowboy #723 behind. Play chips only.',
+      alt: 'SALOON: violet-haired #4764 with glasses, brown-haired #652, yellow-haired #3704, green-haired #3710, long-haired #555, black-haired #85 and cowboy #723 play poker round a green felt table in a warm western saloon, with a wooden bar, bottles and glowing oil lamps.',
     },
   },
   {

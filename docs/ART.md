@@ -8,7 +8,8 @@ the rare automatic hero turn, using the same fallback as everyone else.
 
 `public/og3.jpg` is the share-size export of `public/img/art/vyvanse.webp`, as before. The older solo-style
 `og2.jpg` and terminal-style `og.png` now show the main four. The SALOON background is the new game's
-painting with its footer typography removed; RADTAP uses its new landscape title painting. Their 420 × 236
+painting of all seven crew members at an oil-lamp-lit poker table in a wooden western saloon, without text.
+All seven faces fit the central square crop. RADTAP uses its new landscape title painting. Their 420 × 236
 cartridge labels are smaller exports of the corresponding 1600 × 900 paintings. SALOON's archived label is likewise a
 textless export of its archived painting. The two new 200 × 200 portraits match the existing NFT bust style; their transparent full-body
 Crew fallbacks are 242 × 500 WebP.
