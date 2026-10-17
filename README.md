@@ -310,6 +310,13 @@ again if you update `three` (pinned to an exact version).
 #268 is #85's cousin and keeps a FREE MITCH poster. His Crew card and download are available;
 he is not in a game yet. `crew-3d-all-nine.zip` includes all nine characters.
 
+Every crew download carries every animation that character has: the crew's shared clips and parkour
+set, the games' own clips (RadPayne / RadOps / RBGO / RadZombies, RADBRAWL, SHITBOX, RADTAP's
+groove) and every Meshy clip bought for them, each moved onto his own rig. That comes to 184 to 234
+clips each, all in the rigged, animated `.glb`, plus a web pair in `web/` and a README listing every
+clip. The file names are unchanged, so these links stay the same when the release assets are
+replaced; only the sizes on the Crew cards change.
+
 #3704 and #3710 use the same 24-joint hero rig, WebP / Draco optimisation, Idle and wave clips, grounding,
 groove and loading budget as the others. Their Crew cards list SALOON and RADTAP, and those two games'
 launcher art and cartridge labels match their new group paintings. SALOON's cast excludes #2564.

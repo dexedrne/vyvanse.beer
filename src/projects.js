@@ -574,7 +574,7 @@ export const crew = {
   title: 'The crew',
   line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85 and his cousin #268, truck guy #723 and rare ghost #2564. All nine built in 3D, rigged and animated.',
   playIn: 'spidertag',
-  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-nine.zip', label: 'all nine, one .zip', size: '185.4 MB' },
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-nine.zip', label: 'all nine, one .zip', size: '269.7 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
   repo: {
     href: 'https://github.com/dexedrne/radbros-3d',
@@ -591,7 +591,7 @@ export const crew = {
       model: '/models/radbro652-hero.glb',
       name: 'Radbro #652',
       line: 'Brown mop, big blue eyes, the Nobody sweatshirt.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v3.zip', label: '3D model .zip', size: '17 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro652-3d-model-v3.zip', label: '3D model .zip', size: '27 MB' },
       image: {
         src: '/img/radbros/radbro-652.webp',
         width: 267,
@@ -607,7 +607,7 @@ export const crew = {
       model: '/models/radbro4764-hero.glb',
       name: 'Radbro #4764',
       line: 'Skull shades, scribble hoodie, katana at his left hip.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v3.zip', label: '3D model .zip', size: '19 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro4764-3d-model-v3.zip', label: '3D model .zip', size: '29 MB' },
       featured: true,
       image: {
         src: '/img/radbros/radbro-4764.webp',
@@ -624,7 +624,7 @@ export const crew = {
       model: '/models/radbro3704-hero.glb',
       name: 'Radbro #3704',
       line: 'Golden yellow hair, amber eyes, green rings on a black tee and olive cargo trousers.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3704-3d-model.zip', label: '3D model .zip', size: '37 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3704-3d-model.zip', label: '3D model .zip', size: '50 MB' },
       image: {
         src: '/img/radbros/radbro-3704.webp', width: 295, height: 500,
         alt: 'Radbro #3704 in 3D: golden yellow bob, amber eyes, a black green-ring tee, olive cargo trousers and black boots, waving hello.',
@@ -638,7 +638,7 @@ export const crew = {
       model: '/models/radbro3710-hero.glb',
       name: 'Radbro #3710',
       line: 'Mint green hair, amber eyes, the Nobody picture tee and dark trousers.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3710-3d-model.zip', label: '3D model .zip', size: '21 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro3710-3d-model.zip', label: '3D model .zip', size: '33 MB' },
       image: {
         src: '/img/radbros/radbro-3710.webp', width: 307, height: 500,
         alt: 'Radbro #3710 in 3D: mint green bob, amber eyes, a black Nobody picture tee, blue jeans and white sneakers, waving hello.',
@@ -652,7 +652,7 @@ export const crew = {
       model: '/models/radbro2564-hero.glb',
       name: 'Radbro #2564',
       line: 'The rare ghost. Foil hat, aviators, RAD RESPONSE vest.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro2564-3d-model.zip', label: '3D model .zip', size: '20 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro2564-3d-model.zip', label: '3D model .zip', size: '29 MB' },
       image: {
         src: '/img/radbros/radbro-2564.webp',
         width: 265,
@@ -668,7 +668,7 @@ export const crew = {
       model: '/models/radbro723-hero.glb',
       name: 'Radbro #723',
       line: 'The truck guy. Cowboy hat, a wink, a black vest and an old pickup.',
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro723-3d-model.zip', label: '3D model .zip', size: '21 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/radbro723-3d-model.zip', label: '3D model .zip', size: '30 MB' },
       image: {
         src: '/img/radbros/radbro-723.webp',
         width: 336,
@@ -689,7 +689,7 @@ export const crew = {
       name: 'Retardio Cousin #555',
       line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee, and a red Miata.',
       repo: false,
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '13 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '21 MB' },
       image: {
         src: '/img/retardios/retardio-555.webp',
         width: 312,
@@ -706,7 +706,7 @@ export const crew = {
       name: 'Retardio Cousin Classic #85',
       line: 'Retardio Cousin Classic: the original artist’s true-to-the-original relaunch. Long black hair, face paint, NEED MONEY FOR PORSCHE tee.',
       repo: false,
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio85-3d-model.zip', label: '3D model .zip', size: '12 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio85-3d-model.zip', label: '3D model .zip', size: '20 MB' },
       image: {
         src: '/img/retardios/retardio-85.webp',
         width: 186,
@@ -723,7 +723,7 @@ export const crew = {
       name: 'Retardio Classic #268',
       line: '#85’s cousin. He keeps a FREE MITCH poster.',
       repo: false,
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio268-3d-model.zip', label: '3D model .zip', size: '23 MB' },
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio268-3d-model.zip', label: '3D model .zip', size: '31 MB' },
       image: {
         src: '/img/retardios/retardio-268.webp',
         width: 310,
