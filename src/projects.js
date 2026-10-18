@@ -579,7 +579,7 @@ export const crew = {
     // the no-JS panel line, the terminal's `assets` header and the ask payload
     line: 'Art from the games, free for the Radbro community. Use it, remix it, credit @dexedrne on X.',
     credit: { label: '@dexedrne on X', href: 'https://x.com/dexedrne' },
-    all: { href: `${REL}/vyvanse-assets-all.zip`, label: 'every pack, one .zip', size: '625 MB' },
+    all: { href: `${REL}/vyvanse-assets-all.zip`, label: 'every pack, one .zip', size: '728 MB' },
     packs: [
       {
         id: 'saloon-card-pack', // hash #crew/saloon-card-pack, terminal `info saloon-card-pack`, ask `pack:saloon-card-pack`
@@ -670,6 +670,34 @@ export const crew = {
         },
         backdrop: '/img/art/radtap.webp',
         download: { href: `${REL}/game-key-art-wallpapers.zip`, label: 'wallpaper pack .zip', size: '99 MB', files: 80, formats: 'png and webp' },
+      },
+      {
+        id: 'retardio-sticker-pack',
+        slug: 'pack-retardio-sticker-pack',
+        kind: 'Retardio · sticker pack',
+        name: 'Stickers',
+        title: 'Retardio Sticker Pack',
+        line: 'Forty-nine deadpan Retardio stickers of #85 and his cousin #268, ready to upload to Telegram or use anywhere.',
+        big: '49',
+        accent: '#ff7ab6',
+        shell: '#1f2a44',
+        games: [],
+        crew: ['85', '268'],
+        contents: [
+          { path: 'telegram-png-512/', what: 'ready to upload to Telegram' },
+          { path: 'webp-512/', what: 'the same stickers, as webp' },
+          { path: 'originals-1254/', what: 'full size, transparent' },
+        ],
+        tile: '/img/packs/retardio-sticker-pack-tile.webp',
+        cover: {
+          src: '/img/packs/retardio-sticker-pack.webp',
+          width: 960,
+          height: 720,
+          phone: '/img/packs/retardio-sticker-pack-phone.webp', // 540x720, phones held upright
+          alt: 'Five die-cut stickers of Retardio #85 in a heap: it’s over, laughing and crying, a thumbs up, unbothered and a poker face.',
+        },
+        backdrop: '/img/art/retardiopayne.webp',
+        download: { href: `${REL}/retardio-sticker-pack.zip`, label: 'sticker pack .zip', size: '103 MB', files: 152, formats: 'png and webp' },
       },
       {
         id: 'radbro-sticker-pack',
@@ -909,6 +937,7 @@ export const contact = {
   code: { label: 'GitHub', href: 'https://github.com/dexedrne' },
   remilia: { label: 'Remilia', href: 'https://www.remilia.net/~dexedrne', note: 'my page on remilia.net' },
   axiom: { label: 'Axiom', href: 'https://axiom.trade/@vyvanse', note: 'trade with my referral' },
+  pumpfun: { label: 'pump.fun', href: 'https://pump.fun/join/vyvanse', note: 'join with my referral' },
 };
 
 // #4764 and #85 stand on the puddle together on Games and Contact, live in 3D (src/duo.js).

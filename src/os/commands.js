@@ -311,6 +311,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         term.print(line(muted('code and models: '), link(contact.code.href, shortUrl(contact.code.href), 'me noopener')));
         if (contact.remilia) term.print(line(muted('remilia: '), link(contact.remilia.href, shortUrl(contact.remilia.href), 'me noopener')));
         if (contact.axiom) term.print(line(muted('trade on axiom: '), link(contact.axiom.href, shortUrl(contact.axiom.href), 'noopener'), muted(`  ${contact.axiom.note}`)));
+        if (contact.pumpfun) term.print(line(muted('pump.fun: '), link(contact.pumpfun.href, shortUrl(contact.pumpfun.href), 'noopener'), muted(`  ${contact.pumpfun.note}`)));
         shell.reveal('contact');
       },
     },

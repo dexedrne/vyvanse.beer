@@ -9,8 +9,8 @@ import { shellFile } from '../src/pwa/build.js';
 const packs = crew.assets?.packs ?? [];
 const render = () => renderShell({ site, groups, projects, crew, contact, duo });
 
-test('five downloadable packs have unique ids, numeric file counts and valid credits and art', () => {
-  assert.equal(packs.length, 5);
+test('six downloadable packs have unique ids, numeric file counts and valid credits and art', () => {
+  assert.equal(packs.length, 6);
   const used = new Set([...crew.members.flatMap(m => [m.num, m.slug]), ...projects.flatMap(p => [p.cmd, p.slug])]);
   for (const p of packs) {
     assert.ok(!used.has(p.id), p.id);
@@ -30,6 +30,10 @@ test('five downloadable packs have unique ids, numeric file counts and valid cre
     assert.deepEqual([p.cover.width, p.cover.height], [960, 720]);
   }
   assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').big, '22');
+  assert.equal(packs.find(p => p.id === 'retardio-sticker-pack').big, '49');
+  // owner 10/18: all the sticker packs sit together, the Retardio ones first, then the Radbro ones
+  const ids = packs.map(p => p.id);
+  assert.equal(ids.indexOf('radbro-sticker-pack'), ids.indexOf('retardio-sticker-pack') + 1);
   assert.deepEqual(packs.filter(p => p.lite).map(p => p.id), ['shitbox-garage-pack']);
   assert.equal(packs.at(-1).lite.size, '25 MB');
   assert.equal(packs.at(-1).download.size, '204 MB');
@@ -38,15 +42,15 @@ test('five downloadable packs have unique ids, numeric file counts and valid cre
 test('rendered packs follow the nine members with a third assets group and working plain downloads', () => {
   const html = render();
   const cards = [...html.matchAll(/<article class="item item--pack"[^]*?<\/article>/g)].map(m => m[0]);
-  assert.equal(cards.length, 5);
+  assert.equal(cards.length, 6);
   assert.equal([...html.matchAll(/<article class="item item--crew"/g)].length, 9);
   assert.ok(html.indexOf('id="retardio-268"') < html.indexOf('id="pack-saloon-card-pack"'));
   assert.match(html, /<p class="panel__line">Art from the games/);
   const row = html.match(/<div class="tgroups">[^]*?<\/section>/)?.[0];
   assert.equal([...row.matchAll(/class="tgroup(?: tgroup--packs)?"/g)].length, 3);
   assert.match(row, /retardios[^]*?tgroup--packs[^]*?tgroup__label">assets</);
-  assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [9, 10, 11, 12, 13]);
-  assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [9, 10, 11, 12, 13]);
+  assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [9, 10, 11, 12, 13, 14]);
+  assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [9, 10, 11, 12, 13, 14]);
   for (const card of cards) {
     assert.match(card, /class="visual visual--crew visual--pack"/);
     assert.match(card, /<picture><source[^]*?<img class="bro"/);
@@ -73,7 +77,7 @@ test('pack hash ids and legacy pack slugs round trip through the menu save and l
     history: { replaceState: (_a, _b, hash) => { location.hash = hash; } },
     show: tab => { S.tab = tab; }, at() {}, locate() {}, openTipJar() {} });
   vm.runInContext(`${idOf}\n${hashFns}`, ctx);
-  assert.equal(packs.length, 5);
+  assert.equal(packs.length, 6);
   for (const [i, p] of packs.entries()) {
     S.crew = 9 + i;
     vm.runInContext('save()', ctx);
@@ -134,7 +138,7 @@ test('terminal lists assets under crew and provides pack info, links, aliases an
     commands.run(cmd);
     text = output.map(el => el.textContent).join(' ');
     assert.match(text, /177 MB[^]*299[^]*SALOON Card Pack|SALOON Card Pack[^]*177 MB[^]*299/);
-    assert.match(text, /625 MB/);
+    assert.match(text, /728 MB/);
     assert.match(text, /Viral Public License/);
   }
   output.length = 0;

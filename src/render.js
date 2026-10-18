@@ -270,7 +270,8 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
     `<li><a class="mi" data-i="2" ${ext(contact.remilia.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('site')}${esc(contact.remilia.label)}</span><span class="det">${esc(shortUrl(contact.remilia.href))}: ${esc(contact.remilia.note)}</span>${newTab}</a></li>`,
     `<li class="js-only"><button class="mi" type="button" data-i="3" data-tip aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('coin')}Tip jar</span><span class="det">SOL to vyvanse.sol, or ETH</span></button></li>`,
     `<li><a class="mi" data-i="4" ${ext(contact.axiom.href, 'noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('chart')}${esc(contact.axiom.label)}</span><span class="det">${esc(shortUrl(contact.axiom.href))}: ${esc(contact.axiom.note)}</span>${newTab}</a></li>`,
-    `<li class="js-only"><button class="mi" type="button" data-i="5" data-os aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('term')}Radbro OS</span><span class="det">the terminal, or <kbd>/</kbd></span></button></li>`,
+    `<li><a class="mi" data-i="5" ${ext(contact.pumpfun.href, 'noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('chart')}${esc(contact.pumpfun.label)}</span><span class="det">${esc(shortUrl(contact.pumpfun.href))}: ${esc(contact.pumpfun.note)}</span>${newTab}</a></li>`,
+    `<li class="js-only"><button class="mi" type="button" data-i="6" data-os aria-haspopup="dialog"><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('term')}Radbro OS</span><span class="det">the terminal, or <kbd>/</kbd></span></button></li>`,
   ].join('');
 
   return `<div class="screen boot" id="screen">
