@@ -177,3 +177,19 @@ test('recorded Jev smoke answer routes without a live call', () => {
   assert.equal(recorded.text, 'zombies as 85');
   assert.equal(routeAnswer(replayAnswer(recorded)).action, 'play:zombietardio:85');
 });
+
+test('Ask includes asset pack criteria and payloads and reveals a card without downloading', () => {
+  assert.equal(ACTIONS.length, 132);
+  assert.equal(makePayload('wallpapers').state.packs.length, 5);
+  const revealed = [];
+  const shell = { reveal: slug => revealed.push(slug), play: () => assert.fail('pack actions must only reveal') };
+  for (const p of crew.assets.packs) {
+    const id = `pack:${p.id}`;
+    assert.equal(ACTIONS.find(a => a.id === id)?.kind, 'pack');
+    assert.ok(makePayload('assets').questions.action.criteria[id]);
+    assert.equal(routeAnswer(answer(id, 1)).action, id);
+    assert.equal(runAction(id, shell), true);
+  }
+  assert.equal(runAction('assets', shell), true);
+  assert.deepEqual(revealed, [...crew.assets.packs.map(p => p.slug), 'pack-saloon-card-pack']);
+});

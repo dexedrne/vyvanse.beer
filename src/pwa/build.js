@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 // Exact build-time allowlist: no runtime URL heuristics can accidentally admit a game or API.
 export function shellFile(file) {
   if (file.includes('.prev.')) return false;
+  if (file.startsWith('img/packs/') && !file.endsWith('-tile.webp')) return false;
   return ['index.html', 'offline.html', 'manifest.webmanifest', 'apple-touch-icon.png', 'favicon.svg', 'vyvanse-pad.js'].includes(file) ||
     /^assets\/[^/]+\.(js|css|woff2)$/.test(file) || /^img\/.*\.(webp|jpg|png)$/.test(file) || /^pwa\/[^/]+\.png$/.test(file) ||
     /^models\/(radbro(?:2564|3704|3710|4764|652|723)|retardio(?:268|555|85))-hero\.glb$/.test(file) ||

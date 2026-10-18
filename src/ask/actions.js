@@ -30,6 +30,13 @@ export const ACTIONS = [
       line: `${m.download.label} (${m.download.size})`,
       criterion: `Find the 3D model, rig, animation or download for #${m.num}.` },
   ]),
+  ...crew.assets.packs.map(p => ({
+    id: `pack:${p.id}`, kind: 'pack', pack: p.id, label: p.title,
+    line: `${p.download.label} (${p.download.size})`,
+    criterion: `Download or find the ${p.title} asset pack: ${p.contents.filter(c => !c.sum).map(c => `${c.path} ${c.what}`).join('; ')}.`,
+  })),
+  { id: 'assets', kind: 'pack', label: 'Assets', line: 'free art packs from the games',
+    criterion: 'Asks for free art, assets, wallpapers, stickers, card art, PFPs or downloads for the community.' },
   { id: 'crew', kind: 'crew', label: 'meet the crew', line: crew.line, criterion: 'Who are the crew, Radbros or Retardios in general?' },
   { id: 'crew-license', kind: 'crew', label: 'using the models', line: `${crew.repo.line} ${crew.repo.license.label}.`,
     criterion: 'Can I use, remix or put the crew models in my game? Model licence or source repository.' },
@@ -82,6 +89,7 @@ export function runAction(id, shell) {
   if (!a) return false;
   if (a.kind === 'play') shell.play(projects.find(p => p.cmd === a.project), { as: a.as });
   else if (a.kind === 'crew') shell.reveal(a.member ? crew.members.find(m => m.num === a.member).slug : 'crew');
+  else if (a.kind === 'pack') shell.reveal((a.pack ? crew.assets.packs.find(p => p.id === a.pack) : crew.assets.packs[0]).slug);
   else if (a.kind === 'contact') shell.reveal('contact');
   else if (a.kind === 'tip') shell.tip();
   else if (a.kind === 'music') shell.music(a.on);

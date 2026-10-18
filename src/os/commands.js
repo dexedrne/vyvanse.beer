@@ -53,7 +53,10 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     const n = norm(args.join('')).replace(/^(radbro|retardio)-?/, '').replace(/^#/, '');
     return crew.members.find((b) => b.num === n);
   };
-  const sections = [...groups.map((g) => g.id), 'crew'];
+  const assets = crew.assets;
+  const packs = assets.packs;
+  const findPack = args => packs.find(p => p.id === norm(args.join('-')));
+  const sections = [...groups.map((g) => g.id), 'crew', 'assets'];
   // `cd` also goes to the contact section, which `ls` has nothing to list in.
   const places = contact ? [...sections, 'contact'] : sections;
   const playIn = projects.find((p) => p.cmd === crew.playIn);
@@ -115,6 +118,22 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     shell.reveal(b.slug);
   }
 
+  const getPack = p => h('a', { href: p.download.href, download: true }, '[get]');
+  const packCredit = () => line('Free to use under the ', link(crew.repo.license.href, crew.repo.license.label),
+    '. Credit ', link(assets.credit.href, assets.credit.label), ' when you post it.');
+
+  function describePack(p) {
+    term.print(h('div', { class: 't-block t-bro-card' },
+      h('img', { src: p.cover.src, alt: p.cover.alt, width: p.cover.width, height: p.cover.height }),
+      h('div', {}, line(strong(p.title)), line(muted(p.kind)), line(p.line),
+        h('ul', { class: 'manifest manifest--all', 'aria-label': 'Contents' }, p.contents.filter(c => !c.sum).map(c =>
+          h('li', {}, h('b', {}, c.path), h('span', {}, c.what)))),
+        line(getPack(p), ' ', link(p.download.href, `${p.download.label} (${p.download.size})`)),
+        line(muted(`${p.download.size}, ${p.download.files} files, ${p.download.formats}`)),
+        packCredit())));
+    shell.reveal(p.slug);
+  }
+
   const table = {
     help: {
       desc: 'this list',
@@ -132,7 +151,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     },
     ls: {
       usage: 'ls [section]',
-      desc: 'list games, crew or sites',
+      desc: 'list games, crew, assets or sites',
       args: () => sections,
       run(args) {
         const want = args[0] ? norm(args[0]).replace(/\/$/, '') : null;
@@ -156,6 +175,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           if (g.id === 'games' && show('crew')) printCrewDir();
         }
         if (want === 'crew') printCrewDir();
+        if (want === 'assets') table.assets.run();
         if (!want) term.print(line(muted('click a name to open it, or try '), 'info <name>'));
       },
     },
@@ -205,7 +225,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     info: {
       usage: 'info <name>',
       desc: 'details and links',
-      args: () => [...projects.map((p) => p.cmd), ...crew.members.map((b) => b.num)],
+      args: () => [...projects.map((p) => p.cmd), ...crew.members.map((b) => b.num), ...packs.map(p => p.id)],
       run(args) {
         if (!args.length) {
           term.print(line('usage: info <name>. names are in ', run('ls'), '.'));
@@ -215,6 +235,8 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         if (p) return describe(p);
         const b = findBro(args);
         if (b) return describeBro(b);
+        const pack = findPack(args);
+        if (pack) return describePack(pack);
         term.print(err(`info: nothing called ${args.join(' ')}`));
       },
     },
@@ -241,6 +263,16 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         shell.reveal('crew');
       },
     },
+    assets: {
+      desc: 'free art packs from the games',
+      run() {
+        term.print(line(strong(assets.title), muted(`  ${assets.line}`)));
+        term.print(grid(...packs.flatMap(p => [run(`info ${p.id}`, p.id),
+          line(muted(`${p.download.size}, ${p.download.files} files  `), p.title, ' ', getPack(p), ' ', run(`info ${p.id}`))])));
+        term.print(line(h('a', { href: assets.all.href, download: true }, `${assets.all.label} (${assets.all.size})`)));
+        term.print(packCredit());
+      },
+    },
     wave: {
       desc: 'make whoever is on the water wave',
       run() {
@@ -253,13 +285,14 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     },
     cd: {
       usage: 'cd <section>',
-      desc: 'go to games, crew, sites or contact',
+      desc: 'go to games, crew, assets, sites or contact',
       args: () => places,
       run(args) {
         const to = args[0] ? norm(args[0]).replace(/\/$/, '') : '~';
         if (to === '~' || to === '/' || to === '') return shell.go('games');
         if (to === '..') return term.print(line(muted("you're already at the top. there's nothing above vyvanse.beer.")));
         if (!places.includes(to)) return term.print(err(`cd: no such section: ${args[0]}`));
+        if (to === 'assets') return shell.reveal(packs[0].slug);
         shell.go(to);
       },
     },
@@ -351,6 +384,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         setTimeout(() => close(), 450);
       },
     },
+    packs: { hidden: true, run: () => table.assets.run() },
     radbros: { hidden: true, run: (a, c) => table.crew.run(a, c) },
     radbrofetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
     fetch: { hidden: true, run: (a, c) => table.neofetch.run(a, c) },
@@ -393,9 +427,9 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
 
   function printCrewDir() {
     term.print(h('div', { class: 't-dir' }, 'crew/'));
-    term.print(
-      line(...crew.members.flatMap((b, i) => [i ? '  ' : '', run(`info ${b.num}`, `#${b.num}`)])),
-    );
+    term.print(line(...crew.members.flatMap((b, i) => [i ? '  ' : '', run(`info ${b.num}`, `#${b.num}`)])));
+    term.print(h('div', { class: 't-dir' }, 'assets/'));
+    term.print(line(...packs.flatMap((p, i) => [i ? '  ' : '', run(`info ${p.id}`, p.id)])));
   }
 
   const names = Object.keys(table);
@@ -409,7 +443,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
       return !!findProject(names) || BY_ID.get(plainAction(names.join(' ')))?.kind === 'play'
         || (names.length === 1 && (!!site.links.find(l => l.cmd === norm(names[0])) || !!findBro(names)));
     }
-    if (name === 'info') return !args.length || !!findProject(args) || !!findBro(args);
+    if (name === 'info') return !args.length || !!findProject(args) || !!findBro(args) || !!findPack(args);
     if (name === 'music') return args.length === 1 && ['on', 'off'].includes(args[0]);
     if (name === 'cd' || name === 'ls') return args.length <= 1
       && (!args.length || [...(name === 'cd' ? places : sections), '~', '.', '/', '..'].includes(norm(args[0]).replace(/\/$/, '')));

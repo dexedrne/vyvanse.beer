@@ -143,6 +143,74 @@ function crewItem(b, i, { crew, projects, shell }) {
 </article>`;
 }
 
+// Y on a pad, I on a keyboard: on a pack it's the full contents list (desktop: in place; phone: the sheet)
+const contentsButton = moreButton.replace('<span>details</span>', '<span>contents</span>');
+
+// what's in the zip: one line per folder, drawn as a tree. `more` lines show with the full list
+// (Y), `sum` lines only without it (a summary of the `more` lines).
+function manifest(p, { all = false } = {}) {
+  const shut = p.contents.filter((c) => !c.more).at(-1); // the last line before the full list opens
+  const open = p.contents.filter((c) => !c.sum).at(-1); // the last line of the full list
+  const rows = p.contents.map((c) => {
+    const cls = [c.more && 'manifest__more', c.sum && 'manifest__sum', c === shut && 'manifest__end', c === open && 'manifest__end-all'].filter(Boolean);
+    return `<li${cls.length ? ` class="${cls.join(' ')}"` : ''}><b>${esc(c.path)}</b><span>${esc(c.what)}</span></li>`;
+  });
+  return `<ul class="manifest${all ? ' manifest--all' : ''}" role="list" aria-label="In ${esc(p.download.href.split('/').pop())}">${rows.join('')}</ul>`;
+}
+
+// "from" the games' spines (they jump to the game, like on a crew card), "with" the crew's mugs
+// (they pick that crew member's card)
+function credits(p, { crew, projects, shell }) {
+  const games = p.games.map((cmd) => projects.find((g) => g.cmd === cmd)).filter(Boolean);
+  const mugs = p.crew.map((n) => crew.members.find((m) => m.num === n)).filter(Boolean);
+  const from = games.length
+    ? `<span class="plays__label">from</span>${games.map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(shell(g))};--accent:${esc(g.accent)}">${esc(g.name)}</a>`).join('')}`
+    : '';
+  const with_ = mugs.length
+    ? `<span class="plays__label">with</span><span class="mugs">${mugs.map((m) => `<a class="mug" href="#${esc(m.slug)}" data-crew="${esc(m.num)}"><img src="${esc(m.face)}" width="200" height="200" alt="" loading="lazy" decoding="async"><span class="vh">${esc(m.name)}</span></a>`).join('')}</span>`
+    : '';
+  return `<div class="plays plays--pack">${from}${with_}</div>`;
+}
+
+export { manifest };
+
+export function packItem(p, i, ctx) {
+  const { crew } = ctx;
+  const a = crew.assets;
+  const file = p.download.href.split('/').pop();
+  const lic = crew.repo.license;
+  return `<article class="item item--pack" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.id)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
+  <div class="visual visual--crew visual--pack">
+    <div class="bignum" aria-hidden="true">${esc(p.big)}</div>
+    <picture><source media="(max-width: 760px) and (orientation: portrait)" srcset="${esc(p.cover.phone)}" width="540" height="720"><img class="bro" src="${esc(p.cover.src)}" width="${p.cover.width}" height="${p.cover.height}" alt="${esc(p.cover.alt)}" loading="lazy" decoding="async"></picture>
+  </div>
+  <div class="info">
+    <p class="kindline">${esc(p.kind)}</p>
+    <h3 class="wm wm--pack" id="${esc(p.slug)}-name"><span class="vh">${esc(p.title)}: </span>${esc(p.name)}</h3>
+    <p class="pitch">${esc(p.line)}</p>
+    ${credits(p, ctx)}
+    <div class="contents">${manifest(p)}${contentsButton}</div>
+    <div class="act">
+      <a class="play play--sm" href="${esc(p.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the pack</span><span class="vh"> ${esc(p.title)} (${esc(p.download.label)}, ${esc(p.download.size)})</span></a>
+      ${status(file, `${p.download.size}, ${p.download.files} files, ${p.download.formats}`)}
+      ${p.lite ? `<p class="lite"><a href="${esc(p.lite.href)}" download>${esc(p.lite.label)} (${esc(p.lite.size)})</a></p>` : ''}
+    </div>
+    <div class="extra"><p class="credit">Free to use under the <a ${ext(lic.href)}>${esc(lic.label)}${newTab}</a>. Credit <a ${ext(a.credit.href)}>${esc(a.credit.label)}${newTab}</a> when you post it.</p><p class="fine"><a class="more-link" href="${esc(a.all.href)}" download>${esc(a.all.label)} (${esc(a.all.size)})</a></p></div>
+  </div>
+</article>`;
+}
+
+// a pack in the row: a sealed booster, the same height as a face tile, 0.72 as wide
+export function packTile(p, i) {
+  return `<li class="tslot tslot--pack" style="--i:${i};--accent:${esc(p.accent)};--shell:${esc(p.shell)}" data-i="${i}"><button class="tile tile--pack" type="button" data-i="${i}" aria-controls="${esc(p.slug)}" aria-label="${esc(p.title)}, ${esc(p.download.size)}"><img src="${esc(p.tile)}" width="144" height="240" alt="" loading="lazy" decoding="async"><span class="tile__foil" aria-hidden="true"></span></button></li>`;
+}
+
+export function packGroup(crew, start) {
+  const packs = crew.assets?.packs || [];
+  if (!packs.length) return '';
+  return `<div class="tgroup tgroup--packs"><p class="tgroup__label">assets</p><ul class="tiles" role="list">${packs.map((p, k) => packTile(p, start + k)).join('')}</ul></div>`;
+}
+
 // One cartridge per game. A game with editions has one label per edition (the shown one on top,
 // src/main.js) and the next one's edge peeking out behind it, so it reads as a two-in-one.
 function cart(p, i, eds = [p]) {
@@ -194,7 +262,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   const radbros = crew.members.filter((m) => !m.kind.startsWith('Retardio'));
   const retardios = crew.members.filter((m) => m.kind.startsWith('Retardio'));
   const idx = (m) => crew.members.indexOf(m);
-  const tiles = `<div class="tgroup"><p class="tgroup__label">radbros</p><ul class="tiles" role="list">${radbros.map((m) => tile(m, idx(m))).join('')}</ul></div><div class="tgroup"><p class="tgroup__label">retardios</p><ul class="tiles" role="list">${retardios.map((m) => tile(m, idx(m))).join('')}</ul></div>`;
+  const tiles = `<div class="tgroup"><p class="tgroup__label">radbros</p><ul class="tiles" role="list">${radbros.map((m) => tile(m, idx(m))).join('')}</ul></div><div class="tgroup"><p class="tgroup__label">retardios</p><ul class="tiles" role="list">${retardios.map((m) => tile(m, idx(m))).join('')}</ul></div>${packGroup(crew, crew.members.length)}`;
 
   const menu = [
     `<li><a class="mi" data-i="0" ${ext(contact.dm.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('x')}${esc(contact.dm.label)}</span><span class="det">${esc(contact.dm.handle)}</span>${newTab}</a></li>`,
@@ -245,7 +313,9 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       'crew',
       crew.title,
       `<p class="panel__line">${esc(crew.line)}</p>
-    <div class="items">${crew.members.map((m, i) => crewItem(m, i, { crew, projects, shell })).join('\n')}</div>
+    <div class="items">${crew.members.map((m, i) => crewItem(m, i, { crew, projects, shell })).join('\n')}
+    <p class="panel__line">${esc(crew.assets.line)}</p>
+    ${crew.assets.packs.map((p, k) => packItem(p, crew.members.length + k, { crew, projects, shell })).join('\n')}</div>
     <div class="row js-only"><div class="tgroups">${tiles}</div></div>`,
     )}
     ${panel(

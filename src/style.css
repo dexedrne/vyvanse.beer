@@ -1492,6 +1492,355 @@ html:not(.js) .js-only {
   animation: snap 0.2s var(--ease);
 }
 
+/* ---------- the row: one tile size for all three groups ----------
+   Fits radbros (6) | retardios (3) | assets (5) on one line from ~1000 px wide; 100 px tiles at
+   1920 x 1080, 86 at 1440, 75 at 1280. 12.6 = 9 face tiles + 5 packs at 0.72; 236 px = the
+   gaps, the group gaps and the tiles' padding. Below that width the row scrolls (see 761–1000). */
+
+.tgroups {
+  --tw: clamp(56px, min(11vh, (100vw - 2 * var(--pad) - 236px) / 12.6), 100px);
+}
+
+.tile {
+  width: var(--tw);
+}
+
+.tgroup--packs .tiles {
+  gap: 10px;
+}
+
+/* a sealed pack: the face tile's skew, border and dimming; 3:5, crimped foil ends */
+.tile--pack {
+  width: calc(var(--tw) * 0.72);
+  aspect-ratio: 3 / 5;
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line-2));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--shell) 78%, #fff 12%), var(--shell));
+}
+
+.tile--pack img {
+  left: -14%;
+  width: 128%;
+}
+
+.tile--pack::before,
+.tile--pack::after {
+  /* the crimped ends: foil in the pack's colour, pressed ridges */
+  content: '';
+  position: absolute;
+  z-index: 2;
+  left: -12%;
+  right: -12%;
+  height: 9%;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.34) 0 1px, rgb(0 0 0 / 0.2) 1px 2px, transparent 2px 4px),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 72%, #fff), color-mix(in srgb, var(--accent) 60%, #000));
+}
+
+.tile--pack::before {
+  top: 0;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.45);
+}
+
+.tile--pack::after {
+  bottom: 0;
+  box-shadow: 0 -1px 0 rgb(0 0 0 / 0.45);
+}
+
+/* foil: a faint standing sheen, and one glint across when the pack is picked */
+.tile__foil {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(112deg, transparent 34%, rgb(255 255 255 / 0.32) 46%, rgb(255 255 255 / 0.08) 53%, transparent 64%) 110% 0 / 260% 100% no-repeat,
+    linear-gradient(160deg, rgb(255 255 255 / 0.12), transparent 42%);
+  mix-blend-mode: screen;
+}
+
+.tslot.sel .tile__foil {
+  animation: glint 0.7s var(--ease) 0.1s both;
+}
+
+@keyframes glint {
+  from {
+    background-position: 110% 0, 0 0;
+  }
+  to {
+    background-position: -10% 0, 0 0;
+  }
+}
+
+/* ---------- the card: what stands on the water ---------- */
+
+.visual--pack .bro {
+  height: min(54vh, 540px);
+  animation: pack-in 0.42s var(--ease) both;
+}
+
+@keyframes pack-in {
+  from {
+    transform: translateY(22px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+/* ---------- the card: the words ---------- */
+
+.wm--pack {
+  font-size: clamp(56px, 11.5vh, 116px);
+}
+
+.item--pack .pitch {
+  --clamp: 2;
+}
+
+.plays--pack {
+  margin: 2px 0 14px;
+}
+
+.plays--pack .spine ~ .plays__label {
+  margin-left: 12px;
+}
+
+/* who's in it: the row's face tiles, small. They pick that crew member's card. */
+.mugs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 2px;
+}
+
+.mug {
+  position: relative;
+  display: block;
+  width: 28px;
+  aspect-ratio: 5 / 6;
+  overflow: hidden;
+  border: 1.5px solid var(--line-2);
+  background: linear-gradient(180deg, #33265a, #150f28);
+  transform: skewX(-9deg);
+  filter: brightness(0.85) saturate(0.9);
+  transition:
+    filter 0.2s,
+    border-color 0.2s,
+    transform 0.2s var(--ease);
+}
+
+.mug img {
+  position: absolute;
+  left: -12%;
+  top: -6%;
+  width: 124%;
+  max-width: none;
+  height: 124%;
+  object-fit: cover;
+  transform: skewX(9deg);
+}
+
+.mug:hover,
+.mug:focus-visible {
+  outline: none;
+  border-color: var(--lilac);
+  filter: none;
+  transform: skewX(-9deg) translateY(-2px);
+}
+
+/* what's in the zip: a glass pane with the folder tree, and "contents" beside it */
+.contents {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin: 0 0 18px;
+  animation: fade 0.5s var(--ease) 0.12s both;
+}
+
+.contents .more-btn {
+  margin: 0 0 4px;
+}
+
+/* a second, smaller download under the status line (SHITBOX: the same art as webp). Sits in .act,
+   so phones show it too (.extra is hidden there). Not a [data-act] link: A keeps the main zip. */
+.item--pack .act:has(.lite) {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0 22px;
+}
+
+.item--pack .lite {
+  grid-column: 2;
+  margin: 6px 0 0;
+  font: 400 19px/1.12 var(--pixel);
+  color: var(--muted);
+}
+
+.item--pack .lite a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.item--pack .lite a:hover,
+.item--pack .lite a:focus-visible {
+  color: var(--text);
+}
+
+.manifest {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 16px;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 6px 14px 5px 10px;
+  list-style: none;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 6px;
+  background: rgb(12 8 22 / 0.66);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.35);
+  font: 400 19px/1.12 var(--pixel);
+}
+
+.manifest li {
+  display: contents;
+}
+
+.manifest b {
+  position: relative;
+  padding: 3px 0 2px 20px;
+  color: var(--text);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.manifest span {
+  min-width: 0;
+  padding: 3px 0 2px;
+  overflow: hidden;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* the tree's lines are drawn (VT323 has no box-drawing glyphs): a trunk, a branch per folder,
+   the trunk stopping at the last line showing (├ … └) */
+.manifest b::before,
+.manifest b::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  border-color: var(--faint);
+  border-style: solid;
+  border-width: 0;
+}
+
+.manifest b::before {
+  top: 0;
+  bottom: 0;
+  border-left-width: 1px;
+}
+
+/* the branch meets the first line of its row, even when a description wraps (the sheet) */
+.manifest b::after {
+  top: calc(3px + 0.5em);
+  width: 9px;
+  border-top-width: 1px;
+}
+
+.item:not(.is-more) .manifest__end b::before,
+.manifest--all .manifest__end-all b::before,
+.item.is-more .manifest__end-all b::before {
+  bottom: auto;
+  height: calc(3px + 0.5em);
+}
+
+.manifest .manifest__more {
+  display: none;
+}
+
+.item.is-more .manifest .manifest__more,
+.manifest.manifest--all .manifest__more {
+  display: contents;
+}
+
+.item.is-more .manifest .manifest__sum,
+.manifest.manifest--all .manifest__sum {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visual--pack .bro,
+  .item--pack .kindline,
+  .item--pack .wm,
+  .item--pack .pitch,
+  .tslot.sel .tile__foil,
+  .contents {
+    animation: none;
+  }
+}
+
+/* short desktop windows (1280 x 720 and the like): the list keeps its first two lines */
+@media (min-width: 761px) and (max-height: 760px) {
+  .manifest {
+    font-size: 17px;
+  }
+
+  .js .item:not(.is-more) .manifest li:nth-child(n + 3) {
+    display: none;
+  }
+
+  .js .item:not(.is-more) .manifest li:nth-child(2) b::before {
+    bottom: auto;
+    height: calc(3px + 0.5em);
+  }
+
+  .contents {
+    margin-bottom: 14px;
+  }
+}
+
+/* narrow desktop windows: the row scrolls under the cursor (main.js keepInView already does
+   any .tgroups wider than its box); the edges fade so it reads as more to the side */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .js .tgroups {
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-top: -34px;
+    padding-top: 40px;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent);
+  }
+
+  .js .tgroups::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- no JS: the packs stack after the crew, like everything else ---------- */
+
+html:not(.js) .visual--pack .bro {
+  height: auto;
+}
+
+html:not(.js) .manifest .manifest__more {
+  display: contents;
+}
+
+html:not(.js) .manifest .manifest__sum {
+  display: none;
+}
+
+html:not(.js) .manifest .manifest__end b::before {
+  bottom: 0;
+  height: auto;
+}
+
+html:not(.js) .manifest .manifest__end-all b::before {
+  bottom: auto;
+  height: calc(3px + 0.5em);
+}
+
+
 /* ---------- Sites: a preview monitor ---------- */
 
 .visual--site {
@@ -3065,6 +3414,102 @@ html.js { --topbar: 52px; --top: calc(var(--topbar) + var(--safe-top)); --gut: 1
 .js .toast { bottom: calc(var(--strip) + var(--tabs) + var(--safe-bottom) + 18px); }
 @keyframes drift { to { transform: translateX(min(0px, calc(100vw - 100%))); } }
 
+  .js .tgroups {
+    --tw: 50px;
+  }
+
+  .js .tgroup--packs .tiles {
+    gap: 7px;
+  }
+
+  .js .tile--pack {
+    width: 38px;
+    aspect-ratio: 38 / 50;
+  }
+
+  .js .tile--pack img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+
+  .js .tile--pack::before,
+  .js .tile--pack::after {
+    left: 0;
+    right: 0;
+    height: 5px;
+  }
+
+  /* held upright, the pack stands where a crew member stands, in its portrait cut (picture >
+     source, 540x720): at the right of the words, its foot on the waterline. The words draw over
+     it, the way they would over a crew member's elbow. */
+  .js .visual--pack .bro {
+    left: 70%;
+    width: auto;
+    height: min(calc(100% - 22px), 88vw); /* 3:4, so never wider than 66vw */
+  }
+
+  .js .item--pack .words {
+    position: relative;
+    z-index: 3;
+  }
+
+  /* two lines, like a crew card, so the words sit where the crew's do (contents has the rest) */
+  .js .item--pack .pitch {
+    --pitch-lines: 2;
+  }
+
+  /* the folder list lives in the sheet (contents / Y) */
+  .js .item--pack .contents {
+    display: none;
+  }
+
+  .js .wm--pack {
+    font-size: 50px;
+  }
+
+  .js .mug {
+    width: 26px;
+  }
+
+  .js .plays--pack .spine ~ .plays__label {
+    display: none;
+  }
+
+  .js .plays--pack .mugs {
+    margin-left: 4px;
+  }
+
+  .js .sheet .manifest {
+    display: grid;
+    margin: 2px 0 14px;
+    padding: 6px 12px 5px 8px;
+    background: rgb(255 255 255 / 0.03);
+    box-shadow: none;
+    font-size: 17px;
+  }
+
+  .js .sheet .manifest span {
+    white-space: normal;
+  }
+
+  .js .sheet__body .sheet__fine {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font: 400 17px/1.2 var(--pixel);
+  }
+
+  .js .item--pack .act {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 0 10px;
+  }
+  .js .item--pack .act [data-act] { grid-area: 1 / 1; }
+  .js .item--pack .act .more-btn { grid-area: 1 / 2; }
+  .js .item--pack .act .status { grid-area: 2 / 1 / 3 / 3; min-width: 0; }
+  .js .item--pack .act .lite { grid-area: 3 / 1 / 4 / 3; }
+
   @media (orientation: landscape) {
 
 html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; --pitch-lines: 2; }
@@ -3149,5 +3594,21 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .js .item--contact .menu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .js .screen .item--crew .body { max-height: none; overflow: visible; }
 
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-width: 960px) and (max-height: 500px) {
+  .js .tile--pack {
+    width: 34px;
+    aspect-ratio: 34 / 44;
+  }
+
+  /* on its side the phone has the right half for the stage: the wide cover fits there */
+  .js .visual--pack .bro {
+    left: 50%;
+    width: auto;
+    height: auto;
+    max-width: calc(100% - 16px);
+    max-height: calc(100% - 16px);
   }
 }

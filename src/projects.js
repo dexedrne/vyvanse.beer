@@ -570,7 +570,174 @@ export const projects = [
 // on Crew). The games each one is in come from the games' `cast`. `model` is the small web
 // model (mesh, Idle and Big_Wave_Hello) that stands on his card in 3D, loaded when first shown;
 // `image` is his render, shown until then (and without WebGL).
+// Provisional asset release tag; confirm before publishing the downloads.
+const REL = 'https://github.com/dexedrne/vyvanse.beer/releases/download/assets';
+
 export const crew = {
+  assets: {
+    title: 'Assets',
+    // the no-JS panel line, the terminal's `assets` header and the ask payload
+    line: 'Art from the games, free for the Radbro community. Use it, remix it, credit @dexedrne on X.',
+    credit: { label: '@dexedrne on X', href: 'https://x.com/dexedrne' },
+    all: { href: `${REL}/vyvanse-assets-all.zip`, label: 'every pack, one .zip', size: '677 MB' },
+    packs: [
+      {
+        id: 'saloon-card-pack', // hash #crew/saloon-card-pack, terminal `info saloon-card-pack`, ask `pack:saloon-card-pack`
+        slug: 'pack-saloon-card-pack', // DOM id; never collides with radbro-*/retardio-* or a project slug
+        kind: 'SALOON · card pack', // kindline
+        name: 'Radbro Deck', // wordmark: short, one line at 116px (≤ 12 characters)
+        title: 'SALOON Card Pack: The Radbro Deck', // full name: aria, terminal, toast, ask
+        line: 'The full 52-card Radbro deck from SALOON with the crew as the court cards, plus the jokers, four card backs, ace art, chips, felts and table UI.',
+        big: '52', // the outlined number behind the cover
+        accent: '#e8c27a', // SALOON's: the wordmark's offset shadow and the pack's foil
+        shell: '#16251c', // SALOON's: the tile's wrapper colour
+        games: ['saloon'], // "from" spines (project cmds)
+        crew: ['4764', '652', '3704', '3710', '723', '555', '85'], // "with" mugs (crew nums)
+        contents: [
+          { path: 'deck/', what: '52 cards, ace to king' },
+          { path: 'courts/', what: 'the crew as kings, queens and jacks' },
+          { path: 'jokers/ backs/', what: '#85 and #555, four backs' },
+          { path: 'tables/ chips/ ui/', what: 'felts, chips, buttons' },
+          { path: 'suits/ card-parts/', what: 'the pieces, to build your own', more: true },
+          { path: 'props/ posters/', what: 'table props, two posters', more: true },
+          { path: 'webp/', what: 'every card again, small', more: true },
+        ],
+        tile: '/img/packs/saloon-card-pack-tile.webp', // 144x240
+        cover: {
+          src: '/img/packs/saloon-card-pack.webp',
+          width: 960,
+          height: 720,
+          phone: '/img/packs/saloon-card-pack-phone.webp', // 540x720, phones held upright
+          alt: 'A poker hand fanned out: a violet skull card back, the seven of hearts, the queen of diamonds with #652, the #85 joker and the king of spades with #4764 on top.',
+        },
+        backdrop: '/img/art/saloon.webp', // soft-blurred behind the panel while the pack is picked
+        download: { href: `${REL}/saloon-card-pack.zip`, label: 'card pack .zip', size: '177 MB', files: 299, formats: 'png and webp' },
+      },
+      {
+        id: 'crew-portrait-pack',
+        slug: 'pack-crew-portrait-pack',
+        kind: 'Crew · portrait pack',
+        name: 'Crew Faces',
+        title: 'Crew Portraits & Faces',
+        line: 'Painted busts of every crew member in six moods (neutral, smug, annoyed, shocked, laughing, thinking), plus face tiles and 3D renders, ready for PFPs, stickers and emotes.',
+        big: '54',
+        accent: '#8e6de0',
+        shell: '#241a3f',
+        games: [],
+        crew: ['4764', '652', '3704', '3710', '2564', '723', '555', '85', '268'],
+        contents: [
+          { path: 'busts/', what: 'all nine, six moods each' },
+          { path: 'pfp/ face-tiles/', what: 'square crops for PFPs' },
+          { path: 'crew-cards/', what: 'a card for each of the crew' },
+          { path: '3d-turnarounds/', what: '3D renders, front to back' },
+          { path: 'portraits/ full-body/', what: 'big painted portraits', more: true },
+        ],
+        tile: '/img/packs/crew-portrait-pack-tile.webp',
+        cover: {
+          src: '/img/packs/crew-portrait-pack.webp',
+          width: 960,
+          height: 720,
+          phone: '/img/packs/crew-portrait-pack-phone.webp', // 540x720, phones held upright
+          alt: 'All nine of the crew as painted busts in two rows, #4764 smug in the middle, #652 laughing, #3704 shocked, #723 thinking under his hat and #85 annoyed in front.',
+        },
+        backdrop: '/img/art/vyvanse.webp',
+        download: { href: `${REL}/crew-portrait-pack.zip`, label: 'portrait pack .zip', size: '94 MB', files: 177, formats: 'png and webp' },
+      },
+      {
+        id: 'game-key-art-wallpapers',
+        slug: 'pack-game-key-art-wallpapers',
+        kind: 'Key art · wallpaper pack',
+        name: 'Wallpapers',
+        title: 'Game Key Art Wallpapers',
+        line: 'Full-size key art from SALOON, SHITBOX, RADTAP, RADBRAWL, SPIDERTAG and the shooters as desktop wallpapers, with phone-sized posters and SHITBOX’s phone backgrounds.',
+        big: '23', // 12 desktop + 11 phone
+        accent: '#b98cff',
+        shell: '#23163f',
+        games: ['saloon', 'shitbox', 'radtap', 'radbrawl', 'spidertag', 'rbgo'],
+        crew: [],
+        contents: [
+          { path: 'desktop/', what: '12 paintings, up to 2560×1440' },
+          { path: 'phone/', what: 'posters and SHITBOX’s phone backgrounds' },
+          { path: 'extras/', what: 'SPIDERTAG skies and billboards' },
+        ],
+        tile: '/img/packs/game-key-art-wallpapers-tile.webp',
+        cover: {
+          src: '/img/packs/game-key-art-wallpapers.webp',
+          width: 960,
+          height: 720,
+          phone: '/img/packs/game-key-art-wallpapers-phone.webp', // 540x720, phones held upright
+          alt: 'Five phone posters fanned out like cards: RADBRAWL, the SALOON back room, a SHITBOX couch run, the RADTAP band and #4764 leaping over the SPIDERTAG rooftops.',
+        },
+        backdrop: '/img/art/radtap.webp',
+        download: { href: `${REL}/game-key-art-wallpapers.zip`, label: 'wallpaper pack .zip', size: '99 MB', files: 80, formats: 'png and webp' },
+      },
+      {
+        id: 'retardio-sticker-pack',
+        slug: 'pack-retardio-sticker-pack',
+        kind: 'Retardio · sticker pack',
+        name: 'Stickers',
+        title: 'Retardio Sticker Pack',
+        line: 'Forty-nine deadpan Retardio stickers of #85 and his cousin #268, ready to upload to Telegram or use anywhere.',
+        big: '49',
+        accent: '#ff7ab6',
+        shell: '#1f2a44',
+        games: [],
+        crew: ['85', '268'],
+        contents: [
+          { path: 'telegram-png-512/', what: 'ready to upload to Telegram' },
+          { path: 'webp-512/', what: 'the same stickers, as webp' },
+          { path: 'originals-1254/', what: 'full size, transparent' },
+        ],
+        tile: '/img/packs/retardio-sticker-pack-tile.webp',
+        cover: {
+          src: '/img/packs/retardio-sticker-pack.webp',
+          width: 960,
+          height: 720,
+          phone: '/img/packs/retardio-sticker-pack-phone.webp', // 540x720, phones held upright
+          alt: 'Five die-cut stickers of Retardio #85 in a heap: it’s over, laughing and crying, a thumbs up, unbothered and a poker face.',
+        },
+        backdrop: '/img/art/retardiopayne.webp',
+        download: { href: `${REL}/retardio-sticker-pack.zip`, label: 'sticker pack .zip', size: '103 MB', files: 152, formats: 'png and webp' },
+      },
+      {
+        id: 'shitbox-garage-pack',
+        slug: 'pack-shitbox-garage-pack',
+        kind: 'SHITBOX · art pack',
+        name: 'Garage',
+        title: 'SHITBOX Garage Pack',
+        line: 'Original SHITBOX art: the intro comic, the crew’s story paintings, made-up licence plates and bumper stickers, loading screens, HUD icons and painted world maps.',
+        big: '185',
+        accent: '#ffb12a',
+        shell: '#3a1418',
+        games: ['shitbox'],
+        crew: ['4764', '652', '3704', '3710', '2564', '723', '555', '85'],
+        contents: [
+          { path: '01-intro-comic/', what: 'eight pages and a cover' },
+          { path: '02-story-paintings/', what: 'the crew’s story paintings' },
+          { path: '03-license-plates/', what: 'made-up licence plates' },
+          { path: '04 … 08/', what: 'stickers, loading screens, icons, maps', sum: true }, // a summary line: hidden once the full list shows
+          { path: '04-bumper-stickers/', what: 'bumper stickers', more: true },
+          { path: '05-loading-screens/', what: 'eight loading screens', more: true },
+          { path: '06-menu-backgrounds/', what: 'menu backgrounds', more: true },
+          { path: '07-icons/', what: 'phone, HUD and map icons', more: true },
+          { path: '08-world-paintings/', what: 'painted world maps', more: true },
+        ],
+        tile: '/img/packs/shitbox-garage-pack-tile.webp',
+        cover: {
+          src: '/img/packs/shitbox-garage-pack.webp',
+          width: 960,
+          height: 720,
+          phone: '/img/packs/shitbox-garage-pack-phone.webp', // 540x720, phones held upright
+          alt: 'A SHITBOX comic page of #85 driving at sunset over a story painting of #4764’s lockup, with an HXP 193 licence plate and PUDDLE CLUB and RUST BUDGET bumper stickers in front.',
+        },
+        backdrop: '/img/art/shitbox.webp',
+        download: { href: `${REL}/shitbox-garage-pack.zip`, label: 'garage pack .zip', size: '204 MB', files: 187, formats: 'png' },
+        // a second, smaller link under the status line (p.lite): the same 185 images as webp
+        lite: { href: `${REL}/shitbox-garage-pack-lite.zip`, label: 'same art as webp, one .zip', size: '25 MB', files: 187, formats: 'webp' },
+      },
+    ],
+  },
+
   title: 'The crew',
   line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85 and his cousin #268, truck guy #723 and rare ghost #2564. All nine built in 3D, rigged and animated.',
   playIn: 'spidertag',

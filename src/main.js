@@ -4,6 +4,7 @@
 // and starts the rain, the puddle and the crew in 3D after the first paint (src/stage.js).
 
 import { site, groups, projects, crew, contact, duo as DUO, shelf } from './projects.js';
+import { manifest } from './render.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
@@ -44,6 +45,7 @@ function phoneMarkup() {
     for (const entry of phoneNodes.items) {
       entry.info.replaceChildren(...entry.children);
       if (entry.act) entry.act.replaceChildren(...entry.actions);
+      if (entry.more) entry.more.parent.insertBefore(entry.more.node, entry.more.next);
       if (entry.kind) entry.kind.innerHTML = entry.kindHTML;
       if (entry.pitch) entry.pitch.textContent = entry.pitchText;
       if (entry.playLabel) entry.playLabel.textContent = entry.playText;
@@ -78,8 +80,10 @@ function phoneMarkup() {
     const wm = $('.wm', info);
     const pitch = $('.pitch', info);
     const act = $('.act', info);
+    const more = $('[data-more]', info);
     phoneNodes.items.push({ info, children: [...info.childNodes], act, actions: act && [...act.childNodes],
       kind, kindHTML: kind?.innerHTML, pitch, pitchText: pitch?.textContent,
+      more: more && { node: more, parent: more.parentElement, next: more.nextSibling },
       playLabel: $('.play__label', info), playText: $('.play__label', info)?.textContent,
       shot: $('.visual--site img', item), shotSrc: $('.visual--site img', item)?.getAttribute('src'),
       monitorLabel: $('.monitor__bar span', item), monitorText: $('.monitor__bar span', item)?.textContent });
@@ -102,10 +106,9 @@ function phoneMarkup() {
     if (plays) body.append(plays);
     if (act) {
       const status = $('.status', act);
-      const more = $('[data-more]', info);
       if (more) act.append(more);
       body.append(act);
-      if (status) body.append(status);
+      if (status && !item.classList.contains('item--pack')) body.append(status);
     }
     info.prepend(words, body);
     if (item.classList.contains('item--contact')) {
@@ -148,9 +151,11 @@ function phoneMarkup() {
 const TABS = ['games', 'crew', 'sites', 'contact'];
 // Games: one cartridge per game, each a list of its editions (src/projects.js, `of`)
 const SHELF = shelf(projects);
+const PACKS = crew.assets?.packs ?? [];
+const isPack = (x) => !!x?.id;
 const LISTS = {
   games: SHELF,
-  crew: crew.members,
+  crew: [...crew.members, ...PACKS],
   sites: projects.filter((p) => p.group === 'sites'),
   contact: $$('#contact .mi'),
 };
@@ -193,7 +198,7 @@ function setEd(i, k) {
 }
 // what a tab's item i shows: on Games, that game's edition
 const at = (tab, i) => (tab === 'games' ? SHELF[i]?.[edOf(i)] : LISTS[tab][i]);
-const idOf = (tab, i) => (tab === 'crew' ? LISTS.crew[i]?.num : tab === 'contact' ? '' : at(tab, i)?.cmd);
+const idOf = (tab, i) => (tab === 'crew' ? LISTS.crew[i]?.num ?? LISTS.crew[i]?.id : tab === 'contact' ? '' : at(tab, i)?.cmd);
 // put the cursor on a game (its cartridge, and that edition) or a site; returns its tab
 function locate(p) {
   if (p.group !== 'games') {
@@ -290,6 +295,10 @@ function bdFor(tab, i) {
     const portrait = phone.matches && screen.clientWidth < screen.clientHeight;
     return { key: `sites:${p.cmd}`, src: portrait ? p.phoneImage || p.image.src : p.image.src, soft: !portrait, pos: phone.matches ? '50% 42%' : undefined };
   }
+  if (tab === 'crew' && isPack(LISTS.crew[i])) {
+    const p = LISTS.crew[i];
+    return { key: `crew:${p.id}`, src: p.backdrop, soft: true };
+  }
   if (tab === 'crew') return { key: 'crew', src: phone.matches ? '/img/art/radrun-cast2.webp' : '/img/art/vyvanse.webp', soft: true };
   return { key: 'contact', src: '/img/art/vyvanse.webp', pos: phone.matches ? screen.clientWidth > screen.clientHeight ? '50% 100%' : '50% 30%' : '60% 6%' };
 }
@@ -326,7 +335,9 @@ function warm(tab, i) {
   if (!n || tab === 'contact') return;
   const go = () => {
     [i - 1, i + 1].forEach((j) => {
-      const b = bdFor(tab, (j + n) % n);
+      const next = (j + n) % n;
+      const b = bdFor(tab, next);
+      if (tab === 'crew' && isPack(LISTS.crew[next])) new Image().src = LISTS.crew[next].cover.src;
       if (!BD[b.key]) new Image().src = b.src;
     });
     // and this game's other editions, so a flip has its art at hand
@@ -338,7 +349,7 @@ function warm(tab, i) {
 function nextUp() {
   const n = LISTS.crew.length;
   const i = S.crew;
-  stage?.prefetch(S.tab === 'crew' ? [LISTS.crew[(i + 1) % n].num, LISTS.crew[(i + n - 1) % n].num] : []);
+  stage?.prefetch(S.tab === 'crew' ? [LISTS.crew[(i + 1) % n], LISTS.crew[(i + n - 1) % n]].filter(m => !isPack(m)).map(m => m.num) : []);
 }
 
 // ---- painting ----
@@ -496,7 +507,7 @@ function show(tab, { sound = true, focus = false } = {}) {
 const tabStep = (d) => show(TABS[(TABS.indexOf(S.tab) + d + TABS.length) % TABS.length], { focus: focusInRow() });
 
 function label(tab, i) {
-  if (tab === 'crew') return `${LISTS.crew[i].name}, ${i + 1} of ${LISTS.crew.length}`;
+  if (tab === 'crew') return `${LISTS.crew[i].title ?? LISTS.crew[i].name}, ${i + 1} of ${LISTS.crew.length}`;
   if (tab === 'contact') return LISTS.contact[i].querySelector('.mi__label').textContent;
   const p = at(tab, i);
   const ed = tab === 'games' && SHELF[i].length > 1 ? `, the ${p.edition?.label || p.name} edition` : '';
@@ -517,7 +528,7 @@ function select(i, { sound = true } = {}) {
   save();
   layout();
   if (S.tab === 'crew') hello(want());
-  if (S.tab === 'games') hints(); // the edition hint comes and goes with the game
+  if (S.tab === 'games' || S.tab === 'crew') hints(); // editions and packs change the available actions
   if (sound) audio.blip('move');
   if (carry) controlsOf(S.tab)[next]?.focus({ preventScroll: true });
   announce(label(S.tab, next));
@@ -646,6 +657,7 @@ function dropMove({ put = false } = {}) {
 // ---- doing things ----
 
 function current() {
+  if (S.tab === 'crew' && isPack(LISTS.crew[S.crew])) return LISTS.crew[S.crew];
   if (S.tab === 'games' || S.tab === 'sites') return at(S.tab, S[S.tab]);
   return null;
 }
@@ -684,7 +696,7 @@ function activate({ from, pad } = {}) {
   btn?.classList.add('is-hit');
   if (S.tab === 'crew') {
     audio.blip('ok');
-    btn.click(); // the model download
+    btn.click(); // the main model or pack download
     toast(`downloading ${LISTS.crew[S.crew].download.label} (${LISTS.crew[S.crew].download.size})`);
     return;
   }
@@ -692,7 +704,7 @@ function activate({ from, pad } = {}) {
 }
 
 function details() {
-  if (S.tab === 'crew') return waveDuo(LISTS.crew[S.crew].num);
+  if (S.tab === 'crew' && !isPack(LISTS.crew[S.crew])) return waveDuo(LISTS.crew[S.crew].num);
   if (phone.matches) return sheet && !sheet.hidden ? closeSheet() : openSheet();
   const item = onItem(S.tab);
   if (!item) return;
@@ -734,7 +746,7 @@ function openSheet() {
       if (e.changedTouches[0].clientY - startY > 64 && $('.sheet__body', sheet).scrollTop <= 0) closeSheet();
     }, { passive: true });
     sheet.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeSheet(); }
+      if (e.key === 'Escape' || e.key.toLowerCase() === 'i') { e.preventDefault(); e.stopPropagation(); closeSheet(); }
       if (e.key !== 'Tab') return;
       const list = $$('a[href], button', sheet);
       if (e.shiftKey && document.activeElement === list[0]) { e.preventDefault(); list.at(-1).focus(); }
@@ -743,20 +755,42 @@ function openSheet() {
   }
   sheetBack = document.activeElement;
   $('#sheet-title', sheet).textContent = p.name;
+  $('.kind', sheet).textContent = isPack(p) ? 'contents' : 'details';
   const body = $('.sheet__body', sheet);
-  const pitch = Object.assign(document.createElement('p'), { textContent: p.blurbPhone || p.blurb });
+  const pitch = Object.assign(document.createElement('p'), { textContent: isPack(p) ? p.line : p.blurbPhone || p.blurb });
   const credit = $('.credit', onItem(S.tab))?.cloneNode(true);
   const links = Object.assign(document.createElement('ul'), { className: 'links' });
-  for (const link of p.links.slice(1).concat({ label: `${new URL(p.url).host} in a new tab`, href: gameUrl(p.url), main: true })) {
+  const release = 'https://github.com/dexedrne/vyvanse.beer/releases';
+  const more = isPack(p) ? [
+    { ...crew.assets.all, download: true, detail: crew.assets.all.size },
+    { label: 'every file on GitHub', href: release },
+  ] : p.links.slice(1).concat({ label: `${new URL(p.url).host} in a new tab`, href: gameUrl(p.url), main: true });
+  for (const link of more) {
     const li = document.createElement('li');
-    const a = Object.assign(document.createElement('a'), { href: link.href, target: '_blank', rel: 'noopener', textContent: link.label });
-    a.append(Object.assign(document.createElement('span'), { textContent: '↗', ariaHidden: 'true' }));
-    if (!link.main) a.append(Object.assign(document.createElement('span'), { className: 'url', textContent: new URL(link.href).host + new URL(link.href).pathname.replace(/\/$/, '') }));
+    const a = Object.assign(document.createElement('a'), { href: link.href, textContent: link.label });
+    if (link.download) a.setAttribute('download', '');
+    else {
+      Object.assign(a, { target: '_blank', rel: 'noopener' });
+      a.append(Object.assign(document.createElement('span'), { textContent: '↗', ariaHidden: 'true' }));
+    }
+    if (!link.main) a.append(Object.assign(document.createElement('span'), { className: 'url', textContent: link.detail || new URL(link.href).host + new URL(link.href).pathname.replace(/\/$/, '') }));
     li.append(a); links.append(li);
   }
-  body.replaceChildren(pitch, ...(credit ? [credit] : []), links);
+  const contents = [];
+  if (isPack(p)) {
+    const list = document.createElement('div');
+    list.innerHTML = manifest(p, { all: true });
+    const fine = Object.assign(document.createElement('p'), { className: 'sheet__fine', textContent: `${p.download.size}, ${p.download.files} files, ${p.download.formats}.` });
+    contents.push(list.firstElementChild, fine);
+  }
+  body.replaceChildren(pitch, ...contents, ...(credit ? [credit] : []), links);
   const playBtn = $('[data-act]', onItem(S.tab)).cloneNode(true);
-  playBtn.addEventListener('click', e => { e.preventDefault(); if (!pwa.canPlay()) return; closeSheet(); play(p); });
+  playBtn.addEventListener('click', e => {
+    e.preventDefault();
+    if (isPack(p)) { closeSheet(); activate(); return; }
+    if (!pwa.canPlay()) return;
+    closeSheet(); play(p);
+  });
   const close = Object.assign(document.createElement('button'), { className: 'ghost', type: 'button', innerHTML: '<span class="g g--b" data-g="b">○</span>close' });
   close.addEventListener('click', closeSheet);
   $('.sheet__foot', sheet).replaceChildren(playBtn, close);
@@ -839,6 +873,7 @@ function act(name, info = {}) {
   if (phone.matches && info.from === 'pad' && name === 'music') return audio.toggleMusic();
   const m = mode();
   if (m === 'modal' || m === 'os') {
+    if (name === 'details' && sheet && !sheet.hidden) return closeSheet();
     if (['left', 'right', 'up', 'down'].includes(name)) return walk(name);
     if (info.from !== 'pad') return false;
     if (name === 'ok' || name === 'start') document.activeElement?.click?.();
@@ -869,14 +904,14 @@ function act(name, info = {}) {
         const d = name === 'left' ? -1 : 1;
         if (phoneZone === 'editions') return edition(d);
         if (phoneZone === 'actions') {
-          if (S.tab === 'crew') {
+          if (S.tab === 'crew' && !isPack(LISTS.crew[S.crew])) {
             if (info.repeat) $('.plays', onItem('crew')).scrollBy({ left: d * 100, behavior: 'smooth' });
           } else phoneButton = 1 - phoneButton;
           phoneFocus(); return;
         }
       }
       if (name === 'ok' && phoneZone === 'editions') return edition(1);
-      if (name === 'ok' && phoneZone === 'actions' && phoneButton && S.tab !== 'crew') return details();
+      if (name === 'ok' && phoneZone === 'actions' && phoneButton && (S.tab !== 'crew' || isPack(LISTS.crew[S.crew]))) return details();
     }
   }
   const vert = S.tab === 'contact';
@@ -994,7 +1029,7 @@ const launcher = {
   music: on => audio.setMusic(on),
   reveal(slug) {
     const p = projects.find(x => x.slug === slug);
-    const b = crew.members.find(x => x.slug === slug);
+    const b = LISTS.crew.find(x => x.slug === slug);
     if (p) show(locate(p), { sound: false });
     else if (b) {
       S.crew = LISTS.crew.indexOf(b);
@@ -1038,6 +1073,13 @@ document.addEventListener('click', (e) => {
     const p = projects.find((g) => g.cmd === go.dataset.goto);
     if (p) locate(p);
     return show('games');
+  }
+  const mug = e.target.closest('[data-crew]');
+  if (mug) {
+    e.preventDefault();
+    const i = LISTS.crew.findIndex(m => m.num === mug.dataset.crew);
+    if (i >= 0) select(i);
+    return;
   }
   const ed = e.target.closest('[data-ed]');
   if (ed) {
@@ -1137,7 +1179,7 @@ function load() {
   const [t, id] = decodeURIComponent(location.hash.slice(1)).split('/');
   // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
   const bySlug = projects.find((p) => p.slug === t || p.cmd === t || p.aliases?.includes(t));
-  const bro = crew.members.find((m) => m.slug === t);
+  const bro = LISTS.crew.find((m) => m.slug === t);
   const named = (x) => x.cmd === id || x.aliases?.includes(id);
   let tab = TABS.includes(t) ? t : 'games';
   // (a game's edition, #games/retardiopayne or #retardiopayne, lands on its game, that edition)
@@ -1146,7 +1188,7 @@ function load() {
     tab = 'crew';
     S.crew = LISTS.crew.indexOf(bro);
   } else if (id && t === 'crew') {
-    const j = LISTS.crew.findIndex((x) => x.num === id);
+    const j = LISTS.crew.findIndex((x) => (x.num ?? x.id) === id);
     if (j >= 0) S.crew = j;
   } else if (id && (t === 'games' || t === 'sites')) {
     const p = projects.find((x) => x.group === t && named(x));
@@ -1171,15 +1213,16 @@ function hints() {
   const hintsEl = $('#hints');
   const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
   const pad = input.scheme === 'ps' || input.scheme === 'xbox';
-  const verb = { games: 'play', crew: 'get model', sites: 'open', contact: 'pick' }[S.tab];
+  const pack = S.tab === 'crew' && isPack(LISTS.crew[S.crew]);
+  const verb = { games: 'play', crew: pack ? 'get pack' : 'get model', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   if (phone.matches && !moving) {
     const landscape = screen.clientWidth > screen.clientHeight;
     hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
-      ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} details`) : '',
-      hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
-      ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
+      pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
+      hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && !pack && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
+      !pack && ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
       landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
     return fitHints();
   }
@@ -1199,9 +1242,9 @@ function hints() {
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
-    S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} details`) : '',
+    pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
     ROWS.includes(S.tab) ? hint(3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
-    hint(2, `${k('x')} wave`),
+    pack ? '' : hint(2, `${k('x')} wave`),
     hint(3, `${k('select')} full screen`),
     pad ? '' : hint(1, '<span class="g">M</span> music'),
     pad ? '' : hint(0, '<span class="g">/</span> terminal'),
@@ -1240,14 +1283,14 @@ function want() {
     return DUO;
   }
   if (S.tab === 'contact') return DUO;
-  if (S.tab === 'crew') return [LISTS.crew[S.crew].num];
+  if (S.tab === 'crew') return isPack(LISTS.crew[S.crew]) ? [] : [LISTS.crew[S.crew].num];
   return [];
 }
 // are they in (three.js and their models loaded)? Until then their renders stand there
 const live = () => !!stage?.ready(want());
 function duoMode() {
   if (S.tab === 'games' || S.tab === 'contact') return 'side';
-  if (S.tab === 'crew' && live()) return 'stage';
+  if (S.tab === 'crew' && !isPack(LISTS.crew[S.crew]) && live()) return 'stage';
   return null;
 }
 // the same framing as src/duo.js: where each one stands across the box (a pair, or one in the
@@ -1273,7 +1316,7 @@ function fitWm() {
   if (!wm) return;
   wm.style.fontSize = '';
   const r = document.createRange();
-  if (phone.matches && wm.lastChild.nodeType === Node.TEXT_NODE) r.selectNode(wm.lastChild);
+  if (wm.lastChild.nodeType === Node.TEXT_NODE) r.selectNode(wm.lastChild);
   else r.selectNodeContents(wm);
   const tw = r.getBoundingClientRect().width;
   let cw = wm.clientWidth;
