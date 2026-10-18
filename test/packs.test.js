@@ -29,7 +29,7 @@ test('five downloadable packs have unique ids, numeric file counts and valid cre
     }
     assert.deepEqual([p.cover.width, p.cover.height], [960, 720]);
   }
-  assert.equal(packs.find(p => p.id === 'retardio-sticker-pack').big, '49');
+  assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').big, '22');
   assert.deepEqual(packs.filter(p => p.lite).map(p => p.id), ['shitbox-garage-pack']);
   assert.equal(packs.at(-1).lite.size, '25 MB');
   assert.equal(packs.at(-1).download.size, '204 MB');
@@ -134,7 +134,7 @@ test('terminal lists assets under crew and provides pack info, links, aliases an
     commands.run(cmd);
     text = output.map(el => el.textContent).join(' ');
     assert.match(text, /177 MB[^]*299[^]*SALOON Card Pack|SALOON Card Pack[^]*177 MB[^]*299/);
-    assert.match(text, /677 MB/);
+    assert.match(text, /625 MB/);
     assert.match(text, /Viral Public License/);
   }
   output.length = 0;
