@@ -907,6 +907,7 @@ export const contact = {
   line: 'DMs are open on X. Questions about the models, a site for your project, or anything else.',
   dm: { label: 'DM me on X', href: 'https://x.com/dexedrne', handle: '@dexedrne' },
   code: { label: 'GitHub', href: 'https://github.com/dexedrne' },
+  remilia: { label: 'Remilia', href: 'https://www.remilia.net/~dexedrne', note: 'my page on remilia.net' },
   axiom: { label: 'Axiom', href: 'https://axiom.trade/@vyvanse', note: 'trade with my referral' },
 };
 
