@@ -94,12 +94,15 @@ export function createAudio({ musicBtn, sfxBtn, toast }) {
     }
   });
   document.addEventListener('visibilitychange', update);
+  // back from the home screen or a call: the page may be shown without a visibility change
+  addEventListener('pageshow', update);
+  addEventListener('focus', update);
 
   function blip(kind) {
     if (!sfx) return;
     try {
       ac ||= new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state === 'suspended') ac.resume();
+      if (ac.state !== 'running') ac.resume()?.catch?.(() => {}); // iOS also reports 'interrupted'
       const t = ac.currentTime;
       const o = ac.createOscillator();
       const g = ac.createGain();

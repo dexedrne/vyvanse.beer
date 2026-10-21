@@ -15,6 +15,8 @@
 // 60 fps while you're doing something, 30 after a few idle seconds; nothing while the tab is
 // hidden (the caller's requestAnimationFrame stops). Reduced motion: no rain, no ripples.
 
+import { dprCap } from './device.js';
+
 const SIM_PX = 4; // css px per ripple cell (the site uses 3; this screen is all water)
 const STEP = 1 / 60;
 const MAX_DROPS = 32;
@@ -422,7 +424,7 @@ export function createWater(canvas, host, { calm }) {
     const r = host.getBoundingClientRect();
     view.w = Math.max(1, r.width);
     view.h = Math.max(1, r.height);
-    const dpr = Math.min(devicePixelRatio || 1, 1.25);
+    const dpr = Math.min(devicePixelRatio || 1, dprCap());
     const budget = view.w < 600 ? 0.6e6 : 0.9e6;
     view.px = Math.min(dpr, Math.sqrt(budget / (view.w * view.h))) * scale;
     const cw = Math.max(1, Math.round(view.w * view.px));

@@ -133,3 +133,15 @@ test('cached music supports Safari byte ranges without caching a partial respons
   assert.equal(partial.headers.get('Content-Range'), 'bytes 1-2/4');
   assert.deepEqual([...new Uint8Array(await partial.arrayBuffer())], [20, 30]);
 });
+
+test('page is built for a full-screen notch phone in both orientations', async () => {
+  const html = await read('index.html');
+  const vp = html.match(/name="viewport" content="([^"]+)"/)[1];
+  for (const part of ['width=device-width', 'initial-scale=1', 'viewport-fit=cover']) assert.ok(vp.includes(part), part);
+  assert.match(html, /apple-mobile-web-app-capable" content="yes"/);
+  assert.match(html, /apple-mobile-web-app-status-bar-style" content="black-translucent"/);
+  assert.match(html, /sizes="180x180"/);
+  const css = await read('src/style.css');
+  assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g, ''), /\b100vh\b/);
+  assert.match(css, /env\(safe-area-inset-left/);
+});

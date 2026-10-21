@@ -20,6 +20,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { dprCap } from './device.js';
 
 export const FEET = 0.976; // where y = 0 sits, as a share of the canvas height
 const FOV = 18;
@@ -53,7 +54,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
   canvas.className = 'duo__gl';
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: true, powerPreference: 'low-power' });
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.25));
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, dprCap()));
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 40);
 

@@ -1507,6 +1507,8 @@ const shell = {
   },
 };
 addEventListener('resize', () => requestAnimationFrame(layout));
+// the Safari toolbar settling after a rotation or a return from the background reports late
+for (const ev of ['orientationchange', 'pageshow']) addEventListener(ev, () => { requestAnimationFrame(layout); setTimeout(layout, 300); });
 globalThis.visualViewport?.addEventListener('resize', () => requestAnimationFrame(layout));
 globalThis.visualViewport?.addEventListener('scroll', () => requestAnimationFrame(layout));
 phone.addEventListener('change', () => { layout(); hints(); });

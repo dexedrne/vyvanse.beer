@@ -26,3 +26,10 @@ test('only phone hardware gets the phone flag, in either orientation', async () 
   assert.equal(isPhone({ userAgent: 'Android', userAgentData: { mobile: true } }), true);
   assert.equal(isPhone({ userAgent: 'Android', userAgentData: { mobile: false } }), false);
 });
+
+test('iPhones get a higher render cap than other devices', async () => {
+  const { dprCap } = await import('../src/device.js');
+  assert.equal(dprCap({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)' }), 1.75);
+  assert.equal(dprCap({ userAgent: 'Mozilla/5.0 (iPad; CPU OS 18_0)' }), 1.25);
+  assert.equal(dprCap({ userAgent: 'Mozilla/5.0 (Linux; Android 15) Mobile' }), 1.25);
+});

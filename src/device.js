@@ -17,3 +17,9 @@ export function deviceFlags(nav = navigator, pads = []) {
   return { type: 'vyvanse:device', phone, touch: phone || nav.maxTouchPoints > 0,
     pad: pads.some(p => p && p.connected !== false) };
 }
+
+// Internal render resolution cap. Current iPhones (dpr 3) are fast enough for a little more than the
+// 1.25 everyone else gets; the pixel budgets in the renderers still bound the actual canvas size.
+export function dprCap(nav = navigator, base = 1.25) {
+  return /iPhone/i.test(nav.userAgent || '') && !/iPad/i.test(nav.userAgent || '') ? 1.75 : base;
+}
