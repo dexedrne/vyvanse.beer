@@ -48,7 +48,7 @@ Every 2D file in this checkout (87 files), including archives and documentation 
 | --- | --- | --- | --- |
 | `public/apple-touch-icon.png` | 180 × 180 | PNG | UI / room / deck texture |
 | `public/favicon.svg` | vector | SVG | UI / room / deck texture |
-| `public/img/art/radbrawl.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/radbrawl.webp` | 1920 × 1080 | WEBP | launcher game / site art |
 | `public/img/art/radfighter.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radops-cast2.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/radops.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
@@ -98,7 +98,7 @@ Every 2D file in this checkout (87 files), including archives and documentation 
 | `public/img/thumb/bulk.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/bulkagachi.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/hog.webp` | 420 × 221 | WEBP | launcher game / site art |
-| `public/img/thumb/radbrawl.webp` | 420 × 236 | WEBP | launcher game / site art |
+| `public/img/thumb/radbrawl.webp` | 1200 × 630 | WEBP | launcher game / site art |
 | `public/img/thumb/radfighter.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/radops-cast2.webp` | 512 × 512 | WEBP | previous cartridge label (retained) |
 | `public/img/thumb/radops-square.webp` | 512 × 512 | WEBP | launcher cartridge label |
