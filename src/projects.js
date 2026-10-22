@@ -395,9 +395,9 @@ export const projects = [
     phone: '50% 22%',
     image: {
       src: '/img/art/radbrawl.webp',
-      width: 1920,
-      height: 1080,
-      alt: 'RADBRAWL: violet-haired #4764 punches cowboy #723 as green-haired #3710 runs in on a rain-slick neon rooftop at night.',
+      width: 1600,
+      height: 900,
+      alt: 'RADBRAWL: Radbro #4764 swings his katana as Retardio #85 throws a punch, sparks where they meet, on a rain-wet neon rooftop at night.',
     },
   },
   {
