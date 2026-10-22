@@ -60,15 +60,15 @@ const ALL = [...RADBROS, '555', '85']; // current game casts; #268 is Crew only
 export const projects = [
   {
     cmd: 'spidertag',
-    boot: 'web-slinger tag on the rooftops, the Robinhood Chain game', // the hero's boot log line
+    boot: 'swing, tag and chase the crew across the rooftops', // the hero's boot log line
     aliases: ['radrun', 'rad-run', 'rug-run', 'rugrun'],
     slug: 'spidertag',
     group: 'games',
     name: 'SPIDERTAG',
-    kind: 'Web-slinger tag on the rooftops, the Robinhood Chain game',
-    kindPhone: "Rooftop web-slinger tag on Robinhood Chain",
+    kind: 'Web-slinger tag across the rooftops',
+    kindPhone: "Rooftop web-slinger tag",
     blurb:
-      'Swing the neon rooftops on webs: TAG a friend online or bots, best of three, or chase down the Radbro who swiped your bag in 90 seconds. Play as the main four, cowboy #723, ghost #2564 or the two Retardios. Soon: 1v1 TAG wagers for the $SPIDERTAG token on Robinhood Chain. Runs in the browser, keyboard or controller, nothing to install.',
+      'Swing the neon rooftops on webs: play best-of-three TAG with a friend or bots, or chase down the Radbro who swiped your bag in 90 seconds. Pick from the main four, cowboy #723, ghost #2564 or the two Retardios. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://spidertag.vyvanse.beer',
     frame: true,
     links: [
@@ -103,7 +103,7 @@ export const projects = [
     name: 'RadPayne',
     kind: 'Bullet-time noir shooter',
     blurb:
-      "They took the bag. A rainy Manhattan night, the Milady rave, the back of the house, an elevator ride up and Madame Pockit in her penthouse, told in rhyming noir comic panels. Dual pistols, shotguns, a sniper, a kill cam, time slowed down, and #4764's katana that blocks bullets and sends them back. Hold the frag button to see where it lands, let go to throw. Keyboard and mouse or a controller.",
+      "They took the bag. Follow the crew from a rainy night through a rave and up to Madame Pockit, told in rhyming noir comic panels. The first two chapters play start to finish; chapter two's art and voices are still in progress. Dual pistols, shotguns, a sniper, a kill cam, time slowed down, and #4764's katana that blocks bullets and sends them back. Hold the frag button to see where it lands, let go to throw. Keyboard and mouse or a controller.",
     url: 'https://radpayne.vyvanse.beer',
     frame: true,
     links: [
@@ -142,7 +142,7 @@ export const projects = [
     kindPhone: "Noir shooter, the harder cut",
     blurbPhone: "The harder cut: Retardios only, the same bullet-time noir, meaner rooms.",
     blurb:
-      'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555 and #85 to play: the same rainy Manhattan night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
+      'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555 and #85 to play: the same rainy night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
     url: 'https://retardiopayne.vyvanse.beer',
     frame: true,
     links: [
@@ -239,7 +239,7 @@ export const projects = [
     kind: 'First-person zombies survival, early preview',
     kindPhone: "Zombies survival, early preview",
     blurb:
-      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Three maps: a derelict picture palace, nine rooms on one loop (the power, eight perks, two traps, a box of odd guns, a machine that re-cuts yours, a few secrets), or a sandbagged bunker on a dead air base at night, now with a crash-site yard and a cellar. And Radcension, a launch base on the steppe, black and white until you find the power, with toy rockets, old tapes and someone to bring home. A leaderboard for each, and a way out at first light for anyone who lasts. Solo, with bots, up to four online (quick play or a room code), or two on split screen with two controllers. Keyboard and mouse or a controller.',
+      'Radbros vs the dead: board up the windows, buy doors and guns, and see how many rounds you last. Four maps: a derelict picture palace; nine rooms on one loop with power, perks, traps and secrets; a sandbagged bunker with a crash-site yard and cellar; and Radcension, a launch base that starts black and white until you find the power. Each map has its own leaderboard and a way out at first light for anyone who lasts. Solo, with bots, up to four online (quick play or a room code), or two on split screen with two controllers. Keyboard and mouse or a controller.',
     url: 'https://radzombies.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radzombies.vyvanse.beer' }],
@@ -296,7 +296,7 @@ export const projects = [
   {
     cmd: 'shitbox',
     featured: true, // the flagship: the menu opens on it
-    boot: 'odd jobs in a tired old four-door', // the hero's boot log line
+    boot: '41 cars, free drive with friends and street takeovers', // the hero's boot log line
     aliases: ['beater', 'car'],
     slug: 'shitbox',
     group: 'games',
@@ -305,7 +305,7 @@ export const projects = [
     kindPhone: "Odd jobs in a tired old four-door",
     blurbPhone: "Deliveries, rides, towing and the crew on the phone, in a car with a real manual. Keep it running, keep it fuelled, keep the lights on.",
     blurb:
-      "A tired 1993 four-door with a real five-speed and $25 to your name. Odd jobs in a small town with proper winters; the crew drive hatchbacks and think yours is a joke. A mountain pass for time trials, night battles and a rally stage, a county past the town line, and every season ends in a final. The city is nine minutes up the highway. Now online: bring your own build and cruise with up to ten, each in their own career. Play as Retardio Cousin Classic #85 in the career, or pick any of the eight crew drivers in online casual rooms. Keyboard or controller.",
+      'A tired 1993 four-door with a real five-speed and 41 cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. Keyboard or controller.',
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
@@ -347,17 +347,16 @@ export const projects = [
   },
   {
     cmd: 'saloon',
-    boot: 'the crew deal you in at the saloon', // the hero's boot log line
+    boot: 'poker at a western saloon table, play with friends', // the hero's boot log line
     // 'pokerbros' is its name from before SALOON: old links, saved orders and commands land here
     aliases: ['pokerbros', 'poker', 'holdem'],
     slug: 'saloon',
     group: 'games',
     name: 'SALOON',
-    kind: "Texas hold'em in the saloon, play chips",
-    kindPhone: "Hold'em in the saloon, play chips",
-    blurbPhone: "Texas hold'em with the crew for play chips: sit down under the lamp, read the table, and take the pot. Touch, keyboard or controller; plays upright on a phone.",
-    blurb:
-      "Hold'em with the crew at a lamp-lit table in a western saloon. Solo against all seven, who talk, sweat and give themselves away (one tell in five is a lie), or online with friends and the crew filling the empty chairs. The Radbro deck, three tables, play chips only and a free refill every day. Keyboard and mouse or a controller.",
+    kind: 'Poker at a western saloon table',
+    kindPhone: 'Poker at a western saloon table',
+    blurbPhone: 'A poker game at a western saloon table. Play with friends.',
+    blurb: 'A poker game at a western saloon table. Play with friends.',
     url: 'https://saloon.cards',
     frame: true,
     orientation: 'any',
@@ -376,7 +375,7 @@ export const projects = [
   },
   {
     cmd: 'radbrawl',
-    boot: 'up to four on one roof', // the hero's boot log line
+    boot: 'platform fighter, up to four locally across two stages', // the hero's boot log line
     aliases: ['brawl', 'fight', 'smash'],
     slug: 'radbrawl',
     group: 'games',
@@ -396,9 +395,9 @@ export const projects = [
     phone: '50% 22%',
     image: {
       src: '/img/art/radbrawl.webp',
-      width: 1600,
-      height: 900,
-      alt: 'RADBRAWL: Radbro #4764 swings his katana as Retardio #85 throws a punch, sparks where they meet, on a rain-wet neon rooftop at night.',
+      width: 1920,
+      height: 1080,
+      alt: 'RADBRAWL: violet-haired #4764 punches cowboy #723 as green-haired #3710 runs in on a rain-slick neon rooftop at night.',
     },
   },
   {
@@ -570,7 +569,7 @@ export const projects = [
 // on Crew). The games each one is in come from the games' `cast`. `model` is the small web
 // model (mesh, Idle and Big_Wave_Hello) that stands on his card in 3D, loaded when first shown;
 // `image` is his render, shown until then (and without WebGL).
-// Provisional asset release tag; confirm before publishing the downloads.
+// The site's downloadable asset release.
 const REL = 'https://github.com/dexedrne/vyvanse.beer/releases/download/assets';
 
 export const crew = {
@@ -579,7 +578,7 @@ export const crew = {
     // the no-JS panel line, the terminal's `assets` header and the ask payload
     line: 'Art from the games, free for the Radbro community. Use it, remix it, credit @dexedrne on X.',
     credit: { label: '@dexedrne on X', href: 'https://x.com/dexedrne' },
-    all: { href: `${REL}/vyvanse-assets-all.zip`, label: 'every pack, one .zip', size: '728 MB' },
+    all: { href: `${REL}/vyvanse-assets-all.zip`, label: 'every pack, one .zip', size: '750 MB' },
     packs: [
       {
         id: 'saloon-card-pack', // hash #crew/saloon-card-pack, terminal `info saloon-card-pack`, ask `pack:saloon-card-pack`
@@ -762,6 +761,34 @@ export const crew = {
         download: { href: `${REL}/shitbox-garage-pack.zip`, label: 'garage pack .zip', size: '204 MB', files: 187, formats: 'png' },
         // a second, smaller link under the status line (p.lite): the same 185 images as webp
         lite: { href: `${REL}/shitbox-garage-pack-lite.zip`, label: 'same art as webp, one .zip', size: '25 MB', files: 187, formats: 'webp' },
+      },
+      {
+        id: 'wallpapers-moody',
+        slug: 'pack-wallpapers-moody',
+        kind: 'Moody nights · wallpaper pack',
+        name: 'Night Drive',
+        title: 'Moody Wallpapers',
+        line: 'Eight rainy-night scenes for desktop, each in 3840×2160 and 2560×1440.',
+        big: '08',
+        accent: '#8ea8c4',
+        shell: '#151b25',
+        games: ['shitbox', 'saloon'],
+        crew: ['4764', '652', '3704', '3710', '555', '85', '723'],
+        contents: [
+          { path: '3840x2160/', what: 'eight full-size desktop wallpapers' },
+          { path: '2560x1440/', what: 'the same eight, smaller' },
+          { path: 'README.md', what: 'credits and technical details' },
+        ],
+        tile: '/img/packs/moody-wallpapers-tile.webp',
+        cover: {
+          src: '/img/packs/moody-wallpapers.webp',
+          width: 1200,
+          height: 630,
+          phone: '/img/packs/moody-wallpapers-phone.webp',
+          alt: 'Eight moody desktop scenes in a contact sheet: a tired red sedan in rain, wet night roads, a junkyard, a quiet street, a saloon poker table, a rainy window, a lone figure and an empty garage.',
+        },
+        backdrop: '/img/art/shitbox.webp',
+        download: { href: `${REL}/wallpapers-moody.zip`, label: 'wallpaper pack .zip', size: '22 MB', files: 17, formats: 'jpg' },
       },
     ],
   },
