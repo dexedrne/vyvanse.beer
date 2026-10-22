@@ -873,7 +873,7 @@ function showLightbox(i) {
   const item = lightboxItems[lightboxIndex];
   $('img', lightbox).src = item.dataset.galleryImage;
   $('img', lightbox).alt = item.dataset.galleryName;
-  $('figcaption', lightbox).textContent = item.dataset.galleryName;
+  $('figcaption', lightbox).textContent = item.dataset.galleryCaption ? `${item.dataset.galleryName} · ${item.dataset.galleryCaption}` : item.dataset.galleryName;
 }
 function lightboxStep(d) { showLightbox(lightboxIndex + d); }
 function closeLightbox() {

@@ -1702,6 +1702,7 @@ html:not(.js) .js-only {
 .pack-gallery__tile:hover, .pack-gallery__tile:focus-visible { border-color: var(--amber); outline: none; }
 .pack-gallery__tile img { display: block; width: 100%; height: auto; max-height: 260px; object-fit: contain; border-radius: 4px; background: #17151d; }
 .pack-gallery__tile > span { display: block; margin: 6px 2px 1px; overflow: hidden; font: 400 12px/1.2 var(--mono); text-overflow: ellipsis; white-space: nowrap; }
+.pack-gallery__tile > small { display: block; margin: 0 2px 1px; overflow: hidden; font: 400 11px/1.2 var(--mono); text-overflow: ellipsis; white-space: nowrap; opacity: .7; }
 .pack-gallery[data-pack-gallery='wallpapers'] .pack-gallery__tiles { display: block; columns: 4 180px; column-gap: 10px; }
 .pack-gallery[data-pack-gallery='wallpapers'] .pack-gallery__tile { display: block; width: 100%; margin: 0 0 10px; break-inside: avoid; }
 .pack-gallery[data-pack-gallery*='sticker'] .pack-gallery__tiles { grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); }

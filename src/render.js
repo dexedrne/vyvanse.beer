@@ -206,7 +206,7 @@ export function packItem(p, i, ctx) {
 
 function gallerySections(images) {
   const groups = images.reduce((map, x) => map.set(x.group || 'Files', [...(map.get(x.group || 'Files') || []), x]), new Map());
-  return [...groups].map(([group, items]) => `<section class="pack-gallery__group"><h4>${esc(group || 'Files')} <span>${items.length}</span></h4><div class="pack-gallery__tiles">${items.map(x => `<button type="button" class="pack-gallery__tile" data-gallery-image="${esc(x.thumb)}" data-gallery-name="${esc(x.name)}"><img src="${esc(x.thumb)}" alt="${esc(x.name)}" width="${x.w}" height="${x.h}" loading="lazy" decoding="async"><span>${esc(x.name)}</span></button>`).join('')}</div></section>`).join('');
+  return [...groups].map(([group, items]) => `<section class="pack-gallery__group"><h4>${esc(group || 'Files')} <span>${items.length}</span></h4><div class="pack-gallery__tiles">${items.map(x => `<button type="button" class="pack-gallery__tile" data-gallery-image="${esc(x.thumb)}" data-gallery-name="${esc(x.name)}"${x.caption ? ` data-gallery-caption="${esc(x.caption)}" title="${esc(x.caption)}"` : ''}><img src="${esc(x.thumb)}" alt="${esc(x.caption ? `${x.name}, ${x.caption}` : x.name)}" width="${x.w}" height="${x.h}" loading="lazy" decoding="async"><span>${esc(x.name)}</span>${x.caption ? `<small>${esc(x.caption)}</small>` : ''}</button>`).join('')}</div></section>`).join('');
 }
 
 // a pack in the row: a sealed booster, the same height as a face tile, 0.72 as wide
