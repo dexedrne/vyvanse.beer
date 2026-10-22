@@ -104,6 +104,8 @@ function phoneMarkup() {
     if (eds) body.append(eds);
     if (pitch) body.append(pitch);
     if (plays) body.append(plays);
+    const gallery = $('.gallery-open', info);
+    if (gallery) body.append(gallery);
     if (act) {
       const status = $('.status', act);
       if (more) act.append(more);
@@ -703,9 +705,9 @@ function activate({ from, pad } = {}) {
   play(current(), { from });
 }
 
-function details() {
+function details({ from } = {}) {
   if (S.tab === 'crew' && !isPack(LISTS.crew[S.crew])) return waveDuo(LISTS.crew[S.crew].num);
-  if (phone.matches) return sheet && !sheet.hidden ? closeSheet() : openSheet();
+  if (phone.matches || from === 'pad' && S.tab === 'crew' && $('.gallery-open', onItem('crew'))) return sheet && !sheet.hidden ? closeSheet() : openSheet();
   const item = onItem(S.tab);
   if (!item) return;
   const open = item.classList.toggle('is-more');
@@ -781,7 +783,8 @@ function openSheet() {
     const list = document.createElement('div');
     list.innerHTML = manifest(p, { all: true });
     const fine = Object.assign(document.createElement('p'), { className: 'sheet__fine', textContent: `${p.download.size}, ${p.download.files} files, ${p.download.formats}.` });
-    contents.push(list.firstElementChild, fine);
+    const gallery = $('.gallery-open', onItem(S.tab))?.cloneNode(true);
+    contents.push(list.firstElementChild, ...(gallery ? [gallery] : []), fine);
   }
   body.replaceChildren(pitch, ...contents, ...(credit ? [credit] : []), links);
   const playBtn = $('[data-act]', onItem(S.tab)).cloneNode(true);
@@ -808,6 +811,7 @@ function back() {
   if (closeSheet()) return;
   if (!pwa.card.hidden) return pwa.dismiss();
   if (closeAsk()) return;
+  if (lightbox && !lightbox.hidden) return closeLightbox();
   const dlg = $('dialog[open]');
   if (dlg) return dlg.close();
   if (os?.isOpen()) return os.close();
@@ -840,8 +844,9 @@ function openModal() {
 function walk(dir) {
   const m = openModal();
   if (!m) return;
+  if (m.matches?.('.pack-gallery') && lightbox && !lightbox.hidden) return lightboxStep(dir === 'left' || dir === 'up' ? -1 : 1);
   if (m === sheet) {
-    const links = $$('a[href]', $('.sheet__body', sheet));
+    const links = $$('a[href], button', $('.sheet__body', sheet));
     const buttons = $$('a, button', $('.sheet__foot', sheet));
     const focused = document.activeElement;
     if (dir === 'left' || dir === 'right') {
@@ -858,6 +863,23 @@ function walk(dir) {
   const at = list.indexOf(document.activeElement);
   const step = dir === 'left' || dir === 'up' ? -1 : 1;
   list[at < 0 ? 0 : (at + step + list.length) % list.length].focus();
+}
+
+let lightbox = null;
+let lightboxItems = [];
+let lightboxIndex = 0;
+function showLightbox(i) {
+  lightboxIndex = (i + lightboxItems.length) % lightboxItems.length;
+  const item = lightboxItems[lightboxIndex];
+  $('img', lightbox).src = item.dataset.galleryImage;
+  $('img', lightbox).alt = item.dataset.galleryName;
+  $('figcaption', lightbox).textContent = item.dataset.galleryName;
+}
+function lightboxStep(d) { showLightbox(lightboxIndex + d); }
+function closeLightbox() {
+  if (!lightbox || lightbox.hidden) return;
+  lightbox.hidden = true;
+  lightboxItems[lightboxIndex]?.focus({ preventScroll: true });
 }
 
 // ---- input ----
@@ -940,7 +962,7 @@ function act(name, info = {}) {
     case 'next':
       return tabStep(1);
     case 'details':
-      return details();
+      return details(info);
     case 'wave': {
       const w = want();
       return waveDuo(w[Math.floor(Math.random() * w.length)], Math.random() < 0.4 ? 'other' : 'viewer');
@@ -1052,6 +1074,27 @@ $('#menu-ask').addEventListener('submit', e => {
 
 document.addEventListener('click', (e) => {
   if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const gallery = e.target.closest('[data-gallery]');
+  if (gallery) {
+    const dialog = $$('.pack-gallery').find(el => el.dataset.packGallery === gallery.dataset.gallery);
+    dialog?.showModal();
+    $('[data-gallery-close]', dialog)?.focus({ preventScroll: true });
+    return;
+  }
+  const closeGallery = e.target.closest('[data-gallery-close]');
+  if (closeGallery) return closeGallery.closest('dialog').close();
+  const picture = e.target.closest('[data-gallery-image]');
+  if (picture) {
+    lightbox = picture.closest('.pack-gallery').querySelector('.gallery-lightbox');
+    lightboxItems = $$('[data-gallery-image]', picture.closest('.pack-gallery'));
+    showLightbox(lightboxItems.indexOf(picture));
+    lightbox.hidden = false;
+    $('[data-lightbox-close]', lightbox).focus({ preventScroll: true });
+    return;
+  }
+  if (e.target.closest('[data-lightbox-close]')) return closeLightbox();
+  if (e.target.closest('[data-lightbox-prev]')) return lightboxStep(-1);
+  if (e.target.closest('[data-lightbox-next]')) return lightboxStep(1);
   if (moving) {
     // a click (or Enter on the focused cartridge) while one is in hand drops it
     const onCart = e.target.closest('.cart');
@@ -1123,6 +1166,20 @@ document.addEventListener('click', (e) => {
     if (y >= $('.top').getBoundingClientRect().bottom && y < $('.words', onItem('sites')).getBoundingClientRect().top) play(current());
   }
 });
+document.addEventListener('keydown', e => {
+  if (!lightbox || lightbox.hidden) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); lightboxStep(e.key === 'ArrowLeft' ? -1 : 1); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeLightbox(); }
+});
+document.addEventListener('touchstart', e => {
+  if (lightbox && !lightbox.hidden) lightbox.dataset.touchX = String(e.touches[0].clientX);
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!lightbox || lightbox.hidden || !lightbox.dataset.touchX) return;
+  const dx = e.changedTouches[0].clientX - +lightbox.dataset.touchX;
+  delete lightbox.dataset.touchX;
+  if (Math.abs(dx) > 45) lightboxStep(dx < 0 ? 1 : -1);
+}, { passive: true });
 // hovering a contact line moves the cursor, like a pause menu
 $('#contact').addEventListener('pointerover', (e) => {
   const mi = e.target.closest('.mi');

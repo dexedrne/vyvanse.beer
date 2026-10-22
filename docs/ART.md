@@ -42,7 +42,13 @@ node --input-type=module -e 'import { globSync } from "node:fs"; import assert f
 ```
 
 
-Every 2D file in this checkout (87 files), including archives and documentation captures. Loading screens use the title art or code; there is no separate raster loading illustration.
+## Asset pack galleries
+
+The pack pages use lazy WebP previews indexed by `src/packGallery.json`; each preview records its archive filename, folder, and intrinsic dimensions. The wallpaper gallery combines game key art and the eight rainy-night scenes, shown once per image even when the zip includes more than one format. Sticker galleries contain 91 Radbro and 94 Retardio designs on a checker tile.
+
+The Cars pack contains the 37 drivable GLBs from SHITBOX. Its 640 × 480 previews are one-at-a-time neutral studio renders of the source models, grouped by decade. `cars-all.zip` contains those 37 `cars/<id>.glb` files plus `README.md` (38 archive entries, 74,584,145 bytes); its per-model credit and original licence lines come from SHITBOX `modelCredits.json`. No external-game textures were added.
+
+The following table covers the 87 core site art files, including archives and documentation captures. Pack gallery thumbnails are a separate generated set, indexed in the manifest above. Loading screens use the title art or code; there is no separate raster loading illustration.
 
 | File | Size | Format | Use |
 | --- | --- | --- | --- |

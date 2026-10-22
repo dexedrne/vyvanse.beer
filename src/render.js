@@ -7,6 +7,7 @@
 // from the cartridge row along the bottom.
 
 import { shortUrl, shelf, playsIn } from './projects.js';
+import packGallery from './packGallery.json' with { type: 'json' };
 
 const esc = (s) =>
   String(s).replace(
@@ -179,6 +180,8 @@ export function packItem(p, i, ctx) {
   const a = crew.assets;
   const file = p.download.href.split('/').pop();
   const lic = crew.repo.license;
+  const titlePrefix = p.title === p.name ? '' : p.title.endsWith(` ${p.name}`) ? p.title.slice(0, -p.name.length - 1) : p.title;
+  const gallery = packGallery[p.id] && [...new Map(packGallery[p.id].map(x => [x.thumb, x])).values()];
   return `<article class="item item--pack" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.id)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
   <div class="visual visual--crew visual--pack">
     <div class="bignum" aria-hidden="true">${esc(p.big)}</div>
@@ -186,7 +189,7 @@ export function packItem(p, i, ctx) {
   </div>
   <div class="info">
     <p class="kindline">${esc(p.kind)}</p>
-    <h3 class="wm wm--pack" id="${esc(p.slug)}-name"><span class="vh">${esc(p.title)}: </span>${esc(p.name)}</h3>
+    <h3 class="wm wm--pack" id="${esc(p.slug)}-name">${titlePrefix ? `<span class="vh">${esc(titlePrefix)}: </span>` : ''}${esc(p.name)}</h3>
     <p class="pitch">${esc(p.line)}</p>
     ${credits(p, ctx)}
     <div class="contents">${manifest(p)}${contentsButton}</div>
@@ -195,9 +198,15 @@ export function packItem(p, i, ctx) {
       ${status(file, `${p.download.size}, ${p.download.files} files, ${p.download.formats}`)}
       ${p.lite ? `<p class="lite"><a href="${esc(p.lite.href)}" download>${esc(p.lite.label)} (${esc(p.lite.size)})</a></p>` : ''}
     </div>
-    <div class="extra"><p class="credit">Free to use under the <a ${ext(lic.href)}>${esc(lic.label)}${newTab}</a>. Credit <a ${ext(a.credit.href)}>${esc(a.credit.label)}${newTab}</a> when you post it.</p><p class="fine"><a class="more-link" href="${esc(a.all.href)}" download>${esc(a.all.label)} (${esc(a.all.size)})</a></p></div>
+    <div class="extra"><p class="credit">${p.licenseText ? esc(p.licenseText) : `Free to use under the <a ${ext(lic.href)}>${esc(lic.label)}${newTab}</a>. Credit <a ${ext(a.credit.href)}>${esc(a.credit.label)}${newTab}</a> when you post it.`}</p><p class="fine"><a class="more-link" href="${esc(a.all.href)}" download>${esc(a.all.label)} (${esc(a.all.size)})</a></p></div>
+    ${gallery ? `<button class="gallery-open js-only" type="button" data-gallery="${esc(p.id)}">Preview gallery <span>${gallery.length} pictures</span></button><dialog class="pack-gallery" data-pack-gallery="${esc(p.id)}" aria-label="${esc(p.title)} gallery"><div class="pack-gallery__head"><h3>${esc(p.title)}</h3><button class="gallery-close" type="button" data-gallery-close>Close</button></div><div class="pack-gallery__grid">${gallerySections(gallery)}</div><div class="gallery-lightbox" hidden role="dialog" aria-modal="true" aria-label="Picture preview"><button class="gallery-lightbox__close" type="button" data-lightbox-close aria-label="Close preview">×</button><button class="gallery-lightbox__prev" type="button" data-lightbox-prev aria-label="Previous picture">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="gallery-lightbox__next" type="button" data-lightbox-next aria-label="Next picture">›</button></div></dialog>` : ''}
   </div>
 </article>`;
+}
+
+function gallerySections(images) {
+  const groups = images.reduce((map, x) => map.set(x.group || 'Files', [...(map.get(x.group || 'Files') || []), x]), new Map());
+  return [...groups].map(([group, items]) => `<section class="pack-gallery__group"><h4>${esc(group || 'Files')} <span>${items.length}</span></h4><div class="pack-gallery__tiles">${items.map(x => `<button type="button" class="pack-gallery__tile" data-gallery-image="${esc(x.thumb)}" data-gallery-name="${esc(x.name)}"><img src="${esc(x.thumb)}" alt="${esc(x.name)}" width="${x.w}" height="${x.h}" loading="lazy" decoding="async"><span>${esc(x.name)}</span></button>`).join('')}</div></section>`).join('');
 }
 
 // a pack in the row: a sealed booster, the same height as a face tile, 0.72 as wide
