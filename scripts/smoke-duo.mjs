@@ -38,7 +38,7 @@ await context.addInitScript(live => {
     HTMLCanvasElement.prototype.getContext = function(type,...args) { return /^webgl/.test(type) ? null : getContext.call(this,type,...args); };
   }
   window.__pads = [];
-  Object.defineProperty(navigator, 'getGamepads', { value: () => window.__pads });
+  Object.defineProperty(navigator, 'getGamepads', { configurable:true, value: () => window.__pads });
   Object.defineProperty(navigator, 'standalone', { get: () => window.__standalone !== false });
   const play = HTMLMediaElement.prototype.play;
   HTMLMediaElement.prototype.play = function(...args) { this.muted = true; return play.apply(this, args); };
@@ -59,7 +59,7 @@ await context.route('**/*', async route => {
     return route.continue();
   }
   if (url.pathname === '/vyvanse-pad.js') return route.fulfill({ contentType: 'text/javascript', body: shim });
-  if (route.request().resourceType() === 'document') return route.fulfill({ contentType: 'text/html', body: `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;background:#101a2d;color:#fff2d4;font:18px system-ui}body{display:grid;place-items:center;text-align:center;touch-action:none;user-select:none}button{min-width:120px;min-height:48px;background:#ffb12a;color:#101a2d;border:0;font:inherit}small{display:block;margin:20px}</style><body><main><h1>Player integration check</h1><p>state survives folding</p><button id="touch">tap · 0</button><small id="size"></small></main><script>window.messages=[];window.taps=0;window.loads=1;navigator.getGamepads=()=>[];addEventListener('message',e=>messages.push(e.data));document.querySelector('#touch').onclick=()=>{taps++;document.querySelector('#touch').textContent='tap · '+taps};function size(){document.querySelector('#size').textContent=innerWidth+' × '+innerHeight+' CSS px'}size();addEventListener('resize',size);</script><script src="/vyvanse-pad.js" data-launcher-origin="${base}"></script>` });
+  if (route.request().resourceType() === 'document') return route.fulfill({ contentType: 'text/html', body: `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;background:#101a2d;color:#fff2d4;font:18px system-ui}body{display:grid;place-items:center;text-align:center;touch-action:none;user-select:none}button{min-width:120px;min-height:48px;background:#ffb12a;color:#101a2d;border:0;font:inherit}small{display:block;margin:20px}</style><body><main><h1>Player integration check</h1><p>state survives folding</p><button id="touch">tap · 0</button><small id="size"></small></main><script>window.messages=[];window.taps=0;window.loads=1;navigator.getGamepads=()=>[];addEventListener('message',e=>messages.push(e.data));document.querySelector('#touch').onclick=()=>{taps++;document.querySelector('#touch').textContent='tap · '+taps};function size(){document.querySelector('#size').textContent=innerWidth+' × '+innerHeight+' CSS px'}size();addEventListener('resize',size);new ResizeObserver(size).observe(document.documentElement);requestAnimationFrame(size);</script><script src="/vyvanse-pad.js" data-launcher-origin="${base}"></script>` });
   return route.fulfill({ contentType: 'application/json', body: '{}' });
 });
 const page = context.pages()[0];
@@ -105,11 +105,34 @@ async function leavePlayer() {
 try {
   for (const [view,width,height] of views.filter(([view]) => !process.env.DUO_VIEW || process.env.DUO_VIEW === view)) {
     await page.setViewportSize({width,height});
+    if (process.env.DUO_RETAKE === 'player') {
+      await go('games/shitbox');
+      await page.tap('.panel.on .item.on [data-act="play"]');
+      await shot(`${view}-loading`);
+      await page.waitForSelector('.player.is-ready');
+      await shot(`${view}-player`);
+      await page.tap('.player__nub');
+      await shot(`${view}-player-menu`);
+      await leavePlayer();
+      await page.evaluate(() => { window.__standalone = false; });
+      await page.tap('.panel.on .item.on [data-act="play"]');
+      await shot(`${view}-install`);
+      await leavePlayer();
+      continue;
+    }
     for (const tab of (process.env.DUO_SURFACES === 'live' ? ['games/shitbox','crew/3710'] : ['games/shitbox','crew/3710','sites','contact'])) {
       await go(tab);
       if (process.env.DUO_LIVE === '1') {
         await page.waitForSelector('.duo__gl');
+        await page.waitForSelector('.screen.duo-live');
         await page.waitForTimeout(1500);
+        const buffers = await page.evaluate(() => Object.fromEntries(['water','duo__gl'].map(name => {
+          const canvas = document.querySelector(`canvas.${name}`);
+          return [name,canvas ? {width:canvas.width,height:canvas.height}:null];
+        })));
+        assert.ok(buffers.water && buffers.water.width * buffers.water.height <= 650000);
+        assert.ok(buffers.duo__gl && buffers.duo__gl.width * buffers.duo__gl.height <= 350000);
+        evidence.checks.push({view,tab,buffers});
       }
       await shot(`${view}-${tab.split('/')[0]}`);
     }
@@ -120,6 +143,8 @@ try {
     }
     await go('games/shitbox');
     await page.tap('.panel.on .item.on [data-more]');
+    assert.equal(await page.evaluate(() => document.getElementById('bgm').paused),false, 'first tap unlocks menu audio');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).overscrollBehaviorY),'none');
     await shot(`${view}-details`);
     await page.tap('.sheet__foot .ghost');
     await page.tap('#menu-ask button');
@@ -131,6 +156,9 @@ try {
     const music = await page.getAttribute('#music','aria-pressed');
     await page.tap('.settings button:first-of-type');
     assert.notEqual(await page.getAttribute('#music','aria-pressed'), music);
+    const sounds = await page.getAttribute('#sfx','aria-pressed');
+    await page.tap('.settings button:nth-of-type(2)');
+    assert.notEqual(await page.getAttribute('#sfx','aria-pressed'),sounds);
     await page.selectOption('#quality','battery');
     assert.equal(await page.evaluate(() => localStorage.getItem('vyv-quality')), 'battery');
     await page.selectOption('#quality','auto');
@@ -233,6 +261,6 @@ try {
   }
 } finally {
   await cleanup();
-  writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}-evidence.json`), JSON.stringify(evidence,null,2));
+  writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}${process.env.DUO_RETAKE ? '-'+process.env.DUO_RETAKE : ''}-evidence.json`), JSON.stringify(evidence,null,2));
 }
 assert.deepEqual(evidence.errors, []);
