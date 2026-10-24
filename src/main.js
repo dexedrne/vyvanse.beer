@@ -846,6 +846,12 @@ function openModal() {
 function walk(dir) {
   const m = openModal();
   if (!m) return;
+  const focused = document.activeElement;
+  if (focused?.matches('select') && (dir === 'left' || dir === 'right')) {
+    focused.selectedIndex = (focused.selectedIndex + (dir === 'left' ? -1 : 1) + focused.options.length) % focused.options.length;
+    focused.dispatchEvent(new Event('change', {bubbles:true}));
+    return;
+  }
   if (m.matches?.('.pack-gallery') && lightbox && !lightbox.hidden) return lightboxStep(dir === 'left' || dir === 'up' ? -1 : 1);
   if (m === sheet) {
     const links = $$('a[href], button', $('.sheet__body', sheet));
@@ -860,7 +866,7 @@ function walk(dir) {
     }
     return;
   }
-  const list = $$('a[href], button:not([disabled]), input:not([disabled]), [tabindex="0"]', m).filter((el) => el.offsetParent || el.getClientRects().length);
+  const list = $$('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex="0"]', m).filter((el) => el.offsetParent || el.getClientRects().length);
   if (!list.length) return;
   const at = list.indexOf(document.activeElement);
   const step = dir === 'left' || dir === 'up' ? -1 : 1;

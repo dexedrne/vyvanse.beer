@@ -103,7 +103,6 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
   function viewport() {
     const height = globalThis.visualViewport?.height || innerHeight;
     const width = globalThis.visualViewport?.width || innerWidth;
-    const landscape = width > height;
     const style = getComputedStyle(document.documentElement);
     const safe = Object.fromEntries(['top', 'right', 'bottom', 'left'].map(side =>
       [side, parseFloat(style.getPropertyValue(`--safe-${side}`)) || 0]));

@@ -1,18 +1,21 @@
 /** @typedef {'auto'|'battery'|'detail'} Quality */
 /** @typedef {{userAgent:string,maxTouchPoints?:number,connection?:{saveData?:boolean}}} Device */
 const modes = ['auto', 'battery', 'detail'];
+/** @type {Quality} */
+let sessionQuality = 'auto';
 
 /** @returns {Quality} */
 export function readQuality() {
   try {
     const value = localStorage.getItem('vyv-quality');
-    return value === 'battery' || value === 'detail' ? value : 'auto';
-  } catch { return 'auto'; }
+    return value === 'battery' || value === 'detail' ? value : sessionQuality;
+  } catch { return sessionQuality; }
 }
 
 /** @param {string} value */
 export function setQuality(value) {
   if (!modes.includes(value)) return;
+  sessionQuality = value === 'detail' ? 'detail' : value === 'battery' ? 'battery' : 'auto';
   try { localStorage.setItem('vyv-quality', value); } catch { /* session-only preference */ }
   dispatchEvent(new Event('vyv:quality'));
 }
@@ -40,4 +43,12 @@ export function renderSize(width, height, dpr, cap, pixels) {
   const w = Math.max(1, width), h = Math.max(1, height);
   const ratio = Math.min(Math.max(1, dpr), cap, Math.sqrt(pixels / (w * h)));
   return { width:Math.max(1, Math.floor(w * ratio)), height:Math.max(1, Math.floor(h * ratio)), ratio };
+}
+
+/** Keep the fractional interval instead of drifting on high refresh displays.
+ * @param {number} now @param {number} due @param {number} fps
+ */
+export function nextRenderTime(now, due, fps) {
+  const interval = 1000 / fps;
+  return now + interval - Math.max(0, now - due) % interval;
 }

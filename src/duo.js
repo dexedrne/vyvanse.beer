@@ -44,6 +44,7 @@ const _rq = new THREE.Quaternion();
 const _ax = new THREE.Vector3();
 const _tw = new THREE.Quaternion();
 const _id = new THREE.Quaternion();
+const _inverseTwist = new THREE.Quaternion();
 const YAW_KEEP = 0.4; // how much of the clips' own body turn is kept (Idle looks around a lot)
 const GROOVY = ['Hips', 'Spine01', 'Spine02', 'neck', 'Head', 'LeftShoulder', 'RightShoulder', 'LeftArm', 'RightArm'];
 
@@ -300,7 +301,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
         // swing-twist: keep the lean, damp the turn about the vertical, so they stay facing out
         const q = h.quaternion;
         _tw.set(0, q.y, 0, q.w).normalize();
-        q.multiply(_tw.clone().invert()).multiply(_id.slerp(_tw, YAW_KEEP));
+        q.multiply(_inverseTwist.copy(_tw).invert()).multiply(_id.slerp(_tw, YAW_KEEP));
         _id.identity();
       }
       if (!still) groove(c, t);

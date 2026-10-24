@@ -243,8 +243,12 @@ memory back.
 - On demand: the tip jar (about 10 KB), its wallet code (1 to 2 KB), Radbro OS (about 9 KB with
   its CSS), the music (1.4 MB).
 - One loop draws both, at 60 fps while you're doing something and 30 after a few idle seconds.
-  Pixel ratio capped at 1.25; the water draws at most about 0.9 MP and drops resolution itself
-  when frames run long. Nothing runs while the tab is hidden or a game is open.
+  Auto uses a mobile tier on touch WebKit hardware: DPR capped at 1.5, water at 0.65 MP,
+  crew at 0.35 MP and three retained crew models. Desktop Auto keeps DPR 1.25 and water at
+  0.9 MP. Contact → Settings offers Auto, Battery (30 fps) and Detail, plus both sound toggles.
+  The water lowers resolution when frames run long. Draw timing retains fractional intervals
+  on 120 Hz screens. Opening a game pauses the shelf, shrinks its draw buffers and releases
+  off-screen crew; returning restores them. Art textures retain only the current crossfade.
 - Reduced motion: no rain, ripples, groove or automatic waves (a wave only when asked), and no
   flicker or slides.
 - No WebGL2, or a failure: the plain backdrops and the crew's renders stay; everything works.
@@ -254,6 +258,20 @@ memory back.
 The art on top with the puddle under it, the cartridges as a sideways swipe row, the tabs as a
 bottom bar, and the ticker drifting slowly above it. Swipe the art to move along the row; tap a
 cartridge to pick it, tap again to play.
+
+The unfolded display also has a landscape layout with larger cartridges and reading text.
+Folding and rotation resize the existing player iframe without replacing it or changing its
+URL. Unfolded portrait play stays available; compact phones keep their landscape hint.
+The 44-pixel player menu, current iframe bounds and a suggested DPR cap are included in the
+[live viewport message](docs/player-viewport.md). A hosted game must resize its own renderer
+and implement its own touch HUD; this repository contains the launcher and relay, not game engines.
+
+`scripts/smoke-duo.mjs` captures launcher surfaces at 466×678, 678×466, 626×890 and 890×626,
+all at DPR 3, with simulated safe areas. It uses a stateful cross-origin fixture for player,
+fold and controller checks. Run it with the shared browser lock, smoke TMPDIR,
+`PLAYWRIGHT_MODULE` and `DUO_OUTPUT`. `DUO_PHASE=before` captures the starting revision;
+the default captures current code. `jsconfig.duo.json` strictly checks the new geometry and
+render-budget modules; the remaining JavaScript uses the existing syntax check.
 
 ## Tip jar
 

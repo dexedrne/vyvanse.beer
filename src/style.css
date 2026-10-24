@@ -3652,6 +3652,9 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
   }
   .js .a2hs__x { width: 44px; height: 44px; }
   .js .spine { font-size: 17px; }
+  .js .mug { width: 44px; height: 44px; }
+  .js .tile--pack { min-width: 44px; min-height: 44px; }
+  .js .a2hs__share { min-height: 44px; }
   .js .plays { overflow-x: auto; touch-action: pan-x; scrollbar-width: none; }
   .js .tip-pill { height: 44px; }
   .js .player__nub { width: 44px; height: 44px; }

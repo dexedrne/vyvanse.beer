@@ -1,3 +1,5 @@
+import { renderProfile } from './quality.js';
+
 // Hardware, not viewport width: a landscape iPhone is still a phone; an iPad is not.
 export function isPhone(nav = navigator) {
   const ua = nav.userAgent || '';
@@ -23,4 +25,3 @@ export function dprCap(nav = navigator, base = 1.25) {
   const profile = renderProfile(undefined, nav);
   return profile.tier === 'desktop' && profile.mode === 'auto' ? base : profile.dpr;
 }
-import { renderProfile } from './quality.js';

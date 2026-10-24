@@ -348,6 +348,7 @@ export function createWater(canvas, host, { calm }) {
     a = { tex: texture(), ready: false };
     arts.set(img, a);
     const go = () => {
+      if (arts.get(img) !== a) return;
       upload(a.tex, img);
       a.ready = true;
     };
