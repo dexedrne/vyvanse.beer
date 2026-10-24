@@ -3698,6 +3698,14 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .settings button:focus-visible, .settings select:focus-visible { outline: 2px solid #ffb12a; outline-offset: 2px; }
 .settings label { display: block; margin-top: 20px; font: 400 20px/1.2 var(--pixel); }
 
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+  .settings[open] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: min(600px, calc(100vw - var(--safe-left) - var(--safe-right) - 32px)); padding: 20px; }
+  .settings h2, .settings p, .settings label, .settings select, .settings button:last-child { grid-column: 1 / 3; margin: 0; }
+  .settings h2 { font-size: 36px; }
+  .settings p, .settings label { font-size: 18px; }
+  .settings button { margin: 0; }
+}
+
 @media (pointer: coarse) {
   .player, .player__bar, .player__nub, .settings button { touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .player__nub { touch-action: none; }
