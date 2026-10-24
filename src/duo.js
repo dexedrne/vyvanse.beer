@@ -339,6 +339,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
     tick,
     resize,
     sleep() {
+      clearTimeout(pumpT);
       soon = [];
       for (const c of cast.values()) if (!on.includes(c)) drop(c);
       renderer.setSize(1, 1, false);

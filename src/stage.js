@@ -16,6 +16,7 @@ export function createStage(shell, { screen, duoBox, models }) {
   let want = []; // who the page wants on the water (show)
   let soon = []; // and who's likely next (prefetch)
   let water = null;
+  let activateCast = null;
 
   // ---- the water ----
   try {
@@ -90,12 +91,15 @@ export function createStage(shell, { screen, duoBox, models }) {
   if (!navigator.connection?.saveData && (water || gl())) {
     import('./duo.js')
       .then((m) => {
+        activateCast = () => {
+        activateCast = null;
         cast = m.createCast(duoBox, {
           calm,
           models,
           framing: shell.framing,
           // everyone the page asked for is in: it swaps the renders out for them
           onReady() {
+            if (paused) return;
             shell.castReady();
             resizeCast();
             cast.tick(0); // a first frame before they show
@@ -106,6 +110,8 @@ export function createStage(shell, { screen, duoBox, models }) {
         cast.show(want);
         cast.prefetch(soon);
         resizeCast();
+        };
+        if (!paused) activateCast();
       })
       .catch((e) => console.warn('the crew stay renders', e));
   }
@@ -177,6 +183,8 @@ export function createStage(shell, { screen, duoBox, models }) {
     resume() {
       paused = false;
       idleSince = performance.now();
+      activateCast?.();
+      cast?.prefetch(soon);
       resizeCast();
       sync();
       wake();
