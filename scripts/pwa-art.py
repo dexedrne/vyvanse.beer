@@ -15,7 +15,8 @@ for size in (192, 512):
 for size in (120, 152, 167):
     mark.resize((size, size), Image.Resampling.LANCZOS).save(out / f'apple-touch-{size}.png')
 art = Image.open(root / 'public' / 'img' / 'art' / 'vyvanse.webp').convert('RGB')
-for width, height in ((1206, 2622), (2622, 1206), (1320, 2868), (2868, 1320)):
+for width, height in ((1206, 2622), (2622, 1206), (1320, 2868), (2868, 1320),
+                      (1878, 2670), (2670, 1878), (1398, 2034), (2034, 1398)):
     launch = ImageOps.fit(art, (width, height), Image.Resampling.LANCZOS, centering=(0.65, 0.5))
     launch = Image.blend(launch, Image.new('RGB', launch.size, '#120c20'), 0.65)
     side = round(min(width, height) * 0.18)

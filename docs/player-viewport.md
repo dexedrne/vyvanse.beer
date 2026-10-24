@@ -7,7 +7,7 @@ There is no iframe scaling, fixed game resolution, or dependency on a ready repl
 On phones, the iframe URL preserves existing query parameters and fragments and adds:
 
 ```text
-?device=phone&vb=1&safe=0,0,0,0&menu=8,8,32,32&standalone=1
+?device=phone&vb=1&safe=0,0,0,0&menu=8,8,44,44&standalone=1
 ```
 
 `safe` is `top,right,bottom,left` in the game's CSS pixels: only the part of the **iframe**
@@ -23,10 +23,13 @@ On load, resize, orientation change, and input change, the parent sends:
 {
   type: 'vyvanse:viewport',
   safe: { top: 0, right: 0, bottom: 21, left: 0 },
-  menu: { x: 8, y: 8, w: 32, h: 32 },
+  menu: { x: 8, y: 8, w: 44, h: 44 },
+  width: 626, height: 802, // measured usable iframe CSS dimensions
+  dpr: 1.5, // suggested cap; games still apply their own total pixel budget
+  layout: 'unfolded', // min viewport side >= 600; otherwise 'compact'
   standalone: true,
   orientation: 'landscape', // or 'portrait'
-  input: 'ps' // or 'touch'
+  input: 'ps' // 'xbox', 'kb', or 'touch'
 }
 ```
 

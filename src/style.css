@@ -3695,6 +3695,12 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 @media (pointer: coarse) {
   .player, .player__bar, .player__nub, .settings button { touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .player__nub { touch-action: none; }
+  .ask-dialog, .settings, .tip {
+    position: fixed;
+    top: calc(var(--view-top, 0px) + var(--safe-top) + (var(--view-height, 100dvh) - var(--safe-top) - var(--safe-bottom)) / 2);
+    bottom: auto; margin: 0 auto; transform: translateY(-50%);
+  }
+  .ask-dialog { max-height: calc(var(--view-height, 100dvh) - var(--safe-top) - var(--safe-bottom) - 32px); }
 }
 
 /* The inner landscape display has room for larger type, art and cartridges. */

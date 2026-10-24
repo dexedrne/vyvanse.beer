@@ -1393,6 +1393,8 @@ function fitWm() {
 }
 function layout() {
   phoneMarkup();
+  document.documentElement.style.setProperty('--view-height', `${globalThis.visualViewport?.height || innerHeight}px`);
+  document.documentElement.style.setProperty('--view-top', `${globalThis.visualViewport?.offsetTop || 0}px`);
   if (phone.matches) screen.style.setProperty('--view-height', `${globalThis.visualViewport?.height || innerHeight}px`);
   const W = screen.clientWidth;
   const H = phone.matches ? screen.clientHeight : innerHeight;
