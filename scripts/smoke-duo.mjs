@@ -2,7 +2,8 @@
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { projects, crew } from '../src/projects.js';
+import { projects, crew, site, groups, contact, duo } from '../src/projects.js';
+import { renderShell } from '../src/render.js';
 import { execFileSync } from 'node:child_process';
 
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -19,17 +20,27 @@ const context = await chromium.launchPersistentContext(profile, {
   args: ['--mute-audio', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
   viewport: { width: 626, height: 890 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true,
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1',
-  serviceWorkers: 'block',
+  serviceWorkers: 'allow',
 });
+async function cleanup() {
+  await context.close().catch(() => {});
+  rmSync(profile, {recursive:true,force:true});
+}
+for (const signal of ['SIGINT','SIGTERM']) process.once(signal, async () => { await cleanup(); process.exit(143); });
 const evidence = { engine: 'Chromium with iPhone UA and touch; WebKit runtime unavailable', phase, captures: [], checks: [], geometry: [], errors: [] };
 const shim = readFileSync('public/vyvanse-pad.js', 'utf8');
-await context.addInitScript(() => {
+await context.addInitScript(live => {
+  // Software GL is covered separately; broad UI captures use the supported poster fallback.
+  if (!live) {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type,...args) { return /^webgl/.test(type) ? null : getContext.call(this,type,...args); };
+  }
   window.__pads = [];
   Object.defineProperty(navigator, 'getGamepads', { value: () => window.__pads });
-  Object.defineProperty(navigator, 'standalone', { value: true });
+  Object.defineProperty(navigator, 'standalone', { get: () => window.__standalone !== false });
   const play = HTMLMediaElement.prototype.play;
   HTMLMediaElement.prototype.play = function(...args) { this.muted = true; return play.apply(this, args); };
-});
+}, process.env.DUO_LIVE === '1');
 await context.route('**/*', async route => {
   const url = new URL(route.request().url());
   if (url.origin === base) {
@@ -39,8 +50,9 @@ await context.route('**/*', async route => {
       return route.fulfill({ contentType: url.pathname.endsWith('.css') ? 'text/css' : 'text/javascript', body });
     }
     if (phase === 'before' && url.pathname === '/') {
-      const response = await route.fetch();
-      return route.fulfill({response, body:(await response.text()).replace(/<li class="js-only"><button class="mi"[^>]*data-settings[\s\S]*?<\/li>/g,'')});
+      const body = readFileSync('index.html','utf8').replace('<!-- shell -->', renderShell({site,groups,projects,crew,contact,duo}))
+        .replace(/<li class="js-only"><button class="mi"[^>]*data-settings[\s\S]*?<\/li>/g,'');
+      return route.fulfill({contentType:'text/html',body});
     }
     return route.continue();
   }
@@ -69,12 +81,15 @@ async function go(hash) {
   await settle();
 }
 async function shot(name) {
+  await page.waitForTimeout(320);
   if (phase !== 'before') evidence.geometry.push(await page.evaluate(name => {
     const box = el => { const r = el.getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}; };
     const selectors = ['.top .sign','.top__right > :not([hidden])','.top .tab','.panel.on .item.on .act > a','.panel.on .item.on [data-more]',
       '.panel.on .item.on .ed','.panel.on .item.on .mi','dialog[open]','.player:not([hidden]) .player__nub','.player:not([hidden]) .player__bar'];
     const rects = selectors.flatMap(selector => [...document.querySelectorAll(selector)].filter(el => el.checkVisibility({visibilityProperty:true})).map(el => ({selector,...box(el)})));
-    return {name,width:innerWidth,height:innerHeight,rects};
+    const terminal = document.querySelector('.os:not([hidden])');
+    return {name,width:innerWidth,height:innerHeight,rects,
+      terminal:terminal ? {opacity:getComputedStyle(terminal).opacity,background:getComputedStyle(terminal).backgroundColor,...box(terminal)} : null};
   }, name));
   await page.screenshot({ path: resolve(output, phase, `${name}.png`), animations:'disabled' });
   evidence.captures.push(name);
@@ -83,11 +98,15 @@ async function shot(name) {
 try {
   for (const [view,width,height] of views.filter(([view]) => !process.env.DUO_VIEW || process.env.DUO_VIEW === view)) {
     await page.setViewportSize({width,height});
-    for (const tab of ['games/shitbox','crew/3710','sites','contact']) {
+    for (const tab of (process.env.DUO_SURFACES === 'live' ? ['games/shitbox','crew/3710'] : ['games/shitbox','crew/3710','sites','contact'])) {
       await go(tab);
+      if (process.env.DUO_LIVE === '1') {
+        await page.waitForSelector('.duo__gl');
+        await page.waitForTimeout(1500);
+      }
       await shot(`${view}-${tab.split('/')[0]}`);
     }
-    if (phase === 'before') continue;
+    if (phase === 'before' || process.env.DUO_SURFACES) continue;
     for (const game of projects.filter(p => p.group === 'games' && p.cmd !== 'shitbox')) {
       await go(`games/${game.cmd}`);
       await shot(`${view}-game-${game.cmd}`);
@@ -110,6 +129,7 @@ try {
     await page.selectOption('#quality','auto');
     await page.locator('.settings').evaluate(el => el.close());
     await page.tap('[data-os]');
+    await page.waitForSelector('.os:not([hidden])');
     await shot(`${view}-terminal`);
     await page.tap('.term__close');
     await page.tap('.tip-pill');
@@ -136,6 +156,11 @@ try {
     await shot(`${view}-player`);
     await page.tap('.player__nub');
     await shot(`${view}-player-menu`);
+    await page.tap('.player__back');
+    await settle();
+    await page.evaluate(() => { window.__standalone = false; });
+    await page.tap('.panel.on .item.on [data-act="play"]');
+    await shot(`${view}-install`);
     await page.tap('.player__back');
     await settle();
     evidence.checks.push(`${view}: sound, Auto/Battery preference, touch menu and player return`);
@@ -178,11 +203,17 @@ try {
     await page.waitForTimeout(100);
     assert.equal(await page.getAttribute('html','data-input'),'touch');
     assert.equal(await game.evaluate(() => VyvansePad.getGamepads().filter(Boolean).length),0);
+    await page.evaluate(() => {
+      window.__pads = [{id:'DualSense Wireless Controller',index:0,connected:true,mapping:'standard',timestamp:performance.now(),axes:[0,0],buttons:Array.from({length:18},(_,i)=>({pressed:i===8||i===9,touched:i===8||i===9,value:i===8||i===9?1:0}))}];
+    });
+    await page.waitForSelector('.player__hold:not([hidden])');
+    await shot('fold-controller-hold');
+    await page.waitForSelector('.player', {state:'hidden'});
+    await page.evaluate(() => { window.__pads = []; });
     evidence.checks.push('controller connect/relay/disconnect restores touch; screenshots use a cross-origin stateful fixture, not hosted game internals');
   }
 } finally {
-  await context.close();
-  rmSync(profile, { recursive:true, force:true });
+  await cleanup();
   writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}-evidence.json`), JSON.stringify(evidence,null,2));
 }
 assert.deepEqual(evidence.errors, []);

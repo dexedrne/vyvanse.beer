@@ -167,9 +167,9 @@ Bluetooth settings, press a pad button to expose it to Safari, and use ✕ to pl
 L1/R1 for sections and the d-pad/stick to select. L3 toggles music (M on a keyboard); the music
 button also starts audio after the first tap. Create + Options held for one second unloads the
 game and returns to the shelf. Touch supports cartridge taps, swiping the artwork, swiping the
-section bar, and safe-area back buttons. Portrait works for browsing and SALOON; other games
-ask for landscape. The manifest permits either orientation, and each game's player controls its
-landscape lock and rotate hint.
+section bar, and safe-area back buttons. Unfolded portrait play is available for every framed
+game; compact screens retain each game's landscape preference. The manifest permits either
+orientation. Contact → Settings has sound and picture controls for touch and controllers.
 
 The production build generates `sw.js` from an exact list of launcher files: scripts, fonts,
 art, the menu's models, music and install assets. Games, APIs and wallets are never cached.
@@ -229,8 +229,8 @@ seconds one of them waves, at you or at the other one. On Crew, whoever is picke
 centre stage, and waves hello; he waves again on a click or tap (or X / G). Each model is
 fetched the first time it's wanted, and on Crew the cards either side are fetched once his is
 in and the page is idle. Until a model is in (and without WebGL, or if it fails) his render
-stands there instead. Past six models loaded, the ones off screen for 30 seconds give their GPU
-memory back.
+stands there instead. Past the hardware tier's retained-model budget, models off screen for
+10 seconds give their GPU memory back.
 
 ## Performance
 
