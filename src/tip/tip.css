@@ -412,3 +412,10 @@
 .tip__in:focus {
   outline: none;
 }
+
+@media (pointer: coarse) {
+  .tip { width: min(540px, calc(100vw - var(--safe-left) - var(--safe-right) - 24px)); margin: auto; }
+  .tip__in { max-height: calc(var(--view-height, 100dvh) - var(--safe-top) - var(--safe-bottom) - 24px); border-radius: 22px; }
+  .tip__close, .tip__seg button, .tip__amts button, .tip button, .tip a { min-width: 44px; min-height: 44px; }
+  .tip input, .tip select { font-size: 16px; min-height: 44px; }
+}

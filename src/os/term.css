@@ -441,3 +441,17 @@
     display: none;
   }
 }
+
+@media (pointer: coarse) {
+  .os {
+    top: calc(var(--safe-top) + 12px); right: calc(var(--safe-right) + 12px);
+    bottom: auto; left: calc(var(--safe-left) + 12px); width: auto;
+    height: calc(var(--view-height, 100dvh) - var(--safe-top) - var(--safe-bottom) - 24px);
+    border-radius: 14px; border-bottom: 1px solid var(--line-2);
+  }
+  .term__close, .term__chips button, .t-cmd { min-width: 44px; min-height: 44px; }
+  .term__chips { flex-wrap: nowrap; flex: none; }
+  .term__keys { display: none; }
+  .term__input { font-size: 19px; min-height: 44px; }
+  .term__line { flex: none; }
+}

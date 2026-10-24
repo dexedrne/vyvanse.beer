@@ -20,7 +20,7 @@ import { createAsk } from './ask/menu.js';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const phone = matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse) and (max-width: 960px) and (max-height: 500px)');
+const phone = matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse) and (max-width: 960px) and (max-height: 700px)');
 
 const screen = $('#screen');
 const duoEl = $('#duo');
