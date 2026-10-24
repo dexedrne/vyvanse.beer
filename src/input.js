@@ -64,6 +64,7 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
       paintGlyphs();
       onScheme?.(s);
     }
+    dispatchEvent(new Event('vyv:input'));
   }
   function paintGlyphs(el = document) {
     const map = GLYPHS[scheme];

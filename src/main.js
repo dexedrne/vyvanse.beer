@@ -16,6 +16,7 @@ import { createPwa } from './pwa.js';
 import { gameUrl } from './device.js';
 import { launchUrl } from './ask/actions.js';
 import { createAsk } from './ask/menu.js';
+import { createSettings } from './settings.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -686,6 +687,7 @@ function activate({ from, pad } = {}) {
     const el = LISTS.contact[S.contact];
     if (el.matches('[data-tip]')) return openTipJar();
     if (el.matches('[data-os]')) return openOS();
+    if (el.matches('[data-settings]')) return settings.open();
     audio.blip('ok');
     if (from === 'pad' && !openTab(el.href)) askTab({ title: el.querySelector('.mi__label').textContent, text: 'The browser only opens new tabs from a click or a key. Open it in this tab instead, or click New tab.', url: el.href });
     else if (from !== 'pad') el.click();
@@ -1039,6 +1041,7 @@ const player = createPlayer({
 });
 addEventListener('message', (e) => player.message(e));
 const pwa = createPwa({ playing: () => !!player.current, toast });
+const settings = createSettings({ audio });
 $('#menu-back').addEventListener('click', back);
 
 const launcher = {
@@ -1158,6 +1161,7 @@ document.addEventListener('click', (e) => {
     return openTipJar();
   }
   if (e.target.closest('[data-os]')) return openOS();
+  if (e.target.closest('[data-settings]')) return settings.open();
   const mi = e.target.closest('.mi');
   if (mi) select(LISTS.contact.indexOf(mi), { sound: false });
   if (phone.matches && S.tab === 'sites' && mode() === 'menu' && !e.target.closest('a, button, .body, .shelf, .top, .tabs, .strip')) {

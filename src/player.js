@@ -163,7 +163,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
       class: 'player__frame',
       title: p.name,
       src: src.href,
-      allow: 'gamepad; fullscreen; autoplay; accelerometer; clipboard-write; xr-spatial-tracking',
+      allow: 'gamepad; fullscreen; autoplay; accelerometer; gyroscope; clipboard-write; xr-spatial-tracking',
       allowfullscreen: true,
       referrerpolicy: 'strict-origin-when-cross-origin',
     });
