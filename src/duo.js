@@ -20,15 +20,14 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { dprCap } from './device.js';
+import { renderProfile, renderSize } from './quality.js';
 
 export const FEET = 0.976; // where y = 0 sits, as a share of the canvas height
 const FOV = 18;
 const PHONE_HEIGHT = 1.85; // include the models' head depth in the phone's perspective framing
 const BPM = 92;
 const WAVE_EVERY = [7, 12]; // seconds between waves they do on their own
-const KEEP = 6; // models kept loaded; past that, the ones off screen for STALE ms are let go
-const STALE = 30000;
+const STALE = 10000;
 // a pair: where each stands (m), how far he faces the other one, his lag behind the beat, his energy
 const PAIR = [
   { x: -0.62, turn: 0.17, beat: 0, energy: 1 },
@@ -54,7 +53,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
   canvas.className = 'duo__gl';
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, premultipliedAlpha: true, powerPreference: 'low-power' });
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, dprCap()));
+  renderer.setPixelRatio(1);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 40);
 
@@ -162,6 +161,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
 
   // past KEEP models, let go of the ones off screen longest (never who's on, wanted or next)
   function gc(now) {
+    const KEEP = renderProfile().models;
     if (cast.size <= KEEP) return;
     const old = [...cast.values()]
       .filter((c) => !on.includes(c) && !want.includes(c.num) && !soon.includes(c.num) && now - c.seen > STALE)
@@ -316,6 +316,9 @@ export function createCast(box, { calm, models, onReady, framing }) {
   function resize(w, h) {
     w = Math.max(1, Math.round(w));
     h = Math.max(1, Math.round(h));
+    const profile = renderProfile();
+    const size = renderSize(w, h, devicePixelRatio || 1, profile.dpr, profile.castPixels);
+    renderer.setPixelRatio(size.ratio);
     renderer.setSize(w, h, false);
     const aspect = w / h;
     camera.aspect = aspect;
@@ -334,6 +337,11 @@ export function createCast(box, { calm, models, onReady, framing }) {
     canvas,
     tick,
     resize,
+    sleep() {
+      soon = [];
+      for (const c of cast.values()) if (!on.includes(c)) drop(c);
+      renderer.setSize(1, 1, false);
+    },
     wave,
     show,
     prefetch,

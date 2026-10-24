@@ -15,7 +15,7 @@
 // 60 fps while you're doing something, 30 after a few idle seconds; nothing while the tab is
 // hidden (the caller's requestAnimationFrame stops). Reduced motion: no rain, no ripples.
 
-import { dprCap } from './device.js';
+import { renderProfile, renderSize } from './quality.js';
 
 const SIM_PX = 4; // css px per ripple cell (the site uses 3; this screen is all water)
 const STEP = 1 / 60;
@@ -424,11 +424,11 @@ export function createWater(canvas, host, { calm }) {
     const r = host.getBoundingClientRect();
     view.w = Math.max(1, r.width);
     view.h = Math.max(1, r.height);
-    const dpr = Math.min(devicePixelRatio || 1, dprCap());
-    const budget = view.w < 600 ? 0.6e6 : 0.9e6;
-    view.px = Math.min(dpr, Math.sqrt(budget / (view.w * view.h))) * scale;
-    const cw = Math.max(1, Math.round(view.w * view.px));
-    const ch = Math.max(1, Math.round(view.h * view.px));
+    const profile = renderProfile();
+    const size = renderSize(view.w, view.h, devicePixelRatio || 1, profile.dpr, profile.waterPixels);
+    view.px = size.ratio * scale;
+    const cw = Math.max(1, Math.floor(size.width * scale));
+    const ch = Math.max(1, Math.floor(size.height * scale));
     if (canvas.width !== cw || canvas.height !== ch) {
       canvas.width = cw;
       canvas.height = ch;
@@ -454,6 +454,12 @@ export function createWater(canvas, host, { calm }) {
     L.lights = s.lights.slice(0, MAX_LIGHTS).map(([el, c]) => ({ rect: rel(el), c }));
     L.ink = s.ink.slice(0, MAX_INK).map((el) => rel(el)).filter((b) => b[2] && b[3]);
     setFigure(s.figure);
+    // Only the two images participating in the art crossfade need GPU textures.
+    for (const [img, entry] of arts) {
+      if (img === art.a?.img || img === art.b?.img) continue;
+      gl.deleteTexture(entry.tex);
+      arts.delete(img);
+    }
   }
   // figure: { el (canvas or img), live, feet } or null
   function setFigure(f) {
@@ -687,5 +693,6 @@ export function createWater(canvas, host, { calm }) {
   }
 
   measure();
-  return { measure, setScene, setFigure, frame, fail, wake, get dead() { return dead; } };
+  return { measure, setScene, setFigure, frame, fail, wake,
+    sleep() { canvas.width = canvas.height = 1; }, get dead() { return dead; } };
 }

@@ -18,8 +18,9 @@ export function deviceFlags(nav = navigator, pads = []) {
     pad: pads.some(p => p && p.connected !== false) };
 }
 
-// Internal render resolution cap. Current iPhones (dpr 3) are fast enough for a little more than the
-// 1.25 everyone else gets; the pixel budgets in the renderers still bound the actual canvas size.
+// A fold keeps the hardware tier; individual renderers also bound the total pixel count.
 export function dprCap(nav = navigator, base = 1.25) {
-  return /iPhone/i.test(nav.userAgent || '') && !/iPad/i.test(nav.userAgent || '') ? 1.75 : base;
+  const profile = renderProfile(undefined, nav);
+  return profile.tier === 'desktop' && profile.mode === 'auto' ? base : profile.dpr;
 }
+import { renderProfile } from './quality.js';

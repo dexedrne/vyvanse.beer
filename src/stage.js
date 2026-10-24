@@ -7,6 +7,7 @@
 // game is open (pause / resume, from the player).
 
 import { createWater } from './water.js';
+import { renderProfile } from './quality.js';
 
 export function createStage(shell, { screen, duoBox, models }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -115,14 +116,19 @@ export function createStage(shell, { screen, duoBox, models }) {
     addEventListener(ev, () => (idleSince = performance.now()), { passive: true });
   }
   let lastDraw = 0;
+  let nextDraw = 0;
+  let lastTarget = 0;
   let raf = 0;
   let paused = false;
   function loop(now) {
     raf = 0;
     if (paused) return;
     raf = requestAnimationFrame(loop);
-    const target = calm() ? 4 : now - idleSince > 6000 ? 30 : 60;
-    if (lastDraw && now - lastDraw < 1000 / target - 2) return;
+    const target = calm() ? 4 : now - idleSince > 6000 ? 30 : renderProfile().fps;
+    if (target !== lastTarget) { nextDraw = now; lastTarget = target; }
+    if (now + 0.5 < nextDraw) return;
+    const interval = 1000 / target;
+    nextDraw = now + interval - Math.max(0, now - nextDraw) % interval;
     const dt = lastDraw ? Math.min(0.1, (now - lastDraw) / 1000) : 1 / 60;
     lastDraw = now;
     if (cast?.live && !duoBox.classList.contains('duo--off')) cast.tick(dt);
@@ -130,12 +136,14 @@ export function createStage(shell, { screen, duoBox, models }) {
   }
   function wake() {
     lastDraw = 0;
+    nextDraw = 0;
     water?.wake?.();
     if (!raf && !paused) raf = requestAnimationFrame(loop);
   }
   wake();
   // a hidden tab gets no animation frames; coming back, the first step is capped
   document.addEventListener('visibilitychange', () => !document.hidden && wake());
+  addEventListener('vyv:quality', () => { resizeCast(); sync(); wake(); });
 
   return {
     wave: (num, at) => cast?.wave(num, at) ?? false,
@@ -163,10 +171,13 @@ export function createStage(shell, { screen, duoBox, models }) {
       paused = true;
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
+      water?.sleep?.();
+      cast?.sleep?.();
     },
     resume() {
       paused = false;
       idleSince = performance.now();
+      resizeCast();
       sync();
       wake();
     },
