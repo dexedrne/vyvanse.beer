@@ -92,24 +92,24 @@ export function createStage(shell, { screen, duoBox, models }) {
     import('./duo.js')
       .then((m) => {
         activateCast = () => {
-        activateCast = null;
-        cast = m.createCast(duoBox, {
-          calm,
-          models,
-          framing: shell.framing,
-          // everyone the page asked for is in: it swaps the renders out for them
-          onReady() {
-            if (paused) return;
-            shell.castReady();
-            resizeCast();
-            cast.tick(0); // a first frame before they show
-            sync();
-            wake();
-          },
-        });
-        cast.show(want);
-        cast.prefetch(soon);
-        resizeCast();
+          activateCast = null;
+          cast = m.createCast(duoBox, {
+            calm,
+            models,
+            framing: shell.framing,
+            // everyone the page asked for is in: it swaps the renders out for them
+            onReady() {
+              if (paused) return;
+              shell.castReady();
+              resizeCast();
+              cast.tick(0); // a first frame before they show
+              sync();
+              wake();
+            },
+          });
+          cast.show(want);
+          cast.prefetch(soon);
+          resizeCast();
         };
         if (!paused) activateCast();
       })

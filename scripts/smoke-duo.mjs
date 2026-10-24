@@ -95,6 +95,11 @@ async function shot(name) {
   evidence.captures.push(name);
   console.log(`Captured ${phase}/${name}`);
 }
+async function leavePlayer() {
+  if (!(await page.locator('.player__back').isVisible())) await page.tap('.player__nub');
+  await page.tap('.player__back');
+  await settle();
+}
 try {
   for (const [view,width,height] of views.filter(([view]) => !process.env.DUO_VIEW || process.env.DUO_VIEW === view)) {
     await page.setViewportSize({width,height});
@@ -128,6 +133,7 @@ try {
     assert.equal(await page.evaluate(() => localStorage.getItem('vyv-quality')), 'battery');
     await page.selectOption('#quality','auto');
     await page.locator('.settings').evaluate(el => el.close());
+    await page.waitForSelector('.toast:not([hidden])', {state:'hidden'});
     await page.tap('[data-os]');
     await page.waitForSelector('.os:not([hidden])');
     await shot(`${view}-terminal`);
@@ -146,6 +152,17 @@ try {
     await shot(`${view}-lightbox`);
     await page.tap('.pack-gallery[open] [data-lightbox-close]');
     await page.tap('.pack-gallery[open] [data-gallery-close]');
+    await go('sites');
+    await page.evaluate(() => {
+      window.open = () => null;
+      window.__pads = [{id:'DualSense Wireless Controller',index:0,connected:true,mapping:'standard',timestamp:performance.now(),axes:[0,0],buttons:Array.from({length:18},(_,i)=>({pressed:i===0,touched:i===0,value:i===0?1:0}))}];
+    });
+    await page.waitForSelector('.ask:not([hidden])');
+    await shot(`${view}-new-tab`);
+    await page.evaluate(() => { window.__pads = []; });
+    await page.tap('[data-cancel]');
+    await page.goto(`${base}/offline.html`);
+    await shot(`${view}-offline-fallback`);
     await go('games/shitbox');
     await page.evaluate(() => dispatchEvent(new Event('offline')));
     await shot(`${view}-offline`);
@@ -156,13 +173,11 @@ try {
     await shot(`${view}-player`);
     await page.tap('.player__nub');
     await shot(`${view}-player-menu`);
-    await page.tap('.player__back');
-    await settle();
+    await leavePlayer();
     await page.evaluate(() => { window.__standalone = false; });
     await page.tap('.panel.on .item.on [data-act="play"]');
     await shot(`${view}-install`);
-    await page.tap('.player__back');
-    await settle();
+    await leavePlayer();
     evidence.checks.push(`${view}: sound, Auto/Battery preference, touch menu and player return`);
   }
   if (phase !== 'before' && process.env.DUO_FOLD !== 'skip') {
