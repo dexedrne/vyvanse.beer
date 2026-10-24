@@ -28,6 +28,8 @@ async function cleanup() {
 }
 for (const signal of ['SIGINT','SIGTERM']) process.once(signal, async () => { await cleanup(); process.exit(143); });
 const evidence = { engine: 'Chromium with iPhone UA and touch; WebKit runtime unavailable', phase, captures: [], checks: [], geometry: [], errors: [] };
+evidence.rendering = process.env.DUO_LIVE === '1' ? 'live WebGL' : 'supported poster fallback';
+if (phase !== 'before') evidence.build = readFileSync('dist/sw.js','utf8').match(/const VERSION = "([a-f0-9]+)"/)?.[1];
 const shim = readFileSync('public/vyvanse-pad.js', 'utf8');
 await context.addInitScript(live => {
   // Software GL is covered separately; broad UI captures use the supported poster fallback.
@@ -142,7 +144,7 @@ try {
     await page.waitForSelector('.tip[open]');
     await shot(`${view}-tip`);
     await page.tap('.tip__close');
-    await go('crew/wallpapers');
+    await go('crew/radbro-sticker-pack');
     await shot(`${view}-pack`);
     await page.tap('.panel.on .item.on [data-more]');
     await page.tap('.sheet [data-gallery]');
@@ -188,6 +190,7 @@ try {
     const game = page.frames().find(f => f !== page.mainFrame());
     const iframe = await page.locator('iframe').elementHandle();
     await game.locator('#touch').tap();
+    let expectedTaps = 1;
     for (const [view,width,height] of views) {
       await page.setViewportSize({width,height});
       await page.evaluate(() => {
@@ -198,9 +201,10 @@ try {
       });
       await page.waitForTimeout(200);
       assert.equal(await iframe.evaluate(el => el === document.querySelector('iframe')),true);
-      assert.equal(await game.evaluate(() => taps),1);
+      assert.equal(await game.evaluate(() => taps),expectedTaps);
       await game.locator('#touch').tap();
-      await game.evaluate(() => { taps = 1; });
+      expectedTaps++;
+      assert.equal(await game.evaluate(() => taps),expectedTaps);
       const packet = await game.evaluate(() => messages.filter(m => m.type === 'vyvanse:viewport').at(-1));
       assert.equal(packet.menu.w,44);
       assert.equal(packet.width,await game.evaluate(() => innerWidth));
