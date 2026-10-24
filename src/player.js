@@ -16,7 +16,8 @@
 
 import { h, icon } from './dom.js';
 import { shortUrl } from './projects.js';
-import { deviceFlags, isPhone } from './device.js';
+import { deviceFlags, isPhone, dprCap } from './device.js';
+import { playerViewport } from './viewport.js';
 import { launchUrl } from './ask/actions.js';
 import { createPadRelay } from './pad-relay.js';
 
@@ -104,19 +105,21 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     const width = globalThis.visualViewport?.width || innerWidth;
     const landscape = width > height;
     const style = getComputedStyle(document.documentElement);
-    const bottom = parseFloat(style.getPropertyValue('--safe-bottom')) || 0;
+    const safe = Object.fromEntries(['top', 'right', 'bottom', 'left'].map(side =>
+      [side, parseFloat(style.getPropertyValue(`--safe-${side}`)) || 0]));
     el.style.setProperty('--view-height', `${height}px`);
-    return { type: 'vyvanse:viewport',
-      safe: { top: 0, right: 0, bottom: landscape ? bottom : 0, left: 0 },
-      menu: { x: 8, y: 8, w: 32, h: 32 },
+    // An unfolded portrait display has ample room to play. Never cover it with a rotate card.
+    el.classList.toggle('player--landscape', (current?.orientation ?? 'landscape') === 'landscape' && Math.min(innerWidth, innerHeight) < 600);
+    return playerViewport({ width, height, safe,
+      dpr: Math.min(globalThis.devicePixelRatio || 1, dprCap()),
       standalone: !!navigator.standalone || matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches,
-      orientation: landscape ? 'landscape' : 'portrait',
-      input: ['ps', 'xbox'].includes(document.documentElement.dataset.input) ? 'ps' : 'touch' };
+      input: document.documentElement.dataset.input });
   }
   function sendViewport() {
     if (!current || !frame || !isPhone()) return;
     const data = viewport();
-    frame.contentWindow?.postMessage(data, '*');
+    frame.contentWindow?.postMessage(data, new URL(frame.src).origin);
+    if (data.layout === 'unfolded') screen.orientation?.unlock?.();
   }
 
   function open(p, { as } = {}) {
@@ -152,7 +155,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
       const data = viewport();
       src.searchParams.set('vb', '1');
       src.searchParams.set('safe', [data.safe.top, data.safe.right, data.safe.bottom, data.safe.left].join(','));
-      src.searchParams.set('menu', '8,8,32,32');
+      src.searchParams.set('menu', '8,8,44,44');
       src.searchParams.set('standalone', data.standalone ? '1' : '0');
     }
 
@@ -190,7 +193,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
       relayFrame = requestAnimationFrame(relayPads);
     };
     relayFrame = requestAnimationFrame(relayPads);
-    const landscape = (p.orientation ?? 'landscape') === 'landscape';
+    const landscape = (p.orientation ?? 'landscape') === 'landscape' && Math.min(innerWidth, innerHeight) < 600;
     el.classList.toggle('player--phone', isPhone());
     el.classList.toggle('player--landscape', landscape);
     el.hidden = false;

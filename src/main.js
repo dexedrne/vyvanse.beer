@@ -1563,10 +1563,15 @@ const shell = {
     if (g && g.every((n) => want().includes(n))) hello(g);
   },
 };
-addEventListener('resize', () => requestAnimationFrame(layout));
+let layoutFrame = 0;
+function scheduleLayout() {
+  if (layoutFrame) return;
+  layoutFrame = requestAnimationFrame(() => { layoutFrame = 0; layout(); });
+}
+addEventListener('resize', scheduleLayout);
 // the Safari toolbar settling after a rotation or a return from the background reports late
 for (const ev of ['orientationchange', 'pageshow']) addEventListener(ev, () => { requestAnimationFrame(layout); setTimeout(layout, 300); });
-globalThis.visualViewport?.addEventListener('resize', () => requestAnimationFrame(layout));
+globalThis.visualViewport?.addEventListener('resize', scheduleLayout);
 globalThis.visualViewport?.addEventListener('scroll', () => requestAnimationFrame(layout));
 phone.addEventListener('change', () => { layout(); hints(); });
 document.fonts?.ready.then(() => layout());

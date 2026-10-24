@@ -155,12 +155,13 @@ test('phone iframe keeps the launch URL and receives geometry excluding already-
   assert.equal(url.searchParams.get('device'), 'phone');
   assert.equal(url.searchParams.get('vb'), '1');
   assert.equal(url.searchParams.get('safe'), '0,0,0,0');
-  assert.equal(url.searchParams.get('menu'), '8,8,32,32');
+  assert.equal(url.searchParams.get('menu'), '8,8,44,44');
   assert.equal(url.searchParams.get('standalone'), '1');
   frame.events.get('load')();
   assert.deepEqual(frame.messages.find(m => m.data.type === 'vyvanse:viewport')?.data, {
     type: 'vyvanse:viewport', safe: { top: 0, right: 0, bottom: 0, left: 0 },
-    menu: { x: 8, y: 8, w: 32, h: 32 }, standalone: true, orientation: 'portrait', input: 'touch',
+    menu: { x: 8, y: 8, w: 44, h: 44 }, width:402, height:778, dpr:1,
+    layout:'compact', standalone: true, orientation: 'portrait', input: 'touch',
   });
   innerWidth = 874; innerHeight = 402;
   Object.assign(h.safe, { top: 0, right: 62, bottom: 21, left: 62 });
@@ -171,6 +172,28 @@ test('phone iframe keeps the launch URL and receives geometry excluding already-
   assert.equal(last.orientation, 'landscape');
   assert.equal(last.input, 'ps');
   delete navigator.standalone;
+});
+
+test('folding keeps the same loaded game and sends each shape to its exact origin', t => {
+  const h = harness(t);
+  innerWidth = 626; innerHeight = 890;
+  h.player.open(landscapeGames[0]);
+  const frame = h.el.children[0];
+  const src = frame.src;
+  frame.events.get('load')();
+  h.player.message({ source:frame.contentWindow, origin:new URL(src).origin, data:{type:'vyvanse:ready'} });
+  assert.deepEqual(h.locks, [], 'unfolded play permits both orientations');
+  assert.equal(h.el.classList.contains('player--landscape'), false);
+  for (const [width,height] of [[890,626],[678,466],[466,678],[626,890]]) {
+    innerWidth = width; innerHeight = height;
+    h.events.get('resize')();
+    assert.equal(h.el.children[0], frame);
+    assert.equal(frame.src, src);
+    assert.equal(h.el.classList.contains('is-ready'), true);
+    const packet = frame.messages.at(-1);
+    assert.equal(packet.origin, new URL(src).origin);
+    assert.equal(packet.data.layout, Math.min(width,height) >= 600 ? 'unfolded':'compact');
+  }
 });
 
 test('ready is accepted only from this game; a legacy load still hides the card after 2.5 seconds', t => {
