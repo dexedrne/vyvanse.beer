@@ -644,10 +644,10 @@ export const crew = {
         name: 'Wallpapers',
         title: 'Wallpapers',
         line: 'Game key art, phone posters and rainy-night scenes in one pack. Desktop, phone and extra backgrounds from across the games.',
-        big: '97',
+        big: '105',
         accent: '#b98cff',
         shell: '#23163f',
-        games: ['saloon', 'shitbox', 'radtap', 'radbrawl', 'spidertag', 'rbgo', 'radpayne', 'retardiopayne', 'radops', 'radzombies'],
+        games: ['saloon', 'shitbox', 'radtap', 'radbrawl', 'radbonk', 'spidertag', 'rbgo', 'radpayne', 'retardiopayne', 'radops', 'radzombies'],
         crew: ['4764', '652', '3704', '3710', '2564', '723', '555', '85', '268'],
         contents: [
           { path: 'game-key-art/', what: 'desktop, phone and extra backgrounds' },
@@ -663,7 +663,7 @@ export const crew = {
           alt: 'Four game wallpapers fanned out as cards: a neon rooftop chase, a poker game, a rainy roadster and the crew in a music venue.',
         },
         backdrop: '/img/art/shitbox.webp',
-        download: { href: `${REL}/wallpapers.zip`, label: 'wallpaper pack .zip', size: '121 MB', files: 97, formats: 'png, webp and jpg' },
+        download: { href: `${REL}/wallpapers.zip`, label: 'wallpaper pack .zip', size: '132 MB', files: 105, formats: 'png, webp and jpg' },
       },
       {
         id: 'retardio-sticker-pack',

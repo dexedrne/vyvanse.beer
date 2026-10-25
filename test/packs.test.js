@@ -35,7 +35,7 @@ test('downloadable packs have unique ids, numeric file counts and valid credits 
   assert.equal(packs.find(p => p.id === 'retardio-sticker-pack').big, '94');
   assert.equal(packs.find(p => p.id === 'retardio-sticker-pack').download.files, 193);
   assert.equal(packs.find(p => p.id === 'wallpapers').download.href, 'https://github.com/dexedrne/vyvanse.beer/releases/download/assets/wallpapers.zip');
-  assert.equal(packs.find(p => p.id === 'wallpapers').download.size, '121 MB');
+  assert.equal(packs.find(p => p.id === 'wallpapers').download.size, '132 MB');
   assert.deepEqual(packs.map(p => p.id), ['saloon-card-pack', 'wallpapers', 'retardio-sticker-pack', 'radbro-sticker-pack', 'shitbox-garage-pack', 'cars']);
   assert.deepEqual(Object.keys(packGallery).sort(), ['cars', 'radbro-sticker-pack', 'retardio-sticker-pack', 'saloon-card-pack', 'shitbox-garage-pack', 'wallpapers'].sort());
   for (const [id, images] of Object.entries(packGallery)) {
