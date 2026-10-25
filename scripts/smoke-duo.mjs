@@ -120,7 +120,7 @@ try {
       await leavePlayer();
       continue;
     }
-    for (const tab of (process.env.DUO_SURFACES === 'live' ? ['games/shitbox','crew/3710'] : ['games/shitbox','crew/3710','sites','contact'])) {
+    for (const tab of (process.env.DUO_SURFACES === 'crew' ? ['crew/3710'] : process.env.DUO_SURFACES === 'live' ? ['games/shitbox','crew/3710'] : ['games/shitbox','crew/3710','sites','contact'])) {
       await go(tab);
       if (process.env.DUO_LIVE === '1') {
         await page.waitForSelector('.duo__gl');
@@ -261,6 +261,6 @@ try {
   }
 } finally {
   await cleanup();
-  writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}${process.env.DUO_RETAKE ? '-'+process.env.DUO_RETAKE : ''}-evidence.json`), JSON.stringify(evidence,null,2));
+  writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}${process.env.DUO_RETAKE ? '-'+process.env.DUO_RETAKE : ''}${process.env.DUO_SURFACES === 'crew' ? '-crew' : ''}-evidence.json`), JSON.stringify(evidence,null,2));
 }
 assert.deepEqual(evidence.errors, []);
