@@ -210,6 +210,33 @@ try {
     await leavePlayer();
     evidence.checks.push(`${view}: sound, Auto/Battery preference, touch menu and player return`);
   }
+  if (process.env.DUO_CONTROLS === 'gallery') {
+    await page.setViewportSize({width:626,height:890});
+    await go('crew/radbro-sticker-pack');
+    await page.tap('.panel.on .item.on [data-more]');
+    await page.tap('.sheet [data-gallery]');
+    await page.tap('.pack-gallery[open] [data-gallery-image]:first-of-type');
+    const imageBefore = await page.getAttribute('.pack-gallery[open] .gallery-lightbox img','src');
+    async function press(button) {
+      await page.evaluate(button => {
+        window.__pads = [{id:'DualSense Wireless Controller',index:0,connected:true,mapping:'standard',timestamp:performance.now(),axes:[0,0],buttons:Array.from({length:18},(_,i)=>({pressed:i===button,touched:i===button,value:i===button?1:0}))}];
+      },button);
+      await page.waitForTimeout(90);
+      await page.evaluate(() => { window.__pads = []; });
+      await page.waitForTimeout(90);
+    }
+    await press(15);
+    assert.notEqual(await page.getAttribute('.pack-gallery[open] .gallery-lightbox img','src'),imageBefore);
+    await press(1);
+    assert.equal(await page.locator('.pack-gallery[open] .gallery-lightbox').isVisible(),false);
+    assert.equal(await page.locator('.sheet').isVisible(),true);
+    await press(1);
+    assert.equal(await page.locator('.pack-gallery[open]').count(),0);
+    assert.equal(await page.locator('.sheet').isVisible(),true);
+    await press(1);
+    assert.equal(await page.locator('.sheet').isVisible(),false);
+    evidence.checks.push('Controller picture navigation and Back close picture, gallery, details in order');
+  }
   if (phase !== 'before' && process.env.DUO_FOLD !== 'skip') {
     await page.setViewportSize({width:626,height:890});
     await go('games/shitbox');
@@ -261,6 +288,6 @@ try {
   }
 } finally {
   await cleanup();
-  writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}${process.env.DUO_RETAKE ? '-'+process.env.DUO_RETAKE : ''}${process.env.DUO_SURFACES === 'crew' ? '-crew' : ''}-evidence.json`), JSON.stringify(evidence,null,2));
+  writeFileSync(resolve(output, `${phase}${process.env.DUO_VIEW ? '-'+process.env.DUO_VIEW : ''}${process.env.DUO_RETAKE ? '-'+process.env.DUO_RETAKE : ''}${process.env.DUO_SURFACES === 'crew' ? '-crew' : ''}${process.env.DUO_CONTROLS ? '-controls' : ''}-evidence.json`), JSON.stringify(evidence,null,2));
 }
 assert.deepEqual(evidence.errors, []);
