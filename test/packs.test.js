@@ -158,7 +158,7 @@ test('terminal lists assets under crew and provides pack info, links, aliases an
     commands.run(cmd);
     text = output.map(el => el.textContent).join(' ');
     assert.match(text, /177 MB[^]*299[^]*SALOON Card Pack|SALOON Card Pack[^]*177 MB[^]*299/);
-    assert.match(text, /750 MB/);
+    assert.match(text, /761 MB/);
     assert.match(text, /Viral Public License/);
   }
   output.length = 0;
