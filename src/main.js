@@ -810,12 +810,12 @@ function openSheet() {
 }
 
 function back() {
-  if (closeSheet()) return;
-  if (!pwa.card.hidden) return pwa.dismiss();
-  if (closeAsk()) return;
   if (lightbox && !lightbox.hidden) return closeLightbox();
   const dlg = $('dialog[open]');
   if (dlg) return dlg.close();
+  if (closeSheet()) return;
+  if (!pwa.card.hidden) return pwa.dismiss();
+  if (closeAsk()) return;
   if (os?.isOpen()) return os.close();
   const item = S.tab !== 'contact' ? onItem(S.tab) : null;
   if (item?.classList.contains('is-more')) return details();
@@ -841,7 +841,7 @@ document.addEventListener('fullscreenchange', () => fsBtn?.setAttribute('aria-pr
 // ---- the modal walk: arrows (or the d-pad) move through a dialog's buttons ----
 
 function openModal() {
-  return (sheet && !sheet.hidden && sheet) || (ask && !ask.hidden && ask) || (!pwa.card.hidden && pwa.card) || $('dialog[open]') || (os?.isOpen() && os.el) || null;
+  return $('dialog[open]') || (sheet && !sheet.hidden && sheet) || (ask && !ask.hidden && ask) || (!pwa.card.hidden && pwa.card) || (os?.isOpen() && os.el) || null;
 }
 function walk(dir) {
   const m = openModal();
