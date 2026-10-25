@@ -427,6 +427,31 @@ export const projects = [
     },
   },
   {
+    cmd: 'radbonk',
+    boot: 'fifteen minutes against the horde', // the hero's boot log line
+    aliases: ['bonk', 'survivors'],
+    slug: 'radbonk',
+    group: 'games',
+    name: 'RADBONK',
+    kind: 'Survival romp, the crew against a cute monster horde',
+    kindPhone: 'Survival romp against the horde',
+    blurb:
+      'Fifteen minutes on a bright hilltop against a horde of cute monsters. Pick a Radbro or Retardio, keep moving, grab the gems and stack your weapons until they evolve. A new map every run, three bosses, chill music that picks up as it gets wild.',
+    url: 'https://radbonk.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://radbonk.vyvanse.beer' }],
+    thumb: '/img/thumb/radbonk.webp',
+    shell: '#1d2a3a',
+    accent: '#7be08a',
+    cast: ['3710', '3704', '4764', '85', '723', '652'],
+    image: {
+      src: '/img/art/radbonk.webp',
+      width: 1600,
+      height: 900,
+      alt: 'RADBONK: Radbro #3710 swings a stone hammer and #3704 fires a launcher on a sunny hilltop, surrounded by cute skeletons, ghosts, slimes, bats, gems and an open treasure chest.',
+    },
+  },
+  {
     cmd: 'solscape',
     boot: 'rev254 server on Solana', // the hero's boot log line
     slug: 'solscape',

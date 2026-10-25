@@ -179,7 +179,7 @@ test('recorded Jev smoke answer routes without a live call', () => {
 });
 
 test('Ask includes asset pack criteria and payloads and reveals a card without downloading', () => {
-  assert.equal(ACTIONS.length, 133);
+  assert.equal(ACTIONS.length, 140); // +7 with RADBONK on the shelf
   assert.equal(makePayload('wallpapers').state.packs.length, 6);
   const revealed = [];
   const shell = { reveal: slug => revealed.push(slug), play: () => assert.fail('pack actions must only reveal') };
