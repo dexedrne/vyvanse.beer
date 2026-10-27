@@ -116,29 +116,29 @@ function siteItem(p, i) {
 }
 
 function crewItem(b, i, { crew, projects, shell }) {
-  const plays = playsIn(projects, b.num);
+  const plays = b.npcOnly ? [] : playsIn(projects, b.num);
   const own = b.repo === false;
-  const file = b.download.href.split('/').pop();
-  const all = crew.downloadAll ? `<p class="fine"><a class="more-link" href="${esc(crew.downloadAll.href)}" download>${esc(crew.downloadAll.label)} (${esc(crew.downloadAll.size)})</a></p>` : '';
-  const fine = own
+  const file = b.download?.href.split('/').pop();
+  const all = crew.downloadAll && !b.npcOnly ? `<p class="fine"><a class="more-link" href="${esc(crew.downloadAll.href)}" download>${esc(crew.downloadAll.label)} (${esc(crew.downloadAll.size)})</a></p>` : '';
+  const fine = b.npcOnly ? '' : own
     ? `<p class="credit">My own Retardio, built on the Radbro rig. Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>, like the Radbros: use him, remix him, put him in your game.</p>`
     : `<p class="credit">Free to use under the <a ${ext(crew.repo.license.href)}>${esc(crew.repo.license.label)}${newTab}</a>: <a ${ext(crew.repo.href)}>models on GitHub${newTab}</a>. ${esc(crew.repo.line)}</p>`;
   return `<article class="item item--crew" id="${esc(b.slug)}" data-i="${i}" data-id="${esc(b.num)}" aria-labelledby="${esc(b.slug)}-name">
   <div class="visual visual--crew">
-    <div class="bignum" aria-hidden="true">${esc(b.num)}</div>
+    <div class="bignum" aria-hidden="true">${esc(b.label || b.num)}</div>
     ${img(b.image, { cls: 'bro' })}
   </div>
   <div class="info">
     <p class="kindline">${esc(b.kind)}</p>
-    <h3 class="wm" id="${esc(b.slug)}-name"><span class="vh">${esc(b.kind)} </span>#${esc(b.num)}</h3>
-    <p class="pitch">${esc(b.line)} Rigged and animated.</p>
-    <div class="plays">${plays.length ? '<span class="plays__label">in</span>' + plays
+    <h3 class="wm" id="${esc(b.slug)}-name"><span class="vh">${esc(b.kind)} </span>${esc(b.label || `#${b.num}`)}</h3>
+    <p class="pitch">${esc(b.line)}${b.npcOnly ? '' : ' Rigged and animated.'}</p>
+    <div class="plays">${b.npcOnly ? '<span class="fine">Non-playable NPC · not in the character roster</span>' : plays.length ? '<span class="plays__label">in</span>' + plays
       .map((g) => `<a class="spine" href="#${esc(g.slug)}" data-goto="${esc(g.cmd)}" style="--shell:${esc(shell(g))};--accent:${esc(g.accent)}">${esc(g.name)}</a>`)
       .join('') : '<span class="fine">not in a game yet</span>'}</div>
-    <div class="act">
+    ${b.download ? `<div class="act">
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
       ${status(file, `${b.download.size}, rigged and animated`)}
-    </div>
+    </div>` : ''}
     <div class="extra">${fine}${all}</div>
   </div>
 </article>`;
@@ -233,7 +233,7 @@ function cart(p, i, eds = [p]) {
 }
 
 function tile(b, i) {
-  return `<li class="tslot" style="--i:${i}" data-i="${i}"><button class="tile" type="button" data-i="${i}" aria-controls="${esc(b.slug)}" aria-label="${esc(b.kind)} #${esc(b.num)}"><img src="${esc(b.face)}" width="200" height="200" alt="" loading="lazy" decoding="async"><span class="tile__num">#${esc(b.num)}</span></button></li>`;
+  return `<li class="tslot" style="--i:${i}" data-i="${i}"><button class="tile" type="button" data-i="${i}" aria-controls="${esc(b.slug)}" aria-label="${esc(b.name)}"><img src="${esc(b.face)}" width="200" height="200" alt="" loading="lazy" decoding="async"><span class="tile__num">${esc(b.label || `#${b.num}`)}</span></button></li>`;
 }
 
 function row(head, items, cls, tag = 'ul') {
@@ -268,10 +268,11 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       `<a class="tab" id="tab-${t.id}" href="#${t.id}" aria-controls="${t.id}" data-tab="${t.id}">${icon(t.icon)}<span>${esc(t.label)}</span></a>`,
   ).join('');
 
-  const radbros = crew.members.filter((m) => !m.kind.startsWith('Retardio'));
+  const radbros = crew.members.filter((m) => !m.kind.startsWith('Retardio') && !m.npcOnly);
   const retardios = crew.members.filter((m) => m.kind.startsWith('Retardio'));
+  const otherCharacters = crew.npcs ?? [];
   const idx = (m) => crew.members.indexOf(m);
-  const tiles = `<div class="tgroup"><p class="tgroup__label">radbros</p><ul class="tiles" role="list">${radbros.map((m) => tile(m, idx(m))).join('')}</ul></div><div class="tgroup"><p class="tgroup__label">retardios</p><ul class="tiles" role="list">${retardios.map((m) => tile(m, idx(m))).join('')}</ul></div>${packGroup(crew, crew.members.length)}`;
+  const tiles = `<div class="tgroup"><p class="tgroup__label">radbros</p><ul class="tiles" role="list">${radbros.map((m) => tile(m, idx(m))).join('')}</ul></div><div class="tgroup"><p class="tgroup__label">retardios</p><ul class="tiles" role="list">${retardios.map((m) => tile(m, idx(m))).join('')}</ul></div>${otherCharacters.length ? `<div class="tgroup"><p class="tgroup__label">other characters</p><ul class="tiles" role="list">${otherCharacters.map((m, i) => tile(m, crew.members.length + i)).join('')}</ul></div>` : ''}${packGroup(crew, crew.members.length + otherCharacters.length)}`;
 
   const menu = [
     `<li><a class="mi" data-i="0" ${ext(contact.dm.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('x')}${esc(contact.dm.label)}</span><span class="det">${esc(contact.dm.handle)}</span>${newTab}</a></li>`,
@@ -325,9 +326,9 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       'crew',
       crew.title,
       `<p class="panel__line">${esc(crew.line)}</p>
-    <div class="items">${crew.members.map((m, i) => crewItem(m, i, { crew, projects, shell })).join('\n')}
+    <div class="items">${[...crew.members, ...(crew.npcs ?? [])].map((m, i) => crewItem(m, i, { crew, projects, shell })).join('\n')}
     <p class="panel__line">${esc(crew.assets.line)}</p>
-    ${crew.assets.packs.map((p, k) => packItem(p, crew.members.length + k, { crew, projects, shell })).join('\n')}</div>
+    ${crew.assets.packs.map((p, k) => packItem(p, crew.members.length + (crew.npcs?.length ?? 0) + k, { crew, projects, shell })).join('\n')}</div>
     <div class="row js-only"><div class="tgroups">${tiles}</div></div>`,
     )}
     ${panel(

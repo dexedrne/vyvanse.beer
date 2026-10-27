@@ -7,12 +7,9 @@
 // kept; past KEEP loaded, the ones that haven't been on screen for STALE give their GPU memory
 // back. Until everyone asked for is in, nobody shows, and the page keeps the renders up.
 //
-// Every web model (public/models/: Draco meshes, unlit materials, the shared Radbro rig) carries
-// two clips, Idle and Big_Wave_Hello. On top of Idle each gets a small procedural groove on one
-// shared beat: a head nod, a shoulder bounce, a hip sway and a little bob, the second of a pair
-// a touch behind the first so they aren't in lockstep. Every so often one of them waves
-// (Big_Wave_Hello), at you or at the other one; wave(num) does it on demand (a click). Reduced
-// motion: they hold still unless you ask for a wave.
+// Radbro models carry Idle and Big_Wave_Hello. Chudjak keeps the source-derived Idle and walk
+// clips; on this page his greeting is a look toward the viewer. Everyone gets the same restrained
+// procedural idle groove. The established Radbro wave animation remains unchanged.
 //
 // The camera is framed so their feet (y = 0) land at FEET of the canvas height, whatever its
 // shape; the page uses that to put their reflection's waterline in the right place.
@@ -202,18 +199,19 @@ export function createCast(box, { calm, models, onReady, framing }) {
     const idle = mixer.clipAction(clip('Idle'));
     idle.play();
     idle.time = (order++ * 1.7) % 3.1; // not in lockstep with whoever loaded with him
-    const wave = mixer.clipAction(clip('Big_Wave_Hello'));
-    wave.setLoop(THREE.LoopOnce, 1);
-    wave.clampWhenFinished = true;
+    const waveClip = clip('Big_Wave_Hello');
+    const wave = waveClip ? mixer.clipAction(waveClip) : null;
+    wave?.setLoop(THREE.LoopOnce, 1);
+    if (wave) wave.clampWhenFinished = true;
     // the bones the groove moves, and their pose as the mixer last left it: three's mixer only
     // writes a value when it changes, so the groove has to be taken off again before each update
     const groovy = GROOVY.map((n) => bones[n]).filter(Boolean);
     const clean = groovy.map((b) => ({ b, q: b.quaternion.clone(), p: b.position.clone() }));
     // the clips walk the hips sideways (the wave leans a long way out); keep them where they stand
     const rest = bones.Hips ? bones.Hips.position.clone() : null;
-    const c = { num, root, bones, mixer, idle, wave, x: 0, base: 0, turn: 0, look: 0, beat: 0, energy: 1, waving: false, clean, rest, seen: performance.now() };
+    const c = { num, root, bones, mixer, idle, wave, waveT: 0, x: 0, base: 0, turn: 0, look: 0, beat: 0, energy: 1, waving: false, clean, rest, seen: performance.now() };
     mixer.addEventListener('finished', (e) => {
-      if (e.action !== wave) return;
+      if (!wave || e.action !== wave) return;
       idle.reset().fadeIn(0.45).play();
       wave.fadeOut(0.45);
       c.waving = false;
@@ -261,8 +259,8 @@ export function createCast(box, { calm, models, onReady, framing }) {
     if (!c || c.waving || !on.includes(c)) return false;
     c.waving = true;
     c.look = at === 'other' && on.length > 1 ? c.base * 2.6 : 0;
-    c.wave.reset().setEffectiveWeight(1).fadeIn(0.3).play();
-    c.idle.fadeOut(0.3);
+    if (c.wave) { c.wave.reset().setEffectiveWeight(1).fadeIn(0.3).play(); c.idle.fadeOut(0.3); }
+    else c.waveT = 1.25;
     return true;
   }
 
@@ -305,6 +303,10 @@ export function createCast(box, { calm, models, onReady, framing }) {
         _id.identity();
       }
       if (!still) groove(c, t);
+      if (c.waveT > 0) {
+        c.waveT = Math.max(0, c.waveT - dt);
+        if (!c.waveT) { c.waving = false; c.look = c.base; }
+      }
     }
     if (now > gcAt) {
       gcAt = now + 5000;

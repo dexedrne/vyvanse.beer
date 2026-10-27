@@ -59,14 +59,14 @@ test('rendered packs follow the nine members with a third assets group and worki
   const html = render();
   const cards = [...html.matchAll(/<article class="item item--pack"[^]*?<\/article>/g)].map(m => m[0]);
   assert.equal(cards.length, 6);
-  assert.equal([...html.matchAll(/<article class="item item--crew"/g)].length, 9);
+  assert.equal([...html.matchAll(/<article class="item item--crew"/g)].length, 10);
   assert.ok(html.indexOf('id="retardio-268"') < html.indexOf('id="pack-saloon-card-pack"'));
   assert.match(html, /<p class="panel__line">Art from the games/);
   const row = html.match(/<div class="tgroups">[^]*?<\/section>/)?.[0];
-  assert.equal([...row.matchAll(/class="tgroup(?: tgroup--packs)?"/g)].length, 3);
-  assert.match(row, /retardios[^]*?tgroup--packs[^]*?tgroup__label">assets</);
-  assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [9, 10, 11, 12, 13, 14]);
-  assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [9, 10, 11, 12, 13, 14]);
+  assert.equal([...row.matchAll(/class="tgroup(?: tgroup--packs)?"/g)].length, 4);
+  assert.match(row, /other characters[^]*?tgroup--packs[^]*?tgroup__label">assets</);
+  assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [10, 11, 12, 13, 14, 15]);
+  assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [10, 11, 12, 13, 14, 15]);
   for (const card of cards) {
     assert.match(card, /class="visual visual--crew visual--pack"/);
     assert.match(card, /<picture><source[^]*?<img class="bro"/);

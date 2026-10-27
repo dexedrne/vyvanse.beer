@@ -52,20 +52,35 @@ test('#268 has a full Crew card beside #85 without advertising a game', () => {
   assert.ok(card?.includes('not in a game yet'));
   assert.ok(!card.includes('data-goto='));
   const tiles = [...html.matchAll(/<button class="tile"[^]*?aria-controls="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(tiles.length, 9);
-  assert.deepEqual(tiles.slice(-2), ['retardio-85', 'retardio-268']);
+  assert.equal(tiles.length, 10);
+  assert.deepEqual(tiles.slice(-3), ['retardio-85', 'retardio-268', 'chudjak']);
+});
+
+test('Chudjak has a separate non-playable NPC card without unsupported license or download claims', () => {
+  const npc = crew.npcs.find(m => m.num === 'chudjak');
+  assert.ok(npc?.model && npc?.face && npc?.image);
+  assert.equal(npc.name, 'Chudjak');
+  assert.match(npc.line, /NPC in RadQuest .* RADBONK and SHITBOX/);
+  const html = renderShell({ site, groups, projects, crew, contact, duo });
+  const card = html.match(/<article class="item item--crew" id="chudjak"[^]*?<\/article>/)?.[0];
+  assert.ok(card?.includes('Chudjak'));
+  assert.ok(card?.includes('Non-playable NPC'));
+  assert.ok(!card?.includes('#chudjak'));
+  assert.ok(!card?.includes('Viral Public License'));
+  assert.ok(!card?.includes('Get the model'));
 });
 
 test('every Crew card offers the same nine-character zip, including the Retardios', () => {
   const html = renderShell({ site, groups, projects, crew, contact, duo });
   const cards = [...html.matchAll(/<article class="item item--crew"[^]*?<\/article>/g)].map(m => m[0]);
-  assert.equal(cards.length, 9);
+  assert.equal(cards.length, 10);
   assert.ok(crew.downloadAll.href.endsWith('/crew-3d-all-nine.zip'));
   assert.equal(crew.downloadAll.label, 'all nine, one .zip');
   assert.ok(!html.includes('original four'));
-  for (const card of cards) {
+  for (const card of cards.slice(0, 9)) {
     assert.ok(card.includes(`href="${crew.downloadAll.href}" download`));
     assert.ok(card.includes(`class="more-link"`));
     assert.ok(card.includes(`${crew.downloadAll.label} (${crew.downloadAll.size})`));
   }
+  assert.ok(!cards[9].includes(crew.downloadAll.href));
 });

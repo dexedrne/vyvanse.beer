@@ -952,6 +952,20 @@ export const crew = {
       },
     },
   ],
+  npcs: [
+    {
+      num: 'chudjak',
+      label: 'Chudjak',
+      slug: 'chudjak',
+      kind: 'Owner character · NPC',
+      npcOnly: true,
+      face: '/img/chudjak.webp',
+      model: '/models/chudjak.glb',
+      name: 'Chudjak',
+      line: 'An NPC in RadQuest (Rad Hamlet), RADBONK and SHITBOX. This skinned game version was made from the owner’s original static Meshy exports.',
+      image: { src: '/img/chudjak.webp', width: 800, height: 1000, alt: 'Chudjak: a stern, pale man with swept hair and glasses, wearing a black slogan shirt, jeans and sneakers.' },
+    },
+  ],
 };
 
 // The Contact section at the end of the page, and `contact` / `dm` in the terminal.
