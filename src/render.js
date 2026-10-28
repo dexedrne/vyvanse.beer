@@ -137,7 +137,7 @@ function crewItem(b, i, { crew, projects, shell }) {
       .join('') : '<span class="fine">not in a game yet</span>'}</div>
     ${b.download ? `<div class="act">
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
-      ${status(file, `${b.download.size}, rigged and animated`)}
+      ${status(file, b.npcOnly ? `${b.download.size}, static GLB` : `${b.download.size}, rigged and animated`)}
     </div>` : ''}
     <div class="extra">${fine}${all}</div>
   </div>

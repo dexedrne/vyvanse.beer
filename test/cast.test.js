@@ -56,7 +56,7 @@ test('#268 has a full Crew card beside #85 without advertising a game', () => {
   assert.deepEqual(tiles.slice(-3), ['retardio-85', 'retardio-268', 'chudjak']);
 });
 
-test('Chudjak has a separate non-playable NPC card without unsupported license or download claims', () => {
+test('Chudjak has a separate non-playable NPC card with his model download', () => {
   const npc = crew.npcs.find(m => m.num === 'chudjak');
   assert.ok(npc?.model && npc?.face && npc?.image);
   assert.equal(npc.name, 'Chudjak');
@@ -67,7 +67,9 @@ test('Chudjak has a separate non-playable NPC card without unsupported license o
   assert.ok(card?.includes('Non-playable NPC'));
   assert.ok(!card?.includes('#chudjak'));
   assert.ok(!card?.includes('Viral Public License'));
-  assert.ok(!card?.includes('Get the model'));
+  assert.ok(card?.includes('Get the model'));
+  assert.ok(card?.includes('/models/chudjak-original.glb'));
+  assert.ok(card?.includes('static GLB'));
 });
 
 test('every Crew card offers the same nine-character zip, including the Retardios', () => {

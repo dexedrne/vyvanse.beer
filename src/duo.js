@@ -187,6 +187,11 @@ export function createCast(box, { calm, models, onReady, framing }) {
 
   function rig(num, gltf) {
     const root = gltf.scene;
+    if (num === 'chudjak') {
+      root.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(root);
+      root.position.y -= bounds.min.y;
+    }
     root.traverse((o) => {
       if (o.isMesh) o.frustumCulled = false;
     });

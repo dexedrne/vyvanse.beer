@@ -700,7 +700,6 @@ function activate({ from, pad } = {}) {
   btn?.classList.add('is-hit');
   if (S.tab === 'crew') {
     audio.blip('ok');
-    if (LISTS.crew[S.crew].npcOnly) { toast('Chudjak is a non-playable NPC. His model is shown in the Crew preview.'); return; }
     btn.click(); // the main model or pack download
     toast(`downloading ${LISTS.crew[S.crew].download.label} (${LISTS.crew[S.crew].download.size})`);
     return;
@@ -1282,7 +1281,7 @@ function hints() {
   const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
   const pad = input.scheme === 'ps' || input.scheme === 'xbox';
   const pack = S.tab === 'crew' && isPack(LISTS.crew[S.crew]);
-  const verb = { games: 'play', crew: pack ? 'get pack' : LISTS.crew[S.crew]?.npcOnly ? 'view NPC' : 'get model', sites: 'open', contact: 'pick' }[S.tab];
+  const verb = { games: 'play', crew: pack ? 'get pack' : 'get model', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   if (phone.matches && !moving) {
