@@ -960,7 +960,7 @@ export const crew = {
       model: '/models/chudjak.glb',
       download: { href: '/models/chudjak-original.glb', label: 'original 3D model .glb', size: '17 MB' },
       name: 'Chudjak',
-      line: 'Chudjak is joining RadQuest (Rad Hamlet), RADBONK and SHITBOX. This skinned game version was made from the owner’s original static Meshy exports.',
+      line: 'Chudjak is joining RadQuest (Rad Hamlet), RADBONK and SHITBOX. Free to use: download the original static 3D model.',
       image: { src: '/img/chudjak.webp', width: 800, height: 1000, alt: 'Chudjak: a stern, pale man with swept hair and glasses, wearing a black slogan shirt, jeans and sneakers.' },
     },
   ],

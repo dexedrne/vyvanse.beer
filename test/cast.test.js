@@ -70,6 +70,7 @@ test('Chudjak has a separate non-playable NPC card with his model download', () 
   assert.ok(card?.includes('Get the model'));
   assert.ok(card?.includes('/models/chudjak-original.glb'));
   assert.ok(card?.includes('static GLB'));
+  assert.ok(card?.includes('Free to use'));
 });
 
 test('every Crew card offers the same nine-character zip, including the Retardios', () => {
