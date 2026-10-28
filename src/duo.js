@@ -7,7 +7,7 @@
 // kept; past KEEP loaded, the ones that haven't been on screen for STALE give their GPU memory
 // back. Until everyone asked for is in, nobody shows, and the page keeps the renders up.
 //
-// Models carry Idle and Big_Wave_Hello. Everyone gets the same restrained procedural idle groove.
+// Models carry Idle and Big_Wave_Hello. The crew idle to the beat; Chudjak adds a little arm dance.
 //
 // The camera is framed so their feet (y = 0) land at FEET of the canvas height, whatever its
 // shape; the page uses that to put their reflection's waterline in the right place.
@@ -208,7 +208,8 @@ export function createCast(box, { calm, models, onReady, framing }) {
     if (wave) wave.clampWhenFinished = true;
     // the bones the groove moves, and their pose as the mixer last left it: three's mixer only
     // writes a value when it changes, so the groove has to be taken off again before each update
-    const groovy = GROOVY.map((n) => bones[n]).filter(Boolean);
+    if (num === 'chudjak' && bones.Neck) bones.neck = bones.Neck;
+    const groovy = [...GROOVY, ...(num === 'chudjak' ? ['LeftForeArm', 'RightForeArm'] : [])].map((n) => bones[n]).filter(Boolean);
     const clean = groovy.map((b) => ({ b, q: b.quaternion.clone(), p: b.position.clone() }));
     // the clips walk the hips sideways (the wave leans a long way out); keep them where they stand
     const rest = bones.Hips ? bones.Hips.position.clone() : null;
@@ -221,40 +222,6 @@ export function createCast(box, { calm, models, onReady, framing }) {
       c.look = c.base;
     });
     return c;
-  }
-
-  // rotate a bone about an axis of the character's own frame, through its pivot
-  function rot(c, name, axis, ang) {
-    const b = c.bones[name];
-    if (!b || !ang) return;
-    c.root.getWorldQuaternion(_rq);
-    _ax.copy(axis).applyQuaternion(_rq);
-    b.parent.getWorldQuaternion(_pq);
-    _iq.copy(_pq).invert();
-    _q.setFromAxisAngle(_ax, ang).premultiply(_iq).multiply(_pq);
-    b.quaternion.premultiply(_q);
-  }
-
-  // the groove, on top of whatever the mixer just posed
-  function groove(c, t) {
-    const ph = (t * BPM) / 60 * Math.PI * 2 - c.beat;
-    const bounce = Math.pow(0.5 - 0.5 * Math.cos(ph), 1.6); // 0..1 every beat
-    const sway = Math.sin(ph / 2); // one side per bar-half
-    const k = c.energy;
-    c.bones.Hips && (c.bones.Hips.position.y -= 0.014 * bounce * k);
-    rot(c, 'Hips', Y, 0.08 * sway * k);
-    rot(c, 'Hips', Z, 0.035 * sway * k);
-    rot(c, 'Spine01', Z, -0.03 * sway * k);
-    rot(c, 'Spine02', X, 0.03 * bounce * k);
-    rot(c, 'neck', X, 0.05 * bounce * k);
-    rot(c, 'Head', X, 0.12 * bounce * k);
-    rot(c, 'Head', Z, -0.05 * sway * k);
-    if (!c.waving) {
-      rot(c, 'LeftShoulder', Z, 0.09 * Math.max(0, sway) * k);
-      rot(c, 'RightShoulder', Z, -0.09 * Math.max(0, -sway) * k);
-      rot(c, 'LeftArm', Z, -0.06 * bounce * k);
-      rot(c, 'RightArm', Z, 0.06 * bounce * k);
-    }
   }
 
   function wave(num, at = 'viewer') {
@@ -362,4 +329,46 @@ export function createCast(box, { calm, models, onReady, framing }) {
     },
     renderer,
   };
+}
+
+// rotate a bone about an axis of the character's own frame, through its pivot
+function rot(c, name, axis, ang) {
+  const b = c.bones[name];
+  if (!b || !ang) return;
+  c.root.getWorldQuaternion(_rq);
+  _ax.copy(axis).applyQuaternion(_rq);
+  b.parent.getWorldQuaternion(_pq);
+  _iq.copy(_pq).invert();
+  _q.setFromAxisAngle(_ax, ang).premultiply(_iq).multiply(_pq);
+  b.quaternion.premultiply(_q);
+}
+
+// the groove, on top of whatever the mixer just posed
+export function groove(c, t) {
+  const ph = (t * BPM) / 60 * Math.PI * 2 - c.beat;
+  const bounce = Math.pow(0.5 - 0.5 * Math.cos(ph), 1.6); // 0..1 every beat
+  const sway = Math.sin(ph / 2); // one side per bar-half
+  const k = c.energy;
+  c.bones.Hips && (c.bones.Hips.position.y -= 0.014 * bounce * k);
+  rot(c, 'Hips', Y, 0.08 * sway * k);
+  rot(c, 'Hips', Z, 0.035 * sway * k);
+  rot(c, 'Spine01', Z, -0.03 * sway * k);
+  rot(c, 'Spine02', X, 0.03 * bounce * k);
+  rot(c, 'neck', X, 0.05 * bounce * k);
+  rot(c, 'Head', X, 0.12 * bounce * k);
+  rot(c, 'Head', Z, -0.05 * sway * k);
+  if (!c.waving) {
+    rot(c, 'LeftShoulder', Z, 0.09 * Math.max(0, sway) * k);
+    rot(c, 'RightShoulder', Z, -0.09 * Math.max(0, -sway) * k);
+    rot(c, 'LeftArm', Z, -0.06 * bounce * k);
+    rot(c, 'RightArm', Z, 0.06 * bounce * k);
+    if (c.num === 'chudjak') {
+      rot(c, 'LeftArm', X, -.18 - .12 * sway);
+      rot(c, 'RightArm', X, -.18 + .12 * sway);
+      rot(c, 'LeftArm', Z, .16 * sway);
+      rot(c, 'RightArm', Z, .16 * sway);
+      rot(c, 'LeftForeArm', X, -.30 - .16 * Math.sin(ph));
+      rot(c, 'RightForeArm', X, -.30 + .16 * Math.sin(ph));
+    }
+  }
 }
