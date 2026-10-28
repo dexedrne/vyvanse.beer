@@ -98,6 +98,8 @@ test('Chudjak preview and public download include both hand joints and the movem
     const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString());
     const joints = new Set(gltf.skins.flatMap(s => s.joints.map(i => gltf.nodes[i].name)));
     for (const name of ['LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand']) assert.ok(joints.has(name), `${file}: ${name}`);
+    assert.ok(gltf.nodes.find(n => n.name === 'LeftShoulder').translation[0] > 0, `${file}: left shoulder convention`);
+    assert.ok(gltf.nodes.find(n => n.name === 'RightShoulder').translation[0] < 0, `${file}: right shoulder convention`);
     const clips = new Set(gltf.animations.map(a => a.name));
     for (const name of ['Idle', 'walk', 'Casual_Walk', 'Run_02', 'Lean_Forward_Sprint', 'Big_Wave_Hello']) assert.ok(clips.has(name), `${file}: ${name}`);
   }
