@@ -138,7 +138,7 @@ function crewItem(b, i, { crew, projects, shell }) {
     ${b.download ? `<div class="act">
       <a class="play play--sm" href="${esc(b.download.href)}" download data-act="download">${glyph('a', 'A')}<span class="play__label">Get the model</span><span class="vh"> of ${esc(b.name)} (${esc(b.download.label)}, ${esc(b.download.size)})</span></a>
       ${status(file, b.npcOnly && !b.download.rigged ? `${b.download.size}, static GLB` : `${b.download.size}, rigged and animated`)}
-    </div>` : ''}
+    </div>` : `<div class="act js-only"><button type="button" class="play play--sm" data-act="wave">${glyph('a', 'A')}<span class="play__label">Say hello</span></button></div>`}
     <div class="extra">${fine}${all}</div>
   </div>
 </article>`;

@@ -693,6 +693,7 @@ function activate({ from, pad } = {}) {
     else if (from !== 'pad') el.click();
     return;
   }
+  if (S.tab === 'crew' && !LISTS.crew[S.crew].download) return waveDuo(LISTS.crew[S.crew].num);
   const item = onItem(S.tab);
   const btn = $('[data-act]', item);
   btn?.classList.remove('is-hit');
@@ -1147,6 +1148,7 @@ document.addEventListener('click', (e) => {
   }
   const more = e.target.closest('[data-more]');
   if (more) return details();
+  if (e.target.closest('[data-act="wave"]')) return waveDuo(LISTS.crew[S.crew].num);
   const playLink = e.target.closest('.panel a[data-act="play"]');
   if (playLink) {
     if (!pwa.canPlay()) return e.preventDefault();
@@ -1281,7 +1283,7 @@ function hints() {
   const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
   const pad = input.scheme === 'ps' || input.scheme === 'xbox';
   const pack = S.tab === 'crew' && isPack(LISTS.crew[S.crew]);
-  const verb = { games: 'play', crew: pack ? 'get pack' : 'get model', sites: 'open', contact: 'pick' }[S.tab];
+  const verb = { games: 'play', crew: pack ? 'get pack' : LISTS.crew[S.crew].download ? 'get model' : 'say hello', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   if (phone.matches && !moving) {
