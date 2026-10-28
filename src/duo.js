@@ -185,6 +185,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
 
   function rig(num, gltf) {
     const root = gltf.scene;
+    prepareCastMaterials(num, root);
     if (num === 'chudjak') {
       root.updateMatrixWorld(true);
       const bounds = new THREE.Box3().setFromObject(root);
@@ -371,4 +372,21 @@ export function groove(c, t) {
       rot(c, 'RightForeArm', X, -.30 + .16 * Math.sin(ph));
     }
   }
+}
+
+// The Crew stage has no lights: Chudjak's PBR export needs the same unlit finish as the other crew.
+export function prepareCastMaterials(num, root) {
+  if (num !== 'chudjak') return;
+  const materials = new Map();
+  const unlit = (source) => {
+    if (!materials.has(source)) materials.set(source, new THREE.MeshBasicMaterial({
+      name: source.name, map: source.map, color: source.color,
+      transparent: source.transparent, opacity: source.opacity, alphaTest: source.alphaTest,
+      side: source.side, depthWrite: source.depthWrite, vertexColors: source.vertexColors,
+    }));
+    return materials.get(source);
+  };
+  root.traverse(o => {
+    if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map(unlit) : unlit(o.material);
+  });
 }
