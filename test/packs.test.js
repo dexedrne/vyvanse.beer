@@ -30,8 +30,8 @@ test('downloadable packs have unique ids, numeric file counts and valid credits 
     }
     assert.deepEqual([p.cover.width, p.cover.height], p.id === 'cars' ? [640, 480] : [960, 720]);
   }
-  assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').big, '91');
-  assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').download.files, 187);
+  assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').big, '92');
+  assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').download.files, 189);
   assert.equal(packs.find(p => p.id === 'retardio-sticker-pack').big, '94');
   assert.equal(packs.find(p => p.id === 'retardio-sticker-pack').download.files, 193);
   assert.equal(packs.find(p => p.id === 'wallpapers').download.href, 'https://github.com/dexedrne/vyvanse.beer/releases/download/assets/wallpapers.zip');
@@ -46,6 +46,8 @@ test('downloadable packs have unique ids, numeric file counts and valid credits 
     }
   }
   for (const id of ['radbro-sticker-pack', 'retardio-sticker-pack']) assert.ok(packGallery[id].every(item => item.group === 'telegram-png-512'));
+  assert.ok(packGallery['radbro-sticker-pack'].some(item => item.name === 'radbro3710_grin_hands.png'));
+  assert.ok(packGallery['saloon-card-pack'].every(item => /^(webp\/)?(deck|jokers|backs)(\/|$)/.test(item.group)));
   // owner 10/18: all the sticker packs sit together, the Retardio ones first, then the Radbro ones
   const ids = packs.map(p => p.id);
   assert.equal(ids.indexOf('radbro-sticker-pack'), ids.indexOf('retardio-sticker-pack') + 1);
@@ -157,8 +159,8 @@ test('terminal lists assets under crew and provides pack info, links, aliases an
     output.length = 0;
     commands.run(cmd);
     text = output.map(el => el.textContent).join(' ');
-    assert.match(text, /177 MB[^]*299[^]*SALOON Card Pack|SALOON Card Pack[^]*177 MB[^]*299/);
-    assert.match(text, /761 MB/);
+    assert.match(text, /81 MB[^]*126[^]*SALOON Card Pack|SALOON Card Pack[^]*81 MB[^]*126/);
+    assert.match(text, /580 MB/);
     assert.match(text, /Viral Public License/);
   }
   output.length = 0;

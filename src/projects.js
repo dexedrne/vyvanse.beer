@@ -603,7 +603,7 @@ export const crew = {
     // the no-JS panel line, the terminal's `assets` header and the ask payload
     line: 'Art from the games, free for the Radbro community. Use it, remix it, credit @dexedrne on X.',
     credit: { label: '@dexedrne on X', href: 'https://x.com/dexedrne' },
-    all: { href: `${REL}/vyvanse-assets-all.zip`, label: 'every pack, one .zip', size: '761 MB' },
+    all: { href: `${REL}/vyvanse-assets-all-current.zip`, label: 'every pack, one .zip', size: '580 MB' },
     packs: [
       {
         id: 'saloon-card-pack', // hash #crew/saloon-card-pack, terminal `info saloon-card-pack`, ask `pack:saloon-card-pack`
@@ -611,7 +611,7 @@ export const crew = {
         kind: 'SALOON · card pack', // kindline
         name: 'Radbro Deck', // wordmark: short, one line at 116px (≤ 12 characters)
         title: 'SALOON Card Pack: The Radbro Deck', // full name: aria, terminal, toast, ask
-        line: 'The full 52-card Radbro deck from SALOON with the crew as the court cards, plus the jokers, four card backs, ace art, chips, felts and table UI.',
+        line: 'The 52-card Radbro deck from SALOON, with alternate fronts, two jokers and four card backs.',
         big: '52', // the outlined number behind the cover
         accent: '#e8c27a', // SALOON's: the wordmark's offset shadow and the pack's foil
         shell: '#16251c', // SALOON's: the tile's wrapper colour
@@ -619,12 +619,9 @@ export const crew = {
         crew: ['4764', '652', '3704', '3710', '723', '555', '85'], // "with" mugs (crew nums)
         contents: [
           { path: 'deck/', what: '52 cards, ace to king' },
-          { path: 'courts/', what: 'the crew as kings, queens and jacks' },
-          { path: 'jokers/ backs/', what: '#85 and #555, four backs' },
-          { path: 'tables/ chips/ ui/', what: 'felts, chips, buttons' },
-          { path: 'suits/ card-parts/', what: 'the pieces, to build your own', more: true },
-          { path: 'props/ posters/', what: 'table props, two posters', more: true },
-          { path: 'webp/', what: 'every card again, small', more: true },
+          { path: 'deck/alt/', what: 'alternate card fronts' },
+          { path: 'jokers/ backs/', what: 'two jokers and four backs' },
+          { path: 'webp/', what: 'the cards and backs as WebP' },
         ],
         tile: '/img/packs/saloon-card-pack-tile.webp', // 144x240
         cover: {
@@ -635,7 +632,7 @@ export const crew = {
           alt: 'A poker hand fanned out: a violet skull card back, the seven of hearts, the queen of diamonds with #652, the #85 joker and the king of spades with #4764 on top.',
         },
         backdrop: '/img/art/saloon.webp', // soft-blurred behind the panel while the pack is picked
-        download: { href: `${REL}/saloon-card-pack.zip`, label: 'card pack .zip', size: '177 MB', files: 299, formats: 'png and webp' },
+        download: { href: `${REL}/saloon-card-fronts-backs.zip`, label: 'card pack .zip', size: '81 MB', files: 126, formats: 'png, webp and svg' },
       },
       {
         id: 'wallpapers',
@@ -700,8 +697,8 @@ export const crew = {
         kind: 'Radbro · sticker pack',
         name: 'Stickers',
         title: 'Radbro Sticker Pack',
-        line: '91 stickers: the six crew Radbros plus SALOON, SHITBOX and Sanko designs. Ready for Telegram or anywhere.',
-        big: '91',
+        line: '92 stickers: the six crew Radbros plus SALOON, SHITBOX and Sanko designs. Ready for Telegram or anywhere.',
+        big: '92',
         accent: '#9d8cff',
         shell: '#1f2a44',
         games: [],
@@ -721,7 +718,7 @@ export const crew = {
           alt: 'Five die-cut Radbro stickers in a heap: #652 saying WTF, #4764 holding CASH MONEY, #723 tipping his hat with HOWDY, #652 locked in on a laptop and #2564 playing ONE MORE GAME.',
         },
         backdrop: '/img/art/radrun-cast2.webp',
-        download: { href: `${REL}/radbro-sticker-pack.zip`, label: 'sticker pack .zip', size: '63 MB', files: 187, formats: 'png and webp' },
+        download: { href: `${REL}/radbro-sticker-pack-v2.zip`, label: 'sticker pack .zip', size: '60 MB', files: 189, formats: 'png and webp' },
       },
       {
         id: 'shitbox-garage-pack',
