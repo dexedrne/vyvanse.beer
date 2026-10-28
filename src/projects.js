@@ -962,7 +962,7 @@ export const crew = {
       face: '/img/chudjak.webp',
       model: '/models/chudjak.glb',
       name: 'Chudjak',
-      line: 'An NPC in RadQuest (Rad Hamlet), RADBONK and SHITBOX. This skinned game version was made from the owner’s original static Meshy exports.',
+      line: 'Chudjak is joining RadQuest (Rad Hamlet), RADBONK and SHITBOX. This skinned game version was made from the owner’s original static Meshy exports.',
       image: { src: '/img/chudjak.webp', width: 800, height: 1000, alt: 'Chudjak: a stern, pale man with swept hair and glasses, wearing a black slogan shirt, jeans and sneakers.' },
     },
   ],

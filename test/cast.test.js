@@ -60,7 +60,7 @@ test('Chudjak has a separate non-playable NPC card without unsupported license o
   const npc = crew.npcs.find(m => m.num === 'chudjak');
   assert.ok(npc?.model && npc?.face && npc?.image);
   assert.equal(npc.name, 'Chudjak');
-  assert.match(npc.line, /NPC in RadQuest .* RADBONK and SHITBOX/);
+  assert.match(npc.line, /joining RadQuest .* RADBONK and SHITBOX/);
   const html = renderShell({ site, groups, projects, crew, contact, duo });
   const card = html.match(/<article class="item item--crew" id="chudjak"[^]*?<\/article>/)?.[0];
   assert.ok(card?.includes('Chudjak'));
