@@ -956,7 +956,7 @@ export const crew = {
       slug: 'chudjak',
       kind: 'Owner character · NPC',
       npcOnly: true,
-      face: '/img/chudjak.webp',
+      face: '/img/chudjak-face.webp',
       model: '/models/chudjak.glb',
       download: { href: '/models/chudjak-rigged.glb', label: 'rigged and animated .glb', size: '8.2 MB', rigged: true },
       name: 'Chudjak',
