@@ -7,9 +7,7 @@
 // kept; past KEEP loaded, the ones that haven't been on screen for STALE give their GPU memory
 // back. Until everyone asked for is in, nobody shows, and the page keeps the renders up.
 //
-// Radbro models carry Idle and Big_Wave_Hello. Chudjak keeps the source-derived Idle and walk
-// clips; on this page his greeting is a look toward the viewer. Everyone gets the same restrained
-// procedural idle groove. The established Radbro wave animation remains unchanged.
+// Models carry Idle and Big_Wave_Hello. Everyone gets the same restrained procedural idle groove.
 //
 // The camera is framed so their feet (y = 0) land at FEET of the canvas height, whatever its
 // shape; the page uses that to put their reflection's waterline in the right place.

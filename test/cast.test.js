@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { site, groups, crew, projects, playsIn, duo, contact } from '../src/projects.js';
 import { renderShell } from '../src/render.js';
@@ -68,8 +69,9 @@ test('Chudjak has a separate non-playable NPC card with his model download', () 
   assert.ok(!card?.includes('#chudjak'));
   assert.ok(!card?.includes('Viral Public License'));
   assert.ok(card?.includes('Get the model'));
-  assert.ok(card?.includes('/models/chudjak-original.glb'));
-  assert.ok(card?.includes('static GLB'));
+  assert.ok(card?.includes('/models/chudjak-rigged.glb'));
+  assert.ok(card?.includes('rigged and animated'));
+  assert.equal(npc.download.rigged, true);
   assert.ok(card?.includes('Free to use'));
 });
 
@@ -86,4 +88,17 @@ test('every Crew card offers the same nine-character zip, including the Retardio
     assert.ok(card.includes(`${crew.downloadAll.label} (${crew.downloadAll.size})`));
   }
   assert.ok(!cards[9].includes(crew.downloadAll.href));
+});
+
+
+test('Chudjak preview and public download include both hand joints and the movement clips', () => {
+  for (const file of ['chudjak.glb', 'chudjak-rigged.glb']) {
+    const bytes = readFileSync(new URL(`../public/models/${file}`, import.meta.url));
+    assert.equal(bytes.readUInt32LE(0), 0x46546c67);
+    const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString());
+    const joints = new Set(gltf.skins.flatMap(s => s.joints.map(i => gltf.nodes[i].name)));
+    for (const name of ['LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand']) assert.ok(joints.has(name), `${file}: ${name}`);
+    const clips = new Set(gltf.animations.map(a => a.name));
+    for (const name of ['Idle', 'walk', 'Casual_Walk', 'Run_02', 'Lean_Forward_Sprint', 'Big_Wave_Hello']) assert.ok(clips.has(name), `${file}: ${name}`);
+  }
 });
