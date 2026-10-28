@@ -186,7 +186,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
   function rig(num, gltf) {
     const root = gltf.scene;
     prepareCastMaterials(num, root);
-    if (num === 'chudjak') {
+    if (num === 'chudjak' || num === 'ophelia') {
       root.updateMatrixWorld(true);
       const bounds = new THREE.Box3().setFromObject(root);
       root.position.y -= bounds.min.y;
@@ -374,9 +374,9 @@ export function groove(c, t) {
   }
 }
 
-// The Crew stage has no lights: Chudjak's PBR export needs the same unlit finish as the other crew.
+// The Crew stage has no lights: these exports need the same unlit finish as the other crew.
 export function prepareCastMaterials(num, root) {
-  if (num !== 'chudjak') return;
+  if (num !== 'chudjak' && num !== 'ophelia') return;
   const materials = new Map();
   const unlit = (source) => {
     if (!materials.has(source)) materials.set(source, new THREE.MeshBasicMaterial({

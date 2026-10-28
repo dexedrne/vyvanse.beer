@@ -53,8 +53,8 @@ test('#268 has a full Crew card beside #85 without advertising a game', () => {
   assert.ok(card?.includes('not in a game yet'));
   assert.ok(!card.includes('data-goto='));
   const tiles = [...html.matchAll(/<button class="tile"[^]*?aria-controls="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(tiles.length, 10);
-  assert.deepEqual(tiles.slice(-3), ['retardio-85', 'retardio-268', 'chudjak']);
+  assert.equal(tiles.length, 11);
+  assert.deepEqual(tiles.slice(-4), ['retardio-85', 'retardio-268', 'chudjak', 'ophelia']);
 });
 
 test('Chudjak has a separate non-playable NPC card with his model download', () => {
@@ -78,7 +78,7 @@ test('Chudjak has a separate non-playable NPC card with his model download', () 
 test('every Crew card offers the same nine-character zip, including the Retardios', () => {
   const html = renderShell({ site, groups, projects, crew, contact, duo });
   const cards = [...html.matchAll(/<article class="item item--crew"[^]*?<\/article>/g)].map(m => m[0]);
-  assert.equal(cards.length, 10);
+  assert.equal(cards.length, 11);
   assert.ok(crew.downloadAll.href.endsWith('/crew-3d-all-nine.zip'));
   assert.equal(crew.downloadAll.label, 'all nine, one .zip');
   assert.ok(!html.includes('original four'));
@@ -87,7 +87,7 @@ test('every Crew card offers the same nine-character zip, including the Retardio
     assert.ok(card.includes(`class="more-link"`));
     assert.ok(card.includes(`${crew.downloadAll.label} (${crew.downloadAll.size})`));
   }
-  assert.ok(!cards[9].includes(crew.downloadAll.href));
+  for (const card of cards.slice(9)) assert.ok(!card.includes(crew.downloadAll.href));
 });
 
 

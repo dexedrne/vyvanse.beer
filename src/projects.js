@@ -963,6 +963,18 @@ export const crew = {
       line: 'Chudjak is joining RadQuest (Rad Hamlet), RADBONK and SHITBOX. Free to use: download the rigged 3D model with idle, walk, run and greeting animations.',
       image: { src: '/img/chudjak.webp', width: 800, height: 1000, alt: 'Chudjak: a stern, pale man with swept hair and glasses, wearing a black slogan shirt, jeans and sneakers.' },
     },
+    {
+      num: 'ophelia',
+      label: 'Ophelia',
+      slug: 'ophelia',
+      kind: 'SHITBOX guide · NPC',
+      npcOnly: true,
+      face: '/img/faces/ophelia.webp',
+      model: '/models/ophelia.glb',
+      name: 'Ophelia',
+      line: 'The SHITBOX guide joins the crew. Long black hair, amber eyes and a black tank top. Say hello and she waves back.',
+      image: { src: '/img/ophelia.webp', width: 800, height: 1000, alt: 'Ophelia in 3D: long black hair, amber eyes, a black tank top, dark trousers and boots.' },
+    },
   ],
 };
 
