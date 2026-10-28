@@ -958,7 +958,7 @@ export const crew = {
       npcOnly: true,
       face: '/img/chudjak.webp',
       model: '/models/chudjak.glb',
-      download: { href: '/models/chudjak-rigged.glb', label: 'rigged and animated .glb', size: '7.8 MB', rigged: true },
+      download: { href: '/models/chudjak-rigged.glb', label: 'rigged and animated .glb', size: '8.2 MB', rigged: true },
       name: 'Chudjak',
       line: 'Chudjak is joining RadQuest (Rad Hamlet), RADBONK and SHITBOX. Free to use: download the rigged 3D model with idle, walk, run and greeting animations.',
       image: { src: '/img/chudjak.webp', width: 800, height: 1000, alt: 'Chudjak: a stern, pale man with swept hair and glasses, wearing a black slogan shirt, jeans and sneakers.' },
