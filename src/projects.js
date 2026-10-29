@@ -25,6 +25,7 @@
 //             the screen behind the menu) or a site's 800x420 screenshot (its preview monitor)
 //   thumb     optional cartridge label in public/img/thumb/ (textless, safe for a centred 4:3 crop)
 //   shell     the cartridge's plastic colour; accent: its glow and the wordmark's shadow
+//   section   games only: drive, shoot, fight, arcade or worlds; editions inherit their case
 //   cast      games only: which of the crew (by `num`) you can play as; drives "in" on Crew
 //   featured  games only, on one game: the menu starts on it and its art is painted first
 //   asParam   true only when the game supports ?as=<crew num> for character preselection
@@ -57,41 +58,42 @@ const MAIN_CAST = ['4764', '652', '3704', '3710'];
 const RADBROS = [...MAIN_CAST, '723', '2564'];
 const ALL = [...RADBROS, '555', '85']; // current game casts; #268 is Crew only
 
+export const sections = [
+  { id: 'drive', label: 'Drive' },
+  { id: 'shoot', label: 'Shoot' },
+  { id: 'fight', label: 'Fight' },
+  { id: 'arcade', label: 'Arcade' },
+  { id: 'worlds', label: 'Worlds' },
+];
+
 export const projects = [
   {
-    cmd: 'spidertag',
-    boot: 'swing, tag and chase the crew across the rooftops', // the hero's boot log line
-    aliases: ['radrun', 'rad-run', 'rug-run', 'rugrun'],
-    slug: 'spidertag',
+    cmd: 'shitbox',
+    featured: true, // the flagship: the menu opens on it
+    boot: '41 cars, free drive with friends and street takeovers', // the hero's boot log line
+    aliases: ['beater', 'car'],
+    slug: 'shitbox',
     group: 'games',
-    name: 'SPIDERTAG',
-    kind: 'Web-slinger tag across the rooftops',
-    kindPhone: "Rooftop web-slinger tag",
+    section: 'drive',
+    name: 'SHITBOX',
+    kind: 'Odd jobs in a tired old four-door with a real manual',
+    kindPhone: "Odd jobs in a tired old four-door",
+    blurbPhone: "Deliveries, rides, towing and the crew on the phone, in a car with a real manual. Keep it running, keep it fuelled, keep the lights on.",
     blurb:
-      'Swing the neon rooftops on webs: play best-of-three TAG with a friend or bots, or chase down the Radbro who swiped your bag in 90 seconds. Pick from the main four, cowboy #723, ghost #2564 or the two Retardios. Runs in the browser, keyboard or controller, nothing to install.',
-    url: 'https://spidertag.vyvanse.beer',
+      'A tired 1993 four-door with a real five-speed and 41 cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. Keyboard or controller.',
+    url: 'https://shitbox.vyvanse.beer',
     frame: true,
-    links: [
-      { label: 'Play', href: 'https://spidertag.vyvanse.beer' },
-      { label: '$SPIDERTAG token', href: 'https://token.spidertag.vyvanse.beer' },
-      { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
-    ],
-    thumb: '/img/thumb/radrun-square.webp',
-    shell: '#3d2263',
-    accent: '#ff5fd2',
+    links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
+    thumb: '/img/thumb/shitbox.webp',
+    shell: '#3a1418',
+    accent: '#ffb12a',
     cast: ALL,
-    phone: '50% 18%',
+    phone: '50% 40%',
     image: {
-      src: '/img/art/radrun-cast2.webp',
+      src: '/img/art/shitbox.webp',
       width: 1600,
       height: 900,
-      alt: 'SPIDERTAG: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 swing over neon rooftops, with a roadster and cowboy #723 by his truck below.',
-    },
-    credit: {
-      before: 'Built on',
-      label: 'react-three-game',
-      href: 'https://prnth.com/react-three-game/',
-      after: 'by prnth.',
+      alt: 'SHITBOX: a faded red 1993 four-door with a primer-grey fender parked at a mountain lookout over the town lights at night, Radbro #4764 leaning on the fender and Retardio #85 sitting on the bonnet with a coffee.',
     },
   },
   {
@@ -100,6 +102,7 @@ export const projects = [
     aliases: ['rad-payne', 'payne'],
     slug: 'radpayne',
     group: 'games',
+    section: 'shoot',
     name: 'RadPayne',
     kind: 'Bullet-time noir shooter',
     blurb:
@@ -135,6 +138,7 @@ export const projects = [
     aliases: ['retardio-payne', 'rpayne'],
     slug: 'retardiopayne',
     group: 'games',
+    section: 'shoot',
     of: 'radpayne',
     edition: { label: 'Retardios', face: '85' },
     name: 'RetardioPayne',
@@ -168,42 +172,12 @@ export const projects = [
     },
   },
   {
-    cmd: 'rbgo',
-    boot: 'plant or defuse the bomb, 2v2 online', // the hero's boot log line
-    aliases: ['rb-go'],
-    slug: 'rbgo',
-    group: 'games',
-    name: 'RBGO',
-    kind: 'First-person bomb-defusal shooter, early preview',
-    kindPhone: "Bomb-defusal shooter, early preview",
-    blurb:
-      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Six Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
-    url: 'https://rbgo.vyvanse.beer',
-    frame: true,
-    links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
-    thumb: '/img/thumb/rbgo-square.webp',
-    shell: '#5c4228',
-    accent: '#f2b45c',
-    cast: ALL,
-    phone: '50% 20%',
-    image: {
-      src: '/img/art/rbgo-cast2.webp',
-      width: 1600,
-      height: 900,
-      alt: 'RBGO: #4764, #652, yellow-haired #3704 and green-haired #3710 plant and defend the bomb in a sunlit bazaar, with #555 by a red roadster and the cowboy by his truck behind.',
-    },
-    credit: {
-      before: 'Built on',
-      label: 'react-three-game',
-      href: 'https://prnth.com/react-three-game/',
-      after: 'by prnth. Gun models by Quaternius.',
-    },
-  },
-  {
     cmd: 'radops',
+    edition: { label: 'Team deathmatch', face: '4764' },
     boot: 'team deathmatch, 5v5 online', // the hero's boot log line
     slug: 'radops',
     group: 'games',
+    section: 'shoot',
     name: 'RadOps',
     kind: 'First-person team deathmatch, early preview',
     kindPhone: "Team deathmatch, early preview",
@@ -231,10 +205,46 @@ export const projects = [
     },
   },
   {
+    cmd: 'rbgo',
+    of: 'radops',
+    edition: { label: 'Bomb defusal', face: '3704' },
+    boot: 'plant or defuse the bomb, 2v2 online', // the hero's boot log line
+    aliases: ['rb-go'],
+    slug: 'rbgo',
+    group: 'games',
+    section: 'shoot',
+    name: 'RBGO',
+    kind: 'First-person bomb-defusal shooter, early preview',
+    kindPhone: "Bomb-defusal shooter, early preview",
+    blurb:
+      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Six Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
+    url: 'https://rbgo.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
+    thumb: '/img/thumb/rbgo-square.webp',
+    shell: '#5c4228',
+    accent: '#f2b45c',
+    cast: ALL,
+    phone: '50% 20%',
+    image: {
+      src: '/img/art/rbgo-cast2.webp',
+      width: 1600,
+      height: 900,
+      alt: 'RBGO: #4764, #652, yellow-haired #3704 and green-haired #3710 plant and defend the bomb in a sunlit bazaar, with #555 by a red roadster and the cowboy by his truck behind.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth. Gun models by Quaternius.',
+    },
+  },
+  {
     cmd: 'radzombies',
     boot: 'radbros vs the dead, co-op, leaderboards', // the hero's boot log line
     slug: 'radzombies',
     group: 'games',
+    section: 'shoot',
     name: 'RadZombies',
     kind: 'First-person zombies survival, early preview',
     kindPhone: "Zombies survival, early preview",
@@ -267,6 +277,7 @@ export const projects = [
     boot: 'retardios vs the dead, their own boards', // the hero's boot log line
     slug: 'zombietardio',
     group: 'games',
+    section: 'shoot',
     of: 'radzombies',
     edition: { label: 'Retardios', face: '85' },
     name: 'ZombieTardio',
@@ -294,91 +305,12 @@ export const projects = [
     },
   },
   {
-    cmd: 'shitbox',
-    featured: true, // the flagship: the menu opens on it
-    boot: '41 cars, free drive with friends and street takeovers', // the hero's boot log line
-    aliases: ['beater', 'car'],
-    slug: 'shitbox',
-    group: 'games',
-    name: 'SHITBOX',
-    kind: 'Odd jobs in a tired old four-door with a real manual',
-    kindPhone: "Odd jobs in a tired old four-door",
-    blurbPhone: "Deliveries, rides, towing and the crew on the phone, in a car with a real manual. Keep it running, keep it fuelled, keep the lights on.",
-    blurb:
-      'A tired 1993 four-door with a real five-speed and 41 cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. Keyboard or controller.',
-    url: 'https://shitbox.vyvanse.beer',
-    frame: true,
-    links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
-    thumb: '/img/thumb/shitbox.webp',
-    shell: '#3a1418',
-    accent: '#ffb12a',
-    cast: ALL,
-    phone: '50% 40%',
-    image: {
-      src: '/img/art/shitbox.webp',
-      width: 1600,
-      height: 900,
-      alt: 'SHITBOX: a faded red 1993 four-door with a primer-grey fender parked at a mountain lookout over the town lights at night, Radbro #4764 leaning on the fender and Retardio #85 sitting on the bonnet with a coffee.',
-    },
-  },
-  {
-    cmd: 'radtap',
-    boot: 'four lanes or seven, the crew on stage', // the hero's boot log line
-    aliases: ['rhythm'],
-    slug: 'radtap',
-    group: 'games',
-    name: 'RADTAP',
-    kind: 'Rhythm game, four lanes or seven',
-    blurb:
-      'Notes fall, you hit them on the line, and the crew plays behind the lanes on a real stage. Eight original songs, from lo-fi and jungle to guitar rock, shoegaze and an 8-bit level theme, charted on the beat from Easy to Expert, in four lanes or seven, or two thumbs on a phone. Mods, practice loops for the hard parts, bests and a few achievements. Keyboard, controller or touch.',
-    url: 'https://radtap.vyvanse.beer',
-    frame: true,
-    links: [{ label: 'Play', href: 'https://radtap.vyvanse.beer' }],
-    thumb: '/img/thumb/radtap.webp',
-    shell: '#23163f',
-    accent: '#b98cff',
-    cast: [...MAIN_CAST, '555', '85', '723', '2564'],
-    image: {
-      src: '/img/art/radtap.webp',
-      width: 1600,
-      height: 900,
-      alt: 'RADTAP: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 lead the band on a neon stage, with #555, #85 and cowboy #723 supporting behind four glowing note lanes.',
-    },
-  },
-  {
-    cmd: 'saloon',
-    boot: 'poker at a western saloon table, play with friends', // the hero's boot log line
-    // 'pokerbros' is its name from before SALOON: old links, saved orders and commands land here
-    aliases: ['pokerbros', 'poker', 'holdem'],
-    slug: 'saloon',
-    group: 'games',
-    name: 'SALOON',
-    kind: 'Poker at a western saloon table',
-    kindPhone: 'Poker at a western saloon table',
-    blurbPhone: 'A poker game at a western saloon table. Play with friends.',
-    blurb: 'A poker game at a western saloon table. Play with friends.',
-    url: 'https://saloon.cards',
-    frame: true,
-    orientation: 'any',
-    links: [{ label: 'Play', href: 'https://saloon.cards' }],
-    thumb: '/img/thumb/saloon.webp',
-    shell: '#16251c',
-    accent: '#e8c27a',
-    cast: [...MAIN_CAST, '555', '85', '723'],
-    phone: '50% 35%',
-    image: {
-      src: '/img/art/saloon.webp',
-      width: 1600,
-      height: 900,
-      alt: 'SALOON: violet-haired #4764 with glasses, brown-haired #652, yellow-haired #3704, green-haired #3710, long-haired #555, black-haired #85 and cowboy #723 play poker round a green felt table in a warm western saloon, with a wooden bar, bottles and glowing oil lamps.',
-    },
-  },
-  {
     cmd: 'radbrawl',
     boot: 'platform fighter, up to four locally across two stages', // the hero's boot log line
     aliases: ['brawl', 'fight', 'smash'],
     slug: 'radbrawl',
     group: 'games',
+    section: 'fight',
     name: 'RADBRAWL',
     kind: 'Platform fighter, up to four on one screen',
     kindPhone: "Platform fighter, four on one screen",
@@ -406,6 +338,7 @@ export const projects = [
     aliases: ['fighter', 'rad-fighter'],
     slug: 'radfighter',
     group: 'games',
+    section: 'fight',
     of: 'radbrawl',
     edition: { label: 'One on one', face: '4764' },
     name: 'RAD FIGHTER',
@@ -427,11 +360,103 @@ export const projects = [
     },
   },
   {
+    cmd: 'spidertag',
+    boot: 'swing, tag and chase the crew across the rooftops', // the hero's boot log line
+    aliases: ['radrun', 'rad-run', 'rug-run', 'rugrun'],
+    slug: 'spidertag',
+    group: 'games',
+    section: 'arcade',
+    name: 'SPIDERTAG',
+    kind: 'Web-slinger tag across the rooftops',
+    kindPhone: "Rooftop web-slinger tag",
+    blurb:
+      'Swing the neon rooftops on webs: play best-of-three TAG with a friend or bots, or chase down the Radbro who swiped your bag in 90 seconds. Pick from the main four, cowboy #723, ghost #2564 or the two Retardios. Runs in the browser, keyboard or controller, nothing to install.',
+    url: 'https://spidertag.vyvanse.beer',
+    frame: true,
+    links: [
+      { label: 'Play', href: 'https://spidertag.vyvanse.beer' },
+      { label: '$SPIDERTAG token', href: 'https://token.spidertag.vyvanse.beer' },
+      { label: 'Source', href: 'https://github.com/dexedrne/radrun' },
+    ],
+    thumb: '/img/thumb/radrun-square.webp',
+    shell: '#3d2263',
+    accent: '#ff5fd2',
+    cast: ALL,
+    phone: '50% 18%',
+    image: {
+      src: '/img/art/radrun-cast2.webp',
+      width: 1600,
+      height: 900,
+      alt: 'SPIDERTAG: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 swing over neon rooftops, with a roadster and cowboy #723 by his truck below.',
+    },
+    credit: {
+      before: 'Built on',
+      label: 'react-three-game',
+      href: 'https://prnth.com/react-three-game/',
+      after: 'by prnth.',
+    },
+  },
+  {
+    cmd: 'radtap',
+    boot: 'four lanes or seven, the crew on stage', // the hero's boot log line
+    aliases: ['rhythm'],
+    slug: 'radtap',
+    group: 'games',
+    section: 'arcade',
+    name: 'RADTAP',
+    kind: 'Rhythm game, four lanes or seven',
+    blurb:
+      'Notes fall, you hit them on the line, and the crew plays behind the lanes on a real stage. Eight original songs, from lo-fi and jungle to guitar rock, shoegaze and an 8-bit level theme, charted on the beat from Easy to Expert, in four lanes or seven, or two thumbs on a phone. Mods, practice loops for the hard parts, bests and a few achievements. Keyboard, controller or touch.',
+    url: 'https://radtap.vyvanse.beer',
+    frame: true,
+    links: [{ label: 'Play', href: 'https://radtap.vyvanse.beer' }],
+    thumb: '/img/thumb/radtap.webp',
+    shell: '#23163f',
+    accent: '#b98cff',
+    cast: [...MAIN_CAST, '555', '85', '723', '2564'],
+    image: {
+      src: '/img/art/radtap.webp',
+      width: 1600,
+      height: 900,
+      alt: 'RADTAP: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 lead the band on a neon stage, with #555, #85 and cowboy #723 supporting behind four glowing note lanes.',
+    },
+  },
+  {
+    cmd: 'saloon',
+    boot: 'poker at a western saloon table, play with friends', // the hero's boot log line
+    // 'pokerbros' is its name from before SALOON: old links, saved orders and commands land here
+    aliases: ['pokerbros', 'poker', 'holdem'],
+    slug: 'saloon',
+    group: 'games',
+    section: 'arcade',
+    name: 'SALOON',
+    kind: 'Poker at a western saloon table',
+    kindPhone: 'Poker at a western saloon table',
+    blurbPhone: 'A poker game at a western saloon table. Play with friends.',
+    blurb: 'A poker game at a western saloon table. Play with friends.',
+    url: 'https://saloon.cards',
+    frame: true,
+    orientation: 'any',
+    links: [{ label: 'Play', href: 'https://saloon.cards' }],
+    thumb: '/img/thumb/saloon.webp',
+    shell: '#16251c',
+    accent: '#e8c27a',
+    cast: [...MAIN_CAST, '555', '85', '723'],
+    phone: '50% 35%',
+    image: {
+      src: '/img/art/saloon.webp',
+      width: 1600,
+      height: 900,
+      alt: 'SALOON: violet-haired #4764 with glasses, brown-haired #652, yellow-haired #3704, green-haired #3710, long-haired #555, black-haired #85 and cowboy #723 play poker round a green felt table in a warm western saloon, with a wooden bar, bottles and glowing oil lamps.',
+    },
+  },
+  {
     cmd: 'radbonk',
     boot: 'fifteen minutes against the horde', // the hero's boot log line
     aliases: ['bonk', 'survivors'],
     slug: 'radbonk',
     group: 'games',
+    section: 'arcade',
     name: 'RADBONK',
     kind: 'Survival romp, the crew against a cute monster horde',
     kindPhone: 'Survival romp against the horde',
@@ -450,6 +475,39 @@ export const projects = [
       height: 900,
       alt: 'RADBONK: Radbro #3710 swings a stone hammer and #3704 fires a launcher on a sunny hilltop, surrounded by cute skeletons, ghosts, slimes, bats, gems and an open treasure chest.',
     },
+  },
+  {
+    cmd: 'radquest', aliases: ['quest'], slug: 'radquest', group: 'games', section: 'worlds',
+    name: 'RadQuest', kind: '3D RPG in a lantern-lit kingdom', kindPhone: '3D medieval RPG',
+    boot: 'a lantern, a blade and the road out of the village',
+    blurb: 'A medieval RPG in 3D. A lantern-lit village at dusk, a road out through the hills, ruins to clear and villagers with work for a traveller. Quests, gear, and the crew along for the trip. Keyboard or controller.',
+    url: 'https://radquest.vyvanse.beer', frame: true,
+    links: [{ label: 'Play', href: 'https://radquest.vyvanse.beer' }],
+    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: RADBROS,
+    phone: '50% 100%',
+    image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RadQuest: a lantern, a blade and the road out of the village.' },
+  },
+  {
+    cmd: 'radcraft', aliases: ['craft'], slug: 'radcraft', group: 'games', section: 'worlds',
+    name: 'RADCRAFT', kind: 'Voxel sandbox: dig, build, keep the lights on', kindPhone: 'Voxel sandbox',
+    boot: 'dig down, build up, mind the night',
+    blurb: 'A block world to dig into and build on. Mine, craft, farm and put a roof up before the sun goes down. Alone or with friends on one world. Keyboard or controller.',
+    url: 'https://radcraft.vyvanse.beer', frame: true,
+    links: [{ label: 'Play', href: 'https://radcraft.vyvanse.beer' }],
+    thumb: '/img/thumb/radcraft.webp', shell: '#27421f', accent: '#bdf05a', cast: RADBROS,
+    phone: '50% 100%',
+    image: { src: '/img/art/radcraft.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RADCRAFT: dig down, build up, mind the night.' },
+  },
+  {
+    cmd: 'brogate', aliases: ['gate'], slug: 'brogate', group: 'games', section: 'worlds',
+    name: 'BROGATE', kind: 'Party RPG: four of the crew at the gate', kindPhone: 'Party RPG at the gate',
+    boot: 'four heroes, one gate, a d20',
+    blurb: 'Four of the crew at the gate of an old flooded city: a knight, a rogue, a ranger and a mage, a die rolled on every swing, loot to split and a long way in. Keyboard or controller.',
+    url: 'https://brogate.vyvanse.beer', frame: true,
+    links: [{ label: 'Play', href: 'https://brogate.vyvanse.beer' }],
+    thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: RADBROS,
+    phone: '50% 100%',
+    image: { src: '/img/art/brogate.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'BROGATE: four heroes, one gate, a d20.' },
   },
   {
     cmd: 'solscape',
@@ -613,12 +671,6 @@ export const projects = [
   },
 ];
 
-// The Radbros, rendered in 3D with transparent backgrounds.
-// `num` is what the terminal takes (`info 4764`). `featured` = the site mascot (picked first
-// on Crew). The games each one is in come from the games' `cast`. `model` is the small web
-// model (mesh, Idle and Big_Wave_Hello) that stands on his card in 3D, loaded when first shown;
-// `image` is his render, shown until then (and without WebGL).
-// The site's downloadable asset release.
 const REL = 'https://github.com/dexedrne/vyvanse.beer/releases/download/assets';
 
 export const crew = {
