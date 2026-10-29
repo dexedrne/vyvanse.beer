@@ -15,7 +15,6 @@ import { createSort, flip } from './sort.js';
 import { createPwa } from './pwa.js';
 import { gameUrl } from './device.js';
 import { launchUrl } from './ask/actions.js';
-import { createAsk } from './ask/menu.js';
 import { createSettings } from './settings.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -29,7 +28,6 @@ const hint = $('#duo-hint');
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
-let askUI = null;
 let phoneNodes = null;
 let phoneZone = 'shelf';
 let phoneButton = 0;
@@ -57,23 +55,13 @@ function phoneMarkup() {
       entry.label.replaceChildren(...entry.labelChildren);
       entry.mi.replaceChildren(...entry.children);
     }
-    const { ask, parent, next, html, askLabel } = phoneNodes;
-    parent.insertBefore(ask, next);
-    $('button', ask).innerHTML = html;
-    if (askLabel) $('button', ask).setAttribute('aria-label', askLabel);
-    else $('button', ask).removeAttribute('aria-label');
     for (const node of phoneNodes.added) node.remove();
     $$('.row').forEach(row => row.classList.remove('shelf'));
     phoneNodes = null;
     screen.style.removeProperty('--view-height');
     return;
   }
-  const ask = $('#menu-ask');
-  phoneNodes = { items: [], contact: [], added: [], ask, parent: ask.parentElement,
-    next: ask.nextSibling, html: $('button', ask).innerHTML, askLabel: $('button', ask).getAttribute('aria-label') };
-  $('.top__right').prepend(ask);
-  $('button', ask).innerHTML = '<svg class="i" aria-hidden="true"><use href="#i-ask"/></svg>';
-  $('button', ask).setAttribute('aria-label', 'ask');
+  phoneNodes = { items: [], contact: [], added: [] };
   for (const item of $$('.item')) {
     const info = $('.info', item);
     if (!info) continue;
@@ -984,8 +972,6 @@ function act(name, info = {}) {
       return audio.toggleSfx();
     case 'os':
       return openOS({ focus: 'input' });
-    case 'ask':
-      return askUI.open({ from: info.from });
     case 'grab':
       return grab();
   }
@@ -1006,7 +992,6 @@ function phoneFocus() {
 const input = createInput({ act, mode, phone: () => phone.matches, onScheme: scheme => {
   hints();
   phoneFocus();
-  askUI?.setPad(scheme === 'ps' || scheme === 'xbox');
   dispatchEvent(new Event('vyv:input'));
 } });
 const audio = createAudio({ musicBtn: $('#music'), sfxBtn: $('#sfx'), toast });
@@ -1025,7 +1010,6 @@ const player = createPlayer({
     sorter.cancel();
     os?.close();
     closeAsk();
-    askUI?.close();
     screen.classList.add('is-away');
     screen.inert = true;
     stage?.pause();
@@ -1070,15 +1054,6 @@ const launcher = {
   },
   wave: () => (!want().length ? 'none' : live() ? (want().forEach((n, k) => setTimeout(() => waveDuo(n), 600 * k)), 'ok') : stage?.live ? 'loading' : 'missing'),
 };
-askUI = createAsk({ shell: launcher, pad: () => input.scheme === 'ps' || input.scheme === 'xbox' });
-$('#menu-ask').addEventListener('submit', e => {
-  e.preventDefault();
-  os?.close();
-  const field = $('#menu-ask-text');
-  const text = field.value.trim();
-  askUI.open({ text, typing: !text });
-  if (text) { field.blur(); askUI.submit(text); }
-});
 
 // ---- mouse and touch ----
 

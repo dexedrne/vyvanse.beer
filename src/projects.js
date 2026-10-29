@@ -587,6 +587,30 @@ export const projects = [
       alt: 'Hog rider 3d mid-ride: the view over chrome motorcycle handlebars down a highway, a purple car ahead, pine trees, low-poly mountains and a blue sky, with the score and hearts at the top.',
     },
   },
+  {
+    cmd: 'sassy',
+    aliases: ['sassysol', 'sassy-camp', 'sasquatch'],
+    slug: 'sassy',
+    group: 'sites',
+    name: 'Sassy',
+    kind: 'Sassy the Sasquatch: a chill 3D camping game and fan site',
+    blurb:
+      'Sassy Camp is a chill 3D camping game: fire, fishing, canoe, hammock, garden, skate park, guitar and stargazing. There is a meme maker too. Free in the browser, keyboard, touch or controller.',
+    url: 'https://sassysol.lol',
+    frame: false,
+    links: [
+      { label: 'Play Sassy Camp', href: 'https://sassysol.lol/camp/' },
+      { label: 'Site', href: 'https://sassysol.lol' },
+    ],
+    thumb: '/img/thumb/sassy.webp',
+    accent: '#ffb81c',
+    image: {
+      src: '/img/sassy.webp',
+      width: 800,
+      height: 420,
+      alt: 'Sassy the Sasquatch in a red beanie stands by a campfire on a lakeside dock, with an orange tent, a guitar and mountains behind, under the title $SASSY.',
+    },
+  },
 ];
 
 // The Radbros, rendered in 3D with transparent backgrounds.
