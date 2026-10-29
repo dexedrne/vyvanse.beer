@@ -79,6 +79,7 @@ export function createInput({ act, mode, onScheme, phone = () => false, wheel = 
 
   // ---- keyboard ----
   const editable = (el) => el?.closest?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]');
+  const keyTurns = new Map();
   const KEYS = {
     ArrowLeft: 'left',
     ArrowRight: 'right',
@@ -125,6 +126,11 @@ export function createInput({ act, mode, onScheme, phone = () => false, wheel = 
     }
     if (!name) return;
     if (e.repeat && !['left', 'right', 'up', 'down'].includes(name)) return;
+    if (['left','right','up','down'].includes(name)) {
+      const now=performance.now();
+      if (e.repeat && now-(keyTurns.get(name) ?? -Infinity)<160) { e.preventDefault();return; }
+      keyTurns.set(name,now);
+    }
     if (name === 'ok') enterHeld = true;
     if (act(name, { from: 'kb', event: e, phase: name === 'ok' ? 'down' : undefined }) !== false) e.preventDefault();
   });
@@ -195,7 +201,7 @@ export function createInput({ act, mode, onScheme, phone = () => false, wheel = 
       for (const [i, name] of Object.entries(STANDARD)) if (+i !== 3 && pressed(+i)) act(name, { from: 'pad', pad: gp, phase:+i===0?'down':undefined });
       if (was[0] && !now2[0]) act('ok-release',{from:'pad',pad:gp});
       // Menu held on its own: 'grab' (and its release is then not a 'start', if grab was taken)
-      if (!phone() && mh && now2[9] && !both && !mh.done && now - mh.t > GRAB_MS) mh.done = act('grab', { from: 'pad', pad: gp }) === false ? 'no' : 'yes';
+      if ((!phone() || wheel()) && mh && now2[9] && !both && !mh.done && now - mh.t > GRAB_MS) mh.done = act('grab', { from: 'pad', pad: gp }) === false ? 'no' : 'yes';
       for (const [i, name] of Object.entries(PAIR)) {
         if (was[i] && !now2[i] && !both && !(+i === 9 && mh?.done === 'yes')) act(phone() && +i === 9 ? 'music' : name, { from: 'pad', pad: gp });
       }
