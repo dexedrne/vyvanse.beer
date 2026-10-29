@@ -499,7 +499,7 @@ function edition(to) {
 
 // keep the picked cartridge in view in the phone's swipe row (scroll the row, not the page)
 function keepInView(el) {
-  if (el?.closest('.panel--games')) return;
+  if (el?.closest('.panel--games') && wheelActive()) return;
   const sc = el?.closest('.carts, .tgroups');
   if (!sc || sc.scrollWidth <= sc.clientWidth) return;
   const r = el.getBoundingClientRect();
@@ -967,6 +967,8 @@ function act(name, info = {}) {
     if ((name === 'up' || name === 'down') && SHELF[S.games].length === 1) return motion.jumpSection(name === 'down' ? 1 : -1);
   }
   if (moving) {
+    if (name === 'wall-cue' || name === 'wall-open') return;
+    if (name === 'wall-close') return resetOrder(moving.tab);
     if (name === 'left' || name === 'right') return nudgeMove(name === 'left' ? -1 : 1);
     if (['up', 'down', 'edprev', 'ednext'].includes(name)) return;
     if (name === 'ok' || name === 'start' || name === 'grab') return dropMove();
@@ -1275,7 +1277,7 @@ screen.addEventListener('pointerdown', e => {
     if(!moving){motion?.closeWall();grab();}
     if(Math.abs(e.clientX-stepX)>80){nudgeMove(e.clientX>stepX?1:-1);stepX=e.clientX;}
   };
-  wallHoldTimer=setTimeout(()=>{held=true;wallHeldAt=performance.now();motion?.openWall();},500);
+  wallHoldTimer=setTimeout(()=>{held=true;swipeBlocked=true;wallHeldAt=performance.now();motion?.openWall();},500);
   screen.addEventListener('pointermove',track,{passive:true});
   screen.addEventListener('pointerup',cancel,{once:true});screen.addEventListener('pointercancel',cancel,{once:true});
 },{passive:true});
