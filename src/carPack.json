@@ -1,0 +1,1253 @@
+{
+  "version": "2026-10-29",
+  "archive": "cars-all-2026-10-29.zip",
+  "sourceCommit": "7666e1d0add6e905b50b27636438b0c5aa9b99f1",
+  "modelCount": 46,
+  "fileCount": 49,
+  "models": [
+    {
+      "id": "sov07",
+      "file": "lada-2107-1979.glb",
+      "realCar": "Lada 2107",
+      "gameName": "Zhiguli 1.5",
+      "year": 1979,
+      "gameYear": 1979,
+      "bytes": 7199660,
+      "sha256": "1bf3be255f7678f919ffa951e02f6d93c9c93c13124eb7309fc29303344c4ebf",
+      "source": "cars/sov07.glb",
+      "sourceSha256": "ec71deed047d8f6baa2746d9b3d1026ea6eac2e2ae8acf6dccc5043e7919101c",
+      "credits": [
+        {
+          "id": "sov07-owner",
+          "title": "Lada 2107",
+          "author": "Aslan",
+          "authorUrl": "https://sketchfab.com/Aslan_",
+          "sourceUrl": "https://sketchfab.com/3d-models/lada-2107-55bd23c141284e758e4eacc01df14037",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "saab900",
+      "file": "saab-900-gle-1979.glb",
+      "realCar": "Saab 900 GLE",
+      "gameName": "N Boreal 2.1",
+      "year": 1979,
+      "gameYear": 1992,
+      "bytes": 3854276,
+      "sha256": "e6f350433c4a000282bf925544ac8f43d289896af614cbdc5bceda4bbe032e30",
+      "source": "cars/saab900.glb",
+      "sourceSha256": "ee0113538fe0a311dea610959cc6515113c5172732228b61303c09651c975b3a",
+      "credits": [
+        {
+          "id": "saab900-owner",
+          "title": "Saab 900 combi GLE 1979",
+          "author": "Nieve5677",
+          "authorUrl": "https://sketchfab.com/iori308408",
+          "sourceUrl": "https://sketchfab.com/3d-models/saab-900-combi-gle-1979-a4adffbfe10247dd8f1ea47e6ab946eb",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "supra70",
+      "file": "toyota-supra-turbo-1987.glb",
+      "realCar": "Toyota Supra Turbo (MA70)",
+      "gameName": "T Meridian 3.0T",
+      "year": 1987,
+      "gameYear": 1987,
+      "bytes": 3184996,
+      "sha256": "b6d9f7c237f95488519e1ae6fb00c9831843e365edb67f54c4f466f67bf1f2f9",
+      "source": "cars/supra70.glb",
+      "sourceSha256": "4926fe2f997059da50d145bf25f61e12c5813c310b59be101e3080a4c3138785",
+      "credits": [
+        {
+          "id": "supra70-owner",
+          "title": "1987 Toyota Supra Turbo",
+          "author": "tonielpro520",
+          "authorUrl": "https://sketchfab.com/tonielpro520",
+          "sourceUrl": "https://sketchfab.com/3d-models/1987-toyota-supra-turbo-f3cb2d62134144c6b8bec82514f97d08",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; original cabin, removable roof panel and pop-up housings retained"
+        }
+      ]
+    },
+    {
+      "id": "efciv",
+      "file": "honda-civic-dx-hatchback-1989.glb",
+      "realCar": "Honda Civic DX hatchback",
+      "gameName": "H Parish 1.5 Hatch",
+      "year": 1989,
+      "gameYear": 1989,
+      "bytes": 11747036,
+      "sha256": "cfe8cb65037ccff4b2681e4a60608217f525a782cfe66f31e82408573c9e4277",
+      "source": "cars/efciv.glb",
+      "sourceSha256": "472ae405f771aa70100c596e03f5a428b365f0c978102dd6a63366fa0b0787ef",
+      "credits": [
+        {
+          "id": "efciv-owner",
+          "title": "1989 Honda Civic DX Hatchback",
+          "author": "outpiston",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/7655ee9ebb5e4db791001b5a69e6e491",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges and plate lettering removed, scaled, optimised, split for the game; interior fittings and material finishes repaired from photo references"
+        }
+      ]
+    },
+    {
+      "id": "fc3s",
+      "file": "mazda-rx-7-1989.glb",
+      "realCar": "Mazda RX-7 (FC3S)",
+      "gameName": "M Gyre 1.3",
+      "year": 1989,
+      "gameYear": 1989,
+      "bytes": 7608136,
+      "sha256": "10fc7401454f4122eda168e97d0217d29e5b5e6bdfd6ccbc30bbbca6e7568a0a",
+      "source": "cars/fc3s.glb",
+      "sourceSha256": "b3b5c5852b88a22fe059f5a6497ecf6cd2bffa3f87da2a921f27c8af4cb462ff",
+      "credits": [
+        {
+          "id": "fc3s-owner",
+          "title": "1989 Mazda Savanna RX-7 Infini III (FC3S)",
+          "author": "Ddiaz Design",
+          "authorUrl": "https://sketchfab.com/ddiaz",
+          "sourceUrl": "https://sketchfab.com/3d-models/1989-mazda-savanna-rx-7-infini-iii-fc3s-3d2746f5446344628ce1559044ca3572",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges, lettering, edition script and wheel-centre marks removed; body recoloured black through the paint material; calibrated, split into doors, bonnet and its own pop-up lamp pods (hinged to open) and reduced for the game; original cabin, glass, lamps, spoiler and alloys retained; working cabin controls fitted; mesh gate: owner-approved with known findings"
+        }
+      ]
+    },
+    {
+      "id": "miata",
+      "file": "mazda-mx-5-miata-1990.glb",
+      "realCar": "Mazda MX-5 Miata (NA)",
+      "gameName": "M Skiff 1.6",
+      "year": 1990,
+      "gameYear": 1990,
+      "bytes": 2567592,
+      "sha256": "9b7e4c9bdd07ce7922ef2c4ddd196e9b7c60e4ac5ed7db69b4e9e89be66a840c",
+      "source": "cars/miata.glb",
+      "sourceSha256": "31423948a3e5400972a24f9146b08acba91bbba2619a20d9acbc9d69dc1beb83",
+      "credits": [
+        {
+          "id": "miata-na",
+          "title": "1990 Mazda Miata NA",
+          "author": "ngon_3d",
+          "authorUrl": "https://sketchfab.com/ngon_3d",
+          "sourceUrl": "https://sketchfab.com/3d-models/1990-mazda-miata-na-7acee5044310499f85df631b203227b5",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; source open cabin retained"
+        },
+        {
+          "id": "miata-hardtop",
+          "title": "Mazda MX-5 Miata Hardtop LOW POLY",
+          "author": "Royd45",
+          "authorUrl": "https://sketchfab.com/Royd45",
+          "sourceUrl": "https://sketchfab.com/3d-models/mazda-mx-5-miata-hardtop-low-poly-40309bd5dce744638391c0e94a8595ba",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "hardtop shell, lining, seals, rear glazing and folded canvas stack extracted, scaled, fitted and optimised for the Skiff"
+        },
+        {
+          "id": "miata-softtop",
+          "title": "Mazda Miata",
+          "author": "JakobOlbracht",
+          "authorUrl": "https://sketchfab.com/JakobOlbracht",
+          "sourceUrl": "https://sketchfab.com/3d-models/mazda-miata-925fa466d92b4393813491d81731cb27",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "raised soft top and rear window extracted, scaled, fitted and optimised for the Skiff; opaque canvas and transparent glazing adapted for the game"
+        },
+        {
+          "id": "skiff90",
+          "title": "low poly mazda mx-5 miata na (UPDATE)",
+          "author": "Speedy-Works",
+          "authorUrl": "https://sketchfab.com/Speedy-Works",
+          "sourceUrl": "https://sketchfab.com/3d-models/low-poly-mazda-mx-5-miata-na-update-819982eac6944241be32c62343c4d530",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, retextured, optimised"
+        }
+      ]
+    },
+    {
+      "id": "s13hatch",
+      "file": "nissan-180sx-1990.glb",
+      "realCar": "Nissan 180SX",
+      "gameName": "D Holt 1.8T Liftback",
+      "year": 1990,
+      "gameYear": 1990,
+      "bytes": 13310204,
+      "sha256": "0167b99c9993e719e82d4477566d4f85d95ca9ae769a4cc77fc0c45321b17d26",
+      "source": "cars/s13hatch.glb",
+      "sourceSha256": "21d614abe3f4b82846646890830ffd6e0a0e17542e0063071c12fa48aa9d6a10",
+      "credits": [
+        {
+          "id": "s13hatch-owner",
+          "title": "Nissan 180sx FREE",
+          "author": "autoNgraphic",
+          "authorUrl": "https://sketchfab.com/autoNgraphic",
+          "sourceUrl": "https://sketchfab.com/3d-models/b37cea6e8a864a2aa602934ddb0e6ff0",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; original fastback roof, glass, lamps, body kit and cabin retained; Holt cabin controls and service assets fitted; cage tubes, sleeves and rear bar removed; plain stock seats fitted from the credited Holt coupe cabin"
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "file": "nissan-silvia-ks-1990.glb",
+      "realCar": "Nissan Silvia K\u2019s (S13)",
+      "gameName": "D Holt 1.8T",
+      "year": 1990,
+      "gameYear": 1990,
+      "bytes": 3159140,
+      "sha256": "8577a900daa482973fcd22ac9ad2b8770cf1eaccf04dd86686e4348678f462e0",
+      "source": "cars/s13.glb",
+      "sourceSha256": "cb2d74ee780cb9011227e89a18d9e6193bebc82e0c9374e4bf76e45b04915f52",
+      "credits": [
+        {
+          "id": "s13-owner",
+          "title": "1990 Nissan Silvia K's Diamond Selection (S13)",
+          "author": "outpiston",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/1990-nissan-silvia-ks-diamond-selection-s13-a544d0fa26e241fa8e0b27dcb627afd1",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; working cabin controls and service assets fitted"
+        }
+      ]
+    },
+    {
+      "id": "volvo240",
+      "file": "volvo-240-1990.glb",
+      "realCar": "Volvo 240",
+      "gameName": "V Tegel 2.3",
+      "year": 1990,
+      "gameYear": 1992,
+      "bytes": 8847200,
+      "sha256": "dddd030f05f4c45b9aaba69c27ee3785a064ed756c165af4d2b8c881f90398a9",
+      "source": "cars/volvo240.glb",
+      "sourceSha256": "bba444497a1e8371eb4362fd29e382b7f3c932427964b279c060e6dbe8bb7410",
+      "credits": [
+        {
+          "id": "volvo240-realwallon",
+          "title": "Volvo 240",
+          "author": "realwallon",
+          "authorUrl": "https://sketchfab.com/realwallon",
+          "sourceUrl": "https://sketchfab.com/3d-models/volvo-240-d90d42c494104fcdb174c4f28a523562",
+          "licence": "Sketchfab Free Standard licence",
+          "licenceUrl": "https://sketchfab.com/licenses",
+          "modified": "badges and plate text removed, retextured, scaled, split and optimised"
+        },
+        {
+          "id": "tegel240t",
+          "title": "Low Poly Volvo 240",
+          "author": "yokatann",
+          "authorUrl": "https://sketchfab.com/yokatann",
+          "sourceUrl": "https://sketchfab.com/3d-models/low-poly-volvo-240-d3b36d0e2cf94bd08cded7745ed97a65",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, scaled, retextured and optimised; sunroof retained"
+        }
+      ]
+    },
+    {
+      "id": "kante",
+      "file": "porsche-944-turbo-1991.glb",
+      "realCar": "Porsche 944 Turbo",
+      "gameName": "P Kante 2.5",
+      "year": 1991,
+      "gameYear": 1986,
+      "bytes": 3710176,
+      "sha256": "2961e664735ec02e3d736ea4ab83a6acabdc9d72d9c8d4a633d1b155d9e3905d",
+      "source": "cars/kante.glb",
+      "sourceSha256": "7d5a7e52f41326bc3bc342ae49c15fc8032b4a3406bb9bb2f26673515ede2ab9",
+      "credits": [
+        {
+          "id": "kante-owner",
+          "title": "1991 Porsche 944 Turbo",
+          "author": "supercarmodels",
+          "authorUrl": "https://sketchfab.com/supercarmodels",
+          "sourceUrl": "https://sketchfab.com/3d-models/1991-porsche-944-turbo-570249cd14c342ea947b05fee05245d9",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "civic92h",
+      "file": "honda-civic-sir-hatchback-1992.glb",
+      "realCar": "Honda Civic SiR hatchback (EG)",
+      "gameName": "H Parish 1.6R Hatch",
+      "year": 1992,
+      "gameYear": 1992,
+      "bytes": 5183004,
+      "sha256": "775c2a511acc350adeed6b1c8d57b7d4a7d33b27c526bd8fca041fd24d99451f",
+      "source": "cars/civic92h.glb",
+      "sourceSha256": "98ef7756a38b4fa14bbc934cf0e55259e0fcc33da3549e36ec86e622f18e497d",
+      "credits": [
+        {
+          "id": "civic92h-owner",
+          "title": "1992 Honda Civic SiR II (EG)",
+          "author": "outpiston",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/6da0242475be43649237efa16ea1061f",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "hush",
+      "file": "lexus-es-300-1992.glb",
+      "realCar": "Lexus ES 300",
+      "gameName": "L Hush 3.0",
+      "year": 1992,
+      "gameYear": 1992,
+      "bytes": 6029144,
+      "sha256": "ca0eee6beca359def96b91d27d4b2d957d63fc7bffcfc230f7fc57db7f981a57",
+      "source": "cars/hush.glb",
+      "sourceSha256": "35d187f57b002540fcc327b9f09106655610a3c2a39b85bcd1d5fd92ab8a6d22",
+      "credits": [
+        {
+          "id": "hush-owner",
+          "title": "1992 Lexus ES 300",
+          "author": "outpiston",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/1992-lexus-es-300-a3dfa45bd50a44c68b6ab205af7bc327",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; source rear interior retained; local sunroof opening and tilt/slide kit fitted"
+        }
+      ]
+    },
+    {
+      "id": "e36cabrio",
+      "file": "bmw-3-series-e36-cabrio-1993.glb",
+      "realCar": "BMW 3 Series (E36) Cabrio",
+      "gameName": "B Kessel 2.8 Cabrio",
+      "year": 1993,
+      "gameYear": 1993,
+      "bytes": 8129948,
+      "sha256": "284e2a02cbdd8a7371c43f00480a4adcaecf79b9c5325f885df0591c86b90665",
+      "source": "cars/e36cabrio.glb",
+      "sourceSha256": "61a4ba32a466775d74bade10cdbe6c2895c21101f6468711170d10f567e51fd5",
+      "credits": [
+        {
+          "id": "e36cabrio-owner",
+          "title": "BMW E36 Cabrio 1990-1999",
+          "author": "szymonpasterczyk",
+          "authorUrl": "https://sketchfab.com/szymonpasterczyk",
+          "sourceUrl": "https://sketchfab.com/3d-models/08475fd3c85b4337ad052a94ea045139",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "rook93",
+      "file": "ford-mustang-gt-1993.glb",
+      "realCar": "Ford Mustang GT (Fox body)",
+      "gameName": "F Rook 5.0",
+      "year": 1993,
+      "gameYear": 1993,
+      "bytes": 4578184,
+      "sha256": "f422e5ec43d8f799fd0b8e791c735b9cff6bc3991658c1733ab641cee0d0b785",
+      "source": "cars/rook93.glb",
+      "sourceSha256": "d5066386eb165d9c4da5b88395cfe560f6c605df65977bccafdcaa700b65a268",
+      "credits": [
+        {
+          "id": "rook93-owner",
+          "title": "1993 Ford Mustang GT (Foxbody)",
+          "author": "Randomness",
+          "authorUrl": "https://sketchfab.com/jvfrhrbf9435793",
+          "sourceUrl": "https://sketchfab.com/3d-models/1993-ford-mustang-gt-foxbody-7055b5b23f454cceb7664e011c7e5478",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "civic93c",
+      "file": "honda-civic-coupe-1993.glb",
+      "realCar": "Honda Civic coupe (EJ1)",
+      "gameName": "H Parish '93 Coupe 1.6",
+      "year": 1993,
+      "gameYear": 1993,
+      "bytes": 5840296,
+      "sha256": "30bcf095497e7df11c8ac8483e1040d28c764428f375d80572a64eb5034b615b",
+      "source": "cars/civic93c.glb",
+      "sourceSha256": "36bb357bb1973dfc8006edbcc4541800143cc3081d12d07e6b743f6dcbed84cf",
+      "credits": [
+        {
+          "id": "civic93c",
+          "title": "Honda Civic EJ1 Coupe",
+          "author": "0verly",
+          "authorUrl": "https://sketchfab.com/0verly",
+          "sourceUrl": "https://sketchfab.com/3d-models/honda-civic-ej1-coupe-f57a01c50c314ad893b8255047f24c20",
+          "licence": "CC BY-NC 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc/4.0/",
+          "modified": "badges removed, optimised, split for the game; stock ride height and wheels; source rear interior retained"
+        }
+      ]
+    },
+    {
+      "id": "taco22r",
+      "file": "toyota-hilux-single-cab-1993.glb",
+      "realCar": "Toyota Hilux single cab",
+      "gameName": "Tether Stave 2.4",
+      "year": 1993,
+      "gameYear": 1993,
+      "bytes": 13323228,
+      "sha256": "34d5a9b0e2fd140c2390dc5df150cd0868c26b61240cebbe3b45dac0bf28c403",
+      "source": "cars/taco22r.glb",
+      "sourceSha256": "76d07c55edc428b33796cf608018a99dff58a431b89b65b4cf91d2e58d07ad4b",
+      "credits": [
+        {
+          "id": "taco22r-owner",
+          "title": "Toyota Hilux Single Cab",
+          "author": "David_Holiday",
+          "authorUrl": "https://sketchfab.com/David_Holiday",
+          "sourceUrl": "https://sketchfab.com/3d-models/7fed88b9da584b1a95c8cc1bb176c169",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; scale, paint, live controls and service fit; interior fittings and material finishes repaired from photo references"
+        }
+      ]
+    },
+    {
+      "id": "integra94lsauto",
+      "file": "acura-integra-ls-1994-auto.glb",
+      "realCar": "Acura Integra LS automatic",
+      "gameName": "H Fugue 1.8L Auto",
+      "year": 1994,
+      "gameYear": 1994,
+      "bytes": 3620136,
+      "sha256": "38b1f402112d1f2bab9477e7c6a6806e3a23f6c32c74adfdf4e13f741c802692",
+      "source": "cars/integra94lsauto.glb",
+      "sourceSha256": "390a5cf5a0f207dbea4893c788360b6a825454c33a1d9c0de843980e5bf94949",
+      "credits": [
+        {
+          "id": "integra98-owner",
+          "title": "2001 Acura Integra Type-R",
+          "author": "OUTPISTON",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/2001-acura-integra-type-r-343a13e17f544a788b9b02fbfc6c58b7",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; retained performance exterior and US cabin; ordinary manual/automatic derived by removing the rear wing and front lip"
+        },
+        {
+          "id": "integra98-jdm-cabin",
+          "title": "1995 Honda Integra Type R",
+          "author": "OUTPISTON",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/1995-honda-integra-type-r-524a8569a5da47c580d2f63e34ba34de",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "Japanese dashboard, console and original red seats extracted, rigidly fitted, branding erased; paired with the retained source cards and rear furniture"
+        }
+      ]
+    },
+    {
+      "id": "integra94ls",
+      "file": "acura-integra-ls-1994.glb",
+      "realCar": "Acura Integra LS",
+      "gameName": "H Fugue 1.8L",
+      "year": 1994,
+      "gameYear": 1994,
+      "bytes": 3615668,
+      "sha256": "e40e8eb825307fb358f59065dbb871a52e33d4b17cf9bdf3cc7e8a09c1d7200d",
+      "source": "cars/integra94ls.glb",
+      "sourceSha256": "e619078b2511350bfa6a58dfb8926ee8d1b58ed73e5364d1b16b0ee95a3ab302",
+      "credits": [
+        {
+          "id": "integra98-owner",
+          "title": "2001 Acura Integra Type-R",
+          "author": "OUTPISTON",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/2001-acura-integra-type-r-343a13e17f544a788b9b02fbfc6c58b7",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; retained performance exterior and US cabin; ordinary manual/automatic derived by removing the rear wing and front lip"
+        },
+        {
+          "id": "integra98-jdm-cabin",
+          "title": "1995 Honda Integra Type R",
+          "author": "OUTPISTON",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/1995-honda-integra-type-r-524a8569a5da47c580d2f63e34ba34de",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "Japanese dashboard, console and original red seats extracted, rigidly fitted, branding erased; paired with the retained source cards and rear furniture"
+        }
+      ]
+    },
+    {
+      "id": "cinderbus",
+      "file": "generic-town-bus-1995.glb",
+      "realCar": "Generic town bus",
+      "gameName": "Cinderline City 12",
+      "year": 1995,
+      "gameYear": 1995,
+      "bytes": 10781228,
+      "sha256": "10d982d86952b20ea40099e3214e995c507183df1918d42a5540d4868dbb5db0",
+      "source": "cars/cinderbus.glb",
+      "sourceSha256": "b8576b460bc70bf8e5a6539139331be36595d159318c25da6c46d2071a13e98e",
+      "credits": [
+        {
+          "id": "cinderbus",
+          "title": "Generic Town Bus",
+          "author": "own.guest",
+          "authorUrl": "https://sketchfab.com/own.guest",
+          "sourceUrl": "https://sketchfab.com/3d-models/14fe03d792914d51b6c6250b393c44fd",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "source body and shaped passenger seats retained; source markings removed; rounded driver seat, flat wheel, live gauges, pedals, door linkage and overhead mirror fitted; traffic LODs regenerated"
+        }
+      ]
+    },
+    {
+      "id": "saltbox",
+      "file": "lct-3000-parcel-truck-1995.glb",
+      "realCar": "LCT 3000 parcel truck",
+      "gameName": "Saltreach Parcel 30",
+      "year": 1995,
+      "gameYear": 1995,
+      "bytes": 8534076,
+      "sha256": "89059bcaf17c863679e06beb89cd90df4c3b5885296754f28742f41db257c42c",
+      "source": "cars/saltbox.glb",
+      "sourceSha256": "52cebc0beafd6d0a2d7cae0702147250640b907f5b8f44440a2f1e651ecb1be5",
+      "credits": [
+        {
+          "id": "saltbox",
+          "title": "LCT 3000 95 - Low poly model",
+          "author": "DanielZhabotinsky",
+          "authorUrl": "https://sketchfab.com/DanielZhabotinsky",
+          "sourceUrl": "https://sketchfab.com/3d-models/663a0953c038434a918cb85725c88ffa",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "source body retained; markings removed; scaled and optimised; driving controls, traffic LODs and city work fittings added"
+        }
+      ]
+    },
+    {
+      "id": "shortbus",
+      "file": "school-bus-1995.glb",
+      "realCar": "School bus",
+      "gameName": "Applewick School 6",
+      "year": 1995,
+      "gameYear": 1995,
+      "bytes": 11324284,
+      "sha256": "d6892b1455ac42b25570c36f3472d0c5ed98e8a10b4ad4ffa68b22a567396abc",
+      "source": "cars/shortbus.glb",
+      "sourceSha256": "ad8eaa0592451e0d55cd1fef7ad359cdba921cfc7d01dc1bcb23b3f9ae8b3842",
+      "credits": [
+        {
+          "id": "shortbus",
+          "title": "School Bus",
+          "author": "Jay0123",
+          "authorUrl": "https://sketchfab.com/Jay0123",
+          "sourceUrl": "https://sketchfab.com/3d-models/school-bus-9fd02ae207d340d08f00d28cf233982c",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "reviewed source shortened to three passenger bays; original cab, entry, rear exit, arch geometry, dual tyres, mirrors, glazing and retained benches; matched pillar cuts, suspension clearance, fictional livery and live controls"
+        }
+      ]
+    },
+    {
+      "id": "e36coupe",
+      "file": "bmw-328i-coupe-1996.glb",
+      "realCar": "BMW 328i coupe (E36)",
+      "gameName": "B Kessel 2.8c",
+      "year": 1996,
+      "gameYear": 1993,
+      "bytes": 5265152,
+      "sha256": "afbde45e1227f0ad8cb08cd6f3160dd2a66f6f5e5569d97a5e796f732baa2f2f",
+      "source": "cars/e36coupe.glb",
+      "sourceSha256": "5bccb47a07c2a04ed9de7de3480642ad27ddbc5391a54f440baba65df6bafe38",
+      "credits": [
+        {
+          "id": "e36coupe-owner",
+          "title": "BMW E36 M3",
+          "author": "TinoD2",
+          "authorUrl": "https://sketchfab.com/TinoD2",
+          "sourceUrl": "https://sketchfab.com/3d-models/bmw-e36-m3-762b90efd3dc413cb61c3e3c8097b8ac",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "civic96c",
+      "file": "honda-civic-hx-coupe-1996.glb",
+      "realCar": "Honda Civic HX coupe",
+      "gameName": "H Parish VI Coupe 1.6E",
+      "year": 1996,
+      "gameYear": 1996,
+      "bytes": 4786472,
+      "sha256": "2c3fbba5e1eb2f064e90904ed1bdfdae800a35cba922596ab796daf65015fa67",
+      "source": "cars/civic96c.glb",
+      "sourceSha256": "ed2e17a2750300e941fd321910868023ed5d20cf97373a56072e9f3f08bd68ad",
+      "credits": [
+        {
+          "id": "civic96c-owner",
+          "title": "1996 Honda Civic HX Coupe",
+          "author": "outpiston",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/1996-honda-civic-hx-coupe-0241b902a54440d78808aa1fe0db636c",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; scaled, working cabin controls and service assets fitted",
+          "cars": [
+            "civic96c"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e38li",
+      "file": "bmw-750il-1997.glb",
+      "realCar": "BMW 750iL (E38)",
+      "gameName": "B Kron 5.4L",
+      "year": 1997,
+      "gameYear": 1998,
+      "bytes": 7337540,
+      "sha256": "0bf8f98cbb6ffcb183473b48d48a9391c5fd981e07d741ec57e1b2260e598fa9",
+      "source": "cars/e38li.glb",
+      "sourceSha256": "bc8e72d49b81c7250b7acfb7237c4023b3b22474d7f3969e040e00e06473942c",
+      "credits": [
+        {
+          "id": "e38li-owner",
+          "title": "1997 BMW 750iL (E38)",
+          "author": "DisneyCars",
+          "authorUrl": "https://sketchfab.com/supercarmodels",
+          "sourceUrl": "https://sketchfab.com/3d-models/1997-bmw-750il-e38-327493267ab348ce98d60c5385798bd7",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; source surface normals restored after reduction, wheels calibrated; original long-wheelbase body and cabin retained"
+        }
+      ]
+    },
+    {
+      "id": "civic97ex",
+      "file": "honda-civic-ex-1997.glb",
+      "realCar": "Honda Civic EX sedan",
+      "gameName": "H Parish 1.6 EX",
+      "year": 1997,
+      "gameYear": 1997,
+      "bytes": 4181148,
+      "sha256": "bab9508806f5f46d2c69ae3eed0a49cbdeb6979e54ed927a86f9816c2fdab9d3",
+      "source": "cars/civic97ex.glb",
+      "sourceSha256": "bca4b66eb95a0e876d911d08395a6c2ae05b1a011c4d7f69cfde63bdf1c20521",
+      "credits": [
+        {
+          "id": "civic97ex-faffdf",
+          "title": "Honda Civic Sedan",
+          "author": "faffdf",
+          "authorUrl": "https://sketchfab.com/faffdf",
+          "sourceUrl": "https://sketchfab.com/3d-models/none-d2351585a3c34030a1041f4483b11203",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges and lettering removed; facelift four-door body, panes, lamps and sunroof pane fitted to the Parish contacts and split for the game as the Parish 1.6 EX; its own interior and wheels replaced by the credited Parish cabin and unbranded house wheels; mesh gate: owner-approved with known intersections (the download's coincident panel and glass shells cross each other; see tools/carqa-owner-approved.json)"
+        },
+        {
+          "id": "civic97-cabin",
+          "title": "2000 Honda Civic",
+          "author": "5spokehubcap",
+          "authorUrl": "https://sketchfab.com/5spokehubcap",
+          "sourceUrl": "https://sketchfab.com/3d-models/2000-honda-civic-ee33696a9a8343ac8da48075c023a840",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "four-door seats, cards, belts and carpet fitted to the Parish cabin; exterior and later dashboard excluded"
+        }
+      ]
+    },
+    {
+      "id": "civic97",
+      "file": "honda-civic-lx-1997.glb",
+      "realCar": "Honda Civic LX sedan",
+      "gameName": "H Parish 1.6",
+      "year": 1997,
+      "gameYear": 1997,
+      "bytes": 3175740,
+      "sha256": "639baa0c91ecefa3fca6b754410f567a8d076dc92900920664554c97505b4759",
+      "source": "cars/civic97.glb",
+      "sourceSha256": "2b6a325d23baf99050eb7338f1cc5e4f55c792f7eb39b82f0b26ef801bb2da0f",
+      "credits": [
+        {
+          "id": "civic97-lx",
+          "title": "1997 Honda Civic LX",
+          "author": "Bobby.2024",
+          "authorUrl": "https://sketchfab.com/Bobby.2024",
+          "sourceUrl": "https://sketchfab.com/3d-models/1997-honda-civic-lx-f9b7ed4d1d4d4996b612007c4e8ec568",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, new wheels, optimised, split for the game"
+        },
+        {
+          "id": "civic97-cabin",
+          "title": "2000 Honda Civic",
+          "author": "5spokehubcap",
+          "authorUrl": "https://sketchfab.com/5spokehubcap",
+          "sourceUrl": "https://sketchfab.com/3d-models/2000-honda-civic-ee33696a9a8343ac8da48075c023a840",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "four-door seats, cards, belts and carpet fitted to the Parish cabin; exterior and later dashboard excluded"
+        }
+      ]
+    },
+    {
+      "id": "luft",
+      "file": "porsche-911-carrera-s-1997.glb",
+      "realCar": "Porsche 911 Carrera S (993)",
+      "gameName": "P Luft 3.6",
+      "year": 1997,
+      "gameYear": 1995,
+      "bytes": 4759544,
+      "sha256": "2e083d163e4793d1496509dbcbd4abbcc7ccfc33d9560f4da8f87e38a7db0e37",
+      "source": "cars/luft.glb",
+      "sourceSha256": "d08720dfd5ed9a5aaf00fe4c7d181190b33bc8847f4850efc74f27868d44904c",
+      "credits": [
+        {
+          "id": "luft-owner",
+          "title": "1997 Porsche 911 Carrera S (993)",
+          "author": "Ddiaz Design",
+          "authorUrl": "https://sketchfab.com/ddiaz-design",
+          "sourceUrl": "https://sketchfab.com/3d-models/1997-porsche-911-carrera-s-993-b7eb0c467a50436aa4a8e09070af51a0",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "kei",
+      "file": "suzuki-carry-pickup-1997.glb",
+      "realCar": "Suzuki Carry pickup",
+      "gameName": "Tether Mite 660T",
+      "year": 1997,
+      "gameYear": 1997,
+      "bytes": 25667792,
+      "sha256": "8accdb802bbb0bac62a2d6525a0d8099dd30759acf18ea140c5850c30d0e8cc8",
+      "source": "cars/kei.glb",
+      "sourceSha256": "824e96c7c9bf59d0e1cad5ed6a3e16301e6fcec936141b0fe23a62e9945f3707",
+      "credits": [
+        {
+          "id": "kei-owner",
+          "title": "Carry Pickup | Suzuki | Game ready",
+          "author": "by__Rx",
+          "authorUrl": "https://sketchfab.com/by__Rx",
+          "sourceUrl": "https://sketchfab.com/3d-models/e1654a399b9d448a9a7ce200410ac91d",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; interior fittings and material finishes repaired from photo references"
+        }
+      ]
+    },
+    {
+      "id": "diadem",
+      "file": "toyota-camry-1997.glb",
+      "realCar": "Toyota Camry (XV20)",
+      "gameName": "T Diadem 2.2",
+      "year": 1997,
+      "gameYear": 2001,
+      "bytes": 5235092,
+      "sha256": "237283d6b294feb01a12d53654e6b7f1d73da936626b4b8bc66a0cdeb90931d7",
+      "source": "cars/diadem.glb",
+      "sourceSha256": "f3644c6f47f133f2001b2263577c04efa4b6c997f1896b824a6f80042556dc8d",
+      "credits": [
+        {
+          "id": "diadem-owner",
+          "title": "Toyota Camry (Mk4)(XV20) 1997",
+          "author": "Nieve5677",
+          "authorUrl": "https://sketchfab.com/iori308408",
+          "sourceUrl": "https://sketchfab.com/3d-models/toyota-camry-mk4xv20-1997-196829bf4cbc4b8cb26c50964f35ff27",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "integra98",
+      "file": "acura-integra-type-r-1998.glb",
+      "realCar": "Acura Integra Type R",
+      "gameName": "H Fugue 1.8",
+      "year": 1998,
+      "gameYear": 1996,
+      "bytes": 3165520,
+      "sha256": "2e71dcc2ff1b54a4c237c88cfe59371184be5acc1328bc81e93238db803d952c",
+      "source": "cars/integra98.glb",
+      "sourceSha256": "e4f4c7ce4c62f065148585b760fdcbe800c4465345107cf4af7b497884eca7e2",
+      "credits": [
+        {
+          "id": "integra98-owner",
+          "title": "2001 Acura Integra Type-R",
+          "author": "OUTPISTON",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/2001-acura-integra-type-r-343a13e17f544a788b9b02fbfc6c58b7",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; retained performance exterior and US cabin; ordinary manual/automatic derived by removing the rear wing and front lip"
+        },
+        {
+          "id": "integra98-jdm-cabin",
+          "title": "1995 Honda Integra Type R",
+          "author": "OUTPISTON",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/1995-honda-integra-type-r-524a8569a5da47c580d2f63e34ba34de",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "Japanese dashboard, console and original red seats extracted, rigidly fitted, branding erased; paired with the retained source cards and rear furniture"
+        }
+      ]
+    },
+    {
+      "id": "drayman",
+      "file": "ford-e-350-1998.glb",
+      "realCar": "Ford E-350 Club Wagon 7.3 diesel",
+      "gameName": "F Drayman 7.3D",
+      "year": 1998,
+      "gameYear": 1999,
+      "bytes": 5939092,
+      "sha256": "d3c972abbd55bf2b63a9eefebc8b3ea5d91afa1ca0c7a34c3e85226501b44699",
+      "source": "cars/drayman.glb",
+      "sourceSha256": "a827f64bb489e76682d9d6eefd49dabcb2aaa5cf46e9530d090b8892ea6927ea",
+      "credits": [
+        {
+          "id": "drayman-owner",
+          "title": "1998 Ford E350",
+          "author": "mutebsheheri",
+          "authorUrl": "https://sketchfab.com/mutebsheheri",
+          "sourceUrl": "https://sketchfab.com/3d-models/1998-ford-e350-2e9b3305b2764b7ea9e13988ba6633a8",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "accord98",
+      "file": "honda-accord-ex-1998.glb",
+      "realCar": "Honda Accord EX",
+      "gameName": "H Unison 2.3",
+      "year": 1998,
+      "gameYear": 1998,
+      "bytes": 3981968,
+      "sha256": "bfe54044b4a9274fcd72ab9447dce44eab0d991a6192816329b144c4a61c2665",
+      "source": "cars/accord98.glb",
+      "sourceSha256": "92094519799278a2ea18b8cd97f475ea8b1c28200b8e2d10245db1d1adf6108c",
+      "credits": [
+        {
+          "id": "accord98-owner",
+          "title": "1998 Honda Accord EX",
+          "author": "outpiston",
+          "authorUrl": "https://sketchfab.com/outpiston",
+          "sourceUrl": "https://sketchfab.com/3d-models/none-a21e8e23269749cda72de46b0c87daa7",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "civic98h",
+      "file": "honda-civic-type-r-1998.glb",
+      "realCar": "Honda Civic Type R (EK9)",
+      "gameName": "H Parish VI-R Hatch",
+      "year": 1998,
+      "gameYear": 2000,
+      "bytes": 3727924,
+      "sha256": "d631458c45091dcb90c880c40948c1b6238f8f542ee0f1d741be743b75665474",
+      "source": "cars/civic98h.glb",
+      "sourceSha256": "bc50b2278f66f1e9798ecca83cf749970a4145c143170d64c2133cb954700bac",
+      "credits": [
+        {
+          "id": "civic98h-owner",
+          "title": "2000 Honda Civic Type R EK9",
+          "author": "Ddiaz Design",
+          "authorUrl": "https://sketchfab.com/ddiaz-design",
+          "sourceUrl": "https://sketchfab.com/3d-models/2000-honda-civic-type-r-ek9-4012706636b843d49ad3974af8fba593",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; shared prefacelift dashboard also fitted to the Parish sedan and VI Coupe"
+        }
+      ]
+    },
+    {
+      "id": "suv98",
+      "file": "toyota-4runner-1998.glb",
+      "realCar": "Toyota 4Runner",
+      "gameName": "T Cairn 3.4",
+      "year": 1998,
+      "gameYear": 1998,
+      "bytes": 5206400,
+      "sha256": "254081ded014e2848364ad8234dde06572f3fa2e82f3ac1b340b9fe5471e98c6",
+      "source": "cars/suv98.glb",
+      "sourceSha256": "66b4cd9c9227e2938f83de2892c821efd7257b8e5340159693cd7f958ca289b0",
+      "credits": [
+        {
+          "id": "suv98-owner",
+          "title": "Toyota 4Runner (Mk3) 1999",
+          "author": "Nieve5677",
+          "authorUrl": "https://sketchfab.com/iori308408",
+          "sourceUrl": "https://sketchfab.com/3d-models/toyota-4runner-mk3-1999-a59c2f5115b04661af8029a49c6b6d4c",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "e46coupe",
+      "file": "bmw-323ci-coupe-1999.glb",
+      "realCar": "BMW 323Ci coupe (E46)",
+      "gameName": "B Sechs 2.5c",
+      "year": 1999,
+      "gameYear": 2002,
+      "bytes": 5059988,
+      "sha256": "dd24e8d07b19b57f59fb97cb528bbf8e6cb3f28ca626bd9af90943a3ee8ff45f",
+      "source": "cars/e46coupe.glb",
+      "sourceSha256": "57bf1cbbadf1b1fff2796e7ceb233e2c3dd7631844648e435a638f1d6c917e00",
+      "credits": [
+        {
+          "id": "e46coupe-owner",
+          "title": "1999 BMW E46 328i Sport",
+          "author": "Ddiaz Design",
+          "authorUrl": "https://sketchfab.com/ddiaz-design",
+          "sourceUrl": "https://sketchfab.com/3d-models/1999-bmw-e46-328i-sport-5fce3b693344450380b0112a4d21cfe5",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        },
+        {
+          "id": "e46coupe-wheel",
+          "title": "BMW 3 Series (E46) 1998-2005",
+          "author": "Merc_TV (szymonpasterczyk)",
+          "authorUrl": "https://sketchfab.com/szymonpasterczyk",
+          "sourceUrl": "https://sketchfab.com/3d-models/bmw-3-series-e46-1998-2005-f11b5fabe86c49afa54f4998dad8777a",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "one three-spoke sport steering wheel cut from the set, scaled to 380 mm and coloured black for the Sechs 2.5c; emblem replaced"
+        }
+      ]
+    },
+    {
+      "id": "falk",
+      "file": "bmw-m5-2000.glb",
+      "realCar": "BMW M5 (E39)",
+      "gameName": "B Falk 4.9",
+      "year": 2000,
+      "gameYear": 2001,
+      "bytes": 1755344,
+      "sha256": "d46bd4fd6ef38f8dba8164f2466041c11009f245edd1608412fe2b1401f107eb",
+      "source": "cars/falk.glb",
+      "sourceSha256": "83fa9c8cb090ea6a2cbb13f81c66085c470d935d20eda768a111c25dacd80efe",
+      "credits": [
+        {
+          "id": "falk-owner",
+          "title": "BMW M5 (E39)",
+          "author": "GT Cars: Hyperspeed",
+          "authorUrl": "https://sketchfab.com/Car2022",
+          "sourceUrl": "https://sketchfab.com/3d-models/bmw-m5-e39-d3d3e96a4fbf4990af173c5f51b93bd6",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "ody01",
+      "file": "honda-odyssey-ex-2001.glb",
+      "realCar": "Honda Odyssey EX",
+      "gameName": "H Overture 3.5",
+      "year": 2001,
+      "gameYear": 2001,
+      "bytes": 4312240,
+      "sha256": "7915654fd1c7b835e8171b247e1fb614da70dc4593a5e9d296463cc7d8df6491",
+      "source": "cars/ody01.glb",
+      "sourceSha256": "186eae94bef0f90b3c07a8cf512a4794e29c0515644363bff655042d9f9a283a",
+      "credits": [
+        {
+          "id": "ody01-owner",
+          "title": "2001 Honda Odyssey EX",
+          "author": "BHP3D",
+          "authorUrl": "https://sketchfab.com/BHP3D",
+          "sourceUrl": "https://sketchfab.com/3d-models/2001-honda-odyssey-ex-24abc0e850f64705906c910e91a6ac4a",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges and lettering removed, rescaled, optimised, split for the game (doors, sliding doors, tailgate, bonnet, wheels, lamps); original body, glazing, cabin and wheels retained; camper fittings added"
+        }
+      ]
+    },
+    {
+      "id": "pickup96",
+      "file": "toyota-tacoma-double-cab-2001.glb",
+      "realCar": "Toyota Tacoma Double Cab",
+      "gameName": "T Tether 2.7",
+      "year": 2001,
+      "gameYear": 2001,
+      "bytes": 10082088,
+      "sha256": "fc37e16f397510c095e607e001c286bec77b545928f35825245ea6f3e1ed5091",
+      "source": "cars/pickup96.glb",
+      "sourceSha256": "c9a06cf15fb41e7659292cd8e3926816d4f0cf91d84333b267986faf5a4a4964",
+      "credits": [
+        {
+          "id": "pickup96-owner",
+          "title": "Toyota Tacoma Double Cab Limited 2001",
+          "author": "Nieve5677",
+          "authorUrl": "https://sketchfab.com/iori308408",
+          "sourceUrl": "https://sketchfab.com/3d-models/toyota-tacoma-double-cab-limited-2001-b924067a9344490b836d5cdd04308f9c",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        },
+        {
+          "id": "pickup96-period-cabin",
+          "title": "Period utility cabin",
+          "author": "DR1KING100K",
+          "authorUrl": "https://sketchfab.com/DR1KING100K",
+          "sourceUrl": "https://sketchfab.com/3d-models/7de7972902f14b249fd68195e947409c",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "Interior dash, wheel, column controls and door trim fitted to the existing shell; retextured and supplied with live gauges. Exterior retained."
+        },
+        {
+          "id": "pickup96-period-window-crank",
+          "title": "Manual window crank arm",
+          "author": "JKignell",
+          "authorUrl": "https://sketchfab.com/JKignell",
+          "sourceUrl": "https://sketchfab.com/3d-models/803bc4ff9dab4793b49f933b83c65676",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "Reduced and fitted to both front period door cards."
+        }
+      ]
+    },
+    {
+      "id": "e46cabrio",
+      "file": "bmw-3-series-e46-cabrio-2002.glb",
+      "realCar": "BMW 3 Series (E46) Cabrio",
+      "gameName": "B Sechs 2.5 Cabrio",
+      "year": 2002,
+      "gameYear": 2002,
+      "bytes": 3371976,
+      "sha256": "59bf86e8565528d1c0daf64408deac3a0bdd60b09526f7bb631cee5978440b55",
+      "source": "cars/e46cabrio.glb",
+      "sourceSha256": "cd5768d9c0b869502aab54630ea95f5dd4f7ab2e6ad5f9997c5fb292fada2f90",
+      "credits": [
+        {
+          "id": "e46cabrio-owner",
+          "title": "BMW/Alpina M3/B3 (E46) Cabrio 1999-2006",
+          "author": "szymonpasterczyk (DEMON_SCARY1235)",
+          "authorUrl": "https://sketchfab.com/szymonpasterczyk734",
+          "sourceUrl": "https://sketchfab.com/3d-models/ba000d466d3a4417a6b814fe32090fee",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; common Sechs front cabin and wheels retained; source rear cabin retained"
+        }
+      ]
+    },
+    {
+      "id": "g35",
+      "file": "infiniti-g35-sport-coupe-2003.glb",
+      "realCar": "Infiniti G35 Sport Coupe",
+      "gameName": "L Aster 3.5c",
+      "year": 2003,
+      "gameYear": 2003,
+      "bytes": 5619316,
+      "sha256": "1ca1782034418005c4dbc455cef084cee050bec19c7758c4639c5382159c52d3",
+      "source": "cars/g35.glb",
+      "sourceSha256": "fb8071abd5e87988ba5d2ba5ef956da837fb1d9f22609ad5609aab84e2edbb3b",
+      "credits": [
+        {
+          "id": "g35-owner",
+          "title": "2003 Infiniti G35 Sport Coupe",
+          "author": "ddiaz-design",
+          "authorUrl": "https://sketchfab.com/ddiaz-design",
+          "sourceUrl": "https://sketchfab.com/3d-models/e5f2f8a69cfb4edb8765d339ee5bebde",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game; interior fittings and material finishes repaired from photo references"
+        }
+      ]
+    },
+    {
+      "id": "ls430",
+      "file": "lexus-ls-430-2004.glb",
+      "realCar": "Lexus LS 430",
+      "gameName": "L Serene 4.3",
+      "year": 2004,
+      "gameYear": 2004,
+      "bytes": 18085432,
+      "sha256": "d03b7250632c820a749811da3f908b7259be523152e87ca3e090c59423895004",
+      "source": "cars/ls430.glb",
+      "sourceSha256": "bb397a953089ec8ab2de5eeba8b2c2de1e49a928efbeb8bd36b8e6ede721aa2e",
+      "credits": [
+        {
+          "id": "ls430-owner",
+          "title": "Lexus LS430 MK3 2000-2006",
+          "author": "szymonpasterczyk",
+          "authorUrl": "https://sketchfab.com/szymonpasterczyk",
+          "sourceUrl": "https://sketchfab.com/3d-models/6d0660bb631b40f9b74c1dfc4e829393",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; optional roll cage removed; source rims uniformly scaled to 17 inches and fitted with road tyres; functional cabin and V8 service kit fitted; interior fittings and material finishes repaired from photo references"
+        }
+      ]
+    },
+    {
+      "id": "hochsitz",
+      "file": "porsche-cayenne-s-2005.glb",
+      "realCar": "Porsche Cayenne S",
+      "gameName": "P Hochsitz S",
+      "year": 2005,
+      "gameYear": 2024,
+      "bytes": 6296012,
+      "sha256": "7e0f4061c6b60abee1dabc00bba5c39260fc039b20a8b703112c0427c9dfd9f1",
+      "source": "cars/hochsitz.glb",
+      "sourceSha256": "ecf3500c518c67437a14bb693c3a319a3351254fd2b076c7d571e1c2a8d8fca1",
+      "credits": [
+        {
+          "id": "hochsitz-owner",
+          "title": "(Game Ready / PBR) Porsche Cayenne Turbo 2005",
+          "author": "nicocarmo05",
+          "authorUrl": "https://sketchfab.com/nicocarmo05",
+          "sourceUrl": "https://sketchfab.com/3d-models/game-ready-pbr-porsche-cayenne-turbo-2005-0c21727cc75e4ecbb39c4eb5c78991ad",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "fit07",
+      "file": "honda-fit-2007.glb",
+      "realCar": "Honda Fit",
+      "gameName": "O Trellis 1.5",
+      "year": 2007,
+      "gameYear": 2007,
+      "bytes": 7069456,
+      "sha256": "7f4411465cd4d17144f1fa76dd98887b578773c49ee6cc16ed748acada874adf",
+      "source": "cars/fit07.glb",
+      "sourceSha256": "7bef5a2871a97f6666faf656abfe24e7ff77904c8175d7d2dadd1a856b4412e5",
+      "credits": [
+        {
+          "id": "fit07-gd3",
+          "title": "2006 Honda Fit GD3",
+          "author": "kusuma844",
+          "authorUrl": "https://sketchfab.com/kusuma844",
+          "sourceUrl": "https://sketchfab.com/3d-models/2006-honda-fit-gd3-045b9221007747ae87e459710f5287ff",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    },
+    {
+      "id": "wisp12",
+      "file": "toyota-prius-2012.glb",
+      "realCar": "Toyota Prius",
+      "gameName": "T Wisp 1.8 Hybrid",
+      "year": 2012,
+      "gameYear": 2012,
+      "bytes": 2568180,
+      "sha256": "94ff93c9c7cfae86da00f3224c93cccb9f8190f92d1d3dc7cb495089d6565b3b",
+      "source": "cars/wisp12.glb",
+      "sourceSha256": "a94e963a3339e038ee5104ffd47e03e3a895269458465f0c218295f3bc16dfe9",
+      "credits": [
+        {
+          "id": "wisp12",
+          "title": "Toyota Prius 2012",
+          "author": "Doz3",
+          "authorUrl": "https://sketchfab.com/Doz3",
+          "sourceUrl": "https://sketchfab.com/3d-models/toyota-prius-2012-04eaf6b288cc466785365b7d985e3b29",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; blank plates, connected closed tyres and neutral paint/trim atlas"
+        }
+      ]
+    },
+    {
+      "id": "frs13",
+      "file": "scion-fr-s-2013.glb",
+      "realCar": "Scion FR-S",
+      "gameName": "S Spindle 2.0",
+      "year": 2013,
+      "gameYear": 2013,
+      "bytes": 2518608,
+      "sha256": "77289f919c11f5d7d3abbdcefb1218f6d1adea08db06b23eeb9169b78911605f",
+      "source": "cars/frs13.glb",
+      "sourceSha256": "2c59c8613c8619f9dd2eba91957534a6e077e82edb6c7aa48485ffcc192c1e63",
+      "credits": [
+        {
+          "id": "frs13-owner",
+          "title": "scion fr-s",
+          "author": "amogusstrikesback2",
+          "authorUrl": "https://sketchfab.com/amogusstrikesback2",
+          "sourceUrl": "https://sketchfab.com/3d-models/scion-fr-s-191e88b99ed143e5a011dfd4d25c0eea",
+          "licence": "CC BY 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+          "modified": "badges removed, optimised, split for the game; original roof, glass, lamps and rear lining retained; working cabin controls fitted"
+        }
+      ]
+    },
+    {
+      "id": "klinge",
+      "file": "porsche-911-gt3-rs-2019.glb",
+      "realCar": "Porsche 911 GT3 RS (991.2)",
+      "gameName": "P Klinge RS",
+      "year": 2019,
+      "gameYear": 2023,
+      "bytes": 5392596,
+      "sha256": "cb84d4cbfd752fe492495f47929f3a0df7de640027aa77c11d39df4be20ba4ad",
+      "source": "cars/klinge.glb",
+      "sourceSha256": "dfc2f1a1f060a3f4502ba269d72b6b605405bbdc8365c52dc118de96c841657e",
+      "credits": [
+        {
+          "id": "klinge-owner",
+          "title": "2019 Porsche 911 (991.2) GT3 RS",
+          "author": "ddiaz-design",
+          "authorUrl": "https://sketchfab.com/ddiaz-design",
+          "sourceUrl": "https://sketchfab.com/3d-models/2019-porsche-911-9912-gt3-rs-97ea84db846e4945961dffb8b2d7af18",
+          "licence": "CC BY-NC-SA 4.0",
+          "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "modified": "badges removed, optimised, split for the game"
+        }
+      ]
+    }
+  ],
+  "excluded": {
+    "saltlift": "Non-road forklift; outside road car/van/truck/bus pack.",
+    "broadacre": "Farm tractor; outside road car/van/truck/bus pack.",
+    "x3e83": "Modified driving GLB identifies x3e83-owner and source SHA256 6e03b566b6a561ec2079f42e98341c27f7af2f015848535ef8f00809bb0b68f3; CC BY-NC-ND 4.0 source. No modified standalone redistribution grant recorded.",
+    "crv99": "Driving GLB identifies crv99-owner/source SHA256 e7d697accb802542a8c3fe09b7f953311e87fb9f5a3ef8df13197a1f28ff4f0d; author/source identified as GMOD Rip in stored source research. No standalone redistribution grant recorded.",
+    "crv99ex": "Same restricted crv99-owner source as crv99.",
+    "is300": "BlackHorn860 source record grants use in SHITBOX only under Sketchfab Standard; no standalone model redistribution grant recorded.",
+    "accord93": "The active runtime identifies the owner-supplied Assetto Corsa conversion (accord93-ac). Stored source terms say no licence file shipped; free availability and game-owner permission do not establish creator/rightsholder permission for standalone redistribution.",
+    "sn95": "Current accepted raw GLB contains loose source components beneath the car; the game loader additionally drops exterior panel surfaces. Excluded from this standalone pack pending a separately reviewed source/adapter repair; no game geometry changed."
+  },
+  "withheld": [
+    "camper89",
+    "accwag",
+    "regentexplorer",
+    "regentcharger",
+    "regentimpala"
+  ]
+}

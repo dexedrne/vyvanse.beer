@@ -74,9 +74,9 @@ test('rendered packs follow the nine members with a third assets group and worki
     assert.match(card, /<picture><source[^]*?<img class="bro"/);
     assert.match(card, /<a class="play play--sm" href="[^"]+\.zip" download data-act="download"/);
     assert.match(card, /data-more[^]*?<span>contents<\/span>/);
-    if (!card.includes('cars-all.zip')) assert.match(card, /Viral Public License/);
+    if (!card.includes('id="pack-cars"')) assert.match(card, /Viral Public License/);
   }
-  assert.match(cards.find(card => card.includes('cars-all.zip')), /<span class="vh">SHITBOX: <\/span>Cars<\/h3>/);
+  assert.match(cards.find(card => card.includes('id="pack-cars"')), /<span class="vh">SHITBOX: <\/span>Cars<\/h3>/);
   assert.equal([...html.matchAll(/data-gallery-image=/g)].length, Object.values(packGallery).reduce((n, items) => n + new Set(items.map(x => x.thumb)).size, 0));
   assert.match(html, /loading="lazy" decoding="async"/);
   assert.doesNotMatch(html, /originals-1254/);
