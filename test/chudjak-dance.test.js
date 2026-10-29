@@ -11,15 +11,15 @@ function dancer(num = 'chudjak') {
   return { num, root, bones, beat:0, energy:1, waving:false };
 }
 
-test('Chudjak has a small rhythmic arm dance while the other crew keep their idle groove', () => {
+test('Chak dances with his body while the fitted arm poses remain authored by the clip', () => {
   const c=dancer(), other=dancer('85');
-  groove(c, .25); groove(other, .25);
-  assert.ok(c.bones.LeftForeArm.quaternion.angleTo(new THREE.Quaternion()) > .1);
-  assert.equal(other.bones.LeftForeArm.quaternion.angleTo(new THREE.Quaternion()), 0);
-  const first=c.bones.LeftArm.quaternion.clone();
-  for(const b of Object.values(c.bones)) { b.quaternion.identity(); b.position.set(0,0,0); }
-  groove(c, .7);
-  assert.ok(first.angleTo(c.bones.LeftArm.quaternion) > .05);
+  const arms=['LeftShoulder','RightShoulder','LeftArm','RightArm','LeftForeArm','RightForeArm'];
+  for(const name of arms)c.bones[name].quaternion.setFromAxisAngle(new THREE.Vector3(1,0,0),.35);
+  const poses=arms.map(name=>c.bones[name].quaternion.clone());
+  groove(c,.25);groove(other,.25);
+  arms.forEach((name,i)=>assert.ok(c.bones[name].quaternion.angleTo(poses[i])<1e-7,name));
+  assert.ok(c.bones.Head.quaternion.angleTo(new THREE.Quaternion())>.01);
+  assert.ok(other.bones.LeftArm.quaternion.angleTo(new THREE.Quaternion())>0);
 });
 
 test('the dance leaves a waving arm to its authored clip and stays restrained over a full minute', () => {

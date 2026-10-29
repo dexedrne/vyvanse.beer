@@ -7,7 +7,7 @@
 // kept; past KEEP loaded, the ones that haven't been on screen for STALE give their GPU memory
 // back. Until everyone asked for is in, nobody shows, and the page keeps the renders up.
 //
-// Models carry Idle and Big_Wave_Hello. The crew idle to the beat; Chudjak adds a little arm dance.
+// Models carry Idle and Big_Wave_Hello. The crew idle to the beat; fitted arm clips stay intact.
 //
 // The camera is framed so their feet (y = 0) land at FEET of the canvas height, whatever its
 // shape; the page uses that to put their reflection's waterline in the right place.
@@ -361,19 +361,13 @@ export function groove(c, t) {
   rot(c, 'neck', X, 0.05 * bounce * k);
   rot(c, 'Head', X, 0.12 * bounce * k);
   rot(c, 'Head', Z, -0.05 * sway * k);
-  if (!c.waving) {
+  // Chak's fitted clips own the arm chains; the dance only adds torso/head movement.
+  if (!c.waving && c.num !== 'chudjak') {
     rot(c, 'LeftShoulder', Z, 0.09 * Math.max(0, sway) * k);
     rot(c, 'RightShoulder', Z, -0.09 * Math.max(0, -sway) * k);
     rot(c, 'LeftArm', Z, -0.06 * bounce * k);
     rot(c, 'RightArm', Z, 0.06 * bounce * k);
-    if (c.num === 'chudjak') {
-      rot(c, 'LeftArm', X, -.18 - .12 * sway);
-      rot(c, 'RightArm', X, -.18 + .12 * sway);
-      rot(c, 'LeftArm', Z, .16 * sway);
-      rot(c, 'RightArm', Z, .16 * sway);
-      rot(c, 'LeftForeArm', X, -.30 - .16 * Math.sin(ph));
-      rot(c, 'RightForeArm', X, -.30 + .16 * Math.sin(ph));
-    }
+
   }
 }
 

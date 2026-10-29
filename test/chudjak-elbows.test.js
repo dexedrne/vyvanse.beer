@@ -14,10 +14,10 @@ test('Chak elbow and wrist joints run through the repaired arm centres in both e
       for(const child of n.children??[])visit(child,m);
     }
     for(const index of g.scenes[g.scene??0].nodes)visit(index,new THREE.Matrix4());
-    for(const [name,at] of [['LeftForeArm',[.360,.235,-.080]],['RightForeArm',[-.360,.235,-.080]],['LeftHand',[.495,.055,.026]],['RightHand',[-.495,.055,.026]]]){
+    for(const [name,at] of [['LeftForeArm',[.355,.235,-.055]],['RightForeArm',[-.355,.235,-.055]],['LeftHand',[.495,.055,.026]],['RightHand',[-.495,.055,.026]]]){
       assert.ok(world.get(name).distanceTo(new THREE.Vector3(...at))<.002,`${file} ${name}: ${world.get(name).toArray()}`);
     }
-    assert.equal(g.skins[0].joints.length,21);
+    assert.equal(g.skins[0].joints.length,29);
     assert.deepEqual(g.animations.map(a=>a.name).sort(),['Big_Wave_Hello','Casual_Walk','Idle','Lean_Forward_Sprint','Run_02','walk']);
   }
 });
