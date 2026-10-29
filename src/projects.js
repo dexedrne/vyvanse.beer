@@ -982,9 +982,9 @@ export const crew = {
       npcOnly: true,
       face: '/img/chak-face.webp',
       model: '/models/chak.glb',
-      download: { href: '/models/chak-rigged.glb', label: 'rigged and animated .glb', size: '8.2 MB', rigged: true },
+      download: { href: '/models/chak-rigged.glb', label: 'rigged and animated .glb', size: '20.4 MB', rigged: true },
       name: 'Chak',
-      line: 'Chak appears as an NPC in RadQuest (Rad Hamlet), RADBONK, SHITBOX, RadZombies and ZombieTardio, and is playable as CHUD in World of Radcraft. Download his rigged and animated 3D model.',
+      line: 'Chak appears as an NPC in RadQuest (Rad Hamlet), RADBONK, SHITBOX, RadZombies and ZombieTardio, and is playable as CHUD in World of Radcraft. Download his rigged and animated 3D model for your own projects.',
       image: { src: '/img/chak.webp', width: 800, height: 1000, alt: 'Chak in 3D: glasses, a white T-shirt and blue jeans.' },
     },
     {

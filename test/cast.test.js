@@ -1,6 +1,7 @@
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
+import * as THREE from 'three';
 import { site, groups, crew, projects, playsIn, duo, contact } from '../src/projects.js';
 import { renderShell } from '../src/render.js';
 
@@ -95,15 +96,20 @@ test('every Crew card offers the same nine-character zip, including the Retardio
 });
 
 
-test('Chudjak preview and public download include both hand joints and the movement clips', () => {
-  for (const file of ['chudjak.glb', 'chudjak-rigged.glb']) {
+test('Chak preview and public download include both hand joints and the movement clips', () => {
+  for (const file of ['chak.glb', 'chak-rigged.glb']) {
     const bytes = readFileSync(new URL(`../public/models/${file}`, import.meta.url));
     assert.equal(bytes.readUInt32LE(0), 0x46546c67);
     const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString());
     const joints = new Set(gltf.skins.flatMap(s => s.joints.map(i => gltf.nodes[i].name)));
     for (const name of ['LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand']) assert.ok(joints.has(name), `${file}: ${name}`);
-    assert.ok(gltf.nodes.find(n => n.name === 'LeftShoulder').translation[0] > 0, `${file}: left shoulder convention`);
-    assert.ok(gltf.nodes.find(n => n.name === 'RightShoulder').translation[0] < 0, `${file}: right shoulder convention`);
+    const parents = new Map();
+    gltf.nodes.forEach((n, i) => (n.children ?? []).forEach(child => parents.set(child, i)));
+    const world = i => {
+      const n = gltf.nodes[i], matrix = n.matrix ? new THREE.Matrix4().fromArray(n.matrix) : new THREE.Matrix4().compose(new THREE.Vector3(...(n.translation ?? [0,0,0])), new THREE.Quaternion(...(n.rotation ?? [0,0,0,1])), new THREE.Vector3(...(n.scale ?? [1,1,1])));
+      return parents.has(i) ? matrix.premultiply(world(parents.get(i))) : matrix;
+    };
+    for (const [name, sign] of [['LeftShoulder', 1], ['RightShoulder', -1]]) assert.ok(new THREE.Vector3().setFromMatrixPosition(world(gltf.nodes.findIndex(n => n.name === name))).x * sign > 0, `${file}: ${name} convention`);
     const clips = new Set(gltf.animations.map(a => a.name));
     for (const name of ['Idle', 'walk', 'Casual_Walk', 'Run_02', 'Lean_Forward_Sprint', 'Big_Wave_Hello']) assert.ok(clips.has(name), `${file}: ${name}`);
   }
