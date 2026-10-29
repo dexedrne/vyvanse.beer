@@ -649,3 +649,6 @@
 @media (min-width:761px) and (hover:hover), (min-width:961px), (orientation:portrait) {
  .js .screen[data-tab='games'] .wheel, .js .screen[data-tab='games'] .arc { touch-action:none; scroll-snap-type:none; }
 }
+@media (max-width:760px) and (orientation:portrait) {
+ .js .screen[data-tab='games'] .hero .more-btn { font-size:15px; }
+}
