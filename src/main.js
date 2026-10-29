@@ -452,8 +452,8 @@ function labels() {
   slotsOf('games').forEach((slot,j) => {
     const eds=SHELF[j], p=eds[edOf(j)];
     for (const el of [slot, ...$$('.fl', wall).filter(el => el.dataset.game === eds[0].cmd)]) {
-      if (el.dataset.ed === p.cmd) continue;
-      el.dataset.ed=p.cmd; el.style.setProperty('--accent',p.accent); el.style.setProperty('--shell',p.shell);
+      if (el.dataset.shownEd === p.cmd) continue;
+      el.dataset.shownEd=p.cmd; el.style.setProperty('--accent',p.accent); el.style.setProperty('--shell',p.shell);
       const {body,mirror}=cartBody(p,j,eds);
       if(el.classList.contains('fl')) el.innerHTML=`<span class="fl__rip"></span><span class="fl__inner">${body}</span>${mirror}`;
       else el.innerHTML=body+mirror;
@@ -1184,7 +1184,7 @@ document.addEventListener('click', (e) => {
     if (i >= 0) select(i);
     return;
   }
-  const ed = e.target.closest('[data-ed]');
+  const ed = e.target.closest('.ed[data-ed]');
   if (ed) {
     e.preventDefault();
     return edition(ed.dataset.ed);
@@ -1385,15 +1385,15 @@ function hints() {
     return fitHints();
   }
   const out = [
-    S.tab === 'games' ? hint(3.5, '▲ ▼ genre') : '',
     hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} ${S.tab === 'games' ? 'turn' : 'select'}`),
     // only on a game with editions, and low: the switch shows its own buttons, right by it
     S.tab === 'games' && SHELF[S.games].length > 1 ? hint(2.5, `${k('lt')}${k('rt')} edition`) : '',
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
+    S.tab === 'games' ? hint(3.5, '▲ ▼ genre') : '',
     pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : S.tab === 'games' ? 'details · hold: all games' : 'details'}`) : '',
-    ROWS.includes(S.tab) ? hint(3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
+    ROWS.includes(S.tab) ? hint(S.tab === 'games' ? 3 : 3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
     pack ? '' : hint(2, `${k('x')} wave`),
     hint(3, `${k('select')} full screen`),
     pad ? '' : hint(1, '<span class="g">M</span> music'),
