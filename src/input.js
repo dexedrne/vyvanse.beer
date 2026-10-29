@@ -53,6 +53,7 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
   const root = document.documentElement;
   let device = matchMedia('(pointer: coarse)').matches ? 'touch' : 'kb'; // kb | mouse | touch | xbox | ps
   let scheme = device;
+  let enterHeld = false;
 
   function setDevice(d) {
     if (d === device) return;
@@ -99,6 +100,7 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
     m: 'music',
     n: 'sfx',
     r: 'grab',
+    '[': 'edprev', ']': 'ednext', Tab: 'wall',
     '/': 'os',
     '`': 'os',
   };
@@ -109,6 +111,7 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
     if (m === 'play' || m === 'os' || editable(e.target)) return;
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     let name = KEYS[k];
+    if (/^[1-5]$/.test(k) && m === 'menu') { act('genre', {index:+k-1,from:'kb'}); e.preventDefault(); return; }
     if (m === 'modal') {
       // dialogs handle their own keys (Esc closes them); arrows walk their buttons
       if (!['left', 'right', 'up', 'down'].includes(name)) return;
@@ -122,8 +125,10 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
     }
     if (!name) return;
     if (e.repeat && !['left', 'right', 'up', 'down'].includes(name)) return;
-    if (act(name, { from: 'kb', event: e }) !== false) e.preventDefault();
+    if (name === 'ok') enterHeld = true;
+    if (act(name, { from: 'kb', event: e, phase: name === 'ok' ? 'down' : undefined }) !== false) e.preventDefault();
   });
+  addEventListener('keyup', e => { if ((e.key === 'Enter' || e.key === ' ') && enterHeld) { enterHeld = false; if (mode() === 'menu') act('ok-release', {from:'kb'}); } });
   addEventListener('pointerdown', (e) => setDevice(e.pointerType === 'touch' ? 'touch' : 'mouse'), { passive: true, capture: true });
 
   // ---- gamepads ----
@@ -131,6 +136,8 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
   // start-up), and a tap that comes and goes between two reads is lost.
   const prev = new Map(); // pad index -> pressed buttons last read
   const pair = new Map(); // pad index -> View and Menu were held together since both were up
+  const detailsHold = new Map();
+  const HOLD_MS = 500;
   const menuHold = new Map(); // pad index -> { t: when Menu went down, done: the hold was used }
   const GRAB_MS = 450; // Menu held this long (alone) picks the cartridge up instead of playing it
   let held = { dir: null, next: 0 };
@@ -157,6 +164,7 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
       prev.delete(i);
       pair.delete(i);
       menuHold.delete(i);
+      detailsHold.delete(i);
     }
     if (!pads.length) {
       held = { dir: null, next: 0 };
@@ -180,7 +188,12 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
       if (pressed(9)) menuHold.set(gp.index, { t: now, done: false });
       const mh = menuHold.get(gp.index);
       if (m === 'play') continue;
-      for (const [i, name] of Object.entries(STANDARD)) if (pressed(+i)) act(name, { from: 'pad', pad: gp });
+      if (pressed(3)) { detailsHold.set(gp.index, {t:now,done:false}); act('wall-cue',{from:'pad'}); }
+      const dh = detailsHold.get(gp.index);
+      if (dh && now2[3] && !dh.done && now-dh.t >= HOLD_MS) { dh.done=true; act('wall-open',{from:'pad'}); }
+      if (was[3] && !now2[3] && dh) { act(dh.done ? 'wall-close' : 'details',{from:'pad'}); detailsHold.delete(gp.index); }
+      for (const [i, name] of Object.entries(STANDARD)) if (+i !== 3 && pressed(+i)) act(name, { from: 'pad', pad: gp, phase:+i===0?'down':undefined });
+      if (was[0] && !now2[0]) act('ok-release',{from:'pad',pad:gp});
       // Menu held on its own: 'grab' (and its release is then not a 'start', if grab was taken)
       if (!phone() && mh && now2[9] && !both && !mh.done && now - mh.t > GRAB_MS) mh.done = act('grab', { from: 'pad', pad: gp }) === false ? 'no' : 'yes';
       for (const [i, name] of Object.entries(PAIR)) {
@@ -194,10 +207,10 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
       return;
     }
     if (dir !== held.dir) {
-      held = { dir, next: now + 380 };
+      held = { dir, next: now + 160 };
       if (dir) act(dir, { from: 'pad' });
     } else if (dir && now > held.next) {
-      held.next = now + 120;
+      held.next = now + 160;
       act(dir, { from: 'pad', repeat: true });
     }
   }

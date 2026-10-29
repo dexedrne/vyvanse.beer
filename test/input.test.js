@@ -7,17 +7,18 @@ async function harness(phone = false) {
   const events = new Map();
   let timer;
   let pads = [];
+  let now = 100;
   const root = { dataset: {} };
   const acts = [];
   const source = (await readFile(new URL('../src/input.js', import.meta.url), 'utf8')).replaceAll('export ', '');
   const context = vm.createContext({ acts, phone, document: { documentElement: root, querySelectorAll: () => [] },
-    navigator: { getGamepads: () => pads }, matchMedia: () => ({ matches: true }), performance: { now: () => 100 }, Event,
+    navigator: { getGamepads: () => pads }, matchMedia: () => ({ matches: true }), performance: { now: () => now }, Event,
     addEventListener: (n, fn) => events.set(n, fn), dispatchEvent() {},
     setInterval: fn => { timer = fn; return 1; }, clearInterval: () => { timer = null; } });
   vm.runInContext(`${source}\nglobalThis.input = createInput({ act: n => acts.push(n), mode: () => 'menu', phone: () => phone });`, context);
   const pad = { id: 'DualSense Wireless Controller', index: 0, connected: true, axes: [0, 0],
     buttons: Array.from({ length: 18 }, () => ({ pressed: false, touched: false, value: 0 })) };
-  return { root, acts, input: context.input, pad, setPads: p => { pads = p; }, poll: () => timer?.(), touch: () => events.get('pointerdown')({ pointerType: 'touch' }) };
+  return { advance: ms => { now += ms; }, root, acts, input: context.input, pad, setPads: p => { pads = p; }, poll: () => timer?.(), touch: () => events.get('pointerdown')({ pointerType: 'touch' }) };
 }
 
 test('discover an already-paired iOS pad without a connection event; last input wins', async () => {
@@ -71,4 +72,18 @@ test('Create + Options never also toggles phone music', async () => {
   h.pad.buttons[8] = h.pad.buttons[9] = { pressed: false, value: 0 };
   h.poll();
   assert.deepEqual(h.acts, []);
+});
+
+
+test('Cross exposes press and release phases and Triangle distinguishes tap from hold', async () => {
+  const h=await harness();h.setPads([h.pad]);h.poll();
+  h.pad.buttons[0]={pressed:true,value:1};h.poll();
+  h.pad.buttons[0]={pressed:false,value:0};h.poll();
+  assert.deepEqual(h.acts,['ok','ok-release']);h.acts.length=0;
+  h.pad.buttons[3]={pressed:true,value:1};h.poll();h.advance(200);
+  h.pad.buttons[3]={pressed:false,value:0};h.poll();
+  assert.deepEqual(h.acts,['wall-cue','details']);h.acts.length=0;
+  h.pad.buttons[3]={pressed:true,value:1};h.poll();h.advance(500);h.poll();
+  h.pad.buttons[3]={pressed:false,value:0};h.poll();
+  assert.deepEqual(h.acts,['wall-cue','wall-open','wall-close']);
 });

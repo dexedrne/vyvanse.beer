@@ -4,7 +4,9 @@
 // and starts the rain, the puddle and the crew in 3D after the first paint (src/stage.js).
 
 import { site, groups, projects, crew, contact, duo as DUO, shelf } from './projects.js';
-import { manifest } from './render.js';
+import './wheel.css';
+import { createMotion } from './motion.js';
+import { cartBody, manifest } from './render.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
@@ -25,6 +27,8 @@ const phone = matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse
 const screen = $('#screen');
 const duoEl = $('#duo');
 const hint = $('#duo-hint');
+const wheelActive = () => screen.clientWidth > 760 || screen.clientHeight >= screen.clientWidth;
+let motion = null;
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
@@ -87,7 +91,7 @@ function phoneMarkup() {
         return Object.assign(document.createElement('span'), { className: 'nb', textContent: text });
       }));
     }
-    if (pitch && p?.blurbPhone) pitch.textContent = p.blurbPhone;
+    if (pitch && p?.blurbPhone && p.group !== 'games') pitch.textContent = p.blurbPhone;
     const eds = $('.eds', info);
     const plays = $('.plays', info);
     if (eds) body.append(eds);
@@ -99,7 +103,7 @@ function phoneMarkup() {
       const status = $('.status', act);
       if (more) act.append(more);
       body.append(act);
-      if (status && !item.classList.contains('item--pack')) body.append(status);
+      if (status && !item.classList.contains('item--pack') && !item.classList.contains('item--game')) body.append(status);
     }
     info.prepend(words, body);
     if (item.classList.contains('item--contact')) {
@@ -444,16 +448,16 @@ function paint(tab) {
 
 // a cartridge with editions wears the shown one's label and glow
 function labels() {
-  slotsOf('games').forEach((slot, j) => {
-    const eds = SHELF[j];
-    if (eds.length < 2) return;
-    const k = edOf(j);
-    slot.style.setProperty('--accent', eds[k].accent);
-    for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
-    // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
-    const name = $('.cart__name', slot);
-    if (name) name.textContent = eds[k].name;
-    $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
+  const wall = $('.wall');
+  slotsOf('games').forEach((slot,j) => {
+    const eds=SHELF[j], p=eds[edOf(j)];
+    for (const el of [slot, ...$$('.fl', wall).filter(el => el.dataset.game === eds[0].cmd)]) {
+      if (el.dataset.ed === p.cmd) continue;
+      el.dataset.ed=p.cmd; el.style.setProperty('--accent',p.accent); el.style.setProperty('--shell',p.shell);
+      const {body,mirror}=cartBody(p,j,eds);
+      if(el.classList.contains('fl')) el.innerHTML=`<span class="fl__rip"></span><span class="fl__inner">${body}</span>${mirror}`;
+      else el.innerHTML=body+mirror;
+    }
   });
 }
 
@@ -483,8 +487,8 @@ function edition(to) {
   if (k < 0 || k === cur) return;
   // focus was on the switch: it goes along to the same pill on the new card
   const pill = document.activeElement?.closest?.('.ed');
-  setEd(S.games, k);
-  paint('games');
+  const apply = () => { setEd(S.games, k); paint('games'); save(); };
+  if (motion) motion.flip(apply); else apply();
   save();
   layout();
   audio.blip('move');
@@ -494,6 +498,7 @@ function edition(to) {
 
 // keep the picked cartridge in view in the phone's swipe row (scroll the row, not the page)
 function keepInView(el) {
+  if (el?.closest('.panel--games')) return;
   const sc = el?.closest('.carts, .tgroups');
   if (!sc || sc.scrollWidth <= sc.clientWidth) return;
   const r = el.getBoundingClientRect();
@@ -507,6 +512,7 @@ function show(tab, { sound = true, focus = false } = {}) {
   if (moving && tab !== moving.tab) dropMove();
   const changed = tab !== S.tab;
   S.tab = tab;
+  if (changed && motion) { if (tab === 'games') motion.boot(); else motion.sinkWheel(); }
   if (changed) { phoneZone = 'shelf'; phoneButton = 0; }
   for (const t of $$('.tab')) {
     const on = t.dataset.tab === tab;
@@ -515,6 +521,7 @@ function show(tab, { sound = true, focus = false } = {}) {
   }
   for (const p of $$('.panel')) p.classList.toggle('on', p.dataset.panel === tab);
   screen.dataset.tab = tab;
+  if (tab === 'games') motion?.select(S.games, {snap:changed});
   if (tab === 'crew') revealCrewGroup(S.crew);
   paint(tab);
   hints();
@@ -549,6 +556,7 @@ function select(i, { sound = true } = {}) {
   paint(S.tab);
   save();
   layout();
+  if (S.tab === 'games') motion?.select(S.games);
   if (S.tab === 'crew') hello(want());
   if (S.tab === 'games' || S.tab === 'crew') hints(); // editions and packs change the available actions
   if (sound) audio.blip('move');
@@ -581,6 +589,10 @@ function arrangeRow(tab, keys) {
     $('.cart', slot).dataset.i = j;
   });
   S[tab] = Math.max(0, list.indexOf(cur));
+  if (tab === 'games') {
+    for (const el of $$('.fl')) { const j = SHELF.findIndex(eds => eds[0].cmd === el.dataset.game); if (j >= 0) { el.dataset.i=j; $$('.cart',el).forEach(c=>c.dataset.i=j); } }
+    motion?.select(S.games);
+  }
   // (moving a focused cartridge in the DOM drops its focus: give it back)
   if (had?.isConnected && had !== document.activeElement && ul.contains(had)) had.focus({ preventScroll: true });
 }
@@ -606,7 +618,7 @@ function resetOrder(tab = S.tab) {
     hints();
     return toast('already in the default order');
   }
-  flip(slotsOf(tab), () => arrangeRow(tab, DEFAULT[tab]), { reduced: reduced.matches, ms: 320 });
+  if (tab === 'games') arrangeRow(tab,DEFAULT[tab]); else flip(slotsOf(tab), () => arrangeRow(tab, DEFAULT[tab]), { reduced: reduced.matches, ms: 320 });
   keep(tab);
   rowMarks(tab);
   hints();
@@ -648,7 +660,7 @@ function nudgeMove(d) {
     if (!reduced.matches) slots[i].animate([{ transform: 'none' }, { transform: `translateX(${d * 7}px)` }, { transform: 'none' }], { duration: 180, easing: 'ease-out' });
     return;
   }
-  flip(slots, () => moveItem(tab, i, j), { reduced: reduced.matches, ms: 170 });
+  if (tab === 'games') moveItem(tab,i,j); else flip(slots, () => moveItem(tab, i, j), { reduced: reduced.matches, ms: 170 });
   rowMarks(tab);
   keepInView(controlsOf(tab)[S[tab]]);
   emit();
@@ -667,7 +679,7 @@ function dropMove({ put = false } = {}) {
   if (!moving) return false;
   const { keys } = moving;
   const tab = endMove();
-  if (put) flip(slotsOf(tab), () => arrangeRow(tab, keys), { reduced: reduced.matches });
+  if (put) { if (tab === 'games') arrangeRow(tab,keys); else flip(slotsOf(tab), () => arrangeRow(tab, keys), { reduced: reduced.matches }); }
   keep(tab);
   rowMarks(tab);
   hints();
@@ -724,6 +736,7 @@ function activate({ from, pad } = {}) {
     toast(`downloading ${LISTS.crew[S.crew].download.label} (${LISTS.crew[S.crew].download.size})`);
     return;
   }
+  if (S.tab === 'games' && motion && wheelActive()) { motion.press(); setTimeout(() => motion.release(),120); return; }
   play(current(), { from });
 }
 
@@ -809,6 +822,10 @@ function openSheet() {
     contents.push(list.firstElementChild, ...(gallery ? [gallery] : []), fine);
   }
   body.replaceChildren(pitch, ...contents, ...(credit ? [credit] : []), links);
+  if (S.tab === 'games') {
+    for (const el of $$('.tags--wheel .tag')) if (+el.style.opacity > .1) lights.push([el,[.23,.21,.29]]);
+    if ($('.deck.lit')) lights.push([$('.deck__seam'),[.9,.86,.76]]);
+  }
   const playBtn = $('[data-act]', onItem(S.tab)).cloneNode(true);
   playBtn.addEventListener('click', e => {
     e.preventDefault();
@@ -930,6 +947,23 @@ function act(name, info = {}) {
     else if (name === 'back') back();
     return;
   }
+  if (S.tab === 'games' && motion && wheelActive() && !moving) {
+    if (motion.inserting) return;
+    if (name === 'wall') return motion.wallOpen ? motion.closeWall() : motion.openWall();
+    if (name === 'wall-cue') return motion.cue(true);
+    if (name === 'details') motion.cue(false);
+    if (name === 'wall-open') { motion.cue(false); return motion.openWall(); }
+    if (name === 'wall-close') { motion.cue(false); return motion.closeWall(); }
+    if (motion.wallOpen) {
+      if (['left','right','up','down'].includes(name)) return motion.focusItem(motion.nearest(name));
+      if (name === 'back') return motion.closeWall();
+    }
+    if (name === 'ok' && info.phase === 'down') return motion.press();
+    if (name === 'ok-release') return motion.release();
+    if (name === 'back' && motion.pressed) return motion.cancel();
+    if (name === 'genre') return select(SHELF.findIndex(e => e[0].section === ['drive','shoot','fight','arcade','worlds'][info.index]));
+    if ((name === 'up' || name === 'down') && SHELF[S.games].length === 1) return motion.jumpSection(name === 'down' ? 1 : -1);
+  }
   if (moving) {
     if (name === 'left' || name === 'right') return nudgeMove(name === 'left' ? -1 : 1);
     if (['up', 'down', 'edprev', 'ednext'].includes(name)) return;
@@ -938,7 +972,7 @@ function act(name, info = {}) {
     if (name === 'details') return resetOrder(moving.tab);
     dropMove(); // anything else (sections, the terminal…): it's dropped here first
   }
-  if (phone.matches && info.from === 'pad') {
+  if (phone.matches && info.from === 'pad' && S.tab !== 'games') {
     const zones = S.tab === 'games' && SHELF[S.games].length > 1 ? ['editions', 'actions', 'shelf'] : ['actions', 'shelf'];
     if (S.tab === 'contact') {
       if (name === 'up' || name === 'down') return move(name === 'up' ? -1 : 1);
@@ -1044,6 +1078,7 @@ const player = createPlayer({
     screen.classList.add('is-away');
     screen.inert = true;
     stage?.pause();
+    motion?.pause();
     ticker?.pause();
     audio.duck(true);
   },
@@ -1056,6 +1091,7 @@ const player = createPlayer({
     if (pwa.resume()) return;
     audio.duck(false);
     stage?.resume();
+    motion?.eject();
     ticker?.resume();
     // back on the same cartridge
     controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
@@ -1145,8 +1181,17 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     return edition(ed.dataset.ed);
   }
+  const tag = e.target.closest('.tag');
+  if (tag && S.tab === 'games') return select(SHELF.findIndex(e => e[0].section === tag.dataset.sec));
+  const fl = e.target.closest('.fl');
+  if (fl && motion?.wallOpen) {
+    const it = motion.items.find(it => it.el === fl);
+    if (fl.classList.contains('sel')) activate({from:'mouse'}); else motion.focusItem(it);
+    return;
+  }
   const c = e.target.closest('.cart, .tile');
   if (c) {
+    if (performance.now() - swipedAt < 500 || performance.now() - wallHeldAt < 500) return e.preventDefault();
     const i = +c.dataset.i;
     if (i === S[S.tab]) activate({ from: 'mouse' });
     else select(i);
@@ -1161,7 +1206,7 @@ document.addEventListener('click', (e) => {
     const p = current();
     if (p?.frame) {
       e.preventDefault();
-      play(p);
+      if (S.tab === 'games') activate({from:'mouse'}); else play(p);
     } else audio.blip('ok'); // the link opens the new tab itself
     return;
   }
@@ -1212,6 +1257,16 @@ document.addEventListener('focusin', (e) => {
   if (mi && S.tab === 'contact') select(LISTS.contact.indexOf(mi), { sound: false });
 });
 
+let wallHoldTimer = 0, wallHeldAt = -Infinity;
+screen.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'touch' || S.tab !== 'games' || !e.target.closest('.slot.sel .cart')) return;
+  const x=e.clientX,y=e.clientY;
+  const cancel=()=>{clearTimeout(wallHoldTimer);screen.removeEventListener('pointermove',track);};
+  const track=e=>{if(Math.hypot(e.clientX-x,e.clientY-y)>12)cancel();};
+  wallHoldTimer=setTimeout(()=>{wallHeldAt=performance.now();motion?.openWall();},500);
+  screen.addEventListener('pointermove',track,{passive:true});
+  screen.addEventListener('pointerup',cancel,{once:true});screen.addEventListener('pointercancel',cancel,{once:true});
+},{passive:true});
 // swipe the art (phones) to move along the row
 let sx = 0;
 let sy = 0;
@@ -1226,7 +1281,7 @@ screen.addEventListener('touchstart', (e) => {
 }, { passive: true });
 screen.addEventListener('touchend', (e) => {
   if (swipeBlocked || sorter.active || !e.changedTouches.length) return;
-  if (!swipeTab && e.target.closest('.row, .menu, .tgroups, a, button, input')) return;
+  if (!swipeTab && !(S.tab === 'games' && e.target.closest('.wheel')) && e.target.closest('.row, .menu, .tgroups, a, button, input')) return;
   const dx = e.changedTouches[0].clientX - sx;
   const dy = e.changedTouches[0].clientY - sy;
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
@@ -1292,10 +1347,14 @@ function hints() {
   const verb = { games: 'play', crew: pack ? 'get pack' : LISTS.crew[S.crew].download ? 'get model' : 'say hello', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
+  if (motion?.wallOpen) {
+    hintsEl.innerHTML = [hint(9,'◀ ▶ ▲ ▼ pick'),hint(8,`${k('a')} play`),hint(7,`${k('y')} let go: close on the pick`),hint(6,`${k('b')} back to the wheel`),hint(5,`${k('lt')}${k('rt')} flip a case`)].join('');
+    return fitHints();
+  }
   if (phone.matches && !moving) {
     const landscape = screen.clientWidth > screen.clientHeight;
     hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
-      pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
+      pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : S.tab === 'games' ? 'details · hold: all games' : 'details'}`) : '',
       hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && !pack && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
       !pack && ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
       landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
@@ -1311,13 +1370,14 @@ function hints() {
     return fitHints();
   }
   const out = [
-    hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
+    S.tab === 'games' ? hint(3.5, '▲ ▼ genre') : '',
+    hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} ${S.tab === 'games' ? 'turn' : 'select'}`),
     // only on a game with editions, and low: the switch shows its own buttons, right by it
     S.tab === 'games' && SHELF[S.games].length > 1 ? hint(2.5, `${k('lt')}${k('rt')} edition`) : '',
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
-    pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
+    pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : S.tab === 'games' ? 'details · hold: all games' : 'details'}`) : '',
     ROWS.includes(S.tab) ? hint(3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
     pack ? '' : hint(2, `${k('x')} wave`),
     hint(3, `${k('select')} full screen`),
@@ -1414,9 +1474,35 @@ function layout() {
   const H = phone.matches ? screen.clientHeight : innerHeight;
   const ph = phone.matches;
   const compact = ph && W > H;
+  if (S.tab === 'games' && motion) {
+    if (compact) { motion.pause(); for (const el of $$('.arc .slot')) { el.hidden=false; el.style.removeProperty('transform');el.style.removeProperty('opacity'); } }
+    else motion.resume();
+  }
   screen.classList.toggle('short', ph && H < 760);
   screen.classList.toggle('short-land', compact && H < 380);
   const panel = panelOf(S.tab);
+  if (S.tab === 'games' && !compact) {
+    screen.classList.toggle('duo-live', live());
+    screen.classList.toggle('has-eds', SHELF[S.games].length > 1);
+    screen.classList.toggle('has-lettered', !!at('games',S.games).image.lettered);
+    const style = getComputedStyle(screen);
+    const u = $('.arc .slot').offsetWidth;
+    const strip = $('.strip').offsetHeight;
+    const tabs = ph ? parseFloat(style.getPropertyValue('--tabs-h')) || 72 : 0;
+    box.wl = H - strip - tabs - u * (ph ? .4 : .5);
+    const artH = ph ? H >= 800 ? 352 : H * .4 : box.wl;
+    screen.style.setProperty('--wl', `${box.wl}px`);
+    screen.style.setProperty('--band', `${box.wl}px`);
+    screen.style.setProperty('--art-h', `${artH}px`);
+    screen.style.setProperty('--floor-art', `url("${bdFor('games',S.games).src}")`);
+    const h = ph ? 112 : Math.min(290,Math.max(170,H*.27));
+    const w = h * 1.5, pad = parseFloat(style.getPropertyValue('--pad')) || 16;
+    const feet = ph ? artH : box.wl;
+    box.b = {x: W-w-(ph?10:pad*.55), y:feet-h*FEET,w,h}; box.feet=feet;
+    Object.assign(duoEl.style,{left:`${box.b.x}px`,top:`${box.b.y}px`,width:`${w}px`,height:`${h}px`});
+    duoEl.classList.remove('duo--off'); duoEl.classList.add('duo--side');
+    backdrop(S.tab,S[S.tab]); stage?.show(want()); motion?.measure(); emit(); return;
+  }
   box.wl = ph ? Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2) : Math.round(H * 0.655);
   screen.style.setProperty('--band', `${box.wl}px`);
   screen.style.setProperty('--wl', `${box.wl}px`);
@@ -1513,7 +1599,11 @@ function scene() {
   const lights = [];
   for (const el of $$('.slot', panel)) {
     const k = el.classList.contains('sel') ? 0.8 : 0.26;
-    lights.push([$('.cart', el), hexRgb(el.style.getPropertyValue('--accent')).map((v) => v * k)]);
+    lights.push([$('.case > .cart:not(.cart--back), :scope > .cart', el), hexRgb(el.style.getPropertyValue('--accent')).map((v) => v * k)]);
+  }
+  if (S.tab === 'games') {
+    for (const el of $$('.tags--wheel .tag')) if (+el.style.opacity > .1) lights.push([el,[.23,.21,.29]]);
+    if ($('.deck.lit')) lights.push([$('.deck__seam'),[.9,.86,.76]]);
   }
   const playBtn = $('.item.on [data-act]', panel);
   if (playBtn) lights.push([playBtn, [0.3, 0.2, 0.68]]);
@@ -1565,6 +1655,7 @@ function hello(nums) {
   nums.forEach((n, k) => (k ? setTimeout(() => waveDuo(n), 700 * k) : waveDuo(n)));
 }
 const shell = {
+  tick: now => motion?.tick(now),
   scene,
   layout,
   framing: () => phone.matches && box.b ? framing(box.b.w, box.b.h) : null,
@@ -1620,7 +1711,7 @@ function openTipJar() {
   audio.blip('ok');
   openTip();
 }
-addEventListener('hashchange', () => location.hash === '#tip' && openTipJar());
+addEventListener('hashchange', () => { if (location.hash === '#tip') openTipJar(); else if (!player.current) load(); });
 for (const ev of ['pointerover', 'focusin']) {
   document.addEventListener(ev, (e) => e.target.closest?.('[data-tip]') && loadTip().catch(() => {}), { passive: true });
 }
@@ -1670,6 +1761,7 @@ const sorter = createSort({
   rows: ROWS.map((tab) => ({ tab, el: $('.carts', panelOf(tab)) })),
   reduced: () => reduced.matches,
   begin(tab) {
+    if (tab === 'games' && input.scheme === 'touch') return false;
     if (mode() !== 'menu' || tab !== S.tab) return false;
     if (moving) dropMove();
     return true;
@@ -1690,7 +1782,14 @@ const sorter = createSort({
     if (moved) announce(`${label(tab, S[tab])}. Order saved.`);
   },
 });
+for (const el of $$('.fl')) el.dataset.game = SHELF[+el.dataset.i][0].cmd;
 load();
+$('.arc').dataset.sel = String(S.games);
+motion = createMotion({ screen, arc: $('.arc'), wheel: $('.wheel'), deck: $('.deck'), wall: $('.wall'), backdrop: $('#backdrops'),
+  onSelect(i) { if (S.tab === 'games' && S.games !== i) select(i); },
+  onPlay() { play(current()); }, onWall() { hints(); },
+});
+motion.select(S.games,{snap:true}); motion.boot(); layout(); if (player.current) motion.pause();
 hints();
 if (new URLSearchParams(location.search).has('probe')) {
   probe = Object.assign(document.createElement('span'), { className: 'viewport-probe' });
@@ -1711,6 +1810,7 @@ requestAnimationFrame(() =>
   setTimeout(() => {
     import('./stage.js')
       .then((m) => {
+        motion?.external();
         stage = m.createStage(shell, { screen, duoBox: duoEl, models: MODELS });
         layout(); // who stands on the water, now that there's a stage to ask
         nextUp();

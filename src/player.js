@@ -126,6 +126,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     if (current) close({ quiet: true });
     current = p;
     lastFocus = document.activeElement;
+    el.classList.toggle('player--insert',p.group === 'games');
     const card = el.querySelector('.player__card');
     const art = card.querySelector('img');
     art.src = p.image?.src || '';

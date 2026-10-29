@@ -2323,7 +2323,7 @@ a.ticker__tok:hover .ticker__k {
   opacity: 0.5;
 }
 
-.player__card::before {
+.player--insert .player__card::before {
   content: '';
   position: absolute;
   z-index: 1;
@@ -3322,7 +3322,7 @@ html.js { --topbar: 52px; --top: calc(var(--topbar) + var(--safe-top)); --gut: 1
 .js .player--phone { position: fixed; height: var(--view-height, 100%); pointer-events: none; inset: 0; z-index: 30; background: #000; }
 .js .player__card { position: absolute; inset: 0; display: grid; align-content: end; gap: 6px; padding: 0 var(--gut) calc(var(--safe-bottom) + 28px) calc(var(--gut) + var(--safe-left)); background: var(--ink); }
 .js .player__card img.art-img { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 22%); opacity: 0.62; }
-.js .player__card::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 22%, rgb(var(--scrim) / 0.62) 42%, rgb(var(--scrim) / 0.1) 72%), linear-gradient(180deg, rgb(var(--scrim) / 0.7), transparent 160px); }
+.js .player--insert .player__card::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 22%, rgb(var(--scrim) / 0.62) 42%, rgb(var(--scrim) / 0.1) 72%), linear-gradient(180deg, rgb(var(--scrim) / 0.7), transparent 160px); }
 .js .player__card > * { position: relative; z-index: 2; }
 .js .player__card .kindline { max-width: 100%; }
 .js .player__card .wm { font-size: 64px; max-width: 100%; white-space: normal; }
@@ -3604,7 +3604,7 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .js .sheet__more { bottom: 78px; }
 
 
-.js .player__card::before { background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 30%, rgb(var(--scrim) / 0.55) 56%, rgb(var(--scrim) / 0.1) 85%), linear-gradient(90deg, rgb(var(--scrim) / 0.8), rgb(var(--scrim) / 0.35) 45%, transparent 75%), linear-gradient(180deg, rgb(var(--scrim) / 0.6), transparent 120px); }
+.js .player--insert .player__card::before { background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 30%, rgb(var(--scrim) / 0.55) 56%, rgb(var(--scrim) / 0.1) 85%), linear-gradient(90deg, rgb(var(--scrim) / 0.8), rgb(var(--scrim) / 0.35) 45%, transparent 75%), linear-gradient(180deg, rgb(var(--scrim) / 0.6), transparent 120px); }
 .js .player__card .status { display: block; }
 .js .player__card { padding-left: calc(var(--gut) + var(--safe-left)); padding-bottom: calc(var(--safe-bottom) + 18px); }
 .js .a2hs { max-width: 420px; }
@@ -3783,3 +3783,8 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .js .tgroup__expand:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 .js .tgroup__label > .no-js-only { display: none; }
 .js .tgroup__count { color: var(--muted); }
+
+/* The console insert lights the existing player card without changing its relay or controls. */
+.player--insert .player__card::before { content:''; position:absolute; inset:0; z-index:5; pointer-events:none; background:radial-gradient(55% 45% at 46% 88%,rgb(255 236 190 / .65),rgb(233 196 126 / .18) 40%,transparent 72%); animation:wheel-warm .7s ease-out both; }
+@keyframes wheel-warm { from { opacity:1; } to { opacity:0; } }
+@media(prefers-reduced-motion:reduce) { .player--insert .player__card::before { animation:none; opacity:0; } }
