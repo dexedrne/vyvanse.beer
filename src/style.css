@@ -3774,12 +3774,12 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
   }
 }
 
-/* Crew families fold into headers; the existing row keeps any expanded tiles scrollable. */
+/* Every Crew group keeps its first tile on the shelf. */
 .js .tgroups { min-width: 0; max-width: 100%; box-sizing: border-box; }
-.js details.tgroup > summary { display: flex; align-items: center; gap: 7px; min-height: 44px; margin: 0; padding: 0 9px; border: 1px solid var(--line-2); border-radius: 7px; list-style: none; cursor: pointer; color: var(--text); white-space: nowrap; }
-.js details.tgroup > summary::-webkit-details-marker { display: none; }
-.js details.tgroup > summary::before { content: '▸'; color: var(--lilac); }
-.js details.tgroup[open] > summary { margin-bottom: 24px; }
-.js details.tgroup[open] > summary::before { content: '▾'; }
-.js details.tgroup > summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.js [data-crew-group]:not(.is-open) > .tiles > .tslot:not(:first-child) { display: none; }
+.js .tgroup__expand { display: flex; align-items: center; gap: 7px; min-height: 44px; margin: -10px 0; padding: 0 6px; border: 1px solid var(--line-2); border-radius: 7px; background: none; font: inherit; cursor: pointer; color: var(--text); white-space: nowrap; }
+.js .tgroup__expand::before { content: '▸'; color: var(--lilac); }
+.js .tgroup__expand[aria-expanded="true"]::before { content: '▾'; }
+.js .tgroup__expand:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.js .tgroup__label > .no-js-only { display: none; }
 .js .tgroup__count { color: var(--muted); }

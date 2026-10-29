@@ -5,29 +5,40 @@ import vm from 'node:vm';
 import { site, groups, projects, crew, contact, duo } from '../src/projects.js';
 import { renderShell } from '../src/render.js';
 
-test('Crew families are native compact controls with counts and unchanged tile indices', () => {
+test('Crew families and assets keep one unique first tile and accessible expansion controls', () => {
   const html = renderShell({ site, groups, projects, crew, contact, duo });
-  const families = [...html.matchAll(/<details class="tgroup" data-crew-group name="crew-family">([^]*?)<\/details>/g)].map(m => m[1]);
-  assert.equal(families.length, 2);
-  for (const [i, name] of ['radbros', 'retardios'].entries()) {
-    assert.match(families[i], new RegExp(`<summary[^>]*aria-controls="crew-${name}">${name} <span class="tgroup__count">${i ? 3 : 6}</span>`));
-    assert.ok(families[i].includes(`id="crew-${name}"`));
+  const sections = [...html.matchAll(/<div class="tgroup(?: tgroup--packs)?" data-crew-group>([^]*?)<\/ul><\/div>/g)].map(m => m[1]);
+  assert.equal(sections.length, 3);
+  for (const [i, name] of ['radbros', 'retardios', 'assets'].entries()) {
+    assert.match(sections[i], new RegExp(`data-crew-expand aria-expanded="false" aria-controls="crew-${name}"`));
+    assert.match(sections[i], new RegExp(`id="crew-${name}"`));
+    assert.equal([...sections[i].matchAll(/<button class="tile(?: tile--pack)?"/g)].length, [6, 3, 6][i]);
   }
-  const tiles = [...html.matchAll(/<button class="tile"[^]*?data-i="(\d+)"[^]*?aria-controls="([^"]+)"/g)];
-  assert.deepEqual(tiles.map(m => +m[1]), [...crew.members, ...crew.npcs].map((_, i) => i));
-  assert.deepEqual(tiles.map(m => m[2]), [...crew.members, ...crew.npcs].map(m => m.slug));
+  const tiles = [...html.matchAll(/<button class="tile(?: tile--pack)?"[^]*?data-i="(\d+)"[^]*?aria-controls="([^"]+)"/g)];
+  const roster = [...crew.members, ...crew.npcs, ...crew.assets.packs];
+  assert.deepEqual(tiles.map(m => +m[1]), roster.map((_, i) => i));
+  assert.deepEqual(tiles.map(m => m[2]), roster.map(m => m.slug));
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(css, /\.js \[data-crew-group\]:not\(\.is-open\) > \.tiles > \.tslot:not\(:first-child\) \{ display: none; \}/);
 });
 
-test('navigation opens only the picked family and keeps NPCs and packs compact', () => {
+test('navigation reveals later tiles in families and assets but leaves first tiles and NPCs compact', () => {
   const source = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
-  const radbros = { open: false }, retardios = { open: false };
-  const familyOf = [radbros, retardios, null, null];
-  const ctx = vm.createContext({ controlsOf: () => familyOf.map(group => ({ closest: () => group })),
-    $$: () => [radbros, retardios], panelOf: () => null });
-  vm.runInContext(source.slice(source.indexOf('function revealCrewGroup('), source.indexOf("document.addEventListener('keydown'", source.indexOf('function revealCrewGroup('))), ctx);
-  for (const [index, expected] of [[0, [true, false]], [1, [false, true]], [2, [false, false]], [3, [false, false]]]) {
+  const groups = Array.from({ length: 3 }, () => ({ open: false, button: { setAttribute(_name, value) { this.expanded = value; } } }));
+  for (const group of groups) group.classList = { toggle(_name, value) { group.open = value; } };
+  const tiles = [];
+  for (const group of groups) {
+    group.first = { closest: () => group };
+    tiles.push(group.first, { closest: () => group });
+  }
+  tiles.push({ closest: () => null });
+  const ctx = vm.createContext({ controlsOf: () => tiles, $$: () => groups, panelOf: () => null,
+    $: (selector, group) => selector === '[data-crew-expand]' ? group.button : group.first });
+  vm.runInContext(source.slice(source.indexOf('function setCrewGroup('), source.indexOf("document.addEventListener('click'", source.indexOf('function setCrewGroup('))), ctx);
+  for (const [index, expected] of [[0, [false, false, false]], [1, [true, false, false]], [3, [false, true, false]], [5, [false, false, true]], [6, [false, false, false]]]) {
     ctx.revealCrewGroup(index);
-    assert.deepEqual([radbros.open, retardios.open], expected);
+    assert.deepEqual(groups.map(g => g.open), expected);
+    assert.deepEqual(groups.map(g => g.button.expanded), expected.map(String));
   }
 });
 

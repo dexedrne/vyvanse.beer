@@ -214,10 +214,14 @@ export function packTile(p, i) {
   return `<li class="tslot tslot--pack" style="--i:${i};--accent:${esc(p.accent)};--shell:${esc(p.shell)}" data-i="${i}"><button class="tile tile--pack" type="button" data-i="${i}" aria-controls="${esc(p.slug)}" aria-label="${esc(p.title)}, ${esc(p.download.size)}"><img src="${esc(p.tile)}" width="144" height="240" alt="" loading="lazy" decoding="async"><span class="tile__foil" aria-hidden="true"></span></button></li>`;
 }
 
+function crewGroup(name, tiles, cls = '') {
+  return `<div class="tgroup${cls}" data-crew-group><p class="tgroup__label"><button class="tgroup__expand js-only" type="button" data-crew-expand aria-expanded="false" aria-controls="crew-${name}">${name} <span class="tgroup__count">${tiles.length}</span></button><span class="no-js-only">${name}</span></p><ul class="tiles" id="crew-${name}" role="list">${tiles.join('')}</ul></div>`;
+}
+
 export function packGroup(crew, start) {
   const packs = crew.assets?.packs || [];
   if (!packs.length) return '';
-  return `<div class="tgroup tgroup--packs"><p class="tgroup__label">assets</p><ul class="tiles" role="list">${packs.map((p, k) => packTile(p, start + k)).join('')}</ul></div>`;
+  return crewGroup('assets', packs.map((p, k) => packTile(p, start + k)), ' tgroup--packs');
 }
 
 // One cartridge per game. A game with editions has one label per edition (the shown one on top,
@@ -272,7 +276,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   const retardios = crew.members.filter((m) => m.kind.startsWith('Retardio'));
   const otherCharacters = crew.npcs ?? [];
   const idx = (m) => crew.members.indexOf(m);
-  const family = (name, members) => `<details class="tgroup" data-crew-group name="crew-family"><summary class="tgroup__label" aria-controls="crew-${name}">${name} <span class="tgroup__count">${members.length}</span></summary><ul class="tiles" id="crew-${name}" role="list">${members.map((m) => tile(m, idx(m))).join('')}</ul></details>`;
+  const family = (name, members) => crewGroup(name, members.map(m => tile(m, idx(m))));
   const tiles = `${family('radbros', radbros)}${family('retardios', retardios)}${otherCharacters.length ? `<div class="tgroup"><p class="tgroup__label">other characters</p><ul class="tiles" role="list">${otherCharacters.map((m, i) => tile(m, crew.members.length + i)).join('')}</ul></div>` : ''}${packGroup(crew, crew.members.length + otherCharacters.length)}`;
 
   const menu = [

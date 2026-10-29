@@ -373,17 +373,33 @@ const onItem = (tab) => $('.item.on', panelOf(tab));
 const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
 const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
 
-function revealCrewGroup(i) {
-  const selected = controlsOf('crew')[i]?.closest('details[data-crew-group]');
-  for (const group of $$('details[data-crew-group]', panelOf('crew'))) group.open = group === selected;
+function setCrewGroup(group, open) {
+  group.classList.toggle('is-open', open);
+  $('[data-crew-expand]', group).setAttribute('aria-expanded', String(open));
 }
 
+function revealCrewGroup(i) {
+  const tile = controlsOf('crew')[i];
+  const selected = tile?.closest('[data-crew-group]');
+  for (const group of $$('[data-crew-group]', panelOf('crew'))) {
+    setCrewGroup(group, group === selected && tile !== $('.tile', group));
+  }
+}
+
+document.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-crew-expand]');
+  if (!button) return;
+  const selected = button.closest('[data-crew-group]');
+  const open = button.getAttribute('aria-expanded') !== 'true';
+  for (const group of $$('[data-crew-group]', panelOf('crew'))) setCrewGroup(group, group === selected && open);
+});
+
 document.addEventListener('keydown', (event) => {
-  const group = event.target.closest?.('details[data-crew-group]');
+  const group = event.target.closest?.('[data-crew-group]');
   if (event.key !== 'Escape' || !group) return;
   event.stopPropagation();
-  group.open = false;
-  $('summary', group).focus({ preventScroll: true });
+  setCrewGroup(group, false);
+  $('[data-crew-expand]', group).focus({ preventScroll: true });
 });
 
 // the row's marks: the cursor, the labels, "3 of 9", and "reset order" when the order is yours

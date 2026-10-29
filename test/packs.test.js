@@ -66,7 +66,7 @@ test('rendered packs follow the nine members with a third assets group and worki
   assert.match(html, /<p class="panel__line">Art from the games/);
   const row = html.match(/<div class="tgroups">[^]*?<\/section>/)?.[0];
   assert.equal([...row.matchAll(/class="tgroup(?: tgroup--packs)?"/g)].length, 4);
-  assert.match(row, /other characters[^]*?tgroup--packs[^]*?tgroup__label">assets</);
+  assert.match(row, /other characters[^]*?tgroup--packs[^]*?data-crew-expand[^]*?>assets /);
   assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [11, 12, 13, 14, 15, 16]);
   assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [11, 12, 13, 14, 15, 16]);
   for (const card of cards) {
