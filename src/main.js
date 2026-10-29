@@ -1268,7 +1268,7 @@ document.addEventListener('focusin', (e) => {
 
 let wallHoldTimer = 0, wallHeldAt = -Infinity;
 screen.addEventListener('pointerdown', e => {
-  if (e.pointerType !== 'touch' || S.tab !== 'games' || !e.target.closest('.slot.sel .cart')) return;
+  if (e.pointerType !== 'touch' || S.tab !== 'games' || !wheelActive() || !e.target.closest('.slot.sel .cart')) return;
   const x=e.clientX,y=e.clientY;
   let held=false,stepX=x;
   const cancel=()=>{clearTimeout(wallHoldTimer);screen.removeEventListener('pointermove',track);if(held){wallHeldAt=performance.now();if(moving)dropMove();}};
@@ -1781,7 +1781,7 @@ const sorter = createSort({
   rows: ROWS.map((tab) => ({ tab, el: $('.carts', panelOf(tab)) })),
   reduced: () => reduced.matches,
   begin(tab) {
-    if (tab === 'games' && input.scheme === 'touch') return false;
+    if (tab === 'games' && input.scheme === 'touch' && wheelActive()) return false;
     if (mode() !== 'menu' || tab !== S.tab) return false;
     if (moving) dropMove();
     return true;
