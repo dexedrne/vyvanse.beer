@@ -1516,6 +1516,11 @@ function layout() {
     box.b = {x: W-w-(ph?10:pad*.55), y:feet-h*FEET,w,h}; box.feet=feet;
     Object.assign(duoEl.style,{left:`${box.b.x}px`,top:`${box.b.y}px`,width:`${w}px`,height:`${h}px`});
     duoEl.classList.remove('duo--off'); duoEl.classList.add('duo--side');
+    const wordmark = $('.item.on .wm',panel);
+    wordmark.style.fontSize='';
+    const titleRange=document.createRange();titleRange.selectNodeContents(wordmark);
+    const titleWidth=titleRange.getBoundingClientRect().width;
+    if (wordmark.clientWidth > 0 && titleWidth > wordmark.clientWidth) wordmark.style.fontSize=`${Math.floor(parseFloat(getComputedStyle(wordmark).fontSize)*wordmark.clientWidth/titleWidth)}px`;
     backdrop(S.tab,S[S.tab]); stage?.show(want()); motion?.measure(); emit(); return;
   }
   box.wl = ph ? Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2) : Math.round(H * 0.655);
