@@ -1503,7 +1503,7 @@ function layout() {
     const style = getComputedStyle(screen);
     const u = $('.arc .slot').offsetWidth;
     const strip = $('.strip').offsetHeight;
-    const tabs = ph ? parseFloat(style.getPropertyValue('--tabs-h')) || 72 : 0;
+    const tabs = ph ? $('.tabs').offsetHeight : 0;
     box.wl = H - strip - tabs - u * (ph ? .4 : .5);
     const artH = ph ? H >= 800 ? 352 : H * .4 : box.wl;
     screen.style.setProperty('--wl', `${box.wl}px`);
