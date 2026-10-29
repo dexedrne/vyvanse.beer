@@ -268,10 +268,13 @@ export function createCast(box, { calm, models, onReady, framing }) {
         h.position.x = c.rest.x;
         h.position.z = c.rest.z;
         // swing-twist: keep the lean, damp the turn about the vertical, so they stay facing out
-        const q = h.quaternion;
-        _tw.set(0, q.y, 0, q.w).normalize();
-        q.multiply(_inverseTwist.copy(_tw).invert()).multiply(_id.slerp(_tw, YAW_KEEP));
-        _id.identity();
+        // Chak's fitted hips use a different rest basis; his baked clips already face forward.
+        if (c.num !== 'chudjak') {
+          const q = h.quaternion;
+          _tw.set(0, q.y, 0, q.w).normalize();
+          q.multiply(_inverseTwist.copy(_tw).invert()).multiply(_id.slerp(_tw, YAW_KEEP));
+          _id.identity();
+        }
       }
       if (!still) groove(c, t);
       if (c.waveT > 0) {
