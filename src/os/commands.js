@@ -119,8 +119,8 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
   }
 
   const getPack = p => h('a', { href: p.download.href, download: true }, '[get]');
-  const packCredit = () => line('Free to use under the ', link(crew.repo.license.href, crew.repo.license.label),
-    '. Credit ', link(assets.credit.href, assets.credit.label), ' when you post it.');
+  const packCredit = p => p?.licenseText ? line(p.licenseText) : line('Artwork is free to use under the ', link(crew.repo.license.href, crew.repo.license.label),
+    '. Credit ', link(assets.credit.href, assets.credit.label), ' when you post it. Car models retain their source licence terms in the ZIP README.');
 
   function describePack(p) {
     term.print(h('div', { class: 't-block t-bro-card' },
@@ -130,7 +130,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
           h('li', {}, h('b', {}, c.path), h('span', {}, c.what)))),
         line(getPack(p), ' ', link(p.download.href, `${p.download.label} (${p.download.size})`)),
         line(muted(`${p.download.size}, ${p.download.files} files, ${p.download.formats}`)),
-        packCredit())));
+        packCredit(p))));
     shell.reveal(p.slug);
   }
 

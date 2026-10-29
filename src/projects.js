@@ -627,7 +627,7 @@ export const crew = {
     // the no-JS panel line, the terminal's `assets` header and the ask payload
     line: 'Art from the games, free for the Radbro community. Use it, remix it, credit @dexedrne on X.',
     credit: { label: '@dexedrne on X', href: 'https://x.com/dexedrne' },
-    all: { href: `${REL}/vyvanse-assets-all-current.zip`, label: 'every pack, one .zip', size: '580 MB' },
+    all: { href: `${REL}/vyvanse-assets-all-2026-10-29.zip`, label: 'every pack, one .zip', size: '739 MB' },
     packs: [
       {
         id: 'saloon-card-pack', // hash #crew/saloon-card-pack, terminal `info saloon-card-pack`, ask `pack:saloon-card-pack`

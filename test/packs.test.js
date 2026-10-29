@@ -160,7 +160,7 @@ test('terminal lists assets under crew and provides pack info, links, aliases an
     commands.run(cmd);
     text = output.map(el => el.textContent).join(' ');
     assert.match(text, /81 MB[^]*126[^]*SALOON Card Pack|SALOON Card Pack[^]*81 MB[^]*126/);
-    assert.match(text, /580 MB/);
+    assert.ok(text.includes(crew.assets.all.size));
     assert.match(text, /Viral Public License/);
   }
   output.length = 0;
@@ -237,4 +237,13 @@ test('desktop pack wordmarks fit the visible name without shrinking for their hi
   const fn = source.slice(source.indexOf('function fitWm()'), source.indexOf('function layout()'));
   vm.runInContext(`${fn}\nfitWm()`, ctx);
   assert.equal(wm.style.fontSize, '');
+});
+
+
+test('terminal car info preserves vehicle source terms instead of the artwork licence', () => {
+  const { commands, output } = terminal();
+  commands.run('info cars');
+  const text = output.map(el => el.textContent).join(' ');
+  assert.match(text, /Source credits and original licence terms/);
+  assert.doesNotMatch(text, /Viral Public License/);
 });
