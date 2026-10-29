@@ -41,7 +41,7 @@ const DIRS = { 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
 // what each glyph reads as, per input
 export const GLYPHS = {
   touch: { a: 'tap', b: 'back', x: 'tap', y: 'details', lb: 'swipe', rb: 'swipe', lt: '↑', rt: '↓', start: 'play', select: '⛶', move: 'swipe', vmove: 'tap', hold: 'Create + Options', grab: 'hold' },
-  kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', lt: '↑', rt: '↓', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc', grab: 'R' },
+  kb: { a: '↵', b: 'Esc', x: 'G', y: 'I', lb: 'Q', rb: 'E', lt: '[', rt: ']', start: 'Enter', select: 'F', move: '← →', vmove: '↑ ↓', hold: 'Esc', grab: 'R' },
   xbox: { a: 'A', b: 'B', x: 'X', y: 'Y', lb: 'LB', rb: 'RB', lt: 'LT', rt: 'RT', start: 'Menu', select: 'View', move: '✚', vmove: '✚', hold: 'View + Menu', grab: 'Menu' },
   ps: { a: '✕', b: '○', x: '□', y: '△', lb: 'L1', rb: 'R1', lt: 'L2', rt: 'R2', start: 'Options', select: 'Create', move: '✚', vmove: '✚', hold: 'Create + Options', grab: 'Options' },
 };
@@ -49,7 +49,7 @@ export const GLYPHS = {
 // Sony pads report as "Wireless Controller" (vendor 054c); Xbox ones can say "Wireless Controller" too
 const isPs = (id = '') => /054c|playstation|dualshock|dualsense|ps[345]/i.test(id) || (/wireless controller/i.test(id) && !/xbox|045e/i.test(id));
 
-export function createInput({ act, mode, onScheme, phone = () => false }) {
+export function createInput({ act, mode, onScheme, phone = () => false, wheel = () => false }) {
   const root = document.documentElement;
   let device = matchMedia('(pointer: coarse)').matches ? 'touch' : 'kb'; // kb | mouse | touch | xbox | ps
   let scheme = device;
@@ -120,7 +120,7 @@ export function createInput({ act, mode, onScheme, phone = () => false }) {
     if (!name && (k === 'Enter' || k === ' ')) {
       // a focused link or button does its own thing; otherwise Enter plays the selection
       const el = document.activeElement;
-      if (el && el !== document.body && el.matches('a, button, summary, [tabindex]')) return;
+      if (el && el !== document.body && el.matches('a, button, summary, [tabindex]') && !(wheel() && el.matches('.cart, .play'))) return;
       name = 'ok';
     }
     if (!name) return;

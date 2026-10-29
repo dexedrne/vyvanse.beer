@@ -236,7 +236,7 @@ function tags(carts, cls) {
   return `<ul class="tags ${cls}" aria-hidden="true">${sections.map(sec => `<li class="tag" data-sec="${sec.id}" role="button" tabindex="-1">${sec.label.toUpperCase()}<i>${carts.filter(e => e[0].section === sec.id).length}</i></li>`).join('')}</ul>`;
 }
 function library(carts) {
-  return `<div class="wall" role="dialog" aria-label="All games" hidden><div class="wall__bg"></div><header class="wall__head"><h2>All games</h2><p>${carts.length} cartridges in ${sections.length} genres · let go of △ to close on the pick</p></header><div class="field"><ul class="flow">${sections.map(sec => `<li class="cl" data-sec="${sec.id}"><h3 class="cl__name">${sec.label}<i>${carts.filter(e => e[0].section === sec.id).length}</i></h3><ul class="cl__items">${carts.map((eds,i) => { if (eds[0].section !== sec.id) return ''; const p=eds[0], {body,mirror}=cartBody(p,i,eds); return `<li class="fl${eds.length > 1 ? ' fl--eds' : ''}" data-i="${i}" data-sec="${sec.id}" style="--accent:${p.accent};--shell:${p.shell}"><span class="fl__rip"></span><span class="fl__inner">${body}</span>${mirror}</li>`; }).join('')}</ul></li>`).join('')}</ul>${tags(carts,'tags--field')}</div></div>`;
+  return `<div class="wall" role="dialog" aria-label="All games" hidden><div class="wall__bg"></div><header class="wall__head"><h2>All games</h2><p>${carts.length} cartridges in ${sections.length} genres · let go of △ to close on the pick</p></header><div class="field"><ul class="flow">${sections.map(sec => `<li class="cl" data-sec="${sec.id}"><h3 class="cl__name">${sec.label}<i>${carts.filter(e => e[0].section === sec.id).length}</i></h3><ul class="cl__items">${carts.map((eds,i) => { if (eds[0].section !== sec.id) return ''; const p=eds[0], {body,mirror}=cartBody(p,i,eds); return `<li class="fl${eds.length > 1 ? ' fl--eds' : ''}" data-i="${i}" data-sec="${sec.id}" data-game="${esc(p.cmd)}" style="--accent:${p.accent};--shell:${p.shell}"><span class="fl__rip"></span><span class="fl__inner">${body}</span>${mirror}</li>`; }).join('')}</ul></li>`).join('')}</ul>${tags(carts,'tags--field')}</div></div>`;
 }
 const DECK = '<div class="deck" aria-hidden="true"><div class="deck__clip"><div class="deck__body"><i class="deck__slot"></i><i class="deck__seam"></i><i class="deck__led"></i><i class="deck__scan"></i></div></div><span class="deck__mirror"></span><i class="deck__bloom"></i></div>';
 
@@ -307,6 +307,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   return `<div class="screen boot" id="screen">
   <div class="backdrops" id="backdrops" aria-hidden="true"><img class="bd on" data-bd="games:${esc(lead.cmd)}" src="${esc(lead.image.src)}" alt="" fetchpriority="high" decoding="async"></div>
   <div class="shafts" aria-hidden="true"><i style="--l:6%;--d1:23s;--d2:9s"></i><i style="--l:40%;--d1:29s;--d2:11s;--dl:-7s"></i><i style="--l:70%;--d1:31s;--d2:13s;--dl:-3s"></i></div><div class="waterline" aria-hidden="true"></div>
+  <div class="rain" aria-hidden="true"></div>
   <div class="scrim" aria-hidden="true"></div>
   <div class="duo duo--off" id="duo" aria-hidden="true">
     <div class="duo__poster">${pair.map((m) => `<img src="${esc(m.image.src)}" width="${m.image.width}" height="${m.image.height}" alt="" decoding="async">`).join('')}</div>

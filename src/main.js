@@ -27,7 +27,7 @@ const phone = matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse
 const screen = $('#screen');
 const duoEl = $('#duo');
 const hint = $('#duo-hint');
-const wheelActive = () => screen.clientWidth > 760 || screen.clientHeight >= screen.clientWidth;
+const wheelActive = () => !phone.matches || screen.clientHeight >= screen.clientWidth;
 let motion = null;
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
@@ -375,7 +375,7 @@ const panelOf = (tab) => $(`#${tab}`);
 const itemsOf = (tab) => $$('.item', panelOf(tab));
 const onItem = (tab) => $('.item.on', panelOf(tab));
 const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
-const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
+const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : tab === 'games' ? 'button.cart' : '.cart', panelOf(tab)));
 
 function setCrewGroup(group, open) {
   group.classList.toggle('is-open', open);
@@ -476,9 +476,10 @@ function crossfade(was, now) {
 // or a side ('first' / 'last': the pad's triggers, which flank the switch, point at its ends)
 function edition(to) {
   if (S.tab !== 'games') return false;
-  const eds = SHELF[S.games];
+  const gameIndex = motion?.wallOpen ? motion.focusIndex : S.games;
+  const eds = SHELF[gameIndex];
   if (eds.length < 2) return false;
-  const cur = edOf(S.games);
+  const cur = edOf(gameIndex);
   const k =
     to === 'first' ? 0
     : to === 'last' ? eds.length - 1
@@ -487,7 +488,7 @@ function edition(to) {
   if (k < 0 || k === cur) return;
   // focus was on the switch: it goes along to the same pill on the new card
   const pill = document.activeElement?.closest?.('.ed');
-  const apply = () => { setEd(S.games, k); paint('games'); save(); };
+  const apply = () => { setEd(gameIndex, k); paint('games'); save(); };
   if (motion) motion.flip(apply); else apply();
   save();
   layout();
@@ -586,11 +587,12 @@ function arrangeRow(tab, keys) {
     if (ul.children[j] !== slot) ul.insertBefore(slot, ul.children[j]);
     slot.dataset.i = j;
     slot.style.setProperty('--i', j);
-    $('.cart', slot).dataset.i = j;
+    $$('button.cart', slot).forEach(c=>c.dataset.i=j);
   });
   S[tab] = Math.max(0, list.indexOf(cur));
   if (tab === 'games') {
     for (const el of $$('.fl')) { const j = SHELF.findIndex(eds => eds[0].cmd === el.dataset.game); if (j >= 0) { el.dataset.i=j; $$('.cart',el).forEach(c=>c.dataset.i=j); } }
+    for (const cl of $$('.cl__items')) [...cl.children].sort((a,b)=>+a.dataset.i-+b.dataset.i).forEach(el=>cl.append(el));
     motion?.select(S.games);
   }
   // (moving a focused cartridge in the DOM drops its focus: give it back)
@@ -1045,6 +1047,10 @@ function act(name, info = {}) {
 
 function phoneFocus() {
   if (!phone.matches) return;
+  if (S.tab === 'games' && wheelActive()) {
+    $$('.panel--games .play, .panel--games .more-btn').forEach(el=>el.classList.remove('is-focus'));
+    delete screen.dataset.zone;delete screen.dataset.button;return;
+  }
   screen.dataset.zone = phoneZone;
   screen.dataset.button = String(phoneButton);
   $$('.panel .play, .panel .more-btn').forEach(el => el.classList.remove('is-focus'));
@@ -1054,7 +1060,7 @@ function phoneFocus() {
   if (phoneZone === 'actions' || phoneZone === 'shelf') (phoneButton && phoneZone === 'actions' ? $('[data-more]', item) : $('[data-act]', item))?.classList.add('is-focus');
 }
 
-const input = createInput({ act, mode, phone: () => phone.matches, onScheme: scheme => {
+const input = createInput({ act, mode, wheel: () => S.tab === 'games' && wheelActive(), phone: () => phone.matches, onScheme: scheme => {
   hints();
   phoneFocus();
   dispatchEvent(new Event('vyv:input'));
@@ -1252,6 +1258,7 @@ $('#contact').addEventListener('pointerover', (e) => {
 document.addEventListener('focusin', (e) => {
   if (!e.target.matches?.(':focus-visible')) return;
   const c = e.target.closest?.('.cart, .tile');
+  if (c) c.closest('.slot')?.classList.add('is-focus');
   if (c && +c.dataset.i !== S[S.tab]) select(+c.dataset.i, { sound: false });
   const mi = e.target.closest?.('.mi');
   if (mi && S.tab === 'contact') select(LISTS.contact.indexOf(mi), { sound: false });
@@ -1261,12 +1268,18 @@ let wallHoldTimer = 0, wallHeldAt = -Infinity;
 screen.addEventListener('pointerdown', e => {
   if (e.pointerType !== 'touch' || S.tab !== 'games' || !e.target.closest('.slot.sel .cart')) return;
   const x=e.clientX,y=e.clientY;
-  const cancel=()=>{clearTimeout(wallHoldTimer);screen.removeEventListener('pointermove',track);};
-  const track=e=>{if(Math.hypot(e.clientX-x,e.clientY-y)>12)cancel();};
-  wallHoldTimer=setTimeout(()=>{wallHeldAt=performance.now();motion?.openWall();},500);
+  let held=false,stepX=x;
+  const cancel=()=>{clearTimeout(wallHoldTimer);screen.removeEventListener('pointermove',track);if(held){wallHeldAt=performance.now();if(moving)dropMove();}};
+  const track=e=>{if(Math.hypot(e.clientX-x,e.clientY-y)<=12)return;
+    if(!held)return cancel();
+    if(!moving){motion?.closeWall();grab();}
+    if(Math.abs(e.clientX-stepX)>80){nudgeMove(e.clientX>stepX?1:-1);stepX=e.clientX;}
+  };
+  wallHoldTimer=setTimeout(()=>{held=true;wallHeldAt=performance.now();motion?.openWall();},500);
   screen.addEventListener('pointermove',track,{passive:true});
   screen.addEventListener('pointerup',cancel,{once:true});screen.addEventListener('pointercancel',cancel,{once:true});
 },{passive:true});
+document.addEventListener('focusout', e => e.target.closest?.('.slot')?.classList.remove('is-focus'));
 // swipe the art (phones) to move along the row
 let sx = 0;
 let sy = 0;
@@ -1782,7 +1795,7 @@ const sorter = createSort({
     if (moved) announce(`${label(tab, S[tab])}. Order saved.`);
   },
 });
-for (const el of $$('.fl')) el.dataset.game = SHELF[+el.dataset.i][0].cmd;
+for (const el of $$('.fl')) el.dataset.game ||= SHELF[+el.dataset.i][0].cmd;
 load();
 $('.arc').dataset.sel = String(S.games);
 motion = createMotion({ screen, arc: $('.arc'), wheel: $('.wheel'), deck: $('.deck'), wall: $('.wall'), backdrop: $('#backdrops'),

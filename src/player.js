@@ -15,6 +15,7 @@
 //   - the browser's Back, or a phone's back gesture: the game has its own history entry.
 
 import { h, icon } from './dom.js';
+import { cartBody } from './render.js';
 import { shortUrl } from './projects.js';
 import { deviceFlags, isPhone, dprCap } from './device.js';
 import { playerViewport } from './viewport.js';
@@ -46,6 +47,8 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
           <button class="a2hs__share" type="button"><span class="a2hs__ic" aria-hidden="true">⌂</span><span><b>Add to Home Screen</b> for the full screen · share ⇧ then “Add to Home Screen”</span></button>
           <button class="a2hs__x" type="button" aria-label="Dismiss Add to Home Screen hint">✕</button>
         </div>
+        <div class="player__cartridge" aria-hidden="true"></div>
+        <div class="player__progress" aria-hidden="true"><i></i></div>
         <p class="kindline"></p>
         <p class="wm"></p>
         <p class="status"><span class="cmd"></span> <span class="ok player__load">loading</span></p>
@@ -128,14 +131,15 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
     lastFocus = document.activeElement;
     el.classList.toggle('player--insert',p.group === 'games');
     const card = el.querySelector('.player__card');
-    const art = card.querySelector('img');
+    if (p.group === 'games') card.querySelector('.player__cartridge').innerHTML=cartBody(p,0).body.replace('<button','<span').replace('type="button"','').replace('</button>','</span>');
+    const art = card.querySelector('img.art-img');
     art.src = p.image?.src || '';
     art.style.objectPosition = (isPhone() ? p.phone : p.image?.position) || '';
     card.style.setProperty('--accent', p.accent || '');
     card.querySelector('.kindline').textContent = p.kind;
     card.querySelector('.wm').textContent = p.name;
     card.querySelector('.cmd').textContent = `> ${p.cmd}.exe`;
-    card.querySelector('.player__how').innerHTML = how();
+    card.querySelector('.player__how').innerHTML = p.group === 'games' ? `hold <span class="g">${glyph('b')}</span> or ◀ menu to come back` : how();
     const tab = el.querySelector('.player__btn--tab');
     const url = launchUrl(p, as);
     tab.href = url;
@@ -279,7 +283,7 @@ export function createPlayer({ glyph, paintGlyphs, onOpen, onClose, pads, blip }
   // View + Menu (buttons 8 + 9 in the standard mapping), held on any pad
   function watchPads() {
     if (!current) return;
-    const both = pads().some((gp) => gp.buttons[8]?.pressed && gp.buttons[9]?.pressed);
+    const both = pads().some((gp) => gp.buttons[8]?.pressed && gp.buttons[9]?.pressed || current.group === 'games' && gp.buttons[1]?.pressed);
     if (both && !hold.by) startHold('pad');
     else if (!both && hold.by === 'pad') stopHold();
     else if (both) tickHold();

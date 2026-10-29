@@ -36,7 +36,7 @@ test('wheel turns enter beyond reach and settle to the approved targets',()=>{
   const s=new Spring(0,17,.62);s.set(169.84);let max=0;for(let i=0;i<180;i++){s.step(1/120);max=Math.max(max,s.x);}assert.ok(max>169.84);assert.ok(Math.abs(s.x-169.84)<.01);
 });
 test('insert accepts one press/release, cancel, ordered beats and return',()=>{
-  const s=new InsertState();assert.equal(s.release(),false);assert.ok(s.press());assert.equal(s.press(),false);assert.ok(s.cancel());assert.equal(s.state,'idle');
+  const s=new InsertState();assert.equal(s.advance('lifting'),false);assert.equal(s.release(),false);assert.ok(s.press());assert.equal(s.press(),false);assert.ok(s.cancel());assert.equal(s.state,'idle');
   s.press();assert.ok(s.release());assert.equal(s.press(),false);assert.equal(s.release(),false);assert.equal(s.advance('playing'),false);
   for(const state of ['dropping','seated','playing'])assert.ok(s.advance(state));s.eject();assert.equal(s.state,'idle');assert.ok(s.press());
 });

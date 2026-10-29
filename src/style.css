@@ -2323,7 +2323,7 @@ a.ticker__tok:hover .ticker__k {
   opacity: 0.5;
 }
 
-.player--insert .player__card::before {
+.player__card::before {
   content: '';
   position: absolute;
   z-index: 1;
@@ -3322,7 +3322,7 @@ html.js { --topbar: 52px; --top: calc(var(--topbar) + var(--safe-top)); --gut: 1
 .js .player--phone { position: fixed; height: var(--view-height, 100%); pointer-events: none; inset: 0; z-index: 30; background: #000; }
 .js .player__card { position: absolute; inset: 0; display: grid; align-content: end; gap: 6px; padding: 0 var(--gut) calc(var(--safe-bottom) + 28px) calc(var(--gut) + var(--safe-left)); background: var(--ink); }
 .js .player__card img.art-img { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 22%); opacity: 0.62; }
-.js .player--insert .player__card::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 22%, rgb(var(--scrim) / 0.62) 42%, rgb(var(--scrim) / 0.1) 72%), linear-gradient(180deg, rgb(var(--scrim) / 0.7), transparent 160px); }
+.js .player__card::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 22%, rgb(var(--scrim) / 0.62) 42%, rgb(var(--scrim) / 0.1) 72%), linear-gradient(180deg, rgb(var(--scrim) / 0.7), transparent 160px); }
 .js .player__card > * { position: relative; z-index: 2; }
 .js .player__card .kindline { max-width: 100%; }
 .js .player__card .wm { font-size: 64px; max-width: 100%; white-space: normal; }
@@ -3604,7 +3604,7 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .js .sheet__more { bottom: 78px; }
 
 
-.js .player--insert .player__card::before { background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 30%, rgb(var(--scrim) / 0.55) 56%, rgb(var(--scrim) / 0.1) 85%), linear-gradient(90deg, rgb(var(--scrim) / 0.8), rgb(var(--scrim) / 0.35) 45%, transparent 75%), linear-gradient(180deg, rgb(var(--scrim) / 0.6), transparent 120px); }
+.js .player__card::before { background: linear-gradient(0deg, rgb(var(--scrim) / 0.98) 0, rgb(var(--scrim) / 0.9) 30%, rgb(var(--scrim) / 0.55) 56%, rgb(var(--scrim) / 0.1) 85%), linear-gradient(90deg, rgb(var(--scrim) / 0.8), rgb(var(--scrim) / 0.35) 45%, transparent 75%), linear-gradient(180deg, rgb(var(--scrim) / 0.6), transparent 120px); }
 .js .player__card .status { display: block; }
 .js .player__card { padding-left: calc(var(--gut) + var(--safe-left)); padding-bottom: calc(var(--safe-bottom) + 18px); }
 .js .a2hs { max-width: 420px; }
@@ -3785,6 +3785,31 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .js .tgroup__count { color: var(--muted); }
 
 /* The console insert lights the existing player card without changing its relay or controls. */
-.player--insert .player__card::before { content:''; position:absolute; inset:0; z-index:5; pointer-events:none; background:radial-gradient(55% 45% at 46% 88%,rgb(255 236 190 / .65),rgb(233 196 126 / .18) 40%,transparent 72%); animation:wheel-warm .7s ease-out both; }
+.js .player.player--insert .player__card::before { content:''; position:absolute; inset:0; z-index:5; pointer-events:none; background:radial-gradient(55% 45% at 46% 88%,rgb(255 236 190 / .65),rgb(233 196 126 / .18) 40%,transparent 72%); animation:wheel-warm .7s ease-out both; }
 @keyframes wheel-warm { from { opacity:1; } to { opacity:0; } }
-@media(prefers-reduced-motion:reduce) { .player--insert .player__card::before { animation:none; opacity:0; } }
+@media(prefers-reduced-motion:reduce) { .js .player.player--insert .player__card::before { animation:none; opacity:0; } }
+
+.player__cartridge, .player__progress { display:none; }
+.js .player.player--insert .player__card { display:grid; padding:0; align-content:center; justify-content:center; grid-template-columns:118px 360px; column-gap:28px; row-gap:6px; background:#07050d; }
+.js .player.player--insert .player__card > .art-img { position:absolute; inset:0; width:100%; height:100%; opacity:1; filter:brightness(.3) saturate(.7); }
+.js .player.player--insert .player__card > .kindline { display:none; }
+.js .player.player--insert .player__cartridge { display:block; grid-column:1; grid-row:1 / 5; align-self:center; --cw:118px; --u:118px; animation:wheel-card-rise .6s cubic-bezier(.22,1.18,.36,1) both; }
+.js .player.player--insert .player__cartridge .cart { width:118px; height:144px; padding:14px 9px 0; filter:none; gap:5px; }
+.js .player.player--insert .player__cartridge img { position:static; inset:auto; height:100%; width:100%; opacity:1; object-fit:cover; }
+.js .player.player--insert .player__cartridge .cart__name { font-size:18px; }
+.js .player.player--insert .player__card .wm { grid-column:2; grid-row:1; font-size:60px; line-height:.86; margin:0; }
+.js .player.player--insert .player__card .status { grid-column:2; grid-row:2; font-size:19px; margin:0; }
+.js .player.player--insert .player__progress { display:block; grid-column:2; grid-row:3; width:320px; height:3px; margin:4px 0 2px; background:rgb(255 255 255 / .1); border-radius:2px; overflow:hidden; }
+.js .player.player--insert .player__progress i { display:block; width:100%; height:100%; background:var(--amber); box-shadow:0 0 8px var(--amber); transform-origin:0 50%; animation:wheel-progress 2.4s ease-out both; }
+.js .player.player--insert .player__how { grid-column:2; grid-row:4; font-size:15px; line-height:1.3; margin:0; color:var(--faint); max-width:360px; }
+@keyframes wheel-card-rise { from { transform:translateY(30px); opacity:0; } }
+@keyframes wheel-progress { from { transform:scaleX(0); } to { transform:scaleX(.62); } }
+@media(max-width:760px) and (orientation:portrait) {
+ .js .player.player--insert .player__card { grid-template-columns:86px minmax(0,220px); gap:12px; padding:16px; }
+ .js .player.player--insert .player__cartridge { transform:scale(.73); transform-origin:0 50%; }
+ .js .player.player--insert .player__card .wm { font-size:46px; }
+ .js .player.player--insert .player__progress { width:100%; }
+}
+@media(prefers-reduced-motion:reduce) { .js .player.player--insert .player__cartridge, .js .player.player--insert .player__progress i { animation:none; } }
+
+.player__cartridge { pointer-events:none; }

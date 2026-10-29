@@ -1,3 +1,5 @@
+import { readQuality } from './quality.js';
+
 // Games motion, ported from the approved wheel reference. One fixed-step animation clock.
 const TAU = Math.PI * 2;
 const DT = 1 / 120;
@@ -54,14 +56,17 @@ export class InsertState {
   press() { if(this.state !== 'idle') return false; this.state='pressed';return true; }
   cancel() { if(this.state !== 'pressed') return false; this.state='idle';return true; }
   release() { if(this.state !== 'pressed') return false; this.state='lifting';return true; }
-  advance(next) { const order=['lifting','dropping','seated','playing']; if(order.indexOf(next)!==order.indexOf(this.state)+1)return false; this.state=next;return true; }
+  advance(next) { const order=['lifting','dropping','seated','playing']; if(order.indexOf(this.state)<0 || order.indexOf(next)!==order.indexOf(this.state)+1)return false; this.state=next;return true; }
   eject() { this.state='idle'; }
 }
 
 export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdrop, onSelect, onPlay, onWall }) {
   const root = document.documentElement;
-  const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let LITE = localStorage.getItem('vyv-quality') === 'battery';
+  const calmMedia = matchMedia('(prefers-reduced-motion: reduce)');
+  let CALM = calmMedia.matches;
+  const spring = (name,x=0) => new Spring(x,SP[name][0],CALM ? 1 : SP[name][1]);
+  let LITE = readQuality() === 'battery';
+  screenEl.classList.toggle('is-lite',LITE);
   let PHONE = matchMedia('(max-width: 760px) and (orientation: portrait)').matches;
   const $ = (s,r=screenEl) => r.querySelector(s);
   const $$ = (s,r=screenEl) => [...r.querySelectorAll(s)];
@@ -73,8 +78,9 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
   const mark = fn => fn();
   function fireTimers() { timers.sort((a,b)=>a.at-b.at); while(timers.length && timers[0].at <= t+1e-9) timers.shift().fn(); }
   function writeSlot(el, x, y, s, r, o, rz, i, T, mirror = true) {
-    el.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) scale(${s.toFixed(4)}) rotateY(${r.toFixed(2)}deg) rotateZ(${rz.toFixed(3)}deg)`;
-    el.style.opacity = o.toFixed(3);
+    const transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) scale(${s.toFixed(4)}) rotateY(${r.toFixed(2)}deg) rotateZ(${rz.toFixed(3)}deg)`;
+    if (el.style.transform !== transform) el.style.transform = transform;
+    if (el.style.opacity !== o.toFixed(3)) el.style.opacity = o.toFixed(3);
     if (mirror) {
       const m = el.querySelector(':scope > .slot__mirror');
       if (m && !CALM) {
@@ -108,7 +114,7 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
     for (const s of slots) {
       s.i = +s.el.dataset.i;
       const k = kof(s.i), p = placeK(k, u, reach);
-      s.k = k;
+      s.k = k; s.el.dataset.k=String(k);
       if (snap || CALM) { s.sx.snap(p.x); s.ss.snap(p.s); s.sr.snap(p.r); s.so.snap(p.hidden ? 0 : p.o); }
       else if (s.el.hidden || s.so.x < 0.03) {
         // out past the reach: it slides in from one step further out (never pops into place)
@@ -140,6 +146,7 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
   // ---- boot: every slot starts 0.9u under the waterline, rises 55 ms apart from the apex outwards ----
   let booting = false;
   function boot() {
+    if (CALM) { select(sel,{snap:true});return; }
     booting = true;
     arc.classList.add('is-booting');
     for (const s of slots) {
@@ -158,18 +165,21 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
   };
   let ins = null;
   const insertState = new InsertState();
-  function press() { idleSince = performance.now(); if (!insertState.press()) return; mark(() => byI(sel).el.classList.add('is-pressed')); }
-  function cancel() { insertState.cancel(); mark(() => byI(sel).el.classList.remove('is-pressed')); }
+  function press() { idleSince = performance.now(); if (!insertState.press()) return; mark(() => (wallOpen && focus ? focus.el : byI(sel).el).classList.add('is-pressed')); }
+  function cancel() { insertState.cancel(); mark(() => { byI(sel).el.classList.remove('is-pressed');focus?.el.classList.remove('is-pressed'); }); }
   function release(v = 'a') {
     if (!insertState.release()) return;
     v = 'a';
-    if (wallOpen) closeWall();
+    const fromWall = wallOpen && focus;
+    if (fromWall) select(focus.i);
     inserting = true;
     const c = INS[v] || INS.a;
-    const apex = byI(sel);
+    const unit = fromWall ? fu : u;
+    const apex = fromWall ? {el:focus.el,sx:{x:focus.bx-cx}} : byI(sel);
+    if (fromWall) { wall.append(deck); deck.style.setProperty('--u',`${fu}px`); deck.style.top=`${focus.by-.6*fu}px`; }
     // the seat: the feet a hair above the waterline, the top 0.6u of the cartridge standing out of the console
-    ins = { v, c, t0: t, apex, seat: -0.02 * u, lift: new Spring(0, 14, 0.7), click: new Spring(0, 30, 0.45), dropAt: -1, from: 0, y: 0 };
-    ins.lift.set(-c.lift * u);
+    ins = { v, c, t0: t, apex, fromWall:!!fromWall, seat: -0.02 * unit, lift: new Spring(0, 14, 0.7), click: new Spring(0, 30, 0.45), dropAt: -1, from: 0, y: 0 };
+    ins.lift.set(-c.lift * unit);
     mark(() => {
       apex.el.classList.remove('is-pressed');
       apex.el.classList.add('is-inserting');
@@ -193,7 +203,7 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
         const ws = [[1.6, 0.05], [2.4, 0.16], [3.4, 0.3]].slice(0, c.rings);
         rings.innerHTML = ws.map(([w, dl]) => `<i style="--dl:${dl}s;width:calc(var(--u)*${w});height:calc(var(--u)*${(w * 0.22).toFixed(3)})"></i>`).join('')
          ;
-        arc.append(rings);
+        if (fromWall) { rings.style.left=`${focus.bx}px`;rings.style.top=`${focus.by}px`;rings.style.transform='none';rings.style.setProperty('--u',`${fu}px`);field.append(rings); } else arc.append(rings);
       });
       for (const s of slots) if (s !== apex && !s.el.hidden) { s.sdy.set(c.dip * u); s.so.set(s.target.o * c.fade); }
     });
@@ -266,7 +276,6 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
   function focusItem(it, { snap = false } = {}) {
     if (!it) return;
     focus = it;
-    onSelect?.(it.i);
     for (const x of items) mark(() => x.el.classList.toggle('sel', x === it));
     if (snap) cam.snap(camTarget()); else cam.set(camTarget());
   }
@@ -371,7 +380,8 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
     if (wallOpen) {
       field.style.transform = `translateY(${cam.x.toFixed(1)}px)`;
       for (const it of items) {
-        const fy = CALM || LITE ? 0 : floatY(fu, 1, it.i, T);
+        const mine = ins?.fromWall && ins.apex.el === it.el;
+        const fy = mine ? insertY() : CALM || LITE ? 0 : floatY(fu, 1, it.i, T);
         const rz = CALM || LITE ? 0 : rollZ(it.i, T);
         writeSlot(it.el, it.bx, it.by - 1.22 * fu + fy, 1, 0, 1, rz, it.i, T);
       }
@@ -387,7 +397,8 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
 
 
   function flip(swap) {
-    const els = [byI(sel)?.el, ...$$('.fl', wall).filter(el => +el.dataset.i === sel)].filter(Boolean);
+    const pick = wallOpen && focus ? focus.i : sel;
+    const els = [byI(pick)?.el, ...$$('.fl', wall).filter(el => +el.dataset.i === pick)].filter(Boolean);
     if (els.some(el => el.classList.contains('is-flipping'))) return;
     els.forEach(el => el.classList.add('is-flipping'));
     after(0.21, () => swap?.());
@@ -397,7 +408,11 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
     timers.length=0; insertState.eject();
     screenEl.classList.remove('is-inserting','ins-a','is-rumble');
     deck.classList.remove('lit','bloom');
-    $$('.rings',arc).forEach(el=>el.remove());
+    $$('.rings',screenEl).forEach(el=>el.remove());
+    if(ins?.fromWall) {
+      ins.apex.el.classList.remove('is-inserting');closeWall();ins.apex=byI(sel);
+      wheel.append(deck);deck.style.removeProperty('--u');deck.style.removeProperty('top');ins.fromWall=false;
+    }
     for(const s of slots) { s.el.classList.remove('is-pressed'); s.sdy.set(0); }
     if(ins) {
       ins.lift.snap(insertY()).set(-1.05*u); ins.dropAt=-1;
@@ -428,9 +443,10 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
     if (document.hidden) { cancelAnimationFrame(raf); raf=0; } else if (!paused) resume();
   });
   addEventListener('pointermove', e => { if (CALM || paused) return; px.set((e.clientX/W-0.5)*16); py.set((e.clientY/H-0.5)*10); }, {passive:true});
+  calmMedia.addEventListener('change', e => { CALM=e.matches; wall.classList.toggle('wall--calm',CALM); select(sel,{snap:true}); });
   const remeasure = () => { const before = [W,H,u,wl].join(); measure(); if (before === [W,H,u,wl].join()) return; select(sel, {snap:true}); if (wallOpen) { layoutField(); focusItem(items.find(x => x.i === sel)); } };
   addEventListener('resize', remeasure);
-  addEventListener('vyv:quality', () => { LITE = localStorage.getItem('vyv-quality') === 'battery'; screenEl.classList.toggle('is-lite', LITE); remeasure(); });
+  addEventListener('vyv:quality', () => { LITE = readQuality() === 'battery'; screenEl.classList.toggle('is-lite', LITE); remeasure(); });
   select(sel, {snap:true}); tagTargets();
   for (const tg of tags) { tg.sx.snap(tg.sx.t); tg.sy.snap(tg.sy.t); tg.so.snap(tg.so.t); }
   render(); resume();
@@ -438,6 +454,6 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
     cue: on => byI(sel)?.el.classList.toggle('wall-cue',on),
     get wallOpen() { return wallOpen; }, get inserting() { return inserting; },
     get pressed() { return byI(sel)?.el.classList.contains('is-pressed'); },
-    get items() { return items; },
+    get items() { return items; }, get focusIndex() { return focus?.i ?? sel; },
   };
 }
