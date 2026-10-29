@@ -627,7 +627,7 @@ export const crew = {
     // the no-JS panel line, the terminal's `assets` header and the ask payload
     line: 'Art from the games, free for the Radbro community. Use it, remix it, credit @dexedrne on X.',
     credit: { label: '@dexedrne on X', href: 'https://x.com/dexedrne' },
-    all: { href: `${REL}/vyvanse-assets-all-2026-10-29.zip`, label: 'every pack, one .zip', size: '739 MB' },
+    all: { href: `${REL}/vyvanse-assets-all-2026-10-29-r2.zip`, label: 'every pack, one .zip', size: '736 MB' },
     packs: [
       {
         id: 'saloon-card-pack', // hash #crew/saloon-card-pack, terminal `info saloon-card-pack`, ask `pack:saloon-card-pack`
@@ -786,15 +786,15 @@ export const crew = {
         kind: 'SHITBOX · 3D models',
         name: 'Cars',
         title: 'SHITBOX Cars',
-        line: '46 released SHITBOX road vehicles as individual stock GLB models, including the newer cars, vans, pickups and buses. CARS.csv maps the real and in-game names; the README preserves source credits, licence terms and exclusions.',
-        big: '46',
+        line: '45 released SHITBOX road vehicles as individual stock GLB models, including the newer cars, vans, pickups and buses. CARS.csv maps the real and in-game names; the README preserves source credits, licence terms and exclusions.',
+        big: '45',
         accent: '#ffb12a',
         shell: '#3a1418',
         games: ['shitbox'],
         crew: [],
         licenseText: 'Owner permission granted to redistribute. Source credits and original licence terms are in the zip README.',
         contents: [
-          { path: 'cars/', what: '46 stock GLB models named after the real vehicles' },
+          { path: 'cars/', what: '45 stock GLB models named after the real vehicles' },
           { path: 'CARS.csv', what: 'file, real car, in-game name, year and credit' },
           { path: 'README.md', what: 'credits, licence terms and exclusions' },
           { path: 'MANIFEST.json', what: 'source revision and per-model hashes' },
@@ -802,13 +802,13 @@ export const crew = {
         tile: '/img/packs/gallery/cars/nissan-180sx-1990.webp',
         cover: {
           src: '/img/packs/gallery/cars/nissan-180sx-1990.webp',
-          width: 640,
-          height: 480,
+          width: 1000,
+          height: 750,
           phone: '/img/packs/gallery/cars/nissan-180sx-1990.webp',
           alt: 'The newly added Nissan 180SX liftback in its factory red paint, rendered in a neutral studio.',
         },
         backdrop: '/img/art/shitbox.webp',
-        download: { href: `${REL}/cars-all-2026-10-29.zip`, label: 'car models .zip', size: '206 MB', files: 49, formats: 'GLB' },
+        download: { href: `${REL}/cars-all-2026-10-29-materials-r3.zip`, label: 'car models .zip', size: '204 MB', files: 48, formats: 'GLB' },
       },
     ],
   },

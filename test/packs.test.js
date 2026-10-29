@@ -28,7 +28,7 @@ test('downloadable packs have unique ids, numeric file counts and valid credits 
     for (const src of [p.tile, p.cover.src, p.cover.phone, p.backdrop]) {
       assert.ok(existsSync(new URL(`../public${src}`, import.meta.url)), src);
     }
-    assert.deepEqual([p.cover.width, p.cover.height], p.id === 'cars' ? [640, 480] : [960, 720]);
+    assert.deepEqual([p.cover.width, p.cover.height], p.id === 'cars' ? [1000, 750] : [960, 720]);
   }
   assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').big, '92');
   assert.equal(packs.find(p => p.id === 'radbro-sticker-pack').download.files, 189);
