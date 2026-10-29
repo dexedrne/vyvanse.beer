@@ -272,7 +272,8 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   const retardios = crew.members.filter((m) => m.kind.startsWith('Retardio'));
   const otherCharacters = crew.npcs ?? [];
   const idx = (m) => crew.members.indexOf(m);
-  const tiles = `<div class="tgroup"><p class="tgroup__label">radbros</p><ul class="tiles" role="list">${radbros.map((m) => tile(m, idx(m))).join('')}</ul></div><div class="tgroup"><p class="tgroup__label">retardios</p><ul class="tiles" role="list">${retardios.map((m) => tile(m, idx(m))).join('')}</ul></div>${otherCharacters.length ? `<div class="tgroup"><p class="tgroup__label">other characters</p><ul class="tiles" role="list">${otherCharacters.map((m, i) => tile(m, crew.members.length + i)).join('')}</ul></div>` : ''}${packGroup(crew, crew.members.length + otherCharacters.length)}`;
+  const family = (name, members) => `<details class="tgroup" data-crew-group name="crew-family"><summary class="tgroup__label" aria-controls="crew-${name}">${name} <span class="tgroup__count">${members.length}</span></summary><ul class="tiles" id="crew-${name}" role="list">${members.map((m) => tile(m, idx(m))).join('')}</ul></details>`;
+  const tiles = `${family('radbros', radbros)}${family('retardios', retardios)}${otherCharacters.length ? `<div class="tgroup"><p class="tgroup__label">other characters</p><ul class="tiles" role="list">${otherCharacters.map((m, i) => tile(m, crew.members.length + i)).join('')}</ul></div>` : ''}${packGroup(crew, crew.members.length + otherCharacters.length)}`;
 
   const menu = [
     `<li><a class="mi" data-i="0" ${ext(contact.dm.href, 'me noopener')}><span class="cur" aria-hidden="true">▶</span><span class="mi__label">${icon('x')}${esc(contact.dm.label)}</span><span class="det">${esc(contact.dm.handle)}</span>${newTab}</a></li>`,

@@ -373,6 +373,19 @@ const onItem = (tab) => $('.item.on', panelOf(tab));
 const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
 const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
 
+function revealCrewGroup(i) {
+  const selected = controlsOf('crew')[i]?.closest('details[data-crew-group]');
+  for (const group of $$('details[data-crew-group]', panelOf('crew'))) group.open = group === selected;
+}
+
+document.addEventListener('keydown', (event) => {
+  const group = event.target.closest?.('details[data-crew-group]');
+  if (event.key !== 'Escape' || !group) return;
+  event.stopPropagation();
+  group.open = false;
+  $('summary', group).focus({ preventScroll: true });
+});
+
 // the row's marks: the cursor, the labels, "3 of 9", and "reset order" when the order is yours
 function rowMarks(tab) {
   const i = S[tab];
@@ -391,7 +404,7 @@ function paint(tab) {
   if (tab === 'contact') {
     LISTS.contact.forEach((el, j) => el.classList.toggle('sel', j === i));
   } else {
-    const id = idOf(tab, i);
+    const id = tab === 'crew' ? LISTS.crew[i].num ?? LISTS.crew[i].id : idOf(tab, i);
     const was = onItem(tab);
     itemsOf(tab).forEach((el) => {
       const on = el.dataset.id === id;
@@ -486,6 +499,7 @@ function show(tab, { sound = true, focus = false } = {}) {
   }
   for (const p of $$('.panel')) p.classList.toggle('on', p.dataset.panel === tab);
   screen.dataset.tab = tab;
+  if (tab === 'crew') revealCrewGroup(S.crew);
   paint(tab);
   hints();
   save();
@@ -515,6 +529,7 @@ function select(i, { sound = true } = {}) {
   closeSheet();
   const carry = focusInRow();
   S[S.tab] = next;
+  if (S.tab === 'crew') revealCrewGroup(next);
   paint(S.tab);
   save();
   layout();
