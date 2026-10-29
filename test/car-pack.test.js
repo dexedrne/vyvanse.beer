@@ -7,13 +7,13 @@ import { crew } from '../src/projects.js';
 
 test('released car archive, catalogue and studio gallery describe the same inventory', () => {
   const pack = crew.assets.packs.find(p => p.id === 'cars');
-  assert.equal(manifest.models.length, 46);
+  assert.equal(manifest.models.length, 45);
   assert.equal(manifest.modelCount, manifest.models.length);
   assert.equal(manifest.fileCount, manifest.models.length + 3);
   assert.equal(pack.big, String(manifest.modelCount));
   assert.equal(pack.download.files, manifest.fileCount);
   assert.equal(pack.download.href.split('/').at(-1), manifest.archive);
-  assert.match(manifest.archive, /^cars-all-\d{4}-\d{2}-\d{2}(?:-materials-r2)?\.zip$/);
+  assert.match(manifest.archive, /^cars-all-\d{4}-\d{2}-\d{2}(?:-materials-r3)?\.zip$/);
   assert.deepEqual(gallery.cars.map(x => x.name).sort(), manifest.models.map(x => x.file).sort());
   assert.equal(new Set(manifest.models.map(x => x.id)).size, manifest.models.length);
   assert.equal(new Set(manifest.models.map(x => x.file)).size, manifest.models.length);
@@ -31,9 +31,10 @@ test('released car archive, catalogue and studio gallery describe the same inven
 });
 
 test('standalone car files retain source credits and exclude unapproved or non-road models', () => {
-  for (const id of ['accord93', 'x3e83', 'crv99', 'crv99ex', 'is300', 'saltlift', 'broadacre', 'sn95', ...manifest.withheld]) {
+  for (const id of ['accord93', 'x3e83', 'crv99', 'crv99ex', 'is300', 'saltlift', 'broadacre', 'sn95', 'ody01', ...manifest.withheld]) {
     assert.ok(!manifest.models.some(x => x.id === id), id);
   }
+  assert.match(manifest.excluded.ody01, /roof holes.*detached roof fragment.*side-window slab/);
   for (const car of manifest.models) {
     assert.match(car.file, /^[a-z0-9-]+\.glb$/);
     assert.ok(car.bytes > 0);

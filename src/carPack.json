@@ -1,9 +1,9 @@
 {
-  "version": "2026-10-29-materials-r2",
-  "archive": "cars-all-2026-10-29-materials-r2.zip",
+  "version": "2026-10-29-materials-r3",
+  "archive": "cars-all-2026-10-29-materials-r3.zip",
   "sourceCommit": "7666e1d0add6e905b50b27636438b0c5aa9b99f1",
-  "modelCount": 46,
-  "fileCount": 49,
+  "modelCount": 45,
+  "fileCount": 48,
   "models": [
     {
       "id": "sov07",
@@ -973,30 +973,6 @@
       ]
     },
     {
-      "id": "ody01",
-      "file": "honda-odyssey-ex-2001.glb",
-      "realCar": "Honda Odyssey EX",
-      "gameName": "H Overture 3.5",
-      "year": 2001,
-      "gameYear": 2001,
-      "bytes": 4312380,
-      "sha256": "223bd6230fcebda6b6594dd9f464f0c4c38fa2ea9707e6145b698e9d484c3265",
-      "source": "cars/ody01.glb",
-      "sourceSha256": "186eae94bef0f90b3c07a8cf512a4794e29c0515644363bff655042d9f9a283a",
-      "credits": [
-        {
-          "id": "ody01-owner",
-          "title": "2001 Honda Odyssey EX",
-          "author": "BHP3D",
-          "authorUrl": "https://sketchfab.com/BHP3D",
-          "sourceUrl": "https://sketchfab.com/3d-models/2001-honda-odyssey-ex-24abc0e850f64705906c910e91a6ac4a",
-          "licence": "CC BY 4.0",
-          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
-          "modified": "badges and lettering removed, rescaled, optimised, split for the game (doors, sliding doors, tailgate, bonnet, wheels, lamps); original body, glazing, cabin and wheels retained; camper fittings added"
-        }
-      ]
-    },
-    {
       "id": "pickup96",
       "file": "toyota-tacoma-double-cab-2001.glb",
       "realCar": "Toyota Tacoma Double Cab",
@@ -1241,7 +1217,8 @@
     "crv99ex": "Same restricted crv99-owner source as crv99.",
     "is300": "BlackHorn860 source record grants use in SHITBOX only under Sketchfab Standard; no standalone model redistribution grant recorded.",
     "accord93": "The active runtime identifies the owner-supplied Assetto Corsa conversion (accord93-ac). Stored source terms say no licence file shipped; free availability and game-owner permission do not establish creator/rightsholder permission for standalone redistribution.",
-    "sn95": "Current accepted raw GLB contains loose source components beneath the car; the game loader additionally drops exterior panel surfaces. Excluded from this standalone pack pending a separately reviewed source/adapter repair; no game geometry changed."
+    "sn95": "Current accepted raw GLB contains loose source components beneath the car; the game loader additionally drops exterior panel surfaces. Excluded from this standalone pack pending a separately reviewed source/adapter repair; no game geometry changed.",
+    "ody01": "Accepted raw GLB contains roof holes, a detached roof fragment and an intersecting side-window slab. Excluded from the standalone pack and gallery pending a separately reviewed source geometry repair; the original source and prior export remain privately backed up. No game geometry changed."
   },
   "withheld": [
     "camper89",
