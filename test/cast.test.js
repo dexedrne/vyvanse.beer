@@ -54,25 +54,29 @@ test('#268 has a full Crew card beside #85 without advertising a game', () => {
   assert.ok(!card.includes('data-goto='));
   const tiles = [...html.matchAll(/<button class="tile"[^]*?aria-controls="([^"]+)"/g)].map(m => m[1]);
   assert.equal(tiles.length, 11);
-  assert.deepEqual(tiles.slice(-4), ['retardio-85', 'retardio-268', 'chudjak', 'ophelia']);
+  assert.deepEqual(tiles.slice(-4), ['retardio-85', 'retardio-268', 'chak', 'ophelia']);
 });
 
-test('Chudjak has a separate non-playable NPC card with his model download', () => {
+test('Chak replaces the legacy NPC card with his model download and current game appearances', () => {
   const npc = crew.npcs.find(m => m.num === 'chudjak');
   assert.ok(npc?.model && npc?.face && npc?.image);
-  assert.equal(npc.name, 'Chudjak');
-  assert.match(npc.line, /joining RadQuest .* RADBONK and SHITBOX/);
+  assert.equal(npc.name, 'Chak');
+  assert.equal(npc.slug, 'chak');
+  assert.equal(npc.model, '/models/chak.glb');
+  assert.match(npc.line, /NPC in RadQuest .* RADBONK, SHITBOX, RadZombies and ZombieTardio/);
+  assert.match(npc.line, /playable as CHUD in World of Radcraft/);
   const html = renderShell({ site, groups, projects, crew, contact, duo });
-  const card = html.match(/<article class="item item--crew" id="chudjak"[^]*?<\/article>/)?.[0];
-  assert.ok(card?.includes('Chudjak'));
+  const card = html.match(/<article class="item item--crew" id="chak"[^]*?<\/article>/)?.[0];
+  assert.ok(card?.includes('Chak'));
+  assert.ok(!card.includes('Chudjak'));
   assert.ok(card?.includes('Non-playable NPC'));
   assert.ok(!card?.includes('#chudjak'));
   assert.ok(!card?.includes('Viral Public License'));
   assert.ok(card?.includes('Get the model'));
-  assert.ok(card?.includes('/models/chudjak-rigged.glb'));
+  assert.ok(card?.includes('/models/chak-rigged.glb'));
   assert.ok(card?.includes('rigged and animated'));
   assert.equal(npc.download.rigged, true);
-  assert.ok(card?.includes('Free to use'));
+  assert.ok(!card?.includes('Free to use'));
 });
 
 test('every Crew card offers the same nine-character zip, including the Retardios', () => {

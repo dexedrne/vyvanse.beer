@@ -189,7 +189,7 @@ function setEd(i, k) {
 }
 // what a tab's item i shows: on Games, that game's edition
 const at = (tab, i) => (tab === 'games' ? SHELF[i]?.[edOf(i)] : LISTS[tab][i]);
-const idOf = (tab, i) => (tab === 'crew' ? LISTS.crew[i]?.num ?? LISTS.crew[i]?.id : tab === 'contact' ? '' : at(tab, i)?.cmd);
+const idOf = (tab, i) => (tab === 'crew' ? (LISTS.crew[i]?.npcOnly ? LISTS.crew[i].slug : LISTS.crew[i]?.num ?? LISTS.crew[i]?.id) : tab === 'contact' ? '' : at(tab, i)?.cmd);
 // put the cursor on a game (its cartridge, and that edition) or a site; returns its tab
 function locate(p) {
   if (p.group !== 'games') {
@@ -1045,7 +1045,7 @@ const launcher = {
   music: on => audio.setMusic(on),
   reveal(slug) {
     const p = projects.find(x => x.slug === slug);
-    const b = LISTS.crew.find(x => x.slug === slug);
+    const b = LISTS.crew.find(x => x.slug === slug || x.npcOnly && x.num === slug);
     if (p) show(locate(p), { sound: false });
     else if (b) {
       S.crew = LISTS.crew.indexOf(b);
@@ -1223,7 +1223,7 @@ function load() {
   const [t, id] = decodeURIComponent(location.hash.slice(1)).split('/');
   // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
   const bySlug = projects.find((p) => p.slug === t || p.cmd === t || p.aliases?.includes(t));
-  const bro = LISTS.crew.find((m) => m.slug === t);
+  const bro = LISTS.crew.find((m) => m.slug === t || m.npcOnly && m.num === t);
   const named = (x) => x.cmd === id || x.aliases?.includes(id);
   let tab = TABS.includes(t) ? t : 'games';
   // (a game's edition, #games/retardiopayne or #retardiopayne, lands on its game, that edition)
@@ -1232,7 +1232,7 @@ function load() {
     tab = 'crew';
     S.crew = LISTS.crew.indexOf(bro);
   } else if (id && t === 'crew') {
-    const j = LISTS.crew.findIndex((x) => (x.num ?? x.id) === id);
+    const j = LISTS.crew.findIndex((x) => x.slug === id || (x.num ?? x.id) === id);
     if (j >= 0) S.crew = j;
   } else if (id && (t === 'games' || t === 'sites')) {
     const p = projects.find((x) => x.group === t && named(x));
