@@ -60,7 +60,7 @@ export class InsertState {
   eject() { this.state='idle'; }
 }
 
-export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdrop, onSelect, onPlay, onWall }) {
+export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdrop, onSelect, onPlay, onWall, onInsert }) {
   const root = document.documentElement;
   const calmMedia = matchMedia('(prefers-reduced-motion: reduce)');
   let CALM = calmMedia.matches;
@@ -185,7 +185,7 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
       apex.el.classList.add('is-inserting');
       apex.el.style.setProperty('--tx', `${c.tilt}deg`); apex.el.style.setProperty('--sc', String(c.scale));
       screenEl.classList.add('is-inserting', `ins-${v}`);
-      deck.classList.add('on');
+      deck.classList.add('on'); onInsert?.();
 
     });
     // the drop: straight, face-on, accelerating into the slot
@@ -442,7 +442,7 @@ export function createMotion({ screen: screenEl, arc, wheel, deck, wall, backdro
     root.classList.toggle('is-hidden', document.hidden);
     if (document.hidden) { cancelAnimationFrame(raf); raf=0; } else if (!paused) resume();
   });
-  addEventListener('pointermove', e => { if (CALM || paused) return; px.set((e.clientX/W-0.5)*16); py.set((e.clientY/H-0.5)*10); }, {passive:true});
+  addEventListener('pointermove', e => { if (CALM || paused) return; idleSince=performance.now(); px.set((e.clientX/W-0.5)*16); py.set((e.clientY/H-0.5)*10); }, {passive:true});
   calmMedia.addEventListener('change', e => { CALM=e.matches; wall.classList.toggle('wall--calm',CALM); select(sel,{snap:true}); });
   const remeasure = () => { const before = [W,H,u,wl].join(); measure(); if (before === [W,H,u,wl].join()) return; select(sel, {snap:true}); if (wallOpen) { layoutField(); focusItem(items.find(x => x.i === sel)); } };
   addEventListener('resize', remeasure);

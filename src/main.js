@@ -1808,6 +1808,7 @@ $('.arc').dataset.sel = String(S.games);
 motion = createMotion({ screen, arc: $('.arc'), wheel: $('.wheel'), deck: $('.deck'), wall: $('.wall'), backdrop: $('#backdrops'),
   onSelect(i) { if (S.tab === 'games' && S.games !== i) select(i); },
   onPlay() { play(current()); }, onWall() { hints(); },
+  onInsert() { clearInterval(typeTimer); const line=$('.item--game.on [data-type]'); if(line) {line.textContent='inserting';line.classList.add('typed');} },
 });
 motion.select(S.games,{snap:true}); motion.boot(); layout(); if (player.current) motion.pause();
 hints();
