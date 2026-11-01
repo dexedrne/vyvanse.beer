@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "sh scripts/prepare-run-escape.sh && vite build",
     "preview": "vite preview",
     "check": "node scripts/check.mjs",
     "test": "node --test test/*.js"

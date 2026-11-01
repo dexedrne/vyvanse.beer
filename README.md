@@ -19,6 +19,12 @@ npm run check    # syntax checks for every JavaScript source
 npm test         # order, ticker and cast checks
 ```
 
+`/run-escape/` hosts Run Escape separately from the game selector. The build downloads its pinned
+release, verifies its SHA-256 and extracts it into the ignored `public/run-escape/` folder; it needs
+network access, `curl`, `sha256sum` and `unzip`. The Vercel headers on that path enable the game's
+shared memory. Updating the game means changing the release URL and checksum together in
+`scripts/prepare-run-escape.sh`.
+
 ## How it's put together
 
 The whole screen is rendered into `index.html` at build time from
