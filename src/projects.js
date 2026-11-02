@@ -483,7 +483,7 @@ export const projects = [
     blurb: 'A medieval RPG in 3D. A lantern-lit village at dusk, a road out through the hills, ruins to clear and villagers with work for a traveller. Quests, gear, and the crew along for the trip. Keyboard or controller.',
     url: 'https://radquest.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://radquest.vyvanse.beer' }],
-    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: [...RADBROS, '2214'],
+    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: RADBROS,
     phone: '50% 100%',
     image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RadQuest: a lantern, a blade and the road out of the village.' },
   },
