@@ -56,7 +56,7 @@ export const groups = [
 const MAIN_CAST = ['4764', '652', '3704', '3710'];
 // The runner and shooters' Crew cards; RadPayne's Retardios are in its own edition.
 const RADBROS = [...MAIN_CAST, '723', '2564'];
-const ALL = [...RADBROS, '555', '85']; // current game casts; #268 is Crew only
+const ALL = [...RADBROS, '555', '85', '2214']; // current game casts; #268 is Crew only
 
 export const sections = [
   { id: 'drive', label: 'Drive' },
@@ -146,7 +146,7 @@ export const projects = [
     kindPhone: "Noir shooter, the harder cut",
     blurbPhone: "The harder cut: Retardios only, the same bullet-time noir, meaner rooms.",
     blurb:
-      'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555 and #85 to play: the same rainy night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
+      'They took the bag. They went back for it. The harder cut of RadPayne, with only the Retardio boys #555, #85 and #2214 to play: the same rainy night in rhyming noir comic panels, but the gang aim better, react faster, hit harder and come three at a time, and the bosses take more to put down. Keyboard and mouse or a controller.',
     url: 'https://retardiopayne.vyvanse.beer',
     frame: true,
     links: [
@@ -156,7 +156,7 @@ export const projects = [
     thumb: '/img/thumb/retardiopayne.webp',
     shell: '#1f2a44',
     accent: '#ff7ab6',
-    cast: ['555', '85'],
+    cast: ['555', '85', '2214'],
     phone: '50% 22%',
     image: {
       src: '/img/art/retardiopayne.webp',
@@ -182,7 +182,7 @@ export const projects = [
     kind: 'First-person team deathmatch, early preview',
     kindPhone: "Team deathmatch, early preview",
     blurb:
-      'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Six Radbros and two Retardios, a gun picked at every spawn, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
+      'Radbros vs Radbros, 4v4 or 5v5 online with quick play, bots filling any empty seats. Team Deathmatch in a sun-bleached cul-de-sac: first team to 50. Six Radbros and three Retardios, a gun picked at every spawn, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://radops.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radops.vyvanse.beer' }],
@@ -217,7 +217,7 @@ export const projects = [
     kind: 'First-person bomb-defusal shooter, early preview',
     kindPhone: "Bomb-defusal shooter, early preview",
     blurb:
-      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Six Radbros and two Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
+      'Radbros vs Radbros, 2v2 online (quick play or a friend\'s room) or up to 5 a side with bots. Plant the bomb or defuse it in a desert bazaar, a round at a time. Six Radbros and three Retardios, a gun picked each round, frags you hold to see where they land. Keyboard and mouse (remap any key, side buttons too) or a controller.',
     url: 'https://rbgo.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://rbgo.vyvanse.beer' }],
@@ -283,14 +283,14 @@ export const projects = [
     name: 'ZombieTardio',
     kind: 'First-person zombies, Retardios only',
     blurb:
-      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555 or Retardio Cousin Classic #85. Solo with the other as your bot teammate, or two players online or on split screen. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
+      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555, Retardio Cousin Classic #85 or Retardio Cousin Classic #2214. Solo with another as your bot teammate, or two players online or on split screen. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
     url: 'https://zombietardio.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://zombietardio.vyvanse.beer' }],
     thumb: '/img/thumb/zombietardio.webp',
     shell: '#2a1c3c',
     accent: '#f2899a',
-    cast: ['555', '85'],
+    cast: ['555', '85', '2214'],
     image: {
       src: '/img/art/zombietardio.webp',
       width: 1600,
@@ -315,14 +315,14 @@ export const projects = [
     kind: 'Platform fighter, up to four on one screen',
     kindPhone: "Platform fighter, four on one screen",
     blurb:
-      'A platform fighter with the crew on a wet neon rooftop. Up to four on one screen, any mix of keyboards, controllers and CPUs. Damage percent and stocks, launches off the edge, ledges, shields and dodges. #4764 with a katana, #85 with his fists, #723 with a revolver and a lasso, #652, yellow-haired #3704 with a launcher and green-haired #3710 with fan gusts. Training has an input display.',
+      'A platform fighter with the crew on a wet neon rooftop. Up to four on one screen, any mix of keyboards, controllers and CPUs. Damage percent and stocks, launches off the edge, ledges, shields and dodges. #4764 with a katana, #85 with his fists, #723 with a revolver and a lasso, #652, red-haired #2214, yellow-haired #3704 with a launcher and green-haired #3710 with fan gusts. Training has an input display.',
     url: 'https://radbrawl.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radbrawl.vyvanse.beer' }],
     thumb: '/img/thumb/radbrawl.webp',
     shell: '#2a1e3a',
     accent: '#ff5f9e',
-    cast: ['4764', '85', '723', '652', '3704', '3710'],
+    cast: ['4764', '85', '723', '652', '3704', '3710', '2214'],
     edition: { label: 'Platform', face: '723' },
     phone: '50% 22%',
     image: {
@@ -344,14 +344,14 @@ export const projects = [
     name: 'RAD FIGHTER',
     kind: 'Anime fighting game, one on one, early build',
     blurb:
-      'The first fighter: one on one on a rain-wet rooftop, drawn like an anime fighter. #4764 with the katana and a slash he can throw, #85 up close with a command grab. Six buttons, chains, launchers and air combos, supers, best of three, a CPU on three levels and training with frame data. Keyboard or controller.',
+      'The first fighter: one on one on a rain-wet rooftop, drawn like an anime fighter. #4764 with the katana and a slash he can throw, #85 up close with a command grab, and red-haired #2214. Six buttons, chains, launchers and air combos, supers, best of three, a CPU on three levels and training with frame data. Keyboard or controller.',
     url: 'https://radfighter.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://radfighter.vyvanse.beer' }],
     thumb: '/img/thumb/radfighter.webp',
     shell: '#1e2240',
     accent: '#5fd0ea',
-    cast: ['4764', '85'],
+    cast: ['4764', '85', '2214'],
     image: {
       src: '/img/art/radfighter.webp',
       width: 1600,
@@ -370,7 +370,7 @@ export const projects = [
     kind: 'Web-slinger tag across the rooftops',
     kindPhone: "Rooftop web-slinger tag",
     blurb:
-      'Swing the neon rooftops on webs: play best-of-three TAG with a friend or bots, or chase down the Radbro who swiped your bag in 90 seconds. Pick from the main four, cowboy #723, ghost #2564 or the two Retardios. Runs in the browser, keyboard or controller, nothing to install.',
+      'Swing the neon rooftops on webs: play best-of-three TAG with a friend or bots, or chase down the Radbro who swiped your bag in 90 seconds. Pick from the main four, cowboy #723, ghost #2564 or the three Retardios. Runs in the browser, keyboard or controller, nothing to install.',
     url: 'https://spidertag.vyvanse.beer',
     frame: true,
     links: [
@@ -413,7 +413,7 @@ export const projects = [
     thumb: '/img/thumb/radtap.webp',
     shell: '#23163f',
     accent: '#b98cff',
-    cast: [...MAIN_CAST, '555', '85', '723', '2564'],
+    cast: [...MAIN_CAST, '555', '85', '723', '2564', '2214'],
     image: {
       src: '/img/art/radtap.webp',
       width: 1600,
@@ -441,7 +441,7 @@ export const projects = [
     thumb: '/img/thumb/saloon.webp',
     shell: '#16251c',
     accent: '#e8c27a',
-    cast: [...MAIN_CAST, '555', '85', '723'],
+    cast: [...MAIN_CAST, '555', '85', '723', '2214'],
     phone: '50% 35%',
     image: {
       src: '/img/art/saloon.webp',
@@ -468,7 +468,7 @@ export const projects = [
     thumb: '/img/thumb/radbonk.webp',
     shell: '#1d2a3a',
     accent: '#7be08a',
-    cast: ['3710', '3704', '4764', '85', '723', '652'],
+    cast: ['3710', '3704', '4764', '85', '723', '652', '2214'],
     image: {
       src: '/img/art/radbonk.webp',
       width: 1600,
@@ -483,7 +483,7 @@ export const projects = [
     blurb: 'A medieval RPG in 3D. A lantern-lit village at dusk, a road out through the hills, ruins to clear and villagers with work for a traveller. Quests, gear, and the crew along for the trip. Keyboard or controller.',
     url: 'https://radquest.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://radquest.vyvanse.beer' }],
-    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: RADBROS,
+    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: [...RADBROS, '2214'],
     phone: '50% 100%',
     image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RadQuest: a lantern, a blade and the road out of the village.' },
   },
@@ -505,7 +505,7 @@ export const projects = [
     blurb: 'Four of the crew at the gate of an old flooded city: a knight, a rogue, a ranger and a mage, a die rolled on every swing, loot to split and a long way in. Keyboard or controller.',
     url: 'https://brogate.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://brogate.vyvanse.beer' }],
-    thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: RADBROS,
+    thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: [...RADBROS, '2214'],
     phone: '50% 100%',
     image: { src: '/img/art/brogate.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'BROGATE: four heroes, one gate, a d20.' },
   },
@@ -1105,7 +1105,7 @@ export function shelf(projects) {
 }
 
 // The games one of the crew is in, one per game: of a game's editions, the one made for him (the
-// smallest cast he's in). Retardio #85 is in RetardioPayne and ZombieTardio, Radbro #4764 in
+// smallest cast he's in). Retardios #85 and #2214 are in RetardioPayne and ZombieTardio, Radbro #4764 in
 // RadPayne and RadZombies.
 export function playsIn(projects, num) {
   return shelf(projects)

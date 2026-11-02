@@ -19,10 +19,10 @@ test('Games and Contact keep #4764 and #85 on the puddle; the new pair are on th
   assert.deepEqual(duo, ['4764', '85']);
 });
 
-test('the ten Crew members keep the existing eight SHITBOX drivers and all game casts exclude #268', () => {
+test('the ten Crew members: SHITBOX has the eight earlier drivers plus #2214, and all game casts exclude #268', () => {
   const nums = crew.members.map(m => m.num).sort();
   assert.deepEqual(nums, ['2214', '2564', '268', '3704', '3710', '4764', '555', '652', '723', '85']);
-  assert.deepEqual([...projects.find(p => p.cmd === 'shitbox').cast].sort(), ['2564', '3704', '3710', '4764', '555', '652', '723', '85']);
+  assert.deepEqual([...projects.find(p => p.cmd === 'shitbox').cast].sort(), ['2214', '2564', '3704', '3710', '4764', '555', '652', '723', '85']);
   for (const p of projects.filter(p => p.group === 'games')) {
     assert.ok(p.cast?.length, p.cmd);
     assert.ok(!p.cast.includes('268'), p.cmd);
@@ -31,7 +31,7 @@ test('the ten Crew members keep the existing eight SHITBOX drivers and all game 
 });
 
 test('Crew links pick the Retardio editions and keep the ghost out of SALOON', () => {
-  for (const num of ['555', '85']) {
+  for (const num of ['555', '85', '2214']) {
     const games = playsIn(projects, num).map(p => p.cmd);
     assert.ok(games.includes('retardiopayne') && games.includes('zombietardio'));
     assert.ok(!games.includes('radpayne') && !games.includes('radzombies'));
@@ -77,6 +77,13 @@ test('#2214 has a full Crew card between #268 and #555, keeping the owner\'s Ret
   assert.ok(card?.includes('My own Retardio'));
   assert.ok(card.includes('retardio2214-3d-model.zip'));
   assert.ok(card.includes('/img/retardios/retardio-2214.webp'));
+  // one edition per game: the Retardios editions, RadOps for RadOps/RBGO, RAD FIGHTER for RADBRAWL/RAD FIGHTER
+  assert.deepEqual(playsIn(projects, '2214').map(p => p.cmd),
+    ['shitbox', 'retardiopayne', 'radops', 'zombietardio', 'radfighter', 'spidertag', 'radtap', 'saloon', 'radbonk', 'radquest', 'brogate']);
+  assert.deepEqual(projects.filter(p => p.cast?.includes('2214')).map(p => p.cmd),
+    ['shitbox', 'retardiopayne', 'radops', 'rbgo', 'radzombies', 'zombietardio', 'radbrawl', 'radfighter', 'spidertag', 'radtap', 'saloon', 'radbonk', 'radquest', 'brogate']);
+  assert.ok(!card.includes('not in a game yet'));
+  for (const cmd of ['shitbox', 'retardiopayne', 'zombietardio', 'radfighter', 'radbonk']) assert.ok(card.includes(`data-goto="${cmd}"`), cmd);
 });
 
 test('every Crew member\'s face, card render and hero model are on disk, and each hero has the clips the stage plays', () => {

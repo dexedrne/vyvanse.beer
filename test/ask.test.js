@@ -70,7 +70,7 @@ test('Ask can identify #268 and #85’s cousin without offering a game launch', 
   assert.deepEqual(revealed, ['retardio-268']);
 });
 
-test('Ask can identify Retardio Cousin Classic #2214 and find his model', () => {
+test('Ask can identify Retardio Cousin Classic #2214, find his model and launch his games', () => {
   for (const text of ['who is 2214', 'the red-haired retardio']) {
     const payload = makePayload(text);
     const member = payload.state.crew.find(m => m.num === '2214');
@@ -83,6 +83,11 @@ test('Ask can identify Retardio Cousin Classic #2214 and find his model', () => 
   const revealed = [];
   assert.equal(runAction('crew:2214', { reveal: slug => revealed.push(slug) }), true);
   assert.deepEqual(revealed, ['retardio-2214']);
+  assert.equal(plainAction('zombietardio as 2214'), 'play:zombietardio:2214');
+  assert.equal(plainAction('retardiopayne as #2214'), 'play:retardiopayne:2214');
+  assert.equal(routeAnswer(answer('play:retardiopayne:2214', 0.95))?.action, 'play:retardiopayne:2214');
+  assert.match(ACTIONS.find(a => a.id === 'crew-games:2214').line, /^SHITBOX, RetardioPayne, RadOps, ZombieTardio, RAD FIGHTER/);
+  assert.match(makePayload('zombies as 2214').questions.action.instructions, /#85, #555 or #2214/);
 });
 
 test('input strips control and markup characters, rejects empty, oversize and nontext bodies', () => {
@@ -194,7 +199,7 @@ test('recorded Jev smoke answer routes without a live call', () => {
 });
 
 test('Ask includes asset pack criteria and payloads and reveals a card without downloading', () => {
-  assert.equal(ACTIONS.length, 165); // three new games and their crew entries, then #2214's three crew entries
+  assert.equal(ACTIONS.length, 179); // three new games and their crew entries, then #2214's three crew entries and 14 game casts
   assert.equal(makePayload('wallpapers').state.packs.length, 6);
   const revealed = [];
   const shell = { reveal: slug => revealed.push(slug), play: () => assert.fail('pack actions must only reveal') };
