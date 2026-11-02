@@ -35,6 +35,13 @@ Big_Wave_Hello clips, common 24-joint rig, feet at y=0 and facing +Z. They are 6
 below the previous 753,320-byte hero ceiling. The existing six-model memory cap remains. There is no
 separate held-prop or weapon-skin slot in this launcher, so the optional launcher prop is not attached.
 
+SankoQuest Survivors' key art and cartridge label are cut from the fan game's own 1200 × 630 share
+image (an adventurer ringed by the Greentown horde): its SURVIVORS subtitle and bottom tagline are
+filled in from the surrounding picture by patch inpainting, and the 16:9 key art
+starts below the big title, so neither file carries any lettering. The key art is that crop at 1600 × 900
+(lossy WebP quality 86, method 6); the label is a 4:3 crop around the adventurer at 420 × 315
+(quality 90, method 6), so the cartridge's centred 4:3 cover crop shows all of it.
+
 After `npm run build`, check archive exclusion with:
 
 ```sh
@@ -48,7 +55,7 @@ The pack pages use lazy WebP previews indexed by `src/packGallery.json`; each pr
 
 The Cars pack contains 35 drivable GLBs from SHITBOX (the camper and motorhome are left out: they are not real car models). Each GLB is exported stock from the game's driving model: its default factory paint as a plain gloss material (the wear mask that sits in the paint's emissive slot is dropped), far-away versions, other roofs and gearboxes removed, flat-shaded panels smoothed and coplanar overlaps that flicker cut. Files are named after the real car (`make-model-year`, `-auto` for the automatic); the gallery shows the in-game name as each tile's hover title and caption. Its 640 × 480 previews are renders of those GLBs in one neutral studio with the same 3/4 camera and exposure, grouped by the real car's decade. `cars-all.zip` contains the 35 `cars/<make-model-year>.glb` files plus `README.md` and `CARS.csv` (file, real car, in-game name, year, credit; 37 archive entries, 49,466,972 bytes); its per-model credit and original licence lines come from SHITBOX `modelCredits.json`. No external-game textures were added.
 
-The following table covers the 87 core site art files, including archives and documentation captures. Pack gallery thumbnails are a separate generated set, indexed in the manifest above. Loading screens use the title art or code; there is no separate raster loading illustration.
+The following table covers the 89 core site art files, including archives and documentation captures. Pack gallery thumbnails are a separate generated set, indexed in the manifest above. Loading screens use the title art or code; there is no separate raster loading illustration.
 
 | File | Size | Format | Use |
 | --- | --- | --- | --- |
@@ -71,6 +78,7 @@ The following table covers the 87 core site art files, including archives and do
 | `public/img/art/retardiopayne.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/saloon.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
 | `public/img/art/saloon.webp` | 1600 × 900 | WEBP | launcher game / site art |
+| `public/img/art/sanko.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/shitbox.webp` | 1600 × 900 | WEBP | launcher game / site art |
 | `public/img/art/solscape.webp` | 1600 × 840 | WEBP | launcher game / site art |
 | `public/img/art/vyvanse.prev.webp` | 1600 × 900 | WEBP | archive (excluded from build) |
@@ -127,6 +135,7 @@ The following table covers the 87 core site art files, including archives and do
 | `public/img/thumb/saloon.prev.webp` | 420 × 236 | WEBP | archive (excluded from build) |
 | `public/img/thumb/saloon.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/sanic.webp` | 420 × 221 | WEBP | launcher game / site art |
+| `public/img/thumb/sanko.webp` | 420 × 315 | WEBP | launcher game / site art |
 | `public/img/thumb/shitbox.webp` | 420 × 236 | WEBP | launcher game / site art |
 | `public/img/thumb/solscape.webp` | 420 × 221 | WEBP | launcher game / site art |
 | `public/img/thumb/zombietardio.webp` | 420 × 236 | WEBP | launcher game / site art |
