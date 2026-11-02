@@ -70,6 +70,21 @@ test('Ask can identify #268 and #85’s cousin without offering a game launch', 
   assert.deepEqual(revealed, ['retardio-268']);
 });
 
+test('Ask can identify Retardio Cousin Classic #2214 and find his model', () => {
+  for (const text of ['who is 2214', 'the red-haired retardio']) {
+    const payload = makePayload(text);
+    const member = payload.state.crew.find(m => m.num === '2214');
+    assert.equal(member?.name, 'Retardio Cousin Classic #2214');
+    assert.match(member.description, /red hair/);
+    for (const id of ['crew:2214', 'crew-games:2214', 'crew-model:2214']) assert.ok(payload.questions.action.criteria[id], id);
+  }
+  assert.equal(ACTIONS.find(a => a.id === 'crew-model:2214')?.line, '3D model .zip (31 MB)');
+  assert.equal(routeAnswer(answer('crew:2214', 1))?.action, 'crew:2214');
+  const revealed = [];
+  assert.equal(runAction('crew:2214', { reveal: slug => revealed.push(slug) }), true);
+  assert.deepEqual(revealed, ['retardio-2214']);
+});
+
 test('input strips control and markup characters, rejects empty, oversize and nontext bodies', () => {
   assert.equal(parseInput({ text: '  zombies\n as\u0000 <85>\u202e ' }), 'zombies as 85');
   assert.equal(parseInput({ text: 'a'.repeat(200) }).length, 200);
@@ -179,7 +194,7 @@ test('recorded Jev smoke answer routes without a live call', () => {
 });
 
 test('Ask includes asset pack criteria and payloads and reveals a card without downloading', () => {
-  assert.equal(ACTIONS.length, 162); // three new games and their crew entries
+  assert.equal(ACTIONS.length, 165); // three new games and their crew entries, then #2214's three crew entries
   assert.equal(makePayload('wallpapers').state.packs.length, 6);
   const revealed = [];
   const shell = { reveal: slug => revealed.push(slug), play: () => assert.fail('pack actions must only reveal') };

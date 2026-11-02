@@ -12,7 +12,7 @@ test('Crew families and assets keep one unique first tile and accessible expansi
   for (const [i, name] of ['radbros', 'retardios', 'assets'].entries()) {
     assert.match(sections[i], new RegExp(`data-crew-expand aria-expanded="false" aria-controls="crew-${name}"`));
     assert.match(sections[i], new RegExp(`id="crew-${name}"`));
-    assert.equal([...sections[i].matchAll(/<button class="tile(?: tile--pack)?"/g)].length, [6, 3, 6][i]);
+    assert.equal([...sections[i].matchAll(/<button class="tile(?: tile--pack)?"/g)].length, [6, 4, 6][i]);
   }
   const tiles = [...html.matchAll(/<button class="tile(?: tile--pack)?"[^]*?data-i="(\d+)"[^]*?aria-controls="([^"]+)"/g)];
   const roster = [...crew.members, ...crew.npcs, ...crew.assets.packs];

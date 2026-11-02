@@ -866,15 +866,15 @@ export const crew = {
   },
 
   title: 'The crew',
-  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85 and his cousin #268, truck guy #723 and rare ghost #2564. All nine built in 3D, rigged and animated.',
+  line: 'The main four: #4764, #652, yellow-haired #3704 and green-haired #3710. With Retardio Cousin #555 and his Miata, Retardio Cousin Classic #85 and his cousin #268, red-haired Retardio Cousin Classic #2214, truck guy #723 and rare ghost #2564. All ten built in 3D, rigged and animated.',
   playIn: 'spidertag',
-  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-nine.zip', label: 'all nine, one .zip', size: '269.7 MB' },
+  downloadAll: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/crew-3d-all-ten.zip', label: 'all ten, one .zip', size: '300.8 MB' },
   // Where the models live for anyone to use. `license` is the one line shown with it.
   repo: {
     href: 'https://github.com/dexedrne/radbros-3d',
     label: 'Free to use: models on GitHub',
     license: { label: 'Viral Public License', href: 'https://viralpubliclicense.org/VPL.txt' },
-    line: 'Six Radbros in the repo; the three Retardios are built on the Radbro rig. Rigged and animated. Use them, remix them, put them in your game.',
+    line: 'Six Radbros in the repo; the four Retardios are built on the Radbro rig. Rigged and animated. Use them, remix them, put them in your game.',
   },
   members: [
     {
@@ -971,9 +971,10 @@ export const crew = {
       },
     },
     // The Retardios (Retardio Cousin #555, the original collection, now Candy Labs' programmable one; and
-    // Retardio Cousin Classic #85, the original artist's true-to-the-original relaunch): built on the Radbro rig, not part of the
-    // radbros-3d repo (`repo: false`). Their download is a package like the Radbros' (static, rigged and
-    // animated .glb, a preview, README and the license) on the same radbros-3d release.
+    // Retardio Cousin Classic #85, the original artist's true-to-the-original relaunch, with his cousin #268
+    // and Retardio Cousin Classic #2214): built on the Radbro rig, not part of the radbros-3d repo
+    // (`repo: false`). Their download is a package like the Radbros' (static, rigged and animated .glb, a
+    // preview, README and the license) on the same radbros-3d release. Owner's order: #85 first, #555 last.
     {
       num: '85',
       slug: 'retardio-85',
@@ -1006,6 +1007,23 @@ export const crew = {
         width: 310,
         height: 500,
         alt: 'Retardio Classic #268 in 3D, waving hello: black hair with blunt bangs, olive green eyes with blue tears, a lit cigarette, a white NEED MONEY FOR PORSCHE tee, black trousers and black sneakers with white soles.',
+      },
+    },
+    {
+      num: '2214',
+      slug: 'retardio-2214',
+      kind: 'Retardio Cousin Classic',
+      face: '/img/faces/retardio-2214.webp',
+      model: '/models/retardio2214-hero.glb',
+      name: 'Retardio Cousin Classic #2214',
+      line: 'Long straight red hair with blunt bangs, red eyes, a small w mouth and a black TUNA tank with a red fish.',
+      repo: false,
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio2214-3d-model.zip', label: '3D model .zip', size: '31 MB' },
+      image: {
+        src: '/img/retardios/retardio-2214.webp',
+        width: 306,
+        height: 500,
+        alt: 'Retardio Cousin Classic #2214 in 3D, waving hello: long straight red hair with blunt bangs, red eyes with dark eyeshadow, a small black w mouth, a black tank top with a red fish and the word TUNA, bare arms, black trousers and black sneakers.',
       },
     },
     {

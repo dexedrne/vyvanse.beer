@@ -1,5 +1,5 @@
 import test from 'node:test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { site, groups, crew, projects, playsIn, duo, contact } from '../src/projects.js';
@@ -19,9 +19,9 @@ test('Games and Contact keep #4764 and #85 on the puddle; the new pair are on th
   assert.deepEqual(duo, ['4764', '85']);
 });
 
-test('the nine Crew members keep the existing eight SHITBOX drivers and all game casts exclude #268', () => {
+test('the ten Crew members keep the existing eight SHITBOX drivers and all game casts exclude #268', () => {
   const nums = crew.members.map(m => m.num).sort();
-  assert.deepEqual(nums, ['2564', '268', '3704', '3710', '4764', '555', '652', '723', '85']);
+  assert.deepEqual(nums, ['2214', '2564', '268', '3704', '3710', '4764', '555', '652', '723', '85']);
   assert.deepEqual([...projects.find(p => p.cmd === 'shitbox').cast].sort(), ['2564', '3704', '3710', '4764', '555', '652', '723', '85']);
   for (const p of projects.filter(p => p.group === 'games')) {
     assert.ok(p.cast?.length, p.cmd);
@@ -54,8 +54,42 @@ test('#268 has a full Crew card beside #85 without advertising a game', () => {
   assert.ok(card?.includes('not in a game yet'));
   assert.ok(!card.includes('data-goto='));
   const tiles = [...html.matchAll(/<button class="tile"[^]*?aria-controls="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(tiles.length, 11);
-  assert.deepEqual(tiles.slice(-4), ['retardio-268', 'retardio-555', 'chak', 'ophelia']);
+  assert.equal(tiles.length, 12);
+  assert.deepEqual(tiles.slice(-5), ['retardio-268', 'retardio-2214', 'retardio-555', 'chak', 'ophelia']);
+});
+
+test('#2214 has a full Crew card between #268 and #555, keeping the owner\'s Retardio order 85, 268, 2214, 555', () => {
+  assert.deepEqual(crew.members.filter(m => m.kind.startsWith('Retardio')).map(m => m.num), ['85', '268', '2214', '555']);
+  const member = crew.members.find(m => m.num === '2214');
+  assert.equal(member.name, 'Retardio Cousin Classic #2214');
+  assert.equal(member.slug, 'retardio-2214');
+  assert.equal(member.kind, 'Retardio Cousin Classic');
+  assert.equal(member.repo, false);
+  assert.equal(member.model, '/models/retardio2214-hero.glb');
+  assert.ok(member.download.href.endsWith('/radbros-3d/retardio2214-3d-model.zip'));
+  assert.match(member.line, /red hair/);
+  assert.match(member.line, /TUNA/);
+  assert.match(member.image.alt, /TUNA/);
+  for (const text of [member.line, member.image.alt]) assert.doesNotMatch(text, /\b(she|her|girl)\b/i);
+  assert.deepEqual([member.image.width, member.image.height], [306, 500]);
+  const html = renderShell({ site, groups, projects, crew, contact, duo });
+  const card = html.match(/<article class="item item--crew" id="retardio-2214"[^]*?<\/article>/)?.[0];
+  assert.ok(card?.includes('My own Retardio'));
+  assert.ok(card.includes('retardio2214-3d-model.zip'));
+  assert.ok(card.includes('/img/retardios/retardio-2214.webp'));
+});
+
+test('every Crew member\'s face, card render and hero model are on disk, and each hero has the clips the stage plays', () => {
+  for (const m of crew.members) {
+    for (const asset of [m.face, m.model, m.image.src]) assert.ok(existsSync(new URL(`../public${asset}`, import.meta.url)), `${m.num}: ${asset}`);
+    const bytes = readFileSync(new URL(`../public${m.model}`, import.meta.url));
+    assert.equal(bytes.readUInt32LE(0), 0x46546c67, m.model);
+    const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString());
+    const clips = gltf.animations.map(a => a.name);
+    assert.ok(clips.includes('Idle') && clips.includes('Big_Wave_Hello'), `${m.num}: ${clips}`);
+    assert.equal(gltf.skins[0].joints.length, 24, m.num);
+    assert.ok(gltf.materials.every(mat => mat.extensions?.KHR_materials_unlit), `${m.num}: unlit`);
+  }
 });
 
 test('Chak replaces the legacy NPC card with his model download and current game appearances', () => {
@@ -80,19 +114,19 @@ test('Chak replaces the legacy NPC card with his model download and current game
   assert.ok(!card?.includes('Free to use'));
 });
 
-test('every Crew card offers the same nine-character zip, including the Retardios', () => {
+test('every Crew card offers the same ten-character zip, including the Retardios', () => {
   const html = renderShell({ site, groups, projects, crew, contact, duo });
   const cards = [...html.matchAll(/<article class="item item--crew"[^]*?<\/article>/g)].map(m => m[0]);
-  assert.equal(cards.length, 11);
-  assert.ok(crew.downloadAll.href.endsWith('/crew-3d-all-nine.zip'));
-  assert.equal(crew.downloadAll.label, 'all nine, one .zip');
+  assert.equal(cards.length, 12);
+  assert.ok(crew.downloadAll.href.endsWith('/crew-3d-all-ten.zip'));
+  assert.equal(crew.downloadAll.label, 'all ten, one .zip');
   assert.ok(!html.includes('original four'));
-  for (const card of cards.slice(0, 9)) {
+  for (const card of cards.slice(0, 10)) {
     assert.ok(card.includes(`href="${crew.downloadAll.href}" download`));
     assert.ok(card.includes(`class="more-link"`));
     assert.ok(card.includes(`${crew.downloadAll.label} (${crew.downloadAll.size})`));
   }
-  for (const card of cards.slice(9)) assert.ok(!card.includes(crew.downloadAll.href));
+  for (const card of cards.slice(10)) assert.ok(!card.includes(crew.downloadAll.href));
 });
 
 

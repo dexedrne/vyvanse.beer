@@ -10,7 +10,7 @@ test('Ophelia joins other characters with a preview, without changing the playab
   const npc = crew.npcs.find(m => m.num === 'ophelia');
   assert.ok(npc?.npcOnly);
   assert.ok(!npc.download);
-  assert.equal(crew.members.length, 9);
+  assert.equal(crew.members.length, 10);
   for (const asset of [npc.model, npc.face, npc.image.src]) assert.ok(existsSync(new URL(`../public${asset}`, import.meta.url)), asset);
   const card = renderShell({ site, groups, projects, crew, contact, duo }).match(/<article class="item item--crew" id="ophelia"[^]*?<\/article>/)?.[0];
   assert.ok(card?.includes('Say hello'));

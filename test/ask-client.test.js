@@ -27,6 +27,18 @@ test('terminal info for #268 explains that he is not in a game yet', async () =>
   assert.deepEqual(revealed, ['retardio-268']);
 });
 
+test('terminal info for #2214 shows his card and model download', async () => {
+  const printed = [], revealed = [];
+  const commands = createCommands({ projects, crew, site, groups, contact,
+    term: { print: node => printed.push(node), history: () => [] }, shell: { reveal: slug => revealed.push(slug) } });
+  const text = node => typeof node === 'string' ? node : (node?.children || []).map(text).join('');
+  await commands.run('info 2214');
+  assert.match(printed.map(text).join(''), /Retardio Cousin Classic #2214/);
+  assert.deepEqual(revealed, ['retardio-2214']);
+  await commands.run('info retardio-2214');
+  assert.deepEqual(revealed, ['retardio-2214', 'retardio-2214']);
+});
+
 test('offline chips and exact commands do not make a request; unmatched text gets a polite fallback', async t => {
   t.mock.getter(globalThis.navigator, 'onLine', () => false);
   t.mock.method(globalThis, 'fetch', () => { throw Error('offline network call'); });

@@ -57,7 +57,7 @@ test('downloadable packs have unique ids, numeric file counts and valid credits 
   assert.equal(garage.download.size, '204 MB');
 });
 
-test('rendered packs follow the nine members with a third assets group and working plain downloads', () => {
+test('rendered packs follow the ten members with a third assets group and working plain downloads', () => {
   const html = render();
   const cards = [...html.matchAll(/<article class="item item--pack"[^]*?<\/article>/g)].map(m => m[0]);
   assert.equal(cards.length, 6);
@@ -67,8 +67,8 @@ test('rendered packs follow the nine members with a third assets group and worki
   const row = html.match(/<div class="tgroups">[^]*?<\/section>/)?.[0];
   assert.equal([...row.matchAll(/class="tgroup(?: tgroup--packs)?"/g)].length, 4);
   assert.match(row, /other characters[^]*?tgroup--packs[^]*?data-crew-expand[^]*?>assets /);
-  assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [11, 12, 13, 14, 15, 16]);
-  assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [11, 12, 13, 14, 15, 16]);
+  assert.deepEqual(cards.map(card => +card.match(/data-i="(\d+)"/)[1]), [12, 13, 14, 15, 16, 17]);
+  assert.deepEqual([...row.matchAll(/<button class="tile tile--pack"[^]*?data-i="(\d+)"/g)].map(m => +m[1]), [12, 13, 14, 15, 16, 17]);
   for (const card of cards) {
     assert.match(card, /class="visual visual--crew visual--pack"/);
     assert.match(card, /<picture><source[^]*?<img class="bro"/);
@@ -101,21 +101,24 @@ test('pack hash ids and legacy pack slugs round trip through the menu save and l
   vm.runInContext(`${idOf}\n${hashFns}`, ctx);
   assert.equal(packs.length, 6);
   for (const [i, p] of packs.entries()) {
-    S.crew = 9 + i;
+    S.crew = 10 + i;
     vm.runInContext('save()', ctx);
     assert.equal(location.hash, `#crew/${p.id}`);
     S.crew = 0;
     vm.runInContext('load()', ctx);
-    assert.equal(S.crew, 9 + i);
+    assert.equal(S.crew, 10 + i);
     location.hash = `#${p.slug}`;
     S.crew = 0;
     vm.runInContext('load()', ctx);
     assert.equal(S.tab, 'crew');
-    assert.equal(S.crew, 9 + i);
+    assert.equal(S.crew, 10 + i);
   }
   location.hash = '#crew/268';
   vm.runInContext('load()', ctx);
   assert.equal(S.crew, 7); // #268 is second among the Retardios since #85 leads and #555 closes them
+  location.hash = '#crew/2214';
+  vm.runInContext('load()', ctx);
+  assert.equal(S.crew, 8); // #2214 comes third, between #268 and #555
 });
 
 test('offline precache admits pack tiles and leaves both cover sizes on demand', () => {

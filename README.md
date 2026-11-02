@@ -224,13 +224,12 @@ mirrors the art upside down, the neon of the cartridges and buttons standing in 
 heavy drops that splash, the pointer's wake and clicks. Under text the water is held dark enough
 for every pair to meet WCAG AA.
 
-**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the nine web
+**The crew in 3D** ([`src/duo.js`](src/duo.js)): one renderer that holds any of the ten web
 models (`public/models/*-hero.glb`, each with `Idle` and `Big_Wave_Hello`) and shows a pair or
 one alone, with a small groove on one shared beat (a head nod, a shoulder bounce, a hip sway).
-On Games and Contact, the pair on the right changes on 24-second turns using the existing stage loop.
-#4764, #652, yellow-haired #3704 and green-haired #3710 take 17 of each 20 turns; the two Retardios,
-#555 with cowboy-hat truck driver #723, and a rare #2564 pair take one each. Edition-specific rosters stay
-as before. Reduced motion holds the pair still, and opening a game pauses the loop. Every 7 to 12
+On Games and Contact, #4764 and #85 stand on the puddle together. On desktop, a game shown in its
+Radbros edition has #4764 alone and one shown in its Retardios edition has #555 and #85; the stage
+holds one figure or a pair, never more. Reduced motion holds the pair still, and opening a game pauses the loop. Every 7 to 12
 seconds one of them waves, at you or at the other one. On Crew, whoever is picked stands alone,
 centre stage, and waves hello; he waves again on a click or tap (or X / G). Each model is
 fetched the first time it's wanted, and on Crew the cards either side are fetched once his is
@@ -323,23 +322,29 @@ completion, and `hidden: true` leaves it out of `help`.
 
 `public/img/radbros/` and `public/img/retardios/` hold flat renders of the rigged models on
 transparent backgrounds (the crew renders, 500 px tall), `public/img/faces/` their 200×200 crops
-for the character-select tiles. The web models in `public/models/` (all nine, each crew member's
+for the character-select tiles. The web models in `public/models/` (all ten, each crew member's
 `model` in `src/projects.js`) are the mesh plus `Idle` and `Big_Wave_Hello`, unlit, textures at
 1024 in WebP, Draco-compressed. The Retardios' crew downloads are packages like the Radbros'
-(`retardio555-3d-model.zip`, `retardio85-3d-model.zip` and `retardio268-3d-model.zip` on the `radbros-3d` release: static,
+(`retardio555-3d-model.zip`, `retardio85-3d-model.zip`, `retardio268-3d-model.zip` and `retardio2214-3d-model.zip` on the `radbros-3d` release: static,
 rigged and animated `.glb`, a preview, a README and the license). `public/draco/` is the Draco
 decoder from `three/examples/jsm/libs/draco/gltf/`, served from this site; copy those two files
 again if you update `three` (pinned to an exact version).
 
 #268 is #85's cousin and keeps a FREE MITCH poster. His Crew card and download are available;
-he is not in a game yet. `crew-3d-all-nine.zip` includes all nine characters.
+he is not in a game yet.
 
-Every crew download carries every animation that character has: the crew's shared clips and parkour
+Retardio Cousin Classic #2214 sits between #268 and #555 (the Retardios run #85, #268, #2214, #555).
+His hero's Idle had the hands against the thighs, so its upper arms were swung out by the same
+0.13 m hand-to-thigh rule as the rest of the crew's. `crew-3d-all-ten.zip` includes all ten
+characters; `crew-3d-all-nine.zip` stays on the release for older links.
+
+The other nine crew downloads carry every animation each character has: the crew's shared clips and parkour
 set, the games' own clips (RadPayne / RadOps / RBGO / RadZombies, RADBRAWL, SHITBOX, RADTAP's
 groove) and every Meshy clip bought for them, each moved onto his own rig. That comes to 184 to 234
 clips each, all in the rigged, animated `.glb`, plus a web pair in `web/` and a README listing every
 clip. The file names are unchanged, so these links stay the same when the release assets are
-replaced; only the sizes on the Crew cards change.
+replaced; only the sizes on the Crew cards change. #2214's package has 23 clips in its rigged,
+animated `.glb`, with his locomotion, gun and round-two clip packs in `source/`.
 
 #3704 and #3710 use the same 24-joint hero rig, WebP / Draco optimisation, Idle and wave clips, grounding,
 groove and loading budget as the others. Their Crew cards list SALOON and RADTAP, and those two games'
@@ -357,7 +362,7 @@ The new model download links use the existing `radbros-3d` release on this site'
   a game. Anything made from them keeps the same license. The source models are also at
   [dexedrne/radbros-3d](https://github.com/dexedrne/radbros-3d).
 - `public/draco/` is the Draco decoder that ships with three.js (Apache-2.0).
-- Retardio #555, #85 and #268 (`public/img/retardios/`, `public/models/retardio*`) are dexedrne's own Retardios.
+- Retardio #555, #85, #268 and #2214 (`public/img/retardios/`, `public/models/retardio*`) are dexedrne's own Retardios.
   Their 3D model packages on the `radbros-3d` release are under the same Viral Public License as the Radbros'.
 - The background music (`public/audio/`) was made for this site and isn't covered by either
   license above.
