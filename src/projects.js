@@ -283,7 +283,7 @@ export const projects = [
     name: 'ZombieTardio',
     kind: 'First-person zombies, Retardios only',
     blurb:
-      'The same zombies game, all three maps and everything in them, played as the Retardios: Retardio Cousin #555, Retardio Cousin Classic #85 or Retardio Cousin Classic #2214. Solo with another as your bot teammate, or two players online or on split screen. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
+      'The same zombies game, all three maps and everything in them, played as the Retardios. Retardio Cousin Classic #85 leads, solo with a bot teammate, two on split screen or in an online room; Retardio Cousin #555 and Retardio Cousin Classic #2214 join as the third and fourth players online. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
     url: 'https://zombietardio.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://zombietardio.vyvanse.beer' }],
