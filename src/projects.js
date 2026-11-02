@@ -10,6 +10,13 @@
 //   slug      anchor id on the page (vyvanse.beer/#slug)
 //   group     'games' or 'sites' (see `groups`)
 //   name      display name
+//   twoLines  games only: true for a two-word name too long for one line (SankoQuest Survivors). The
+//             menu's wordmark then sets it on two balanced lines, still fitted to its column, instead
+//             of shrinking it onto one; a phone shorter than 760px keeps one line, so PLAY stays clear
+//             of the wheel
+//   cartName  games only: a shorter name for the cartridge, whose one line of plastic under the label
+//             a long name runs off (SankoQuest Survivors is SankoQuest there); the button still reads
+//             the full name
 //   kind      one line saying what it is
 //   kindPhone shorter panel kindline on phones; blurbPhone: approved phone-only copy
 //   phone     phone art position, keeping the desktop image.position
@@ -109,6 +116,8 @@ export const projects = [
     group: 'games',
     section: 'arcade',
     name: 'SankoQuest Survivors',
+    twoLines: true, // SankoQuest / Survivors: on one line the wordmark would shrink to about a third of its size
+    cartName: 'SankoQuest', // the full name is about 1.5 times as wide as the cartridge's label
     kind: 'Fan game: survive the horde in the SankoQuest world',
     kindPhone: 'Survive the SankoQuest horde',
     blurb:

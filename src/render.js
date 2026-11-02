@@ -75,7 +75,7 @@ function gameItem(p, i, eds, faces) {
   return `<article class="item item--game${eds.length > 1 ? ' item--eds' : ''}" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" data-game="${esc(eds[0].cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
   <div class="info hero">
     <p class="kindline">${esc(p.kind)}</p>
-    <h3 class="wm" data-text="${esc(p.name)}" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
+    <h3 class="wm${p.twoLines ? ' wm--two' : ''}" data-text="${esc(p.name)}" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
     ${editionSwitch(p, eds, faces)}
     <p class="pitch">${esc(p.blurb)}</p>
     ${moreButton}
@@ -224,7 +224,7 @@ export function packGroup(crew, start) {
 // One cartridge per game. A game with editions has one label per edition (the shown one on top,
 // src/main.js) and the next one's edge peeking out behind it, so it reads as a two-in-one.
 export function cartBody(p, i, eds = [p]) {
-  const front = (e, back = false, mirror = false) => `<${back || mirror ? 'span' : 'button'} class="cart${back ? ' cart--back' : ''}" style="--shell:${esc(e.shell)}"${back || mirror ? ' aria-hidden="true"' : ` type="button" data-i="${i}" aria-controls="${esc(e.slug)}"`}><span class="cart__label"><img src="${esc(e.thumb)}" width="420" height="315" alt="" decoding="async"><i class="caus" style="--ph:${((Math.sin(i * 12.9898 + 4.1) * 43758.5453) % 1 + 1) % 1}"></i></span><span class="cart__name">${esc(e.name)}</span>${eds.length > 1 ? `<span class="cart__sub">${eds.indexOf(e) + 1} of ${eds.length}: ${esc(e.edition.label)}</span>` : ''}</${back || mirror ? 'span' : 'button'}>`;
+  const front = (e, back = false, mirror = false) => `<${back || mirror ? 'span' : 'button'} class="cart${back ? ' cart--back' : ''}" style="--shell:${esc(e.shell)}"${back || mirror ? ' aria-hidden="true"' : ` type="button" data-i="${i}" aria-controls="${esc(e.slug)}"${e.cartName ? ` aria-label="${esc(e.name)}"` : ''}`}><span class="cart__label"><img src="${esc(e.thumb)}" width="420" height="315" alt="" decoding="async"><i class="caus" style="--ph:${((Math.sin(i * 12.9898 + 4.1) * 43758.5453) % 1 + 1) % 1}"></i></span><span class="cart__name">${esc(e.cartName || e.name)}</span>${eds.length > 1 ? `<span class="cart__sub">${eds.indexOf(e) + 1} of ${eds.length}: ${esc(e.edition.label)}</span>` : ''}</${back || mirror ? 'span' : 'button'}>`;
   const body = eds.length > 1 ? `<span class="case">${front(eds.find(e => e !== p), true)}${front(p)}<span class="case__tab" aria-hidden="true">${eds.map(e => `<i${e === p ? ' class="on"' : ''}></i>`).join('')}</span></span>` : front(p);
   return { body, mirror: `<span class="slot__mirror" aria-hidden="true">${front(p, false, true)}</span>` };
 }

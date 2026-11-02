@@ -105,6 +105,9 @@
 /* the wordmark's glow breathes: the same word in the accent, blurred once, its opacity 0.22 -> 0.5 over 3.8 s */
 .js .screen[data-tab='games'] .wm::after { content: attr(data-text); position: absolute; z-index: -1; inset: 0; color: var(--accent, var(--amethyst)); text-shadow: none; filter: blur(18px); opacity: 0.22; animation: wheel-glow 3.8s ease-in-out infinite alternate; pointer-events: none; }
 @keyframes wheel-glow { to { opacity: 0.5; } }
+/* a name too long for one line (twoLines in projects.js) goes onto two balanced lines, its glow with it;
+   layout() in main.js still fits the wider line to the column */
+.js .screen[data-tab='games'] .wm--two { white-space: normal; text-wrap: balance; }
 .js .screen[data-tab='games'] .wm--site { font-size: clamp(56px, 11vh, 112px); }
 .js .screen[data-tab='games'] .pitch {
   margin: 14px 0 8px; max-width: 560px; color: var(--text); font: 400 clamp(14px, 1.75vh, 17px)/1.5 var(--sans); text-shadow: 0 1px 8px rgb(0 0 0 / 0.85);
@@ -491,6 +494,8 @@
   .js .screen[data-tab='games'] .kindline .kl--phone { display: inline; }
   .js .screen[data-tab='games'] .kindline { margin: 0 0 2px; max-width: 250px; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .js .screen[data-tab='games'] .wm { font-size: 54px; max-width: 250px; }
+  /* under 760px tall a second line would push PLAY into the wheel: one line, fitted smaller */
+  .js .screen[data-tab='games'].short .wm--two { white-space: nowrap; }
   .js .screen[data-tab='games'] .wm--site { font-size: 46px; }
   .js .screen[data-tab='games'] .pitch { margin: 16px 0 6px; font-size: 13.5px; line-height: 1.4; -webkit-line-clamp: 2; max-width: none; }
   .js .screen[data-tab='games'] .act { display: grid; grid-template-areas: 'play more' 'status status'; grid-template-columns: 1fr auto; gap: 6px 10px; }

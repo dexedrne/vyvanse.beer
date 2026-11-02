@@ -62,6 +62,12 @@ textless cartridge label in `public/img/thumb/`, composed for a centred 4:3 cove
 for each one's "in" list. SankoQuest Survivors, a fan game made for the Sanko community with the
 SankoQuest team's permission, is played as its own adventurers, so its cast is empty.
 
+A long name comes down in size to fit the hero column on one line. A two-word name too long for
+that can set `twoLines: true` to go onto two balanced lines instead (still fitted to the column; a
+phone under 760px tall keeps one line), and a shorter `cartName` for the one name line under its
+cartridge label, which RetardioPayne about fills: SankoQuest Survivors is "SankoQuest / Survivors"
+on the wordmark and "SankoQuest" on the cartridge, whose button still reads the full name.
+
 A game can have editions: RadPayne and RetardioPayne (the harder cut, Retardios only), RadZombies
 and ZombieTardio. Each edition is its own site and its own entry, with its own name, blurb, art,
 links and `cmd`; the second one says `of: 'radpayne'`, and both carry `edition: { label, face }`
