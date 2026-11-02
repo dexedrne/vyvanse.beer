@@ -30,7 +30,7 @@ test('build selects only launcher files, excluding API and game builds', async (
   const { shellFile } = await import('../src/pwa/build.js');
   for (const file of ['index.html', 'offline.html', 'manifest.webmanifest', 'apple-touch-icon.png', 'favicon.svg',
     'vyvanse-pad.js', 'assets/index-abc.js', 'assets/stage-abc.js', 'assets/index-abc.css', 'assets/font-abc.woff2',
-    'img/art/radtap.webp', 'models/radbro4764-hero.glb', 'models/retardio268-hero.glb',
+    'img/art/radtap.webp', 'img/art/sanko.webp', 'img/thumb/sanko.webp', 'models/radbro4764-hero.glb', 'models/retardio268-hero.glb',
     'img/faces/retardio-268.webp', 'img/retardios/retardio-268.webp', 'models/retardio2214-hero.glb',
     'img/faces/retardio-2214.webp', 'img/retardios/retardio-2214.webp', 'audio/vyvanse-bg.m4a', 'draco/draco_decoder.wasm', 'pwa/icon-192.png'])
     assert.equal(shellFile(file), true, file);

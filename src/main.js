@@ -703,12 +703,13 @@ function play(p, { from, as } = {}) {
   if (!pwa.canPlay()) return;
   audio.blip('ok');
   if (p.frame) return player.open(p, { as });
-  // it can't run inside the page: a new tab, which a pad press may not be allowed to open
+  // it doesn't play inside the page (it can't, or its tabNote says why): a new tab, which a pad
+  // press may not be allowed to open
   const url = launchUrl(p, as);
   if (!openTab(url)) {
     askTab({
       title: p.name,
-      text: `${p.name} can’t run inside this page, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
+      text: `${p.name} ${p.tabNote ? `opens in a new tab (${p.tabNote})` : 'can’t run inside this page'}, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
       url,
     });
   }
@@ -1841,7 +1842,12 @@ load();
 $('.arc').dataset.sel = String(S.games);
 motion = createMotion({ screen, arc: $('.arc'), wheel: $('.wheel'), deck: $('.deck'), wall: $('.wall'), backdrop: $('#backdrops'),
   onSelect(i) { if (S.tab === 'games' && S.games !== i) select(i); },
-  onPlay() { play(current()); }, onWall() { hints(); },
+  onPlay() {
+    const p = current();
+    play(p);
+    // a game that opens in its own tab leaves the menu here: its cartridge comes back out of the deck
+    if (p && !p.frame) { motion.eject(); typeOut(onItem('games')); }
+  }, onWall() { hints(); },
   onInsert() { clearInterval(typeTimer); const line=$('.item--game.on [data-type]'); if(line) {line.textContent='inserting';line.classList.add('typed');} },
 });
 motion.select(S.games,{snap:true}); motion.boot(); layout(); if (player.current) motion.pause();

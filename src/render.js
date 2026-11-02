@@ -71,7 +71,7 @@ function editionSwitch(p, eds, faces) {
 }
 
 function gameItem(p, i, eds, faces) {
-  const line = p.frame ? p.boot || p.kind : 'opens in a new tab: it can’t run inside this page';
+  const line = p.frame ? p.boot || p.kind : `opens in a new tab: ${p.tabNote || 'it can’t run inside this page'}`;
   return `<article class="item item--game${eds.length > 1 ? ' item--eds' : ''}" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" data-game="${esc(eds[0].cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
   <div class="info hero">
     <p class="kindline">${esc(p.kind)}</p>

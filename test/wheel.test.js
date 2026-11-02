@@ -4,12 +4,18 @@ import { projects, shelf, sections } from '../src/projects.js';
 import { nearestNeighbour, placeK, Spring, InsertState } from '../src/motion.js';
 import { cartBody } from '../src/render.js';
 
-test('wheel preserves section order, twelve cases and all sixteen game URLs', () => {
+test('wheel keeps every section, thirteen cases and all seventeen game URLs', () => {
   const cases=shelf(projects);
-  assert.equal(cases.length,12);
-  assert.equal(cases.flat().length,16);
-  assert.deepEqual([...new Set(cases.map(e=>e[0].section))],sections.map(s=>s.id));
-  assert.deepEqual(cases.map(e=>e[0].cmd),['shitbox','radpayne','radops','radzombies','radbrawl','spidertag','radtap','saloon','radbonk','radquest','radcraft','brogate']);
+  assert.equal(cases.length,13);
+  assert.equal(cases.flat().length,17);
+  assert.equal(new Set(cases.flat().map(p=>p.url)).size,17);
+  // the row has no genre tags or jumps any more (owner 11/2), so a game may sit outside its
+  // section's run: SankoQuest Survivors (arcade) comes second, right after SHITBOX. The rest
+  // still run in section order, and every section is still in use.
+  const rest=cases.filter(e=>e[0].cmd!=='sanko');
+  assert.deepEqual([...new Set(rest.map(e=>e[0].section))],sections.map(s=>s.id));
+  for(const e of cases)assert.ok(sections.some(s=>s.id===e[0].section),e[0].cmd);
+  assert.deepEqual(cases.map(e=>e[0].cmd),['shitbox','sanko','radpayne','radops','radzombies','radbrawl','spidertag','radtap','saloon','radbonk','radquest','radcraft','brogate']);
   for(const cmd of ['radquest','radcraft','brogate']){
     const p=projects.find(p=>p.cmd===cmd);assert.ok(p.frame);assert.equal(p.section,'worlds');assert.equal(p.image.width,1600);assert.equal(p.image.height,900);assert.equal(p.image.lettered,1);
   }

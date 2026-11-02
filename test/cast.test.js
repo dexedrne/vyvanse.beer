@@ -24,10 +24,14 @@ test('the ten Crew members: SHITBOX has the eight earlier drivers plus #2214, an
   assert.deepEqual(nums, ['2214', '2564', '268', '3704', '3710', '4764', '555', '652', '723', '85']);
   assert.deepEqual([...projects.find(p => p.cmd === 'shitbox').cast].sort(), ['2214', '2564', '3704', '3710', '4764', '555', '652', '723', '85']);
   for (const p of projects.filter(p => p.group === 'games')) {
-    assert.ok(p.cast?.length, p.cmd);
+    assert.ok(Array.isArray(p.cast), p.cmd);
+    // every crew game has a cast; only the Sanko fan game, played as its own adventurers, has none
+    if (p.cmd !== 'sanko') assert.ok(p.cast.length, p.cmd);
     assert.ok(!p.cast.includes('268'), p.cmd);
     for (const num of p.cast) assert.ok(nums.includes(num), `${p.cmd}: ${num}`);
   }
+  assert.deepEqual(projects.find(p => p.cmd === 'sanko').cast, []);
+  for (const m of crew.members) assert.ok(!playsIn(projects, m.num).some(p => p.cmd === 'sanko'), m.num);
 });
 
 test('Crew links pick the Retardio editions and keep the ghost out of SALOON', () => {

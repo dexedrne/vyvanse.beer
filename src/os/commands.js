@@ -72,7 +72,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     const url = launchUrl(p, as);
     const ok = openTab(url);
     if (!ok) term.print(line('your browser blocked the new tab. open it here: ', link(url)));
-    else if (want === 'here') term.print(line(strong(p.name), ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't play here.`));
+    else if (want === 'here') term.print(line(strong(p.name), p.tabNote ? ` opened in a new tab: ${p.tabNote}.` : ` opened in a new tab. ${shortUrl(p.url)} doesn't allow embedding, so it can't play here.`));
     else term.print(line('opened ', strong(p.name), ' in a new tab ', muted(`(${shortUrl(p.url)})`)));
   }
 
@@ -90,7 +90,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
         p.note ? line(muted(p.note)) : null,
         p.frame
           ? grid(run(`open ${p.cmd}`), muted('plays here'), run(`open ${p.cmd} --tab`), muted('in a new tab'))
-          : line(run(`open ${p.cmd}`), muted('  opens in a new tab')),
+          : line(run(`open ${p.cmd}`), muted(`  opens in a new tab${p.tabNote ? `: ${p.tabNote}` : ''}`)),
       ),
     );
     shell.reveal(p.slug);

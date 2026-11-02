@@ -241,7 +241,9 @@ try {
     assert.equal(await page.getAttribute('#screen', 'data-tab'), 'contact');
     // Keyboard selection, edition switches and sheet close.
     await page.keyboard.press('e');
-    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight'); // SankoQuest Survivors, right after SHITBOX
+    assert.equal(await page.getAttribute('#games .item.on', 'data-id'), 'sanko');
+    await page.keyboard.press('ArrowRight'); // RadPayne
     await page.keyboard.press('ArrowDown');
     assert.equal(await page.getAttribute('#games .item.on', 'data-id'), 'retardiopayne');
     await page.keyboard.press('i'); await page.keyboard.press('Escape');

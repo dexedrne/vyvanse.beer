@@ -19,6 +19,9 @@
 //             page, full screen, in the player (src/player.js). false = it sends
 //             X-Frame-Options / frame-ancestors, so it opens in a new tab (and says so).
 //             Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
+//   tabNote   with frame: false on a site that could be framed: why it opens in its own tab instead,
+//             said on its status line, in the terminal and when a new tab is blocked
+//             (SankoQuest Survivors keeps its saves per web address, so a framed copy would start over)
 //   orientation games only: 'landscape' by default; 'any' permits portrait without a lock or hint
 //   links     [{ label, href }]; the first one is the main action and should match `url`
 //   image     optional { src, width, height, alt } in public/img/: a game's key art (it fills
@@ -94,6 +97,37 @@ export const projects = [
       width: 1600,
       height: 900,
       alt: 'SHITBOX: a faded red 1993 four-door with a primer-grey fender parked at a mountain lookout over the town lights at night, Radbro #4764 leaning on the fender and Retardio #85 sitting on the bonnet with a coffee.',
+    },
+  },
+  {
+    // a fan game for the Sanko community, made with the SankoQuest team's permission
+    cmd: 'sanko',
+    boot: 'fifteen minutes in Greentown, the horde closing in', // the hero's boot log line
+    // `survivors` alone stays RADBONK's, as it was before this one
+    aliases: ['sankoquest', 'sankosurvivors', 'sankoquest-survivors', 'sanko-survivors'],
+    slug: 'sanko',
+    group: 'games',
+    section: 'arcade',
+    name: 'SankoQuest Survivors',
+    kind: 'Fan game: survive the horde in the SankoQuest world',
+    kindPhone: 'Survive the SankoQuest horde',
+    blurb:
+      'A fan game made for the Sanko community, with the SankoQuest team’s permission. Survive fifteen minutes in Greentown, on SankoQuest’s own map, against monsters from its bestiary while your weapons attack on their own. Eight weapons upgrade from Bronze to Runite and evolve with the right item; five bosses lead up to the Dragon. Reward caskets hold real SankoQuest gear you keep and wear between runs, and there are quests, a leaderboard for each map and new maps to open as you clear them. Keyboard, controller or touch.',
+    url: 'https://sankosurvivors.quest',
+    // it could be framed, but its saves live with its own web address: a copy in here would start over
+    frame: false,
+    tabNote: 'it keeps your saves on its own site',
+    links: [{ label: 'Play', href: 'https://sankosurvivors.quest' }],
+    thumb: '/img/thumb/sanko.webp',
+    shell: '#2f251b',
+    accent: '#ff981f',
+    cast: [], // you play its own adventurers, none of the crew
+    phone: '50% 42%', // the adventurer in the gold ring
+    image: {
+      src: '/img/art/sanko.webp',
+      width: 1600,
+      height: 900,
+      alt: 'SankoQuest Survivors: an adventurer stands in a gold ring on the green in Greentown, surrounded by a horde of chickens, goblins, cows and skeletons, between a stone house, wooden fences and a big tree, with air shards on the grass.',
     },
   },
   {

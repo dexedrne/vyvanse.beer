@@ -59,7 +59,8 @@ its key art fills the screen (`image`, 1600×900 webp in `public/img/art/`); `gr
 a grey cartridge on Sites and its 800×420 screenshot in the preview monitor. Both want a
 textless cartridge label in `public/img/thumb/`, composed for a centred 4:3 cover crop, a `shell` colour for the plastic and an
 `accent` for the glow. A game's `cast` lists who you can play as (by crew `num`); Crew reads it
-for each one's "in" list.
+for each one's "in" list. SankoQuest Survivors, a fan game made for the Sanko community with the
+SankoQuest team's permission, is played as its own adventurers, so its cast is empty.
 
 A game can have editions: RadPayne and RetardioPayne (the harder cut, Retardios only), RadZombies
 and ZombieTardio. Each edition is its own site and its own entry, with its own name, blurb, art,
@@ -78,7 +79,11 @@ curl -sI https://example.com | grep -iE 'x-frame-options|frame-ancestors'
 ```
 
 No output means `frame: true` is fine and PLAY runs it inside the page. With `frame: false` it
-opens in a new tab, and the button and status line say so (Solscape, bitcorn and sanic).
+opens in a new tab, and the button and status line say so (Solscape, bitcorn and sanic). A site
+that could be framed can still be `frame: false`, with a `tabNote` saying why on its status line,
+in the terminal and when a new tab is blocked: SankoQuest Survivors keeps its saves per web
+address, so it opens on sankosurvivors.quest in its own tab rather than as a fresh copy in here.
+Picked on the wheel, such a game's cartridge comes straight back out of the deck after PLAY.
 Phone games default to landscape; set `orientation: 'any'` for a game that also supports portrait,
 such as SALOON. That skips the orientation lock and the player's rotate hint.
 
@@ -367,3 +372,6 @@ The new model download links use the existing `radbros-3d` release on this site'
 - The background music (`public/audio/`) was made for this site and isn't covered by either
   license above.
 - The screenshots of other people's projects in `public/img/` belong to those projects.
+- SankoQuest Survivors' key art and cartridge label (`public/img/art/sanko.webp`,
+  `public/img/thumb/sanko.webp`) are cut from the fan game's own share image. SankoQuest, its world
+  and its art belong to Sanko GameCorp and are used with the SankoQuest team's permission.
