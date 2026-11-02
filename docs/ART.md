@@ -36,11 +36,13 @@ below the previous 753,320-byte hero ceiling. The existing six-model memory cap 
 separate held-prop or weapon-skin slot in this launcher, so the optional launcher prop is not attached.
 
 SankoQuest Survivors' key art and cartridge label are cut from the fan game's own 1200 × 630 share
-image (an adventurer ringed by the Greentown horde): its SURVIVORS subtitle and bottom tagline are
-filled in from the surrounding picture by patch inpainting, and the 16:9 key art
-starts below the big title, so neither file carries any lettering. The key art is that crop at 1600 × 900
-(lossy WebP quality 86, method 6); the label is a 4:3 crop around the adventurer at 420 × 315
-(quality 90, method 6), so the cartridge's centred 4:3 cover crop shows all of it.
+image (an adventurer ringed by the Greentown horde) by `scripts/sanko-art.py` (Pillow and numpy; run it
+with the game's `public/og.jpg`). Its SURVIVORS subtitle is filled in from the surrounding picture by
+patch inpainting; the 16:9 key art is the 853 × 480 band between the big title and the bottom tagline,
+so neither file carries any lettering and no filled-in patch shows along the bottom. The key art is that
+band at 1600 × 900 (×1.88, lossy WebP quality 86, method 6); the label is a 4:3 crop around the
+adventurer at 420 × 315 (quality 90, method 6), so the cartridge's centred 4:3 cover crop shows all of it.
+The share image is the game's only scene picture, so the key art is softer than art drawn at size.
 
 After `npm run build`, check archive exclusion with:
 
