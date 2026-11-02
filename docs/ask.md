@@ -6,7 +6,7 @@ PS5 touchpad click opens Ask with chips focused. D-pad moves, Cross chooses, Cir
 
 ## Fixed actions
 
-`src/ask/actions.js` derives 123 actions from `src/projects.js`: `play:<cmd>` for all 18 projects/sites and their editions; `play:<cmd>:<num>` for each listed cast member; `crew:<num>`, `crew-games:<num>` and `crew-model:<num>` for each of the eight crew; `crew`, `crew-license`, `contact`, `tip`, `music:on`, `music:off`, `menu` and `none`. Games without a verified `asParam: true` open normally. Verified support adds `?as=<num>` while preserving existing query/fragment and the PWA phone flag. The original project object stays in the player so returning selects the correct cartridge/edition.
+`src/ask/actions.js` derives 178 actions from `src/projects.js`: `play:<cmd>` for all 23 projects/sites and their editions; `play:<cmd>:<num>` for each listed cast member; `crew:<num>`, `crew-games:<num>` and `crew-model:<num>` for each of the ten crew; `pack:<id>` for each of the six asset packs; `assets`, `crew`, `crew-license`, `contact`, `tip`, `music:on`, `music:off`, `menu` and `none`. Games without a verified `asParam: true` open normally. Verified support adds `?as=<num>` while preserving existing query/fragment and the PWA phone flag. The original project object stays in the player so returning selects the correct cartridge/edition.
 
 Responses contain only `{action, line}` or `{action: null, line, suggestions: [{action, line}, ...]}`. Suggestions contain exactly three known actions ranked by probability. The client validates the action and authored line again and supplies the button label locally.
 
