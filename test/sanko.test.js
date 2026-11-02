@@ -59,6 +59,11 @@ test('Play opens sankosurvivors.quest in its own tab, where the game keeps its s
 
 test('the copy calls it a fan game made with the SankoQuest team’s permission, never unofficial or official', () => {
   assert.match(sanko.blurb, /^A fan game made for the Sanko community, with the SankoQuest team’s permission\./);
+  // Greentown's bosses are the Lesser Giant, Ogre Warlord, Pumpkin Reaper and Rime Colossus, then the Dragon
+  assert.match(sanko.blurb, /four bosses lead up to the Dragon/);
+  // the staff climbs through shards, the bow through woods, the two-handed and short swords stop at Adamantite: no "Runite" promise
+  assert.match(sanko.blurb, /Eight weapons level up through SankoQuest’s tiers/);
+  assert.doesNotMatch(sanko.blurb, /Runite|five bosses/);
   const words = [sanko.name, sanko.kind, sanko.kindPhone, sanko.boot, sanko.blurb, sanko.tabNote, sanko.image.alt].join(' ');
   assert.doesNotMatch(words, /official/i);
   assert.doesNotMatch(card, /official/i);
