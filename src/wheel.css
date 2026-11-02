@@ -652,3 +652,8 @@
 @media (max-width:760px) and (orientation:portrait) {
  .js .screen[data-tab='games'] .hero .more-btn { font-size:15px; }
 }
+
+/* no genre tags (owner 11/2); click-drag along the wheel */
+.tags, .tag { display: none !important; }
+.wheel { user-select: none; -webkit-user-select: none; }
+.is-dragging, .is-dragging * { cursor: grabbing !important; }

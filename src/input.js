@@ -112,7 +112,6 @@ export function createInput({ act, mode, onScheme, phone = () => false, wheel = 
     if (m === 'play' || m === 'os' || editable(e.target)) return;
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     let name = KEYS[k];
-    if (/^[1-5]$/.test(k) && m === 'menu') { act('genre', {index:+k-1,from:'kb'}); e.preventDefault(); return; }
     if (m === 'modal') {
       // dialogs handle their own keys (Esc closes them); arrows walk their buttons
       if (!['left', 'right', 'up', 'down'].includes(name)) return;

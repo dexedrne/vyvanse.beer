@@ -55,7 +55,7 @@ test('#268 has a full Crew card beside #85 without advertising a game', () => {
   assert.ok(!card.includes('data-goto='));
   const tiles = [...html.matchAll(/<button class="tile"[^]*?aria-controls="([^"]+)"/g)].map(m => m[1]);
   assert.equal(tiles.length, 11);
-  assert.deepEqual(tiles.slice(-4), ['retardio-85', 'retardio-268', 'chak', 'ophelia']);
+  assert.deepEqual(tiles.slice(-4), ['retardio-268', 'retardio-555', 'chak', 'ophelia']);
 });
 
 test('Chak replaces the legacy NPC card with his model download and current game appearances', () => {

@@ -975,23 +975,6 @@ export const crew = {
     // radbros-3d repo (`repo: false`). Their download is a package like the Radbros' (static, rigged and
     // animated .glb, a preview, README and the license) on the same radbros-3d release.
     {
-      num: '555',
-      slug: 'retardio-555',
-      kind: 'Retardio Cousin',
-      face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
-      model: '/models/retardio555-hero.glb',
-      name: 'Retardio Cousin #555',
-      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee, and a red Miata.',
-      repo: false,
-      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '21 MB' },
-      image: {
-        src: '/img/retardios/retardio-555.webp',
-        width: 312,
-        height: 500,
-        alt: 'Retardio #555 in 3D, waving: long straight brown hair, grey-green anime eyes, a double ring piercing at the end of his right brow, pink heart blush, a :3 mouth, a white BRITISH FOOD tee with a vomiting emoji, light-blue jeans and white sneakers.',
-      },
-    },
-    {
       num: '85',
       slug: 'retardio-85',
       kind: 'Retardio Cousin Classic',
@@ -1023,6 +1006,23 @@ export const crew = {
         width: 310,
         height: 500,
         alt: 'Retardio Classic #268 in 3D, waving hello: black hair with blunt bangs, olive green eyes with blue tears, a lit cigarette, a white NEED MONEY FOR PORSCHE tee, black trousers and black sneakers with white soles.',
+      },
+    },
+    {
+      num: '555',
+      slug: 'retardio-555',
+      kind: 'Retardio Cousin',
+      face: '/img/faces/retardio-555.webp', // 200x200 crop for the character-select tile
+      model: '/models/retardio555-hero.glb',
+      name: 'Retardio Cousin #555',
+      line: 'The original Retardio Cousins, now part of Candy Labs: programmable NFTs with swappable traits. Long brown hair, heart blush, BRITISH FOOD tee, and a red Miata.',
+      repo: false,
+      download: { href: 'https://github.com/dexedrne/vyvanse.beer/releases/download/radbros-3d/retardio555-3d-model.zip', label: '3D model .zip', size: '21 MB' },
+      image: {
+        src: '/img/retardios/retardio-555.webp',
+        width: 312,
+        height: 500,
+        alt: 'Retardio #555 in 3D, waving: long straight brown hair, grey-green anime eyes, a double ring piercing at the end of his right brow, pink heart blush, a :3 mouth, a white BRITISH FOOD tee with a vomiting emoji, light-blue jeans and white sneakers.',
       },
     },
   ],

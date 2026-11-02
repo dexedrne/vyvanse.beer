@@ -963,8 +963,6 @@ function act(name, info = {}) {
     if (name === 'ok' && info.phase === 'down') return motion.press();
     if (name === 'ok-release') return motion.release();
     if (name === 'back' && motion.pressed) return motion.cancel();
-    if (name === 'genre') return select(SHELF.findIndex(e => e[0].section === ['drive','shoot','fight','arcade','worlds'][info.index]));
-    if ((name === 'up' || name === 'down') && SHELF[S.games].length === 1) return motion.jumpSection(name === 'down' ? 1 : -1);
   }
   if (moving) {
     if (name === 'wall-cue' || name === 'wall-open') return;
@@ -1189,8 +1187,6 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     return edition(ed.dataset.ed);
   }
-  const tag = e.target.closest('.tag');
-  if (tag && S.tab === 'games') return select(SHELF.findIndex(e => e[0].section === tag.dataset.sec));
   const fl = e.target.closest('.fl');
   if (fl && motion?.wallOpen) {
     const it = motion.items.find(it => it.el === fl);
@@ -1282,6 +1278,45 @@ screen.addEventListener('pointerdown', e => {
   screen.addEventListener('pointerup',cancel,{once:true});screen.addEventListener('pointercancel',cancel,{once:true});
 },{passive:true});
 document.addEventListener('focusout', e => e.target.closest?.('.slot')?.classList.remove('is-focus'));
+// mouse: the wheel of cartridges turns with the mouse wheel or a trackpad, and by click-dragging along it
+{
+  let acc = 0, lastEvent = 0, lastStep = 0, drag = null, dragEndedAt = -Infinity;
+  const wheelOk = (e) => mode() === 'menu' && S.tab === 'games' && wheelActive() && motion && !motion.wallOpen && !motion.inserting
+    && !moving && !sorter.active && e.target.closest?.('.panel--games') && !e.target.closest('dialog, .sheet, .ask, .offline-card, .wall, a, input, textarea');
+  screen.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || !wheelOk(e)) return;
+    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (!d) return;
+    e.preventDefault();
+    const now = performance.now();
+    if (now - lastEvent > 220) acc = 0; // a new gesture
+    lastEvent = now;
+    acc += d * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1); // lines and pages into pixels
+    if (Math.abs(acc) < 40 || now - lastStep < 150) return;
+    move(acc > 0 ? 1 : -1);
+    acc = 0; lastStep = now;
+  }, { passive: false });
+  screen.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch' || e.button !== 0 || !wheelOk(e)) return;
+    drag = { x: e.clientX, y: e.clientY, step: e.clientX, on: false };
+  });
+  addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    if (!drag.on) {
+      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 10) return;
+      drag.on = true; screen.classList.add('is-dragging');
+    }
+    const w = Math.max(70, Math.min(150, innerWidth * 0.07));
+    while (e.clientX - drag.step <= -w) { move(1); drag.step -= w; }  // drag left: the next one
+    while (e.clientX - drag.step >= w) { move(-1); drag.step += w; }  // drag right: the one before
+  });
+  const endDrag = () => { if (drag?.on) dragEndedAt = performance.now(); drag = null; screen.classList.remove('is-dragging'); };
+  addEventListener('pointerup', endDrag);
+  addEventListener('pointercancel', endDrag);
+  // a drag that ends over a cartridge must not also click it
+  screen.addEventListener('click', (e) => { if (performance.now() - dragEndedAt < 120) { e.stopPropagation(); e.preventDefault(); } }, true);
+  screen.addEventListener('dragstart', (e) => { if (e.target.closest?.('.wheel')) e.preventDefault(); });
+}
 // swipe the art (phones) to move along the row
 let sx = 0;
 let sy = 0;
@@ -1391,7 +1426,6 @@ function hints() {
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
-    S.tab === 'games' ? hint(3.5, '▲ ▼ genre') : '',
     pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : S.tab === 'games' ? 'details · hold: all games' : 'details'}`) : '',
     ROWS.includes(S.tab) ? hint(S.tab === 'games' ? 3 : 3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
     pack ? '' : hint(2, `${k('x')} wave`),

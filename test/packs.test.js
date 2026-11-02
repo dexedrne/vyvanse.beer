@@ -115,7 +115,7 @@ test('pack hash ids and legacy pack slugs round trip through the menu save and l
   }
   location.hash = '#crew/268';
   vm.runInContext('load()', ctx);
-  assert.equal(S.crew, 8);
+  assert.equal(S.crew, 7); // #268 is second among the Retardios since #85 leads and #555 closes them
 });
 
 test('offline precache admits pack tiles and leaves both cover sizes on demand', () => {
