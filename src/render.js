@@ -226,6 +226,7 @@ export function packGroup(crew, start) {
 
 // One cartridge per game. A game with editions has one label per edition (the shown one on top,
 // src/main.js) and the next one's edge peeking out behind it, so it reads as a two-in-one.
+// A game's cartridge also carries its own Play, shown only on the phone's two-column shelf.
 function cart(p, i, eds = [p]) {
   const two = eds.length > 1;
   const labels = eds
@@ -233,7 +234,7 @@ function cart(p, i, eds = [p]) {
     .map((e, k) => `<img${two ? ` class="${k ? '' : 'on'}" data-label="${esc(e.cmd)}"` : ''} src="${esc(e.thumb)}" width="420" height="236" alt="" loading="lazy" decoding="async">`)
     .join('');
   return `<li class="slot${two ? ' slot--eds' : ''}" style="--i:${i};--shell:${esc(p.shell || '#4b4855')};--accent:${esc(p.accent)}${two ? `;--accent2:${esc(eds[1].accent)}` : ''}" data-i="${i}">
-      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"${p.cartName ? ` aria-label="${esc(p.name)}"` : ''}><span class="cart__label">${labels}</span><span class="cart__name">${esc(p.cartName || p.name)}</span>${two ? `<span class="vh">, ${eds.length} editions</span>` : ''}</button></li>`;
+      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"${p.cartName ? ` aria-label="${esc(p.name)}"` : ''}><span class="cart__label">${labels}</span><span class="cart__name">${esc(p.cartName || p.name)}</span>${two ? `<span class="vh">, ${eds.length} editions</span>` : ''}</button>${p.group === 'games' ? `<a class="slot__play" href="${esc(p.url)}" data-slot-play>Play<span class="vh"> ${esc(p.name)}</span></a>` : ''}</li>`;
 }
 
 function tile(b, i) {

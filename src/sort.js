@@ -66,6 +66,7 @@ export function createSort({ rows, reduced, begin, pick, over, moved, commit, dr
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       const slot = e.target.closest('.slot');
       const tab = tabOf(ul);
+      if (e.target.closest('[data-slot-play]')) return; // its own Play button is pressed, not picked up
       if (!slot || !begin(tab)) return;
       pend = { id: e.pointerId, mouse: e.pointerType === 'mouse', ul, tab, slot, sx: e.clientX, sy: e.clientY, x: e.clientX, y: e.clientY, timer: 0 };
       if (!pend.mouse) pend.timer = setTimeout(() => pend && start(), LONG_PRESS);
@@ -91,7 +92,12 @@ export function createSort({ rows, reduced, begin, pick, over, moved, commit, dr
     slots.forEach(stopFlips);
     const from = slots.indexOf(slot);
     if (from < 0) return;
-    drag = { ...p, slots, from, to: from, cx: slots.map((s) => center(s).x), scroll0: ul.scrollLeft, t0: performance.now(), pose: '', emitT: 0, raf: 0 };
+    const cs = slots.map(center);
+    // the phone's two-column shelf wraps: there the nearest place is found in both directions,
+    // and the panel it sits in scrolls up and down instead of the row scrolling sideways
+    const grid = cs.some((c) => Math.abs(c.y - cs[0].y) > 1);
+    const pane = grid ? ul.closest('.panel') : null;
+    drag = { ...p, slots, from, to: from, cx: cs.map((c) => c.x), cs, grid, pane, scroll0: ul.scrollLeft, top0: pane?.scrollTop || 0, t0: performance.now(), pose: '', emitT: 0, raf: 0 };
     try {
       slot.setPointerCapture(p.id);
     } catch {
@@ -122,22 +128,38 @@ export function createSort({ rows, reduced, begin, pick, over, moved, commit, dr
       const v = d.x < r.left + edge ? -(r.left + edge - d.x) / edge : d.x > r.right - edge ? (d.x - (r.right - edge)) / edge : 0;
       if (v) ul.scrollLeft += Math.max(-1, Math.min(1, v)) * 12;
     }
+    if (d.grid && d.pane) {
+      const r = d.pane.getBoundingClientRect();
+      const edge = Math.min(72, r.height / 6);
+      const v = d.y < r.top + edge ? -(r.top + edge - d.y) / edge : d.y > r.bottom - edge ? (d.y - (r.bottom - edge)) / edge : 0;
+      if (v) d.pane.scrollTop += Math.max(-1, Math.min(1, v)) * 12;
+    }
     const dx = d.x - d.sx + (ul.scrollLeft - d.scroll0);
-    const dy = Math.max(-90, Math.min(40, d.y - d.sy));
+    const dy = d.grid ? d.y - d.sy + ((d.pane?.scrollTop || 0) - d.top0) : Math.max(-90, Math.min(40, d.y - d.sy));
     // the lift: up off the row, a bit bigger, tilted, over 140 ms
     const k = reduced() ? 1 : 1 - (1 - Math.min(1, (now - d.t0) / 140)) ** 3;
     d.pose = `scale(${1 + 0.08 * k}) rotate(${reduced() ? 0 : -2.5 * k}deg)`;
     d.slot.style.transform = `translate(${dx}px, ${dy - 10 * k}px) ${d.pose}`;
     // the place it's over: the nearest slot centre; the ones in between make room
-    const c = d.cx[d.from] + dx;
     let to = 0;
-    d.cx.forEach((x, j) => Math.abs(x - c) < Math.abs(d.cx[to] - c) && (to = j));
+    if (d.grid) {
+      const c = { x: d.cs[d.from].x + dx, y: d.cs[d.from].y + dy };
+      const far = (j) => Math.hypot(d.cs[j].x - c.x, d.cs[j].y - c.y);
+      d.cs.forEach((_, j) => far(j) < far(to) && (to = j));
+    } else {
+      const c = d.cx[d.from] + dx;
+      d.cx.forEach((x, j) => Math.abs(x - c) < Math.abs(d.cx[to] - c) && (to = j));
+    }
     if (to !== d.to) {
       d.to = to;
       d.slots.forEach((s, j) => {
         if (s === d.slot) return;
-        const shift = d.from < to && j > d.from && j <= to ? d.cx[j - 1] - d.cx[j] : to < d.from && j >= to && j < d.from ? d.cx[j + 1] - d.cx[j] : 0;
-        s.style.transform = shift ? `translateX(${shift}px)` : '';
+        const k = d.from < to && j > d.from && j <= to ? j - 1 : to < d.from && j >= to && j < d.from ? j + 1 : j;
+        if (d.grid) s.style.transform = k !== j ? `translate(${d.cs[k].x - d.cs[j].x}px, ${d.cs[k].y - d.cs[j].y}px)` : '';
+        else {
+          const shift = d.cx[k] - d.cx[j];
+          s.style.transform = shift ? `translateX(${shift}px)` : '';
+        }
       });
       over(d.tab, to);
     }

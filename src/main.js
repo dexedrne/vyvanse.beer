@@ -1146,11 +1146,24 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     return edition(ed.dataset.ed);
   }
+  // a cartridge's own Play on the phone's shelf: pick it, then play it like the big button
+  const slotPlay = e.target.closest('[data-slot-play]');
+  if (slotPlay) {
+    e.preventDefault();
+    const i = +slotPlay.closest('.slot').dataset.i;
+    if (i !== S[S.tab]) select(i, { sound: false });
+    return activate({ from: 'mouse' });
+  }
   const c = e.target.closest('.cart, .tile');
   if (c) {
     const i = +c.dataset.i;
     if (i === S[S.tab]) activate({ from: 'mouse' });
-    else select(i);
+    else {
+      select(i);
+      // (on the phone's scrolling shelf, go back up to the picked game's art and blurb)
+      const panel = c.closest('.panel');
+      if (panel?.scrollTop) panel.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+    }
     return;
   }
   const more = e.target.closest('[data-more]');
@@ -1418,7 +1431,9 @@ function layout() {
   screen.classList.toggle('short', ph && H < 760);
   screen.classList.toggle('short-land', compact && H < 380);
   const panel = panelOf(S.tab);
-  box.wl = ph ? Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2) : Math.round(H * 0.655);
+  // (the phone's games panel scrolls down to the shelf: measure as if it were at the top)
+  const scrolled = ph ? panel.scrollTop : 0;
+  box.wl = ph ? Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2) : Math.round(H * 0.655);
   screen.style.setProperty('--band', `${box.wl}px`);
   screen.style.setProperty('--wl', `${box.wl}px`);
   for (const img of $$('.bd--lettered')) cutLettered(img);
@@ -1460,7 +1475,7 @@ function layout() {
   box.b = b;
   fitWm();
   if (ph) {
-    const band = Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2);
+    const band = Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2);
     if (b && m === 'side') {
       const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
       if (band - top < b.h) { b.h = Math.max(0, band - top); b.w = b.h * 1.5; b.x = W - 16 - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0) - b.w; }
