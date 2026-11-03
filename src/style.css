@@ -3180,6 +3180,9 @@ html.js { --topbar: 52px; --top: calc(var(--topbar) + var(--safe-top)); --gut: 1
 .js .wm { margin: 0; color: #fff; font: 400 58px/0.86 var(--word); letter-spacing: 0.012em; text-shadow: 0.032em 0.032em 0 var(--accent), 0 10px 60px rgb(0 0 0 / 0.6); white-space: nowrap; max-width: 64%; overflow: visible; }
 .js .wm--site { font-size: 50px; }
 .js .wm--contact { --accent: var(--amber); }
+/* a name too long for one line (twoLines in projects.js) goes onto two balanced lines; fitWm() in main.js
+   still fits the wider line to the column */
+.js .wm--two { white-space: normal; text-wrap: balance; }
 .js .body { grid-row: 3; padding: 8px var(--gut) 0; }
 .js .pitch { margin: 0 0 10px; color: var(--text); font: 400 15px/1.45 var(--sans); text-shadow: 0 1px 14px rgb(0 0 0 / 0.75); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--pitch-lines); overflow: hidden; }
 .js .act { display: flex; align-items: stretch; gap: 10px; }
@@ -3290,6 +3293,8 @@ html.js { --topbar: 52px; --top: calc(var(--topbar) + var(--safe-top)); --gut: 1
 .js .screen.short { --cw: 84px; --pitch-lines: 2; --words: 72px; --tabs: 52px; --strip: 26px; }
 .js .screen.short .wm { font-size: 52px; }
 .js .screen.short .wm--site { font-size: 46px; }
+/* under 760px tall a second line would push PLAY into the shelf: one line, fitted smaller */
+.js .screen.short .wm--two { white-space: nowrap; }
 .js .screen.short .kindline { -webkit-line-clamp: 2; max-width: 60%; }
 .js .screen.short .status { display: none; }
 .js .screen.short .play, .js .screen.short .more-btn, .js .screen.short .ghost { min-height: 48px; }
@@ -3783,33 +3788,3 @@ html.js { --topbar: 50px; --cw: 64px; --tabs: 0px; --strip: 26px; --words: 0px; 
 .js .tgroup__expand:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 .js .tgroup__label > .no-js-only { display: none; }
 .js .tgroup__count { color: var(--muted); }
-
-/* The console insert lights the existing player card without changing its relay or controls. */
-.js .player.player--insert .player__card::before { content:''; position:absolute; inset:0; z-index:5; pointer-events:none; background:radial-gradient(55% 45% at 46% 88%,rgb(255 236 190 / .65),rgb(233 196 126 / .18) 40%,transparent 72%); animation:wheel-warm .7s ease-out both; }
-@keyframes wheel-warm { from { opacity:1; } to { opacity:0; } }
-@media(prefers-reduced-motion:reduce) { .js .player.player--insert .player__card::before { animation:none; opacity:0; } }
-
-.player__cartridge, .player__progress { display:none; }
-.js .player.player--insert .player__card { display:grid; padding:0; align-content:center; justify-content:center; grid-template-columns:118px 360px; column-gap:28px; row-gap:6px; background:#07050d; }
-.js .player.player--insert .player__card > .art-img { position:absolute; inset:0; width:100%; height:100%; opacity:1; filter:brightness(.3) saturate(.7); }
-.js .player.player--insert .player__card > .kindline { display:none; }
-.js .player.player--insert .player__cartridge { display:block; grid-column:1; grid-row:1 / 5; align-self:center; --cw:118px; --u:118px; animation:wheel-card-rise .6s cubic-bezier(.22,1.18,.36,1) both; }
-.js .player.player--insert .player__cartridge .cart { width:118px; height:144px; padding:14px 9px 0; filter:none; gap:5px; }
-.js .player.player--insert .player__cartridge img { position:static; inset:auto; height:100%; width:100%; opacity:1; object-fit:cover; }
-.js .player.player--insert .player__cartridge .cart__name { font-size:18px; }
-.js .player.player--insert .player__card .wm { grid-column:2; grid-row:1; font-size:60px; line-height:.86; margin:0; }
-.js .player.player--insert .player__card .status { grid-column:2; grid-row:2; font-size:19px; margin:0; }
-.js .player.player--insert .player__progress { display:block; grid-column:2; grid-row:3; width:320px; height:3px; margin:4px 0 2px; background:rgb(255 255 255 / .1); border-radius:2px; overflow:hidden; }
-.js .player.player--insert .player__progress i { display:block; width:100%; height:100%; background:var(--amber); box-shadow:0 0 8px var(--amber); transform-origin:0 50%; animation:wheel-progress 2.4s ease-out both; }
-.js .player.player--insert .player__how { grid-column:2; grid-row:4; font-size:15px; line-height:1.3; margin:0; color:var(--faint); max-width:360px; }
-@keyframes wheel-card-rise { from { transform:translateY(30px); opacity:0; } }
-@keyframes wheel-progress { from { transform:scaleX(0); } to { transform:scaleX(.62); } }
-@media(max-width:760px) and (orientation:portrait) {
- .js .player.player--insert .player__card { grid-template-columns:86px minmax(0,220px); gap:12px; padding:16px; }
- .js .player.player--insert .player__cartridge { transform:scale(.73); transform-origin:0 50%; }
- .js .player.player--insert .player__card .wm { font-size:46px; }
- .js .player.player--insert .player__progress { width:100%; }
-}
-@media(prefers-reduced-motion:reduce) { .js .player.player--insert .player__cartridge, .js .player.player--insert .player__progress i { animation:none; } }
-
-.player__cartridge { pointer-events:none; }

@@ -86,27 +86,27 @@ test('its key art and textless cartridge label are on disk at the games’ sizes
     assert.deepEqual(webpSize(readFileSync(file)), size, src);
   }
   assert.ok(card.includes('src="/img/art/sanko.webp" width="1600" height="900"'));
-  assert.ok(html.includes('<img src="/img/thumb/sanko.webp" width="420" height="315"'));
+  assert.ok(html.includes('<img src="/img/thumb/sanko.webp"'));
 });
 
 test('its long name: two lines on the wordmark, SankoQuest on the cartridge, every other game as it was', () => {
   assert.equal(sanko.twoLines, true);
   assert.equal(sanko.cartName, 'SankoQuest');
   assert.ok(sanko.name.startsWith(`${sanko.cartName} `));
-  assert.match(card, /<h3 class="wm wm--two" data-text="SankoQuest Survivors" id="sanko-name">SankoQuest Survivors<\/h3>/);
-  // the wheel's cartridge, its reflection and the All games wall show the short name; the button reads the full one
-  assert.equal(html.match(/<button class="cart" style="--shell:#2f251b" type="button" data-i="1" aria-controls="sanko" aria-label="SankoQuest Survivors">/g)?.length, 2);
-  assert.equal(html.match(/<span class="cart__name">SankoQuest<\/span>/g)?.length, 4); // wheel + mirror, wall + mirror
+  assert.match(card, /<h3 class="wm wm--two" id="sanko-name">SankoQuest Survivors<\/h3>/);
+  // the shelf's cartridge shows the short name; the button reads the full one
+  assert.equal(html.match(/<button class="cart" type="button" data-i="1" aria-controls="sanko" aria-label="SankoQuest Survivors">/g)?.length, 1);
+  assert.equal(html.match(/<span class="cart__name">SankoQuest<\/span>/g)?.length, 1);
   assert.doesNotMatch(html, /<span class="cart__name">SankoQuest Survivors<\/span>/);
   for (const p of games.filter(p => p !== sanko)) {
     assert.ok(!p.twoLines && !p.cartName, p.cmd);
-    assert.match(html, new RegExp(`<h3 class="wm" data-text="${p.name}" id="${p.slug}-name">`), p.cmd);
+    assert.match(html, new RegExp(`<h3 class="wm" id="${p.slug}-name">`), p.cmd);
   }
   for (const m of html.matchAll(/<button class="cart"[^>]*>/g)) assert.equal(/aria-label=/.test(m[0]), m[0].includes('aria-controls="sanko"'), m[0]);
-  const css = readFileSync(new URL('../src/wheel.css', import.meta.url), 'utf8');
-  assert.match(css, /\.js \.screen\[data-tab='games'\] \.wm--two \{ white-space: normal; text-wrap: balance; \}/);
-  // a phone under 760px tall keeps it on one line (fitted smaller), so PLAY stays clear of the wheel
-  assert.match(css, /\.js \.screen\[data-tab='games'\]\.short \.wm--two \{ white-space: nowrap; \}/);
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(css, /\.js \.wm--two \{ white-space: normal; text-wrap: balance; \}/);
+  // a screen under 760px tall keeps it on one line (fitted smaller), so PLAY stays clear of the shelf
+  assert.match(css, /\.js \.screen\.short \.wm--two \{ white-space: nowrap; \}/);
 });
 
 test('every project name is its own: the terminal, deep links and Ask each find one project', () => {

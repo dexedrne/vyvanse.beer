@@ -4,9 +4,7 @@
 // and starts the rain, the puddle and the crew in 3D after the first paint (src/stage.js).
 
 import { site, groups, projects, crew, contact, duo as DUO, shelf } from './projects.js';
-import './wheel.css';
-import { createMotion } from './motion.js';
-import { cartBody, manifest } from './render.js';
+import { manifest } from './render.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createPlayer } from './player.js';
@@ -27,8 +25,6 @@ const phone = matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse
 const screen = $('#screen');
 const duoEl = $('#duo');
 const hint = $('#duo-hint');
-const wheelActive = () => !phone.matches || screen.clientHeight >= screen.clientWidth;
-let motion = null;
 let stage = null; // src/stage.js, once it has loaded (the water and the duo)
 let fresh = false; // a crew model has just come in (shell.castReady)
 let freshT = 0;
@@ -91,7 +87,7 @@ function phoneMarkup() {
         return Object.assign(document.createElement('span'), { className: 'nb', textContent: text });
       }));
     }
-    if (pitch && p?.blurbPhone && p.group !== 'games') pitch.textContent = p.blurbPhone;
+    if (pitch && p?.blurbPhone) pitch.textContent = p.blurbPhone;
     const eds = $('.eds', info);
     const plays = $('.plays', info);
     if (eds) body.append(eds);
@@ -103,7 +99,7 @@ function phoneMarkup() {
       const status = $('.status', act);
       if (more) act.append(more);
       body.append(act);
-      if (status && !item.classList.contains('item--pack') && !item.classList.contains('item--game')) body.append(status);
+      if (status && !item.classList.contains('item--pack')) body.append(status);
     }
     info.prepend(words, body);
     if (item.classList.contains('item--contact')) {
@@ -375,7 +371,7 @@ const panelOf = (tab) => $(`#${tab}`);
 const itemsOf = (tab) => $$('.item', panelOf(tab));
 const onItem = (tab) => $('.item.on', panelOf(tab));
 const slotsOf = (tab) => $$(tab === 'crew' ? '.tslot' : '.slot', panelOf(tab));
-const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : tab === 'games' ? 'button.cart' : '.cart', panelOf(tab)));
+const controlsOf = (tab) => (tab === 'contact' ? LISTS.contact : $$(tab === 'crew' ? '.tile' : '.cart', panelOf(tab)));
 
 function setCrewGroup(group, open) {
   group.classList.toggle('is-open', open);
@@ -448,16 +444,16 @@ function paint(tab) {
 
 // a cartridge with editions wears the shown one's label and glow
 function labels() {
-  const wall = $('.wall');
-  slotsOf('games').forEach((slot,j) => {
-    const eds=SHELF[j], p=eds[edOf(j)];
-    for (const el of [slot, ...$$('.fl', wall).filter(el => el.dataset.game === eds[0].cmd)]) {
-      if (el.dataset.shownEd === p.cmd) continue;
-      el.dataset.shownEd=p.cmd; el.style.setProperty('--accent',p.accent); el.style.setProperty('--shell',p.shell);
-      const {body,mirror}=cartBody(p,j,eds);
-      if(el.classList.contains('fl')) el.innerHTML=`<span class="fl__rip"></span><span class="fl__inner">${body}</span>${mirror}`;
-      else el.innerHTML=body+mirror;
-    }
+  slotsOf('games').forEach((slot, j) => {
+    const eds = SHELF[j];
+    if (eds.length < 2) return;
+    const k = edOf(j);
+    slot.style.setProperty('--accent', eds[k].accent);
+    for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
+    // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
+    const name = $('.cart__name', slot);
+    if (name) name.textContent = eds[k].cartName || eds[k].name;
+    $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
   });
 }
 
@@ -476,10 +472,9 @@ function crossfade(was, now) {
 // or a side ('first' / 'last': the pad's triggers, which flank the switch, point at its ends)
 function edition(to) {
   if (S.tab !== 'games') return false;
-  const gameIndex = motion?.wallOpen ? motion.focusIndex : S.games;
-  const eds = SHELF[gameIndex];
+  const eds = SHELF[S.games];
   if (eds.length < 2) return false;
-  const cur = edOf(gameIndex);
+  const cur = edOf(S.games);
   const k =
     to === 'first' ? 0
     : to === 'last' ? eds.length - 1
@@ -488,8 +483,8 @@ function edition(to) {
   if (k < 0 || k === cur) return;
   // focus was on the switch: it goes along to the same pill on the new card
   const pill = document.activeElement?.closest?.('.ed');
-  const apply = () => { setEd(gameIndex, k); paint('games'); save(); };
-  if (motion) motion.flip(apply); else apply();
+  setEd(S.games, k);
+  paint('games');
   save();
   layout();
   audio.blip('move');
@@ -499,7 +494,6 @@ function edition(to) {
 
 // keep the picked cartridge in view in the phone's swipe row (scroll the row, not the page)
 function keepInView(el) {
-  if (el?.closest('.panel--games') && wheelActive()) return;
   const sc = el?.closest('.carts, .tgroups');
   if (!sc || sc.scrollWidth <= sc.clientWidth) return;
   const r = el.getBoundingClientRect();
@@ -513,7 +507,6 @@ function show(tab, { sound = true, focus = false } = {}) {
   if (moving && tab !== moving.tab) dropMove();
   const changed = tab !== S.tab;
   S.tab = tab;
-  if (changed && motion) { if (tab === 'games') motion.boot(); else motion.sinkWheel(); }
   if (changed) { phoneZone = 'shelf'; phoneButton = 0; }
   for (const t of $$('.tab')) {
     const on = t.dataset.tab === tab;
@@ -522,7 +515,6 @@ function show(tab, { sound = true, focus = false } = {}) {
   }
   for (const p of $$('.panel')) p.classList.toggle('on', p.dataset.panel === tab);
   screen.dataset.tab = tab;
-  if (tab === 'games') motion?.select(S.games, {snap:changed});
   if (tab === 'crew') revealCrewGroup(S.crew);
   paint(tab);
   hints();
@@ -557,7 +549,6 @@ function select(i, { sound = true } = {}) {
   paint(S.tab);
   save();
   layout();
-  if (S.tab === 'games') motion?.select(S.games);
   if (S.tab === 'crew') hello(want());
   if (S.tab === 'games' || S.tab === 'crew') hints(); // editions and packs change the available actions
   if (sound) audio.blip('move');
@@ -587,14 +578,9 @@ function arrangeRow(tab, keys) {
     if (ul.children[j] !== slot) ul.insertBefore(slot, ul.children[j]);
     slot.dataset.i = j;
     slot.style.setProperty('--i', j);
-    $$('button.cart', slot).forEach(c=>c.dataset.i=j);
+    $('.cart', slot).dataset.i = j;
   });
   S[tab] = Math.max(0, list.indexOf(cur));
-  if (tab === 'games') {
-    for (const el of $$('.fl')) { const j = SHELF.findIndex(eds => eds[0].cmd === el.dataset.game); if (j >= 0) { el.dataset.i=j; $$('.cart',el).forEach(c=>c.dataset.i=j); } }
-    for (const cl of $$('.cl__items')) [...cl.children].sort((a,b)=>+a.dataset.i-+b.dataset.i).forEach(el=>cl.append(el));
-    motion?.select(S.games);
-  }
   // (moving a focused cartridge in the DOM drops its focus: give it back)
   if (had?.isConnected && had !== document.activeElement && ul.contains(had)) had.focus({ preventScroll: true });
 }
@@ -620,7 +606,7 @@ function resetOrder(tab = S.tab) {
     hints();
     return toast('already in the default order');
   }
-  if (tab === 'games') arrangeRow(tab,DEFAULT[tab]); else flip(slotsOf(tab), () => arrangeRow(tab, DEFAULT[tab]), { reduced: reduced.matches, ms: 320 });
+  flip(slotsOf(tab), () => arrangeRow(tab, DEFAULT[tab]), { reduced: reduced.matches, ms: 320 });
   keep(tab);
   rowMarks(tab);
   hints();
@@ -662,7 +648,7 @@ function nudgeMove(d) {
     if (!reduced.matches) slots[i].animate([{ transform: 'none' }, { transform: `translateX(${d * 7}px)` }, { transform: 'none' }], { duration: 180, easing: 'ease-out' });
     return;
   }
-  if (tab === 'games') moveItem(tab,i,j); else flip(slots, () => moveItem(tab, i, j), { reduced: reduced.matches, ms: 170 });
+  flip(slots, () => moveItem(tab, i, j), { reduced: reduced.matches, ms: 170 });
   rowMarks(tab);
   keepInView(controlsOf(tab)[S[tab]]);
   emit();
@@ -681,7 +667,7 @@ function dropMove({ put = false } = {}) {
   if (!moving) return false;
   const { keys } = moving;
   const tab = endMove();
-  if (put) { if (tab === 'games') arrangeRow(tab,keys); else flip(slotsOf(tab), () => arrangeRow(tab, keys), { reduced: reduced.matches }); }
+  if (put) flip(slotsOf(tab), () => arrangeRow(tab, keys), { reduced: reduced.matches });
   keep(tab);
   rowMarks(tab);
   hints();
@@ -739,7 +725,6 @@ function activate({ from, pad } = {}) {
     toast(`downloading ${LISTS.crew[S.crew].download.label} (${LISTS.crew[S.crew].download.size})`);
     return;
   }
-  if (S.tab === 'games' && motion && wheelActive()) { motion.press(); setTimeout(() => motion.release(),120); return; }
   play(current(), { from });
 }
 
@@ -825,10 +810,6 @@ function openSheet() {
     contents.push(list.firstElementChild, ...(gallery ? [gallery] : []), fine);
   }
   body.replaceChildren(pitch, ...contents, ...(credit ? [credit] : []), links);
-  if (S.tab === 'games') {
-    for (const el of $$('.tags--wheel .tag')) if (+el.style.opacity > .1) lights.push([el,[.23,.21,.29]]);
-    if ($('.deck.lit')) lights.push([$('.deck__seam'),[.9,.86,.76]]);
-  }
   const playBtn = $('[data-act]', onItem(S.tab)).cloneNode(true);
   playBtn.addEventListener('click', e => {
     e.preventDefault();
@@ -950,24 +931,7 @@ function act(name, info = {}) {
     else if (name === 'back') back();
     return;
   }
-  if (S.tab === 'games' && motion && wheelActive() && !moving) {
-    if (motion.inserting) return;
-    if (name === 'wall') return motion.wallOpen ? motion.closeWall() : motion.openWall();
-    if (name === 'wall-cue') return motion.cue(true);
-    if (name === 'details') motion.cue(false);
-    if (name === 'wall-open') { motion.cue(false); return motion.openWall(); }
-    if (name === 'wall-close') { motion.cue(false); return motion.closeWall(); }
-    if (motion.wallOpen) {
-      if (['left','right','up','down'].includes(name)) return motion.focusItem(motion.nearest(name));
-      if (name === 'back') return motion.closeWall();
-    }
-    if (name === 'ok' && info.phase === 'down') return motion.press();
-    if (name === 'ok-release') return motion.release();
-    if (name === 'back' && motion.pressed) return motion.cancel();
-  }
   if (moving) {
-    if (name === 'wall-cue' || name === 'wall-open') return;
-    if (name === 'wall-close') return resetOrder(moving.tab);
     if (name === 'left' || name === 'right') return nudgeMove(name === 'left' ? -1 : 1);
     if (['up', 'down', 'edprev', 'ednext'].includes(name)) return;
     if (name === 'ok' || name === 'start' || name === 'grab') return dropMove();
@@ -975,7 +939,7 @@ function act(name, info = {}) {
     if (name === 'details') return resetOrder(moving.tab);
     dropMove(); // anything else (sections, the terminal…): it's dropped here first
   }
-  if (phone.matches && info.from === 'pad' && S.tab !== 'games') {
+  if (phone.matches && info.from === 'pad') {
     const zones = S.tab === 'games' && SHELF[S.games].length > 1 ? ['editions', 'actions', 'shelf'] : ['actions', 'shelf'];
     if (S.tab === 'contact') {
       if (name === 'up' || name === 'down') return move(name === 'up' ? -1 : 1);
@@ -1048,10 +1012,6 @@ function act(name, info = {}) {
 
 function phoneFocus() {
   if (!phone.matches) return;
-  if (S.tab === 'games' && wheelActive()) {
-    $$('.panel--games .play, .panel--games .more-btn').forEach(el=>el.classList.remove('is-focus'));
-    delete screen.dataset.zone;delete screen.dataset.button;return;
-  }
   screen.dataset.zone = phoneZone;
   screen.dataset.button = String(phoneButton);
   $$('.panel .play, .panel .more-btn').forEach(el => el.classList.remove('is-focus'));
@@ -1061,7 +1021,7 @@ function phoneFocus() {
   if (phoneZone === 'actions' || phoneZone === 'shelf') (phoneButton && phoneZone === 'actions' ? $('[data-more]', item) : $('[data-act]', item))?.classList.add('is-focus');
 }
 
-const input = createInput({ act, mode, wheel: () => S.tab === 'games' && wheelActive(), phone: () => phone.matches, onScheme: scheme => {
+const input = createInput({ act, mode, phone: () => phone.matches, onScheme: scheme => {
   hints();
   phoneFocus();
   dispatchEvent(new Event('vyv:input'));
@@ -1085,7 +1045,6 @@ const player = createPlayer({
     screen.classList.add('is-away');
     screen.inert = true;
     stage?.pause();
-    motion?.pause();
     ticker?.pause();
     audio.duck(true);
   },
@@ -1098,7 +1057,6 @@ const player = createPlayer({
     if (pwa.resume()) return;
     audio.duck(false);
     stage?.resume();
-    motion?.eject();
     ticker?.resume();
     // back on the same cartridge
     controlsOf(tab)[S[tab]]?.focus({ preventScroll: true });
@@ -1183,20 +1141,13 @@ document.addEventListener('click', (e) => {
     if (i >= 0) select(i);
     return;
   }
-  const ed = e.target.closest('.ed[data-ed]');
+  const ed = e.target.closest('[data-ed]');
   if (ed) {
     e.preventDefault();
     return edition(ed.dataset.ed);
   }
-  const fl = e.target.closest('.fl');
-  if (fl && motion?.wallOpen) {
-    const it = motion.items.find(it => it.el === fl);
-    if (fl.classList.contains('sel')) activate({from:'mouse'}); else motion.focusItem(it);
-    return;
-  }
   const c = e.target.closest('.cart, .tile');
   if (c) {
-    if (performance.now() - swipedAt < 500 || performance.now() - wallHeldAt < 500) return e.preventDefault();
     const i = +c.dataset.i;
     if (i === S[S.tab]) activate({ from: 'mouse' });
     else select(i);
@@ -1211,7 +1162,7 @@ document.addEventListener('click', (e) => {
     const p = current();
     if (p?.frame) {
       e.preventDefault();
-      if (S.tab === 'games') activate({from:'mouse'}); else play(p);
+      play(p);
     } else audio.blip('ok'); // the link opens the new tab itself
     return;
   }
@@ -1257,67 +1208,11 @@ $('#contact').addEventListener('pointerover', (e) => {
 document.addEventListener('focusin', (e) => {
   if (!e.target.matches?.(':focus-visible')) return;
   const c = e.target.closest?.('.cart, .tile');
-  if (c) c.closest('.slot')?.classList.add('is-focus');
   if (c && +c.dataset.i !== S[S.tab]) select(+c.dataset.i, { sound: false });
   const mi = e.target.closest?.('.mi');
   if (mi && S.tab === 'contact') select(LISTS.contact.indexOf(mi), { sound: false });
 });
 
-let wallHoldTimer = 0, wallHeldAt = -Infinity;
-screen.addEventListener('pointerdown', e => {
-  if (e.pointerType !== 'touch' || S.tab !== 'games' || !wheelActive() || !e.target.closest('.slot.sel .cart')) return;
-  const x=e.clientX,y=e.clientY;
-  let held=false,stepX=x;
-  const cancel=()=>{clearTimeout(wallHoldTimer);screen.removeEventListener('pointermove',track);if(held){wallHeldAt=performance.now();if(moving)dropMove();}};
-  const track=e=>{if(Math.hypot(e.clientX-x,e.clientY-y)<=12)return;
-    if(!held)return cancel();
-    if(!moving){motion?.closeWall();grab();}
-    if(Math.abs(e.clientX-stepX)>80){nudgeMove(e.clientX>stepX?1:-1);stepX=e.clientX;}
-  };
-  wallHoldTimer=setTimeout(()=>{held=true;swipeBlocked=true;wallHeldAt=performance.now();motion?.openWall();},500);
-  screen.addEventListener('pointermove',track,{passive:true});
-  screen.addEventListener('pointerup',cancel,{once:true});screen.addEventListener('pointercancel',cancel,{once:true});
-},{passive:true});
-document.addEventListener('focusout', e => e.target.closest?.('.slot')?.classList.remove('is-focus'));
-// mouse: the wheel of cartridges turns with the mouse wheel or a trackpad, and by click-dragging along it
-{
-  let acc = 0, lastEvent = 0, lastStep = 0, drag = null, dragEndedAt = -Infinity;
-  const wheelOk = (e) => mode() === 'menu' && S.tab === 'games' && wheelActive() && motion && !motion.wallOpen && !motion.inserting
-    && !moving && !sorter.active && e.target.closest?.('.panel--games') && !e.target.closest('dialog, .sheet, .ask, .offline-card, .wall, a, input, textarea');
-  screen.addEventListener('wheel', (e) => {
-    if (e.ctrlKey || !wheelOk(e)) return;
-    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (!d) return;
-    e.preventDefault();
-    const now = performance.now();
-    if (now - lastEvent > 220) acc = 0; // a new gesture
-    lastEvent = now;
-    acc += d * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1); // lines and pages into pixels
-    if (Math.abs(acc) < 40 || now - lastStep < 150) return;
-    move(acc > 0 ? 1 : -1);
-    acc = 0; lastStep = now;
-  }, { passive: false });
-  screen.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'touch' || e.button !== 0 || !wheelOk(e)) return;
-    drag = { x: e.clientX, y: e.clientY, step: e.clientX, on: false };
-  });
-  addEventListener('pointermove', (e) => {
-    if (!drag) return;
-    if (!drag.on) {
-      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 10) return;
-      drag.on = true; screen.classList.add('is-dragging');
-    }
-    const w = Math.max(70, Math.min(150, innerWidth * 0.07));
-    while (e.clientX - drag.step <= -w) { move(1); drag.step -= w; }  // drag left: the next one
-    while (e.clientX - drag.step >= w) { move(-1); drag.step += w; }  // drag right: the one before
-  });
-  const endDrag = () => { if (drag?.on) dragEndedAt = performance.now(); drag = null; screen.classList.remove('is-dragging'); };
-  addEventListener('pointerup', endDrag);
-  addEventListener('pointercancel', endDrag);
-  // a drag that ends over a cartridge must not also click it
-  screen.addEventListener('click', (e) => { if (performance.now() - dragEndedAt < 120) { e.stopPropagation(); e.preventDefault(); } }, true);
-  screen.addEventListener('dragstart', (e) => { if (e.target.closest?.('.wheel')) e.preventDefault(); });
-}
 // swipe the art (phones) to move along the row
 let sx = 0;
 let sy = 0;
@@ -1332,7 +1227,7 @@ screen.addEventListener('touchstart', (e) => {
 }, { passive: true });
 screen.addEventListener('touchend', (e) => {
   if (swipeBlocked || sorter.active || !e.changedTouches.length) return;
-  if (!swipeTab && !(S.tab === 'games' && e.target.closest('.wheel')) && e.target.closest('.row, .menu, .tgroups, a, button, input')) return;
+  if (!swipeTab && e.target.closest('.row, .menu, .tgroups, a, button, input')) return;
   const dx = e.changedTouches[0].clientX - sx;
   const dy = e.changedTouches[0].clientY - sy;
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
@@ -1398,14 +1293,10 @@ function hints() {
   const verb = { games: 'play', crew: pack ? 'get pack' : LISTS.crew[S.crew].download ? 'get model' : 'say hello', sites: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
-  if (motion?.wallOpen) {
-    hintsEl.innerHTML = [hint(9,'◀ ▶ ▲ ▼ pick'),hint(8,`${k('a')} play`),hint(7,`${k('y')} let go: close on the pick`),hint(6,`${k('b')} back to the wheel`),hint(5,`${k('lt')}${k('rt')} flip a case`)].join('');
-    return fitHints();
-  }
   if (phone.matches && !moving) {
     const landscape = screen.clientWidth > screen.clientHeight;
     hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
-      pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : S.tab === 'games' ? 'details · hold: all games' : 'details'}`) : '',
+      pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
       hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && !pack && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
       !pack && ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
       landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
@@ -1421,14 +1312,14 @@ function hints() {
     return fitHints();
   }
   const out = [
-    hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} ${S.tab === 'games' ? 'turn' : 'select'}`),
+    hint(4, `${pad ? k(nav) : input.glyph(nav).split(' ').map((g) => `<span class="g">${g}</span>`).join('')} select`),
     // only on a game with editions, and low: the switch shows its own buttons, right by it
     S.tab === 'games' && SHELF[S.games].length > 1 ? hint(2.5, `${k('lt')}${k('rt')} edition`) : '',
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
-    pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : S.tab === 'games' ? 'details · hold: all games' : 'details'}`) : '',
-    ROWS.includes(S.tab) ? hint(S.tab === 'games' ? 3 : 3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
+    pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
+    ROWS.includes(S.tab) ? hint(3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
     pack ? '' : hint(2, `${k('x')} wave`),
     hint(3, `${k('select')} full screen`),
     pad ? '' : hint(1, '<span class="g">M</span> music'),
@@ -1524,40 +1415,9 @@ function layout() {
   const H = phone.matches ? screen.clientHeight : innerHeight;
   const ph = phone.matches;
   const compact = ph && W > H;
-  if (S.tab === 'games' && motion) {
-    if (compact) { motion.pause(); for (const el of $$('.arc .slot')) { el.hidden=false; el.style.removeProperty('transform');el.style.removeProperty('opacity'); } }
-    else motion.resume();
-  }
   screen.classList.toggle('short', ph && H < 760);
   screen.classList.toggle('short-land', compact && H < 380);
   const panel = panelOf(S.tab);
-  if (S.tab === 'games' && !compact) {
-    screen.classList.toggle('duo-live', live());
-    screen.classList.toggle('has-eds', SHELF[S.games].length > 1);
-    screen.classList.toggle('has-lettered', !!at('games',S.games).image.lettered);
-    const style = getComputedStyle(screen);
-    const u = $('.arc .slot').offsetWidth;
-    const strip = $('.strip').offsetHeight;
-    const tabs = ph ? $('.tabs').offsetHeight : 0;
-    box.wl = H - strip - tabs - u * (ph ? .4 : .5);
-    const artH = ph ? H >= 800 ? 352 : H * .4 : box.wl;
-    screen.style.setProperty('--wl', `${box.wl}px`);
-    screen.style.setProperty('--band', `${box.wl}px`);
-    screen.style.setProperty('--art-h', `${artH}px`);
-    screen.style.setProperty('--floor-art', `url("${bdFor('games',S.games).src}")`);
-    const h = ph ? 112 : Math.min(290,Math.max(170,H*.27));
-    const w = h * 1.5, pad = parseFloat(style.getPropertyValue('--pad')) || 16;
-    const feet = ph ? artH : box.wl;
-    box.b = {x: W-w-(ph?10:pad*.55), y:feet-h*FEET,w,h}; box.feet=feet;
-    Object.assign(duoEl.style,{left:`${box.b.x}px`,top:`${box.b.y}px`,width:`${w}px`,height:`${h}px`});
-    duoEl.classList.remove('duo--off'); duoEl.classList.add('duo--side');
-    const wordmark = $('.item.on .wm',panel);
-    wordmark.style.fontSize='';
-    const titleRange=document.createRange();titleRange.selectNodeContents(wordmark);
-    const titleWidth=titleRange.getBoundingClientRect().width;
-    if (wordmark.clientWidth > 0 && titleWidth > wordmark.clientWidth) wordmark.style.fontSize=`${Math.floor(parseFloat(getComputedStyle(wordmark).fontSize)*wordmark.clientWidth/titleWidth)}px`;
-    backdrop(S.tab,S[S.tab]); stage?.show(want()); motion?.measure(); emit(); return;
-  }
   box.wl = ph ? Math.round(compact ? rel($('.shelf', panel)).y + 14 : rel($('.words', onItem(S.tab))).y + rel($('.words', onItem(S.tab))).h + 2) : Math.round(H * 0.655);
   screen.style.setProperty('--band', `${box.wl}px`);
   screen.style.setProperty('--wl', `${box.wl}px`);
@@ -1654,11 +1514,7 @@ function scene() {
   const lights = [];
   for (const el of $$('.slot', panel)) {
     const k = el.classList.contains('sel') ? 0.8 : 0.26;
-    lights.push([$('.case > .cart:not(.cart--back), :scope > .cart', el), hexRgb(el.style.getPropertyValue('--accent')).map((v) => v * k)]);
-  }
-  if (S.tab === 'games') {
-    for (const el of $$('.tags--wheel .tag')) if (+el.style.opacity > .1) lights.push([el,[.23,.21,.29]]);
-    if ($('.deck.lit')) lights.push([$('.deck__seam'),[.9,.86,.76]]);
+    lights.push([$('.cart', el), hexRgb(el.style.getPropertyValue('--accent')).map((v) => v * k)]);
   }
   const playBtn = $('.item.on [data-act]', panel);
   if (playBtn) lights.push([playBtn, [0.3, 0.2, 0.68]]);
@@ -1710,7 +1566,6 @@ function hello(nums) {
   nums.forEach((n, k) => (k ? setTimeout(() => waveDuo(n), 700 * k) : waveDuo(n)));
 }
 const shell = {
-  tick: now => motion?.tick(now),
   scene,
   layout,
   framing: () => phone.matches && box.b ? framing(box.b.w, box.b.h) : null,
@@ -1766,7 +1621,7 @@ function openTipJar() {
   audio.blip('ok');
   openTip();
 }
-addEventListener('hashchange', () => { if (location.hash === '#tip') openTipJar(); else if (!player.current) load(); });
+addEventListener('hashchange', () => location.hash === '#tip' && openTipJar());
 for (const ev of ['pointerover', 'focusin']) {
   document.addEventListener(ev, (e) => e.target.closest?.('[data-tip]') && loadTip().catch(() => {}), { passive: true });
 }
@@ -1816,7 +1671,6 @@ const sorter = createSort({
   rows: ROWS.map((tab) => ({ tab, el: $('.carts', panelOf(tab)) })),
   reduced: () => reduced.matches,
   begin(tab) {
-    if (tab === 'games' && input.scheme === 'touch' && wheelActive()) return false;
     if (mode() !== 'menu' || tab !== S.tab) return false;
     if (moving) dropMove();
     return true;
@@ -1837,20 +1691,7 @@ const sorter = createSort({
     if (moved) announce(`${label(tab, S[tab])}. Order saved.`);
   },
 });
-for (const el of $$('.fl')) el.dataset.game ||= SHELF[+el.dataset.i][0].cmd;
 load();
-$('.arc').dataset.sel = String(S.games);
-motion = createMotion({ screen, arc: $('.arc'), wheel: $('.wheel'), deck: $('.deck'), wall: $('.wall'), backdrop: $('#backdrops'),
-  onSelect(i) { if (S.tab === 'games' && S.games !== i) select(i); },
-  onPlay() {
-    const p = current();
-    play(p);
-    // a game that opens in its own tab leaves the menu here: its cartridge comes back out of the deck
-    if (p && !p.frame) { motion.eject(); typeOut(onItem('games')); }
-  }, onWall() { hints(); },
-  onInsert() { clearInterval(typeTimer); const line=$('.item--game.on [data-type]'); if(line) {line.textContent='inserting';line.classList.add('typed');} },
-});
-motion.select(S.games,{snap:true}); motion.boot(); layout(); if (player.current) motion.pause();
 hints();
 if (new URLSearchParams(location.search).has('probe')) {
   probe = Object.assign(document.createElement('span'), { className: 'viewport-probe' });
@@ -1871,7 +1712,6 @@ requestAnimationFrame(() =>
   setTimeout(() => {
     import('./stage.js')
       .then((m) => {
-        motion?.external();
         stage = m.createStage(shell, { screen, duoBox: duoEl, models: MODELS });
         layout(); // who stands on the water, now that there's a stage to ask
         nextUp();

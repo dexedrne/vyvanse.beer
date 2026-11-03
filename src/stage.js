@@ -99,7 +99,7 @@ export function createStage(shell, { screen, duoBox, models }) {
             framing: shell.framing,
             // everyone the page asked for is in: it swaps the renders out for them
             onReady() {
-              if (paused || document.hidden) return;
+              if (paused) return;
               shell.castReady();
               resizeCast();
               cast.tick(0); // a first frame before they show
@@ -131,7 +131,6 @@ export function createStage(shell, { screen, duoBox, models }) {
     raf = 0;
     if (paused) return;
     raf = requestAnimationFrame(loop);
-    shell.tick?.(now);
     const target = calm() ? 4 : now - idleSince > 6000 ? 30 : profile.fps;
     if (target !== lastTarget) { nextDraw = now; lastTarget = target; }
     if (now + 0.5 < nextDraw) return;
@@ -149,7 +148,7 @@ export function createStage(shell, { screen, duoBox, models }) {
   }
   wake();
   // a hidden tab gets no animation frames; coming back, the first step is capped
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(raf); raf=0; } else wake(); });
+  document.addEventListener('visibilitychange', () => !document.hidden && wake());
   addEventListener('vyv:quality', () => { profile = renderProfile(); resizeCast(); sync(); wake(); });
 
   return {

@@ -6,7 +6,7 @@
 // becomes one full-screen menu: one panel at a time, one item of each panel at a time, picked
 // from the cartridge row along the bottom.
 
-import { shortUrl, shelf, playsIn, sections } from './projects.js';
+import { shortUrl, shelf, playsIn } from './projects.js';
 import packGallery from './packGallery.json' with { type: 'json' };
 
 const esc = (s) =>
@@ -66,16 +66,19 @@ function status(cmd, line, ok = '[ OK ]') {
 // JS it jumps down the page to it; with JS it flips the edition in place (src/main.js).
 function editionSwitch(p, eds, faces) {
   if (eds.length < 2) return '';
-  const pills = eds.map((e) => `<a class="ed" href="#${esc(e.slug)}" data-ed="${esc(e.cmd)}" style="--accent:${esc(e.accent)};--shell:${esc(e.shell)}"${e === p ? ' aria-current="true"' : ''}><span class="ed__label"><img src="${esc(e.thumb || faces[e.edition?.face])}" width="420" height="315" alt=""></span><span class="ed__text"><b>${esc(e.name)}</b><small>${esc(e.edition?.label || e.name)}</small></span></a>`);
-  return `<div class="eds" role="group" aria-label="${esc(eds[0].name)}: ${eds.length} editions">${glyph('lt', '[')}<span class="eds__tray">${pills.join('')}</span>${glyph('rt', ']')}</div>`;
+  const pills = eds.map((e) => {
+    const face = faces[e.edition?.face];
+    return `<a class="ed" href="#${esc(e.slug)}" data-ed="${esc(e.cmd)}" style="--accent:${esc(e.accent)}"${e === p ? ' aria-current="true"' : ''}>${face ? `<img src="${esc(face)}" width="200" height="200" alt="" loading="lazy" decoding="async">` : ''}<span>${esc(e.edition?.label || e.name)}</span><span class="vh">: ${esc(e.name)}</span></a>`;
+  });
+  return `<div class="eds" role="group" aria-label="${esc(eds[0].name)}: ${eds.length} editions">${glyph('lt', '↑')}<span class="eds__seg">${pills.join('')}</span>${glyph('rt', '↓')}</div>`;
 }
 
 function gameItem(p, i, eds, faces) {
   const line = p.frame ? p.boot || p.kind : `opens in a new tab: ${p.tabNote || 'it can’t run inside this page'}`;
   return `<article class="item item--game${eds.length > 1 ? ' item--eds' : ''}" id="${esc(p.slug)}" data-i="${i}" data-id="${esc(p.cmd)}" data-game="${esc(eds[0].cmd)}" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}" aria-labelledby="${esc(p.slug)}-name">
-  <div class="info hero">
+  <div class="info">
     <p class="kindline">${esc(p.kind)}</p>
-    <h3 class="wm${p.twoLines ? ' wm--two' : ''}" data-text="${esc(p.name)}" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
+    <h3 class="wm${p.twoLines ? ' wm--two' : ''}" id="${esc(p.slug)}-name">${esc(p.name)}</h3>
     ${editionSwitch(p, eds, faces)}
     <p class="pitch">${esc(p.blurb)}</p>
     ${moreButton}
@@ -223,30 +226,14 @@ export function packGroup(crew, start) {
 
 // One cartridge per game. A game with editions has one label per edition (the shown one on top,
 // src/main.js) and the next one's edge peeking out behind it, so it reads as a two-in-one.
-export function cartBody(p, i, eds = [p]) {
-  const front = (e, back = false, mirror = false) => `<${back || mirror ? 'span' : 'button'} class="cart${back ? ' cart--back' : ''}" style="--shell:${esc(e.shell)}"${back || mirror ? ' aria-hidden="true"' : ` type="button" data-i="${i}" aria-controls="${esc(e.slug)}"${e.cartName ? ` aria-label="${esc(e.name)}"` : ''}`}><span class="cart__label"><img src="${esc(e.thumb)}" width="420" height="315" alt="" decoding="async"><i class="caus" style="--ph:${((Math.sin(i * 12.9898 + 4.1) * 43758.5453) % 1 + 1) % 1}"></i></span><span class="cart__name">${esc(e.cartName || e.name)}</span>${eds.length > 1 ? `<span class="cart__sub">${eds.indexOf(e) + 1} of ${eds.length}: ${esc(e.edition.label)}</span>` : ''}</${back || mirror ? 'span' : 'button'}>`;
-  const body = eds.length > 1 ? `<span class="case">${front(eds.find(e => e !== p), true)}${front(p)}<span class="case__tab" aria-hidden="true">${eds.map(e => `<i${e === p ? ' class="on"' : ''}></i>`).join('')}</span></span>` : front(p);
-  return { body, mirror: `<span class="slot__mirror" aria-hidden="true">${front(p, false, true)}</span>` };
-}
 function cart(p, i, eds = [p]) {
-  const { body, mirror } = cartBody(p, i, eds);
-  return `<li class="slot${eds.length > 1 ? ' slot--eds' : ''}" data-i="${i}" data-sec="${esc(p.section)}" data-k="0" style="--accent:${esc(p.accent)};--shell:${esc(p.shell)}">${body}${mirror}</li>`;
-}
-// no genre tags: the cartridges are one row, in order (owner 11/2: "they dont need genres and categories")
-function tags() { return ''; }
-function library(carts) {
-  return `<div class="wall" role="dialog" aria-label="All games" hidden><div class="wall__bg"></div><header class="wall__head"><h2>All games</h2><p>${carts.length} cartridges · let go of △ to close on the pick</p></header><div class="field"><ul class="flow"><li class="cl" data-sec="all"><ul class="cl__items">${carts.map((eds,i) => { const p=eds[0], {body,mirror}=cartBody(p,i,eds); return `<li class="fl${eds.length > 1 ? ' fl--eds' : ''}" data-i="${i}" data-sec="all" data-game="${esc(p.cmd)}" style="--accent:${p.accent};--shell:${p.shell}"><span class="fl__rip"></span><span class="fl__inner">${body}</span>${mirror}</li>`; }).join('')}</ul></li></ul>${tags(carts,'tags--field')}</div></div>`;
-}
-const DECK = '<div class="deck" aria-hidden="true"><div class="deck__clip"><div class="deck__body"><i class="deck__slot"></i><i class="deck__seam"></i><i class="deck__led"></i><i class="deck__scan"></i></div></div><span class="deck__mirror"></span><i class="deck__bloom"></i></div>';
-
-function siteCart(p, i, eds = [p]) {
   const two = eds.length > 1;
   const labels = eds
     .filter((e) => e.thumb)
     .map((e, k) => `<img${two ? ` class="${k ? '' : 'on'}" data-label="${esc(e.cmd)}"` : ''} src="${esc(e.thumb)}" width="420" height="236" alt="" loading="lazy" decoding="async">`)
     .join('');
   return `<li class="slot${two ? ' slot--eds' : ''}" style="--i:${i};--shell:${esc(p.shell || '#4b4855')};--accent:${esc(p.accent)}${two ? `;--accent2:${esc(eds[1].accent)}` : ''}" data-i="${i}">
-      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"><span class="cart__label">${labels}</span><span class="cart__name">${esc(p.name)}</span>${two ? `<span class="vh">, ${eds.length} editions</span>` : ''}</button></li>`;
+      <button class="cart" type="button" data-i="${i}" aria-controls="${esc(p.slug)}"${p.cartName ? ` aria-label="${esc(p.name)}"` : ''}><span class="cart__label">${labels}</span><span class="cart__name">${esc(p.cartName || p.name)}</span>${two ? `<span class="vh">, ${eds.length} editions</span>` : ''}</button></li>`;
 }
 
 function tile(b, i) {
@@ -305,8 +292,6 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
 
   return `<div class="screen boot" id="screen">
   <div class="backdrops" id="backdrops" aria-hidden="true"><img class="bd on" data-bd="games:${esc(lead.cmd)}" src="${esc(lead.image.src)}" alt="" fetchpriority="high" decoding="async"></div>
-  <div class="shafts" aria-hidden="true"><i style="--l:6%;--d1:23s;--d2:9s"></i><i style="--l:40%;--d1:29s;--d2:11s;--dl:-7s"></i><i style="--l:70%;--d1:31s;--d2:13s;--dl:-3s"></i></div><div class="waterline" aria-hidden="true"></div>
-  <div class="rain" aria-hidden="true"></div>
   <div class="scrim" aria-hidden="true"></div>
   <div class="duo duo--off" id="duo" aria-hidden="true">
     <div class="duo__poster">${pair.map((m) => `<img src="${esc(m.image.src)}" width="${m.image.width}" height="${m.image.height}" alt="" decoding="async">`).join('')}</div>
@@ -334,9 +319,8 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       'games',
       g.games.title,
       `<div class="items">${games.map((p) => gameItem(p, carts.indexOf(edsOf(p)), edsOf(p), faces)).join('\n')}</div>
-    <div class="wheel row js-only"><ul class="arc carts carts--games" role="list" data-n="${carts.length}" data-sel="0">${carts.map((eds,i) => cart(eds[0],i,eds)).join('')}</ul>${tags(carts,'tags--wheel')}${DECK}</div>`,
+    ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, carts.map((eds, i) => cart(eds[0], i, eds)).join(''), 'carts--games')}`,
     )}
-    ${library(carts)}
     ${panel(
       'crew',
       crew.title,
@@ -350,7 +334,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       'sites',
       g.sites.title,
       `<div class="items">${sites.map(siteItem).join('\n')}</div>
-    ${row(`sites I built<span class="cap-long">: my own, and for other people’s projects</span>`, sites.map((p, i) => siteCart(p, i)).join(''), 'carts--sites')}`,
+    ${row(`sites I built<span class="cap-long">: my own, and for other people’s projects</span>`, sites.map((p, i) => cart(p, i)).join(''), 'carts--sites')}`,
     )}
     ${panel(
       'contact',
