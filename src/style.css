@@ -1007,6 +1007,19 @@ html:not(.js) .js-only {
   flex: none;
 }
 
+/* the games row on a wide screen: its cartridges come down in size (to 84px at the least) so every
+   game fits across the screen; a screen too narrow for that still scrolls the row as before */
+.carts--games {
+  --cw-row: var(--cw);
+  --fit: calc((100vw - 2 * var(--pad) - (var(--n, 12) - 1) * clamp(10px, 1.1vw, 18px) - 16px) / var(--n, 12));
+}
+
+@media (min-width: 761px) {
+  .carts--games > .slot {
+    --cw: min(var(--cw-row), max(84px, var(--fit)));
+  }
+}
+
 .cart {
   --sh: var(--shell);
   position: relative;

@@ -241,10 +241,10 @@ function tile(b, i) {
   return `<li class="tslot" style="--i:${i}" data-i="${i}"><button class="tile" type="button" data-i="${i}" aria-controls="${esc(b.slug)}" aria-label="${esc(b.name)}"><img src="${esc(b.face)}" width="200" height="200" alt="" loading="lazy" decoding="async"><span class="tile__num">${esc(b.label || `#${b.num}`)}</span></button></li>`;
 }
 
-function row(head, items, cls, tag = 'ul') {
+function row(head, items, cls, tag = 'ul', n = 0) {
   return `<div class="row js-only">
       <p class="row__head"><span>${head}</span><span class="count" aria-hidden="true"></span></p>
-      <${tag} class="carts ${cls}" role="list">${items}</${tag}>
+      <${tag} class="carts ${cls}" role="list"${n ? ` style="--n:${n}"` : ''}>${items}</${tag}>
     </div>`;
 }
 
@@ -320,7 +320,7 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       'games',
       g.games.title,
       `<div class="items">${games.map((p) => gameItem(p, carts.indexOf(edsOf(p)), edsOf(p), faces)).join('\n')}</div>
-    ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, carts.map((eds, i) => cart(eds[0], i, eds)).join(''), 'carts--games')}`,
+    ${row(`my games<span class="cap-long">. free, in the browser, keyboard or controller</span>`, carts.map((eds, i) => cart(eds[0], i, eds)).join(''), 'carts--games', 'ul', carts.length)}`,
     )}
     ${panel(
       'crew',
