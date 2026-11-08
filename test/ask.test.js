@@ -86,7 +86,7 @@ test('Ask can identify Retardio Cousin Classic #2214, find his model and launch 
   assert.equal(plainAction('zombietardio as 2214'), 'play:zombietardio:2214');
   assert.equal(plainAction('retardiopayne as #2214'), 'play:retardiopayne:2214');
   assert.equal(routeAnswer(answer('play:retardiopayne:2214', 0.95))?.action, 'play:retardiopayne:2214');
-  assert.match(ACTIONS.find(a => a.id === 'crew-games:2214').line, /^SHITBOX, RetardioPayne, RadOps, ZombieTardio, RAD FIGHTER/);
+  assert.match(ACTIONS.find(a => a.id === 'crew-games:2214').line, /^SHITBOX, SALOON, RetardioPayne, RadOps, ZombieTardio, RAD FIGHTER/);
   assert.match(makePayload('zombies as 2214').questions.action.instructions, /#85, #555 or #2214/);
 });
 

@@ -83,9 +83,9 @@ test('#2214 has a full Crew card between #268 and #555, keeping the owner\'s Ret
   assert.ok(card.includes('/img/retardios/retardio-2214.webp'));
   // one edition per game: the Retardios editions, RadOps for RadOps/RBGO, RAD FIGHTER for RADBRAWL/RAD FIGHTER
   assert.deepEqual(playsIn(projects, '2214').map(p => p.cmd),
-    ['shitbox', 'retardiopayne', 'radops', 'zombietardio', 'radfighter', 'spidertag', 'radtap', 'saloon', 'radbonk', 'brogate']);
+    ['shitbox', 'saloon', 'retardiopayne', 'radops', 'zombietardio', 'radfighter', 'spidertag', 'radtap', 'radbonk', 'brogate']);
   assert.deepEqual(projects.filter(p => p.cast?.includes('2214')).map(p => p.cmd),
-    ['shitbox', 'retardiopayne', 'radops', 'rbgo', 'radzombies', 'zombietardio', 'radbrawl', 'radfighter', 'spidertag', 'radtap', 'saloon', 'radbonk', 'brogate']);
+    ['shitbox', 'saloon', 'retardiopayne', 'radops', 'rbgo', 'radzombies', 'zombietardio', 'radbrawl', 'radfighter', 'spidertag', 'radtap', 'radbonk', 'brogate']);
   assert.ok(!card.includes('not in a game yet'));
   for (const cmd of ['shitbox', 'retardiopayne', 'zombietardio', 'radfighter', 'radbonk']) assert.ok(card.includes(`data-goto="${cmd}"`), cmd);
 });

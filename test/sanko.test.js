@@ -23,15 +23,16 @@ function webpSize(buf) {
   throw Error(`unknown WebP chunk ${kind}`);
 }
 
-test('SankoQuest Survivors sits second, right after SHITBOX, which still opens the menu', () => {
+test('SankoSurvivors sits third, after SHITBOX and SALOON; SHITBOX still opens the menu', () => {
   assert.ok(sanko);
   assert.equal(games[0].cmd, 'shitbox');
-  assert.equal(games[1], sanko);
-  assert.equal(shelf(projects)[1][0], sanko);
-  assert.deepEqual(shelf(projects)[1], [sanko]); // a cartridge of its own, no editions
+  assert.equal(games[1].cmd, 'saloon');
+  assert.equal(games[2], sanko);
+  assert.equal(shelf(projects)[2][0], sanko);
+  assert.deepEqual(shelf(projects)[2], [sanko]); // a cartridge of its own, no editions
   assert.deepEqual(games.filter(p => p.featured).map(p => p.cmd), ['shitbox']);
   assert.ok(!sanko.featured && !sanko.of && !sanko.edition);
-  assert.equal(sanko.name, 'SankoQuest Survivors');
+  assert.equal(sanko.name, 'SankoSurvivors'); // the game's own title
   assert.equal(sanko.group, 'games');
   // a survivors-style game, filed like RADBONK
   assert.equal(sanko.section, projects.find(p => p.cmd === 'radbonk').section);
@@ -47,7 +48,7 @@ test('Play opens sankosurvivors.quest in its own tab, where the game keeps its s
   assert.ok(card);
   assert.match(card, /<a class="play" href="https:\/\/sankosurvivors\.quest" target="_blank" rel="noopener" data-act="play" data-tab>/);
   assert.match(card, /<span class="play__tab">new tab /);
-  assert.match(card, /SankoQuest Survivors \(opens in a new tab\)/);
+  assert.match(card, /SankoSurvivors \(opens in a new tab\)/);
   assert.match(card, /<span class="ok">\[ TAB \]<\/span>/);
   assert.ok(card.includes(`opens in a new tab: ${sanko.tabNote}`));
   assert.doesNotMatch(card, /can’t run inside this page/);
@@ -79,7 +80,7 @@ test('its key art and textless cartridge label are on disk at the games’ sizes
   assert.equal(sanko.image.src, '/img/art/sanko.webp');
   assert.equal(sanko.thumb, '/img/thumb/sanko.webp');
   assert.ok(!sanko.image.lettered && !sanko.image.position);
-  assert.match(sanko.image.alt, /^SankoQuest Survivors: /);
+  assert.match(sanko.image.alt, /^SankoSurvivors: /);
   for (const [src, size] of [[sanko.image.src, [1600, 900]], [sanko.thumb, [420, 315]]]) {
     const file = new URL(`../public${src}`, import.meta.url);
     assert.ok(existsSync(file), src);
@@ -89,20 +90,19 @@ test('its key art and textless cartridge label are on disk at the games’ sizes
   assert.ok(html.includes('<img src="/img/thumb/sanko.webp"'));
 });
 
-test('its long name: two lines on the wordmark, SankoQuest on the cartridge, every other game as it was', () => {
-  assert.equal(sanko.twoLines, true);
-  assert.equal(sanko.cartName, 'SankoQuest');
-  assert.ok(sanko.name.startsWith(`${sanko.cartName} `));
-  assert.match(card, /<h3 class="wm wm--two" id="sanko-name">SankoQuest Survivors<\/h3>/);
-  // the shelf's cartridge shows the short name; the button reads the full one
-  assert.equal(html.match(/<button class="cart" type="button" data-i="1" aria-controls="sanko" aria-label="SankoQuest Survivors">/g)?.length, 1);
-  assert.equal(html.match(/<span class="cart__name">SankoQuest<\/span>/g)?.length, 1);
-  assert.doesNotMatch(html, /<span class="cart__name">SankoQuest Survivors<\/span>/);
-  for (const p of games.filter(p => p !== sanko)) {
+test('its cartridge and wordmark carry the game\'s own name, SankoSurvivors, like every other game', () => {
+  assert.ok(!sanko.twoLines && !sanko.cartName);
+  assert.match(card, /<h3 class="wm" id="sanko-name">SankoSurvivors<\/h3>/);
+  // one word on the cartridge; a name too wide for the plastic is shrunk to fit it at layout
+  assert.equal(html.match(/<span class="cart__name">SankoSurvivors<\/span>/g)?.length, 1);
+  assert.doesNotMatch(html, /<span class="cart__name">SankoQuest<\/span>/);
+  assert.match(readFileSync(new URL('../src/main.js', import.meta.url), 'utf8'), /function fitCartNames\(\)/);
+  for (const p of games) {
     assert.ok(!p.twoLines && !p.cartName, p.cmd);
     assert.match(html, new RegExp(`<h3 class="wm" id="${p.slug}-name">`), p.cmd);
   }
-  for (const m of html.matchAll(/<button class="cart"[^>]*>/g)) assert.equal(/aria-label=/.test(m[0]), m[0].includes('aria-controls="sanko"'), m[0]);
+  // no cartridge needs a separate spoken name now
+  for (const m of html.matchAll(/<button class="cart"[^>]*>/g)) assert.doesNotMatch(m[0], /aria-label=/, m[0]);
   const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
   assert.match(css, /\.js \.wm--two \{ white-space: normal; text-wrap: balance; \}/);
   // a screen under 760px tall keeps it on one line (fitted smaller), so PLAY stays clear of the shelf
@@ -116,7 +116,7 @@ test('every project name is its own: the terminal, deep links and Ask each find 
   for (const name of ['sanko', 'sankoquest', 'sankosurvivors', 'sankoquest-survivors', 'sanko-survivors'])
     assert.equal(plainAction(name), 'play:sanko', name);
   assert.equal(plainAction('play sankoquest'), 'play:sanko');
-  assert.equal(plainAction('SankoQuest Survivors'), 'play:sanko');
+  assert.equal(plainAction('SankoSurvivors'), 'play:sanko');
   assert.equal(plainAction('survivors'), 'play:radbonk');
   const payload = makePayload('the sanko game').state.projects.find(p => p.cmd === 'sanko');
   assert.deepEqual(payload, { name: sanko.name, cmd: 'sanko', of: undefined, kind: sanko.kind, description: sanko.blurb, cast: [] });
@@ -171,7 +171,7 @@ test('the terminal describes it and opens it in a new tab, saying why', async ()
     shell: { reveal: slug => revealed.push(slug), go() {}, play: p => played.push(p.cmd) }, close() {} });
   commands.run('info sankoquest survivors');
   let text = output.map(el => el.textContent).join(' ');
-  assert.match(text, /SankoQuest Survivors/);
+  assert.match(text, /SankoSurvivors/);
   assert.match(text, /A fan game made for the Sanko community/);
   assert.ok(text.includes(`opens in a new tab: ${sanko.tabNote}`));
   assert.deepEqual(revealed, ['sanko']);
@@ -180,6 +180,6 @@ test('the terminal describes it and opens it in a new tab, saying why', async ()
   text = output.map(el => el.textContent).join(' ');
   assert.deepEqual(opened, ['https://sankosurvivors.quest/']);
   assert.deepEqual(played, []);
-  assert.ok(text.includes(`SankoQuest Survivors opened in a new tab: ${sanko.tabNote}.`));
+  assert.ok(text.includes(`SankoSurvivors opened in a new tab: ${sanko.tabNote}.`));
   assert.doesNotMatch(text, /doesn't allow embedding/);
 });

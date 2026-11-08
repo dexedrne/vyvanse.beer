@@ -49,10 +49,11 @@ test('a saved order that still says pokerbros keeps SALOON in its place', () => 
   const order = arrange(keys, saved, old);
   assert.deepEqual(order, ['saloon', ...keys.filter(k => k !== 'saloon').reverse()]);
   // games saved since still slot in by default, and SALOON is never doubled or lost
-  const added = arrange(keys, [keys[1], OLD, 'saloon', keys[0]], old);
+  const other = keys.find(k => k !== 'saloon' && k !== keys[0]);
+  const added = arrange(keys, [other, OLD, 'saloon', keys[0]], old);
   const at = k => added.indexOf(k);
   assert.deepEqual([...added].sort(), [...keys].sort());
-  assert.ok(at(keys[1]) < at('saloon') && at('saloon') < at(keys[0]));
+  assert.ok(at(other) < at('saloon') && at('saloon') < at(keys[0]));
   // without the old names it would have dropped back to its default place
   assert.notEqual(arrange(keys, saved)[0], 'saloon');
   // an old name never takes over a key that exists today

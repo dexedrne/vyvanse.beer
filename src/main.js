@@ -452,7 +452,10 @@ function labels() {
     for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
     // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
     const name = $('.cart__name', slot);
-    if (name) name.textContent = eds[k].cartName || eds[k].name;
+    if (name) {
+      name.textContent = eds[k].cartName || eds[k].name;
+      fitCartNames();
+    }
     $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
   });
 }
@@ -1399,6 +1402,14 @@ function framing(w, h) {
 }
 const box = { wl: 0, feet: 0, b: null };
 const m0 = () => (duoEl.classList.contains('duo--side') ? 'side' : null);
+// a long name on a cartridge (SankoSurvivors, RetardioPayne) comes down in size to fit its plastic
+function fitCartNames() {
+  for (const n of $$('.cart__name')) {
+    n.style.fontSize = '';
+    if (n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1)
+      n.style.fontSize = `${Math.floor((parseFloat(getComputedStyle(n).fontSize) * n.clientWidth) / n.scrollWidth * 10) / 10}px`;
+  }
+}
 // a long name (RetardioPayne) comes down in size to fit its column instead of running off it
 function fitWm() {
   const wm = $('.item.on .wm', panelOf(S.tab));
@@ -1474,6 +1485,7 @@ function layout() {
   }
   box.b = b;
   fitWm();
+  fitCartNames();
   if (ph) {
     const band = Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2);
     if (b && m === 'side') {

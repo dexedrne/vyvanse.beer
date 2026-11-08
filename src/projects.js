@@ -10,13 +10,12 @@
 //   slug      anchor id on the page (vyvanse.beer/#slug)
 //   group     'games' or 'sites' (see `groups`)
 //   name      display name
-//   twoLines  games only: true for a two-word name too long for one line (SankoQuest Survivors). The
+//   twoLines  games only: true for a two-word name too long for one line. The
 //             menu's wordmark then sets it on two balanced lines, still fitted to its column, instead
 //             of shrinking it onto one; a phone shorter than 760px keeps one line, so PLAY stays clear
 //             of the wheel
-//   cartName  games only: a shorter name for the cartridge, whose one line of plastic under the label
-//             a long name runs off (SankoQuest Survivors is SankoQuest there); the button still reads
-//             the full name
+//   cartName  games only: a shorter name for the cartridge's one line of plastic under the label
+//             (a long name is otherwise shrunk to fit it); the button still reads the full name
 //   kind      one line saying what it is
 //   kindPhone shorter panel kindline on phones; blurbPhone: approved phone-only copy
 //   phone     phone art position, keeping the desktop image.position
@@ -28,7 +27,7 @@
 //             Check with: curl -sI <url> | grep -iE 'x-frame-options|frame-ancestors'
 //   tabNote   with frame: false on a site that could be framed: why it opens in its own tab instead,
 //             said on its status line, in the terminal and when a new tab is blocked
-//             (SankoQuest Survivors keeps its saves per web address, so a framed copy would start over)
+//             (SankoSurvivors keeps its saves per web address, so a framed copy would start over)
 //   orientation games only: 'landscape' by default; 'any' permits portrait without a lock or hint
 //   links     [{ label, href }]; the first one is the main action and should match `url`
 //   image     optional { src, width, height, alt } in public/img/: a game's key art (it fills
@@ -107,6 +106,35 @@ export const projects = [
     },
   },
   {
+    cmd: 'saloon',
+    boot: 'poker at a western saloon table, play with friends', // the hero's boot log line
+    // 'pokerbros' is its name from before SALOON: old links, saved orders and commands land here
+    aliases: ['pokerbros', 'poker', 'holdem'],
+    slug: 'saloon',
+    group: 'games',
+    section: 'arcade',
+    name: 'SALOON',
+    kind: 'Poker at a western saloon table',
+    kindPhone: 'Poker at a western saloon table',
+    blurbPhone: 'A poker game at a western saloon table. Play with friends.',
+    blurb: 'A poker game at a western saloon table. Play with friends.',
+    url: 'https://saloon.cards',
+    frame: true,
+    orientation: 'any',
+    links: [{ label: 'Play', href: 'https://saloon.cards' }],
+    thumb: '/img/thumb/saloon.webp',
+    shell: '#16251c',
+    accent: '#e8c27a',
+    cast: [...MAIN_CAST, '555', '85', '723', '2214'],
+    phone: '50% 35%',
+    image: {
+      src: '/img/art/saloon.webp',
+      width: 1600,
+      height: 900,
+      alt: 'SALOON: violet-haired #4764 with glasses, brown-haired #652, yellow-haired #3704, green-haired #3710, long-haired #555, black-haired #85 and cowboy #723 play poker round a green felt table in a warm western saloon, with a wooden bar, bottles and glowing oil lamps.',
+    },
+  },
+  {
     // a fan game for the Sanko community, made with the SankoQuest team's permission
     cmd: 'sanko',
     boot: 'fifteen minutes in Greentown, the horde closing in', // the hero's boot log line
@@ -115,9 +143,7 @@ export const projects = [
     slug: 'sanko',
     group: 'games',
     section: 'arcade',
-    name: 'SankoQuest Survivors',
-    twoLines: true, // SankoQuest / Survivors: on one line the wordmark would shrink to about a third of its size
-    cartName: 'SankoQuest', // the full name is about 1.5 times as wide as the cartridge's label
+    name: 'SankoSurvivors',
     kind: 'Fan game: survive the horde in the SankoQuest world',
     kindPhone: 'Survive the SankoQuest horde',
     blurb:
@@ -136,7 +162,7 @@ export const projects = [
       src: '/img/art/sanko.webp',
       width: 1600,
       height: 900,
-      alt: 'SankoQuest Survivors: an adventurer stands in a gold ring on the green in Greentown, surrounded by a horde of chickens, goblins, cows and skeletons, between a stone house, wooden fences and a big tree, with air shards on the grass.',
+      alt: 'SankoSurvivors: an adventurer stands in a gold ring on the green in Greentown, surrounded by a horde of chickens, goblins, cows and skeletons, between a stone house, wooden fences and a big tree, with air shards on the grass.',
     },
   },
   {
@@ -462,35 +488,6 @@ export const projects = [
       width: 1600,
       height: 900,
       alt: 'RADTAP: violet-haired #4764, brown-haired #652, yellow-haired #3704 and green-haired #3710 lead the band on a neon stage, with #555, #85 and cowboy #723 supporting behind four glowing note lanes.',
-    },
-  },
-  {
-    cmd: 'saloon',
-    boot: 'poker at a western saloon table, play with friends', // the hero's boot log line
-    // 'pokerbros' is its name from before SALOON: old links, saved orders and commands land here
-    aliases: ['pokerbros', 'poker', 'holdem'],
-    slug: 'saloon',
-    group: 'games',
-    section: 'arcade',
-    name: 'SALOON',
-    kind: 'Poker at a western saloon table',
-    kindPhone: 'Poker at a western saloon table',
-    blurbPhone: 'A poker game at a western saloon table. Play with friends.',
-    blurb: 'A poker game at a western saloon table. Play with friends.',
-    url: 'https://saloon.cards',
-    frame: true,
-    orientation: 'any',
-    links: [{ label: 'Play', href: 'https://saloon.cards' }],
-    thumb: '/img/thumb/saloon.webp',
-    shell: '#16251c',
-    accent: '#e8c27a',
-    cast: [...MAIN_CAST, '555', '85', '723', '2214'],
-    phone: '50% 35%',
-    image: {
-      src: '/img/art/saloon.webp',
-      width: 1600,
-      height: 900,
-      alt: 'SALOON: violet-haired #4764 with glasses, brown-haired #652, yellow-haired #3704, green-haired #3710, long-haired #555, black-haired #85 and cowboy #723 play poker round a green felt table in a warm western saloon, with a wooden bar, bottles and glowing oil lamps.',
     },
   },
   {
