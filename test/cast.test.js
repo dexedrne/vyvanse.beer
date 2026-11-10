@@ -34,11 +34,13 @@ test('the ten Crew members: SHITBOX has the eight earlier drivers plus #2214, an
   for (const m of crew.members) assert.ok(!playsIn(projects, m.num).some(p => p.cmd === 'sanko'), m.num);
 });
 
-test('BROGATE lists the party the game has', () => {
+test('RadQuest stars #652 alone and BROGATE lists the party the game has', () => {
+  assert.deepEqual(projects.find(p => p.cmd === 'radquest').cast, ['652']);
   assert.deepEqual(projects.find(p => p.cmd === 'brogate').cast, ['85', '2214', '4764', '652', '723']);
   const games = num => playsIn(projects, num).map(p => p.cmd);
   for (const num of ['85', '2214', '4764', '652', '723']) assert.ok(games(num).includes('brogate'), num);
-  for (const num of ['3704', '3710', '2564']) assert.ok(!games(num).includes('brogate'), num);
+  for (const num of ['3704', '3710', '2564']) assert.ok(!games(num).includes('brogate') && !games(num).includes('radquest'), num);
+  for (const num of crew.members.map(m => m.num)) assert.equal(games(num).includes('radquest'), num === '652', num);
 });
 
 test('Crew links pick the Retardio editions and keep the ghost out of SALOON', () => {

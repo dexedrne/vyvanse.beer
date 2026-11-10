@@ -199,7 +199,7 @@ test('recorded Jev smoke answer routes without a live call', () => {
 });
 
 test('Ask includes asset pack criteria and payloads and reveals a card without downloading', () => {
-  assert.equal(ACTIONS.length, 177); // three new games and their crew entries, #2214's three crew entries and 13 game casts, then play:sanko (no crew cast); less the two cast entries BROGATE never had in the game
+  assert.equal(ACTIONS.length, 172); // three new games and their crew entries, #2214's three crew entries and 13 game casts, then play:sanko (no crew cast); less the seven cast entries RadQuest (#652 only) and BROGATE (its real party) never had in the games
   assert.equal(makePayload('wallpapers').state.packs.length, 6);
   const revealed = [];
   const shell = { reveal: slug => revealed.push(slug), play: () => assert.fail('pack actions must only reveal') };
