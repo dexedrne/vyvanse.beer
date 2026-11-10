@@ -525,7 +525,7 @@ export const projects = [
     links: [{ label: 'Play', href: 'https://radquest.vyvanse.beer' }],
     thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: RADBROS,
     phone: '50% 100%',
-    image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RadQuest: a lantern, a blade and the road out of the village.' },
+    image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', alt: 'RadQuest: a lantern, a blade and the road out of the village.' },
   },
   {
     cmd: 'radcraft', aliases: ['craft'], slug: 'radcraft', group: 'games', section: 'worlds',
@@ -536,7 +536,7 @@ export const projects = [
     links: [{ label: 'Play', href: 'https://radcraft.vyvanse.beer' }],
     thumb: '/img/thumb/radcraft.webp', shell: '#27421f', accent: '#bdf05a', cast: RADBROS,
     phone: '50% 100%',
-    image: { src: '/img/art/radcraft.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RADCRAFT: dig down, build up, mind the night.' },
+    image: { src: '/img/art/radcraft.webp', width: 1600, height: 900, position: '50% 100%', alt: 'RADCRAFT: dig down, build up, mind the night.' },
   },
   {
     cmd: 'brogate', aliases: ['gate'], slug: 'brogate', group: 'games', section: 'worlds',
@@ -547,7 +547,7 @@ export const projects = [
     links: [{ label: 'Play', href: 'https://brogate.vyvanse.beer' }],
     thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: [...RADBROS, '2214'],
     phone: '50% 100%',
-    image: { src: '/img/art/brogate.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'BROGATE: four heroes, one gate, a d20.' },
+    image: { src: '/img/art/brogate.webp', width: 1600, height: 900, position: '50% 100%', alt: 'BROGATE: four heroes, one gate, a d20.' },
   },
   {
     cmd: 'solscape',

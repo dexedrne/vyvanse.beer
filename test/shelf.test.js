@@ -15,7 +15,9 @@ test('shelf keeps every section, thirteen cases and all seventeen game URLs', ()
   for(const e of cases)assert.ok(sections.some(s=>s.id===e[0].section),e[0].cmd);
   assert.deepEqual(cases.map(e=>e[0].cmd),['shitbox','saloon','sanko','radpayne','radops','radzombies','radbrawl','spidertag','radtap','radbonk','radquest','radcraft','brogate']);
   for(const cmd of ['radquest','radcraft','brogate']){
-    const p=projects.find(p=>p.cmd===cmd);assert.ok(p.frame);assert.equal(p.section,'worlds');assert.equal(p.image.width,1600);assert.equal(p.image.height,900);assert.equal(p.image.lettered,1);
+    const p=projects.find(p=>p.cmd===cmd);assert.ok(p.frame);assert.equal(p.section,'worlds');assert.equal(p.image.width,1600);assert.equal(p.image.height,900);
+    // their key art is drawn whole: no lettered flag, which at 1 masked the entire picture and its reflection
+    assert.ok(!('lettered' in p.image),cmd);
   }
 });
 test('shooter case resolves either edition without changing its URL',()=>{
