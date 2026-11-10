@@ -149,7 +149,7 @@ export const projects = [
     blurb:
       'A fan game made for the Sanko community, with the SankoQuest team’s permission. Survive fifteen minutes in Greentown, on SankoQuest’s own map, against monsters from its bestiary while your weapons attack on their own. Eight weapons level up through SankoQuest’s tiers and evolve with the right item; four bosses lead up to the Dragon. Reward caskets hold real SankoQuest gear you keep and wear between runs, and there are quests, a leaderboard for each map and new maps to open as you clear them. Keyboard, controller or touch.',
     url: 'https://sankosurvivors.quest',
-    // it could be framed, but its saves live with its own web address: a copy in here would start over
+    // its site sends X-Frame-Options: DENY (and frame-ancestors 'none'), and its saves live with its own web address
     frame: false,
     tabNote: 'it keeps your saves on its own site',
     links: [{ label: 'Play', href: 'https://sankosurvivors.quest' }],
