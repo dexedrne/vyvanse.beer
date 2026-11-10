@@ -694,7 +694,7 @@ export const projects = [
     kind: 'Sassy the Sasquatch: a chill 3D camping game and fan site',
     blurb:
       'Sassy Camp is a chill 3D camping game: fire, fishing, canoe, hammock, garden, skate park, guitar and stargazing. There is a meme maker too. Free in the browser, keyboard, touch or controller.',
-    url: 'https://sassysol.lol',
+    url: 'https://sassysol.lol/camp/',
     frame: false,
     links: [
       { label: 'Play Sassy Camp', href: 'https://sassysol.lol/camp/' },

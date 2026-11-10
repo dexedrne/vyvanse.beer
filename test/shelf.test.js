@@ -20,6 +20,11 @@ test('shelf keeps every section, thirteen cases and all seventeen game URLs', ()
     assert.ok(!('lettered' in p.image),cmd);
   }
 });
+test('every card\'s main button goes where its first link says',()=>{
+  // the button is built from url with the first link's label: Sassy's "Play Sassy Camp" opens the camp, not the home page
+  for(const p of projects)assert.equal(p.url,p.links[0].href,p.cmd);
+  assert.equal(projects.find(p=>p.cmd==='sassy').url,'https://sassysol.lol/camp/');
+});
 test('shooter case resolves either edition without changing its URL',()=>{
   const eds=shelf(projects).find(e=>e[0].cmd==='radops');
   assert.deepEqual(eds.map(e=>e.edition.label),['Team deathmatch','Bomb defusal']);
