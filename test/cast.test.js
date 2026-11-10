@@ -41,6 +41,8 @@ test('RadQuest stars #652 alone and BROGATE lists the party the game has', () =>
   for (const num of ['85', '2214', '4764', '652', '723']) assert.ok(games(num).includes('brogate'), num);
   for (const num of ['3704', '3710', '2564']) assert.ok(!games(num).includes('brogate') && !games(num).includes('radquest'), num);
   for (const num of crew.members.map(m => m.num)) assert.equal(games(num).includes('radquest'), num === '652', num);
+  // RADCRAFT's picker still offers the six Radbros
+  assert.deepEqual([...projects.find(p => p.cmd === 'radcraft').cast].sort(), ['2564', '3704', '3710', '4764', '652', '723']);
 });
 
 test('Crew links pick the Retardio editions and keep the ghost out of SALOON', () => {
