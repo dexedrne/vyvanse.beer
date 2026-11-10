@@ -79,7 +79,7 @@ export const projects = [
   {
     cmd: 'shitbox',
     featured: true, // the flagship: the menu opens on it
-    boot: 'over forty cars, free drive with friends and street takeovers', // the hero's boot log line
+    boot: '40+ cars, free drive with friends and street takeovers', // the hero's boot log line
     aliases: ['beater', 'car'],
     slug: 'shitbox',
     group: 'games',
