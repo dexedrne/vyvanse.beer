@@ -34,7 +34,7 @@ test('Settings closes on a click outside its panel, and not on a click on its ow
   const dialog = page.made.find((el) => el.tag === 'dialog');
   assert.equal(page.document.body.children.at(-1), dialog);
   dialog.box = { left: 420, right: 860, top: 145, bottom: 575 };
-  const click = (target, clientX, clientY) => dialog.fire('click', { target, clientX, clientY });
+  const click = (target, clientX, clientY) => { dialog.fire('pointerdown', { target, clientX, clientY }); dialog.fire('click', { target, clientX, clientY }); };
 
   settings.open();
   assert.equal(dialog.open, true);
@@ -42,6 +42,9 @@ test('Settings closes on a click outside its panel, and not on a click on its ow
   assert.equal(dialog.open, true, 'a click on the padding keeps it open');
   click(page.made.find((el) => el.tag === 'select'), 600, 460);
   assert.equal(dialog.open, true, 'a click on a control keeps it open');
+  dialog.fire('pointerdown', { target: page.made.find((el) => el.tag === 'button'), clientX: 500, clientY: 200 });
+  dialog.fire('click', { target: dialog, clientX: 900, clientY: 200 }); // pressed on a button, let go off the panel
+  assert.equal(dialog.open, true, 'a press dragged off the panel keeps it open');
   click(dialog, 419, 300); // one pixel left of the panel: the backdrop
   assert.equal(dialog.open, false, 'a click on the backdrop closes it');
 

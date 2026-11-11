@@ -13,11 +13,19 @@ export function createSettings({ audio }) {
     h('label', { for:'quality' }, 'picture'), quality,
     h('button', { type:'button', onclick:() => el.close() }, 'close'));
   // A click on the backdrop closes it, like the tip jar. This dialog has its own padding, and a click
-  // there lands on the dialog element too, so the point decides: only outside the panel's box.
-  el.addEventListener('click', (e) => {
-    if (e.target !== el) return;
+  // there lands on the dialog element too, so the point decides: only outside the panel's box. The
+  // press has to start out there as well, so a press on a button dragged off the panel keeps it open.
+  const outside = (e) => {
+    if (e.target !== el) return false;
     const r = el.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) el.close();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  };
+  let pressedOutside = false;
+  el.addEventListener('pointerdown', (e) => { pressedOutside = outside(e); });
+  el.addEventListener('click', (e) => {
+    const from = pressedOutside;
+    pressedOutside = false;
+    if (from && outside(e)) el.close();
   });
   document.body.append(el);
   function paint() {
