@@ -744,7 +744,9 @@ function details({ from } = {}) {
   const open = item.classList.toggle('is-more');
   $('[data-more]', item)?.setAttribute('aria-expanded', String(open));
   // the whole blurb while it's open, whole sentences again when it shuts, and room under the top bar
+  fitWm();
   fitPitch();
+  fitInfo();
   audio.blip(open ? 'ok' : 'back');
   emit();
 }
@@ -984,6 +986,9 @@ function act(name, info = {}) {
       if (name === 'ok' && phoneZone === 'actions' && phoneButton && (S.tab !== 'crew' || isPack(LISTS.crew[S.crew]))) return details();
     }
   }
+  // a pack's file list in its scrolling box (fitInfo(), a short screen): up and down scroll it
+  const files = (name === 'up' || name === 'down') && tight ? $('.manifest', tight) : null;
+  if (files?.style.maxHeight) return files.scrollBy({ top: name === 'up' ? -48 : 48, behavior: reduced.matches ? 'auto' : 'smooth' });
   const vert = S.tab === 'contact';
   // up / down on Games flip the edition, once per press (held, they don't run round and round)
   const flip = (d) => (S.tab !== 'games' ? false : info.repeat || info.event?.repeat ? undefined : edition(d));
@@ -1472,6 +1477,51 @@ function fitPitch() {
   for (let j = parts.length - 1; j > 0 && pitch.offsetHeight > room; j--) parts[j].hidden = true;
   pitch.style.removeProperty('-webkit-line-clamp');
 }
+// Details on a short screen (1280 x 720) would push the card's words up through the top bar. Make room a
+// step at a time, only as far as it takes: the paragraph and the credit get the column's whole width, the
+// name comes down in size, the kind line goes, and a pack's file list keeps as many whole rows as fit and
+// scrolls for the rest (up and down, in act()). Desktop only, and always straight after fitWm() and
+// fitPitch(), which put the name's size and the paragraph's width back.
+let tight = null; // the card it last made room on
+function fitInfo() {
+  const item = onItem(S.tab);
+  for (const card of new Set([tight, item])) {
+    const [kind, credit, list] = ['.kindline', '.credit', '.manifest'].map((s) => card && $(s, card));
+    if (kind) kind.style.display = '';
+    if (credit) credit.style.maxWidth = '';
+    if (!list) continue;
+    list.style.maxHeight = list.style.overflowY = list.style.maskImage = list.style.webkitMaskImage = '';
+    list.onscroll = null;
+    list.scrollTop = 0;
+  }
+  tight = null;
+  const info = item && $('.info', item);
+  if (phone.matches || !info) return;
+  const bar = $('.top').getBoundingClientRect().bottom + 8;
+  const over = () => bar - info.getBoundingClientRect().top; // how far through the bar it is
+  if (over() <= 0) return;
+  tight = item;
+  const [wm, pitch, kind, credit, list] = ['.wm', '.pitch', '.kindline', '.credit', '.manifest'].map((s) => $(s, info));
+  for (const el of [pitch, credit]) if (el) el.style.maxWidth = 'none';
+  let size = wm ? parseFloat(getComputedStyle(wm).fontSize) : 0;
+  for (let gap = over(); gap > 0 && size > 44; gap = over()) {
+    const lines = Math.max(1, Math.round(wm.offsetHeight / (size * 0.86))); // (its line-height is 0.86)
+    size = Math.max(44, Math.floor(size - Math.max(1, gap / lines / 0.86)));
+    wm.style.fontSize = `${size}px`;
+  }
+  if (kind && over() > 0) kind.style.display = 'none';
+  const gap = over();
+  const rows = list && gap > 0 ? $$('b', list).filter((b) => b.offsetParent) : [];
+  if (rows.length < 3) return;
+  const row = rows[1].offsetTop - rows[0].offsetTop;
+  const keep = Math.max(2, rows.length - Math.ceil(gap / row));
+  list.style.maxHeight = `${list.offsetHeight - (rows.length - keep) * row}px`;
+  list.style.overflowY = 'auto';
+  // the cut edge fades while there is more below it
+  const fade = () => (list.style.maskImage = list.style.webkitMaskImage = list.scrollHeight - list.scrollTop - list.clientHeight > 4 ? 'linear-gradient(#000 calc(100% - 22px), transparent)' : '');
+  list.onscroll = fade;
+  fade();
+}
 // a long name (RetardioPayne) comes down in size to fit its column instead of running off it
 function fitWm() {
   const wm = $('.item.on .wm', panelOf(S.tab));
@@ -1548,6 +1598,7 @@ function layout() {
   box.b = b;
   fitWm();
   fitPitch();
+  fitInfo();
   fitCartNames();
   if (ph) {
     const band = Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2);
