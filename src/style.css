@@ -1984,6 +1984,17 @@ html:not(.js) .manifest .manifest__end-all b::before {
   animation: fade 0.35s both;
 }
 
+/* the button and its status line keep to the space left of the monitor (not to the words' column,
+   which they may outrun where the monitor is far away): a line too long for that drops under the button */
+@media (min-width: 961px), (min-width: 761px) and (min-height: 701px), (min-width: 761px) and (hover: hover), (min-width: 761px) and (pointer: fine) {
+  .item--site .act {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    width: max-content;
+    max-width: calc(100vw - min(50vw, 64vh * 1.9, 760px) - 2 * var(--pad) - 16px);
+  }
+}
+
 /* ---------- Contact: a pause menu ---------- */
 
 .panel--contact .info {
