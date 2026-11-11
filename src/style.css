@@ -651,6 +651,14 @@ html:not(.js) .js-only {
   animation: fade 0.4s both;
 }
 
+/* a kindline that takes two lines doesn't leave one word alone on the second (pretty, not balance:
+   balance breaks SHITBOX's at the hyphen in "four-door"; the phone's are set in its own block) */
+@media (min-width: 961px), (min-width: 761px) and (min-height: 701px), (min-width: 761px) and (hover: hover), (min-width: 761px) and (pointer: fine) {
+  .kindline {
+    text-wrap: pretty;
+  }
+}
+
 .wm {
   margin: 0;
   color: #fff;
