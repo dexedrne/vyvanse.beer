@@ -2032,6 +2032,20 @@ html:not(.js) .manifest .manifest__end-all b::before {
   outline-offset: 4px;
 }
 
+/* laptop heights: the lines come down in size so the heading and all eight stay between the top
+   bar and the strip. The size meets the 60px above at 1000px tall, so nothing jumps there. */
+@media (min-width: 761px) and (max-height: 1000px) {
+  @media (min-width: 961px), (min-height: 701px), (hover: hover), (pointer: fine) {
+    .mi {
+      font-size: clamp(30px, calc(9vh - 30px), 60px);
+    }
+
+    .mi .det {
+      font-size: clamp(17px, 2.6vh, 21px);
+    }
+  }
+}
+
 /* ---------- the duo (src/duo.js), the rain and the puddle (src/water.js) ---------- */
 
 .water {
