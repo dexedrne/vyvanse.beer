@@ -224,6 +224,8 @@ function openTab(url) {
 
 // A pad press doesn't count as a click to the browser, so it may not be allowed to open a tab.
 // Then ask: open it here (leaving the menu), or a real link to click.
+const BACK_HERE = 'The browser’s Back returns to this menu.';
+const hereLine = (url) => `Open ${new URL(url).host.replace(/^www\./, '')} here? ${BACK_HERE}`;
 let ask = null;
 function askTab({ title, text, url }) {
   if (!ask) {
@@ -235,6 +237,8 @@ function askTab({ title, text, url }) {
       <div class="ask__acts"><button class="play" type="button" data-here><span class="g g--a" data-g="a">A</span>Open it here</button>
       <a class="play play--ghost" target="_blank" rel="noopener" data-tabby>New tab</a>
       <button class="play play--ghost" type="button" data-cancel><span class="g g--b" data-g="b">B</span>Back</button></div></div>`;
+    // (on a phone these take the big Play button's rules, which let "Open it here" break over three lines)
+    for (const b of $$('.play', ask)) b.style.whiteSpace = 'nowrap';
     ask.addEventListener('click', (e) => {
       if (e.target === ask || e.target.closest('[data-cancel]')) closeAsk();
       else if (e.target.closest('[data-here]')) location.assign(ask.dataset.url);
@@ -246,7 +250,11 @@ function askTab({ title, text, url }) {
   ask.dataset.url = url;
   $('#ask-title').textContent = title;
   $('#ask-text').textContent = text;
-  $('[data-tabby]', ask).href = url;
+  const tabby = $('[data-tabby]', ask);
+  tabby.href = url;
+  // a pad's press on New tab would be refused like the one that brought this up: a pad gets Open it here
+  // and Back (an inline style, because .play's display wins over the hidden attribute)
+  tabby.style.display = input.scheme === 'ps' || input.scheme === 'xbox' ? 'none' : '';
   input.paintGlyphs(ask);
   ask.hidden = false;
   ask.back = document.activeElement;
@@ -451,11 +459,10 @@ function labels() {
     slot.style.setProperty('--accent', eds[k].accent);
     for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
     // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
+    // (written only when it changes; layout(), which follows every flip, fits it to the plastic)
     const name = $('.cart__name', slot);
-    if (name) {
-      name.textContent = eds[k].cartName || eds[k].name;
-      fitCartNames();
-    }
+    const text = eds[k].cartName || eds[k].name;
+    if (name && name.textContent !== text) name.textContent = text;
     $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
   });
 }
@@ -696,11 +703,8 @@ function play(p, { from, as } = {}) {
   // press may not be allowed to open
   const url = launchUrl(p, as);
   if (!openTab(url)) {
-    askTab({
-      title: p.name,
-      text: `${p.name} ${p.tabNote ? `opens in a new tab (${p.tabNote})` : 'can’t run inside this page'}, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
-      url,
-    });
+    const why = p.tabNote ? p.tabNote[0].toUpperCase() + p.tabNote.slice(1) : 'It can’t run inside this page';
+    askTab({ title: p.name, text: `${why}. Open it here? ${BACK_HERE}`, url });
   }
 }
 
@@ -712,7 +716,8 @@ function activate({ from, pad } = {}) {
     if (el.matches('[data-os]')) return openOS();
     if (el.matches('[data-settings]')) return settings.open();
     audio.blip('ok');
-    if (from === 'pad' && !openTab(el.href)) askTab({ title: el.querySelector('.mi__label').textContent, text: 'The browser only opens new tabs from a click or a key. Open it in this tab instead, or click New tab.', url: el.href });
+    // (the phone's label holds the name and its detail in two spans: the title is the name)
+    if (from === 'pad' && !openTab(el.href)) askTab({ title: (el.querySelector('.mi__label > span') || el.querySelector('.mi__label')).textContent, text: hereLine(el.href), url: el.href });
     else if (from !== 'pad') el.click();
     return;
   }
@@ -738,6 +743,10 @@ function details({ from } = {}) {
   if (!item) return;
   const open = item.classList.toggle('is-more');
   $('[data-more]', item)?.setAttribute('aria-expanded', String(open));
+  // the whole blurb while it's open, whole sentences again when it shuts, and room under the top bar
+  fitWm();
+  fitPitch();
+  fitInfo();
   audio.blip(open ? 'ok' : 'back');
   emit();
 }
@@ -930,8 +939,17 @@ function act(name, info = {}) {
     if (name === 'details' && sheet && !sheet.hidden) return closeSheet();
     if (['left', 'right', 'up', 'down'].includes(name)) return walk(name);
     if (info.from !== 'pad') return false;
-    if (name === 'ok' || name === 'start') document.activeElement?.click?.();
-    else if (name === 'back') back();
+    if (name === 'ok' || name === 'start') {
+      const el = document.activeElement;
+      // a link in the details sheet opens a tab, which a pad press may not: it gets the same offer as Play
+      if (el?.matches?.('.sheet__body a[target="_blank"]:not([download])')) {
+        const url = el.href;
+        const label = (el.firstChild?.nodeValue || el.textContent).trim();
+        const title = label.endsWith(' in a new tab') ? current()?.name || label : label; // (the game's own link: its name)
+        closeSheet();
+        if (!openTab(url)) askTab({ title, text: hereLine(url), url });
+      } else el?.click?.();
+    } else if (name === 'back') back();
     return;
   }
   if (moving) {
@@ -968,6 +986,9 @@ function act(name, info = {}) {
       if (name === 'ok' && phoneZone === 'actions' && phoneButton && (S.tab !== 'crew' || isPack(LISTS.crew[S.crew]))) return details();
     }
   }
+  // a pack's file list in its scrolling box (fitInfo(), a short screen): up and down scroll it
+  const files = (name === 'up' || name === 'down') && tight ? $('.manifest', tight) : null;
+  if (files?.style.maxHeight) return files.scrollBy({ top: name === 'up' ? -48 : 48, behavior: reduced.matches ? 'auto' : 'smooth' });
   const vert = S.tab === 'contact';
   // up / down on Games flip the edition, once per press (held, they don't run round and round)
   const flip = (d) => (S.tab !== 'games' ? false : info.repeat || info.event?.repeat ? undefined : edition(d));
@@ -1268,7 +1289,13 @@ function save() {
   history.replaceState(null, '', `#${S.tab}${id ? `/${id}` : ''}`);
 }
 function load() {
-  const [t, id] = decodeURIComponent(location.hash.slice(1)).split('/');
+  let hash = location.hash.slice(1);
+  try {
+    hash = decodeURIComponent(hash);
+  } catch {
+    /* a mangled link (#%E0%A4%A): read it as typed, and it lands on Games like any unknown name */
+  }
+  const [t, id] = hash.split('/');
   // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
   const bySlug = projects.find((p) => p.slug === t || p.cmd === t || p.aliases?.includes(t));
   const bro = LISTS.crew.find((m) => m.slug === t || m.npcOnly && m.num === t);
@@ -1311,9 +1338,17 @@ function hints() {
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   if (phone.matches && !moving) {
     const landscape = screen.clientWidth > screen.clientHeight;
+    // what left and right do where the pad's cursor is (act(), the phone's zones): flip the edition, step
+    // between the two buttons, or move along the shelf. On Contact the d-pad picks a line.
+    const zone = phoneZone === 'editions' && !(S.tab === 'games' && SHELF[S.games].length > 1) ? 'shelf' : phoneZone;
+    const sides = S.tab === 'contact' ? `${k('vmove')} select`
+      : zone === 'editions' ? '◁ ▷ edition'
+      : zone !== 'actions' ? '◁ ▷ select'
+      : S.tab === 'crew' && !pack ? '◁ ▷ games'
+      : `◁ ▷ ${verb} · ${pack ? 'contents' : 'details'}`;
     hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
       pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
-      hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && !pack && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
+      hint(7, sides),
       !pack && ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
       landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
     return fitHints();
@@ -1348,15 +1383,21 @@ function hints() {
 function fitHints() {
   const hintsEl = $('#hints');
   const all = $$('.hint', hintsEl);
-  for (const el of all) el.hidden = false;
+  // (hidden, and its display too: the phone's rule for a hint's display wins over the hidden attribute,
+  // which left the last hint there cut off part-way through)
+  const drop = (el, off) => { el.hidden = off; el.style.display = off ? 'none' : ''; };
+  for (const el of all) drop(el, false);
   if (!hintsEl.clientWidth) return;
   const order = all.slice().sort((a, b) => a.dataset.rank - b.dataset.rank);
-  while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) order.shift().hidden = true;
+  while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) drop(order.shift(), true);
 }
 
 // ---- the stage: the waterline, who stands on it, what the water mirrors ----
 
 const FEET = 0.976; // src/duo.js: their feet sit at this share of the box height
+// the phone's pair: this much spare canvas either side of the 1.5:1 box they are framed in, so an arm or
+// hair that sways past it is drawn, not cut off in a straight line (they stand where they did)
+const SPILL = 16;
 const MODELS = Object.fromEntries([...crew.members, ...(crew.npcs ?? [])].map((m) => [m.num, m.model]));
 function rel(el) {
   const h = screen.getBoundingClientRect();
@@ -1392,7 +1433,7 @@ function framing(w, h) {
     if (S.tab === 'crew') return { spots: [screen.clientWidth > screen.clientHeight ? 0.5 : 0.62], tall: (h - 16) / h, feet: (h - 4) / h };
     const imgs = $$('.duo__poster img', duoEl);
     const widths = imgs.map((img, i) => h * (i ? 0.94 : 1) * (+img.getAttribute('width') / +img.getAttribute('height')));
-    const left = w - widths[0] - widths[1] - 6;
+    const left = w - SPILL - widths[0] - widths[1] - 6;
     return { spots: [(left + widths[0] / 2) / w, (left + widths[0] + 6 + widths[1] / 2) / w], tall: FEET, feet: FEET, width: widths[0] + widths[1] + 6 };
   }
   const a = w / h;
@@ -1403,12 +1444,86 @@ function framing(w, h) {
 const box = { wl: 0, feet: 0, b: null };
 const m0 = () => (duoEl.classList.contains('duo--side') ? 'side' : null);
 // a long name on a cartridge (SankoSurvivors, RetardioPayne) comes down in size to fit its plastic
+// (three passes over the row: clear, measure, write, so the page is laid out twice, not once a name)
 function fitCartNames() {
-  for (const n of $$('.cart__name')) {
-    n.style.fontSize = '';
-    if (n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1)
-      n.style.fontSize = `${Math.floor((parseFloat(getComputedStyle(n).fontSize) * n.clientWidth) / n.scrollWidth * 10) / 10}px`;
+  const names = $$('.cart__name');
+  for (const n of names) n.style.fontSize = '';
+  const sizes = names.map((n) =>
+    n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1
+      ? Math.floor((parseFloat(getComputedStyle(n).fontSize) * n.clientWidth) / n.scrollWidth * 10) / 10
+      : 0,
+  );
+  names.forEach((n, j) => sizes[j] && (n.style.fontSize = `${sizes[j]}px`));
+}
+// The opening lines end on a whole sentence. The stylesheet clamps the blurb to its first few lines, which
+// cuts it off part-way through one; this leaves out the sentences that don't fit whole (details, or the
+// phone's sheet, has them all). Each sentence gets a span and every character is kept, so the paragraph's
+// textContent, which phoneMarkup() saves and puts back, stays what it was.
+function fitPitch() {
+  const pitch = $('.item.on .pitch', panelOf(S.tab));
+  if (!pitch) return;
+  pitch.style.maxWidth = ''; // (fitInfo() may have widened it)
+  if (!pitch.children.length && pitch.textContent) {
+    const text = pitch.textContent;
+    const cuts = [0];
+    for (let i = 1; i < text.length - 1; i++) if ('.!?'.includes(text[i - 1]) && text[i] === ' ') cuts.push(i + 1);
+    pitch.replaceChildren(...cuts.map((at, j) => Object.assign(document.createElement('span'), { className: 'pitch__s', textContent: text.slice(at, cuts[j + 1]) })));
   }
+  const parts = $$('.pitch__s', pitch);
+  for (const s of parts) s.hidden = false;
+  const style = getComputedStyle(pitch);
+  const room = parseInt(style.webkitLineClamp, 10) * parseFloat(style.lineHeight) + 1;
+  if (!(room > 0)) return; // details are open, or nothing clamps it: the whole blurb
+  // its height without the clamp (scrollHeight can't be trusted to see past one), a sentence fewer at a
+  // time; the first always stays, and if even that is too long the clamp cuts it as before
+  pitch.style.setProperty('-webkit-line-clamp', 'none');
+  for (let j = parts.length - 1; j > 0 && pitch.offsetHeight > room; j--) parts[j].hidden = true;
+  pitch.style.removeProperty('-webkit-line-clamp');
+}
+// Details on a short screen (1280 x 720) would push the card's words up through the top bar. Make room a
+// step at a time, only as far as it takes: the paragraph and the credit get the column's whole width, the
+// name comes down in size, the kind line goes, and a pack's file list keeps as many whole rows as fit and
+// scrolls for the rest (up and down, in act()). Desktop only, and always straight after fitWm() and
+// fitPitch(), which put the name's size and the paragraph's width back.
+let tight = null; // the card it last made room on
+function fitInfo() {
+  const item = onItem(S.tab);
+  for (const card of new Set([tight, item])) {
+    const [kind, credit, list] = ['.kindline', '.credit', '.manifest'].map((s) => card && $(s, card));
+    if (kind) kind.style.display = '';
+    if (credit) credit.style.maxWidth = '';
+    if (!list) continue;
+    list.style.maxHeight = list.style.overflowY = list.style.maskImage = list.style.webkitMaskImage = '';
+    list.onscroll = null;
+    list.scrollTop = 0;
+  }
+  tight = null;
+  const info = item && $('.info', item);
+  if (phone.matches || !info) return;
+  const bar = $('.top').getBoundingClientRect().bottom + 8;
+  const over = () => bar - info.getBoundingClientRect().top; // how far through the bar it is
+  if (over() <= 0) return;
+  tight = item;
+  const [wm, pitch, kind, credit, list] = ['.wm', '.pitch', '.kindline', '.credit', '.manifest'].map((s) => $(s, info));
+  for (const el of [pitch, credit]) if (el) el.style.maxWidth = 'none';
+  let size = wm ? parseFloat(getComputedStyle(wm).fontSize) : 0;
+  for (let gap = over(); gap > 0 && size > 44; gap = over()) {
+    const lines = Math.max(1, Math.round(wm.offsetHeight / (size * 0.86))); // (its line-height is 0.86)
+    size = Math.max(44, Math.floor(size - Math.max(1, gap / lines / 0.86)));
+    wm.style.fontSize = `${size}px`;
+  }
+  if (kind && over() > 0) kind.style.display = 'none';
+  const gap = over();
+  const rows = list && gap > 0 ? $$('b', list).filter((b) => b.offsetParent) : [];
+  if (rows.length < 3) return;
+  const row = rows[1].offsetTop - rows[0].offsetTop;
+  const keep = Math.max(2, rows.length - Math.ceil(gap / row));
+  list.style.maxHeight = `${list.offsetHeight - (rows.length - keep) * row}px`;
+  list.style.overflowY = 'auto';
+  // the cut edge fades while there is more below it
+  const fade = () => (list.style.maskImage = list.style.webkitMaskImage = list.scrollHeight - list.scrollTop - list.clientHeight > 4 ? 'linear-gradient(#000 calc(100% - 22px), transparent)' : '');
+  list.onscroll = fade;
+  fade();
 }
 // a long name (RetardioPayne) comes down in size to fit its column instead of running off it
 function fitWm() {
@@ -1425,7 +1540,7 @@ function fitWm() {
     const style = getComputedStyle(row);
     const inner = row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     // The 1.5:1 canvas includes transparent space; fit to the pair drawn at its right edge.
-    const left = box.b && duoMode() === 'side' ? box.b.x + box.b.w - framing(box.b.w, box.b.h).width : Infinity;
+    const left = box.b && duoMode() === 'side' ? box.b.x + box.b.w - SPILL - framing(box.b.w, box.b.h).width : Infinity;
     cw = screen.clientWidth > screen.clientHeight ? inner : Math.min(inner * 0.64, left - rel(row).x - parseFloat(style.paddingLeft) - 12);
   }
   if (cw > 0 && tw > cw) wm.style.fontSize = `${Math.max(phone.matches ? 40 : 0, Math.floor((parseFloat(getComputedStyle(wm).fontSize) * cw) / tw))}px`;
@@ -1457,6 +1572,9 @@ function layout() {
   });
   duoEl.classList.toggle('duo--off', !m);
   duoEl.classList.toggle('duo--side', m === 'side');
+  // (the phone's renders, which stand in until 3D loads, keep their place inside its wider canvas)
+  const poster = $('.duo__poster', duoEl);
+  if (poster) poster.style.right = ph && m === 'side' ? `${SPILL}px` : '';
   let b = null;
   if (m === 'stage' && vis) {
     b = rel(vis);
@@ -1471,26 +1589,28 @@ function layout() {
     if (ph) {
       const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
       h = Math.min(compact ? 136 : H < 760 ? 124 : 150, Math.max(0, feet - top));
-      w = h * 1.5;
+      w = h * 1.5 + 2 * SPILL;
       if (!compact) {
         const wm = $('.wm', onItem(S.tab));
         wm.style.fontSize = '40px';
         const range = document.createRange(); range.selectNodeContents(wm);
         if (range.getBoundingClientRect().width > W - safeRight - 16 - framing(w, h).width - 28) {
-          h = Math.min(h, 110); w = h * 1.5;
+          h = Math.min(h, 110); w = h * 1.5 + 2 * SPILL;
         }
       }
-      b = { x: W - 16 - safeRight - w, y: Math.max(top + h * (1 - FEET), feet - h * FEET), w, h };
+      b = { x: W - safeRight - w, y: Math.max(top + h * (1 - FEET), feet - h * FEET), w, h };
     } else b = { x: W - w - pad * 0.4 - safeRight, y: feet - h * FEET, w, h };
   }
   box.b = b;
   fitWm();
+  fitPitch();
+  fitInfo();
   fitCartNames();
   if (ph) {
     const band = Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2);
     if (b && m === 'side') {
       const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
-      if (band - top < b.h) { b.h = Math.max(0, band - top); b.w = b.h * 1.5; b.x = W - 16 - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0) - b.w; }
+      if (band - top < b.h) { b.h = Math.max(0, band - top); b.w = b.h * 1.5 + 2 * SPILL; b.x = W - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0) - b.w; }
       b.y = band - b.h * FEET;
     }
     box.wl = band;
@@ -1511,7 +1631,7 @@ function layout() {
     Object.assign(duoEl.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
     box.feet = b.y + b.h * FEET;
     const f = framing(b.w, b.h);
-    if (ph) duoEl.style.setProperty('--pair-left', `${f.width ? b.w - f.width : 0}px`);
+    if (ph) duoEl.style.setProperty('--pair-left', `${f.width ? b.w - SPILL - f.width : 0}px`);
     f.spots.forEach((x, k) => duoEl.style.setProperty(`--s${k}`, `${x * 100}%`));
     duoEl.style.setProperty('--ph', `${f.tall * 100}%`);
   }
@@ -1523,12 +1643,22 @@ function layout() {
 // "click them to wave": under their feet, until the first wave
 let waved = false;
 function placeHint() {
-  // (on a phone, only on Crew: on Games it would sit on the words)
-  const on = live() && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !(phone.matches && S.tab !== 'crew');
-  hint.hidden = !on;
-  if (!on) return;
+  // (not on a phone: it would sit on the words, and the pad's strip says "wave" already)
+  const on = live() && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !phone.matches;
+  // it goes between their feet and the row below, a pixel clear of the row's head and its count (on Crew,
+  // of the group buttons, which stand a little proud of the row). On a short screen that is less than its
+  // 26 px and a little air under their shoes: it gives up 2 px of padding top and bottom and sits as low
+  // as it can; with no room even for that, it's left out
+  const panel = panelOf(S.tab);
+  const row = on && $('.row', panel);
+  const proud = row ? $$('[data-crew-expand]', panel).filter((el) => el.offsetParent).map((el) => rel(el).y) : [];
+  const floor = row ? Math.min(rel(row).y, ...proud) - 1 : Infinity;
+  const tall = floor - box.feet < 29 ? 22 : 26;
+  hint.hidden = !on || floor - box.feet < tall;
+  if (hint.hidden) return;
   hint.style.left = `${box.b.x + box.b.w / 2}px`;
-  hint.style.top = `${Math.min(screen.clientHeight - 60, box.feet + 18)}px`;
+  hint.style.padding = tall < 26 ? '2px 9px' : '';
+  hint.style.top = `${Math.min(screen.clientHeight - 60, box.feet + 18, floor - tall)}px`;
 }
 
 const hexRgb = (hx) => {
@@ -1557,7 +1687,9 @@ function scene() {
     figure = { kind: 'duo', feet: box.feet };
     if (m0() === 'side') {
       const b = box.b;
-      halo = [b.x - b.w * 0.08, b.y + b.h * 0.02, b.w * 1.16, (box.feet - b.y) * 1.02];
+      // (the glow follows the pair's own box, not the phone's spare canvas either side of it)
+      const s = phone.matches ? SPILL : 0;
+      halo = [b.x + s - (b.w - 2 * s) * 0.08, b.y + b.h * 0.02, (b.w - 2 * s) * 1.16, (box.feet - b.y) * 1.02];
     }
   } else if (S.tab === 'crew') {
     const bro = $('.item.on .bro', panel);
@@ -1637,7 +1769,9 @@ document.addEventListener('pointerdown', (e) => {
   const u = (x - b.x) / b.w;
   const near = f.spots.map((s) => Math.abs(u - s));
   const i = near.indexOf(Math.min(...near));
-  if (near[i] > 0.16 * (b.h / b.w) + 0.05) return;
+  // (how near counts, from the pair's own box: the phone's has spare canvas either side)
+  const pw = phone.matches && m0() === 'side' ? b.w - 2 * SPILL : b.w;
+  if (near[i] * b.w > 0.16 * b.h + 0.05 * pw) return;
   audio.blip('ok');
   waveDuo(want()[i]);
 });
