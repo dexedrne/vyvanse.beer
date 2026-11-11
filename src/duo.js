@@ -41,6 +41,11 @@ const _tw = new THREE.Quaternion();
 const _id = new THREE.Quaternion();
 const _inverseTwist = new THREE.Quaternion();
 const YAW_KEEP = 0.4; // how much of the clips' own body turn is kept (Idle looks around a lot)
+// and how far from the camera they may then face, about the vertical (rad): see faceOut
+const HIPS_OUT = 0.3;
+const HEAD_OUT = 0.6;
+const KNEE = 0.6; // the share of a limit that's left as it is; past it the turn eases in under the limit
+const HOLD_FADE = 0.4; // seconds to let go of the limits for a wave, and to take them up again
 const GROOVY = ['Hips', 'Spine01', 'Spine02', 'neck', 'Head', 'LeftShoulder', 'RightShoulder', 'LeftArm', 'RightArm'];
 
 // models: { num: '/models/….glb' }. onReady(): everyone asked for by show() is now standing there.
@@ -69,7 +74,8 @@ export function createCast(box, { calm, models, onReady, framing }) {
     if (cast.has(num)) return Promise.resolve(cast.get(num));
     if (loading.has(num)) return loading.get(num);
     clearTimeout(dracoT);
-    draco ||= new DRACOLoader().setDecoderPath('/draco/').setWorkerLimit(2);
+    // (preload: the decoder downloads alongside the model, not after it has arrived)
+    draco ||= new DRACOLoader().setDecoderPath('/draco/').setWorkerLimit(2).preload();
     const p = new GLTFLoader()
       .setDRACOLoader(draco)
       .loadAsync(models[num])
@@ -99,14 +105,16 @@ export function createCast(box, { calm, models, onReady, framing }) {
   const can = (n) => models[n] && !cast.has(n) && !bad.has(n);
 
   // fetch whoever's wanted (after a beat, so running the d-pad along the row doesn't fetch everyone
-  // it passes), and once that's done and the pick has held a moment, with the page idle, whoever's
-  // likely next, one at a time
+  // it passes; the very first pick at once), and once that's done and the pick has held a moment,
+  // with the page idle, whoever's likely next, one at a time
   let pumpT = 0;
+  let first = true;
   const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 2000 }) : setTimeout(f, 200));
   function pump() {
     clearTimeout(pumpT);
     if (want.some(can)) {
-      pumpT = setTimeout(() => want.filter(can).forEach((n) => load(n).then(settle)), 120);
+      pumpT = setTimeout(() => want.filter(can).forEach((n) => load(n).then(settle)), first ? 0 : 120);
+      first = false;
       return;
     }
     if (loading.size || !soon.some(can)) return;
@@ -214,7 +222,7 @@ export function createCast(box, { calm, models, onReady, framing }) {
     const clean = groovy.map((b) => ({ b, q: b.quaternion.clone(), p: b.position.clone() }));
     // the clips walk the hips sideways (the wave leans a long way out); keep them where they stand
     const rest = bones.Hips ? bones.Hips.position.clone() : null;
-    const c = { num, root, bones, mixer, idle, wave, waveT: 0, x: 0, base: 0, turn: 0, look: 0, beat: 0, energy: 1, waving: false, clean, rest, seen: performance.now() };
+    const c = { num, root, bones, mixer, idle, wave, waveT: 0, x: 0, base: 0, turn: 0, look: 0, beat: 0, energy: 1, waving: false, hold: 1, clean, rest, seen: performance.now() };
     mixer.addEventListener('finished', (e) => {
       if (!wave || e.action !== wave) return;
       idle.reset().fadeIn(0.45).play();
@@ -276,6 +284,9 @@ export function createCast(box, { calm, models, onReady, framing }) {
           _id.identity();
         }
       }
+      // a wave turns on purpose (c.look): the limits let go for it, and come back after
+      c.hold = Math.min(1, Math.max(0, c.hold + (c.waving ? -dt : dt) / HOLD_FADE));
+      faceOut(c, Math.atan2(camera.position.x - c.root.position.x, camera.position.z - c.root.position.z), c.hold);
       if (!still) groove(c, t);
       if (c.waveT > 0) {
         c.waveT = Math.max(0, c.waveT - dt);
@@ -294,7 +305,8 @@ export function createCast(box, { calm, models, onReady, framing }) {
     w = Math.max(1, Math.round(w));
     h = Math.max(1, Math.round(h));
     const profile = renderProfile();
-    const size = renderSize(w, h, devicePixelRatio || 1, profile.dpr, profile.castPixels);
+    const dpr = devicePixelRatio || 1;
+    const size = renderSize(w, h, dpr, castCap(profile, dpr), profile.castPixels);
     renderer.setPixelRatio(size.ratio);
     renderer.setSize(w, h, false);
     const aspect = w / h;
@@ -335,6 +347,14 @@ export function createCast(box, { calm, models, onReady, framing }) {
   };
 }
 
+// How many canvas pixels per CSS pixel the cast may draw at. On a phone that's the screen's own
+// density (up to 3): the pair's box there is small, and at the scene's 1.5 their hair stair-steps
+// beside crisp art. The profile's castPixels still bounds the buffer, so the Crew stage barely
+// changes; battery mode and desktops keep the profile's cap.
+export function castCap(profile, dpr) {
+  return profile.tier === 'phone' ? Math.max(profile.dpr, Math.min(dpr || 1, 3)) : profile.dpr;
+}
+
 // rotate a bone about an axis of the character's own frame, through its pivot
 function rot(c, name, axis, ang) {
   const b = c.bones[name];
@@ -345,6 +365,38 @@ function rot(c, name, axis, ang) {
   _iq.copy(_pq).invert();
   _q.setFromAxisAngle(_ax, ang).premultiply(_iq).multiply(_pq);
   b.quaternion.premultiply(_q);
+}
+
+// which way a bone faces about the vertical: 0 is down +z, where the models face at rest
+function yawOf(b) {
+  b.getWorldQuaternion(_pq);
+  _ax.copy(Z).applyQuaternion(_pq);
+  return Math.atan2(_ax.x, _ax.z);
+}
+// a turn held under `max`: as it is up to KNEE of the way, easing in under the limit past that
+function under(a, max) {
+  const knee = max * KNEE;
+  const over = Math.abs(a) - knee;
+  return over <= 0 ? a : Math.sign(a) * (knee + (max - knee) * Math.tanh(over / (max - knee)));
+}
+const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+
+// Keep a face in view. Every hero's Idle is the same long look-around (the hips turn from -80 to
+// +11 degrees, the head from -38 to +53 on top of them) and it leans one way, so whoever stands
+// turned that way ended up in profile, or showing the back of a head. After the mixer and the
+// hips' damping: hold the hips within HIPS_OUT of the camera and the head within HEAD_OUT, about
+// the vertical, so the lean and the nod stay. cam: the way to the camera from where he stands;
+// k: 1 holds, 0 lets go. Chak's fitted rig already faces forward (and has another rest basis).
+export function faceOut(c, cam = 0, k = 1) {
+  const { Hips, neck, Head } = c.bones;
+  if (c.num === 'chudjak' || !Hips || k <= 0) return;
+  let off = wrap(yawOf(Hips) - cam);
+  rot(c, 'Hips', Y, (under(off, HIPS_OUT) - off) * k);
+  if (!Head) return;
+  off = wrap(yawOf(Head) - cam);
+  const turn = (under(off, HEAD_OUT) - off) * k;
+  rot(c, 'neck', Y, neck ? turn * 0.4 : 0);
+  rot(c, 'Head', Y, neck ? turn * 0.6 : turn);
 }
 
 // the groove, on top of whatever the mixer just posed
