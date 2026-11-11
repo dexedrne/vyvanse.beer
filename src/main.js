@@ -1331,9 +1331,17 @@ function hints() {
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   if (phone.matches && !moving) {
     const landscape = screen.clientWidth > screen.clientHeight;
+    // what left and right do where the pad's cursor is (act(), the phone's zones): flip the edition, step
+    // between the two buttons, or move along the shelf. On Contact the d-pad picks a line.
+    const zone = phoneZone === 'editions' && !(S.tab === 'games' && SHELF[S.games].length > 1) ? 'shelf' : phoneZone;
+    const sides = S.tab === 'contact' ? `${k('vmove')} select`
+      : zone === 'editions' ? '◁ ▷ edition'
+      : zone !== 'actions' ? '◁ ▷ select'
+      : S.tab === 'crew' && !pack ? '◁ ▷ games'
+      : `◁ ▷ ${verb} · ${pack ? 'contents' : 'details'}`;
     hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
       pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
-      hint(7, S.tab === 'contact' ? '△ ▽ select' : S.tab === 'crew' && !pack && phoneZone === 'actions' ? '◁ ▷ games' : '◁ ▷ select'),
+      hint(7, sides),
       !pack && ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
       landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
     return fitHints();
@@ -1368,10 +1376,13 @@ function hints() {
 function fitHints() {
   const hintsEl = $('#hints');
   const all = $$('.hint', hintsEl);
-  for (const el of all) el.hidden = false;
+  // (hidden, and its display too: the phone's rule for a hint's display wins over the hidden attribute,
+  // which left the last hint there cut off part-way through)
+  const drop = (el, off) => { el.hidden = off; el.style.display = off ? 'none' : ''; };
+  for (const el of all) drop(el, false);
   if (!hintsEl.clientWidth) return;
   const order = all.slice().sort((a, b) => a.dataset.rank - b.dataset.rank);
-  while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) order.shift().hidden = true;
+  while (hintsEl.scrollWidth > hintsEl.clientWidth + 1 && order.length > 1) drop(order.shift(), true);
 }
 
 // ---- the stage: the waterline, who stands on it, what the water mirrors ----
