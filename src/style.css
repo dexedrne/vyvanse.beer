@@ -1903,6 +1903,38 @@ html:not(.js) .js-only {
   .contents {
     margin-bottom: 14px;
   }
+
+  /* a pack from many games (Wallpapers): closed, its row is one line. The first spine is whole, the
+     next gives way and fades out, the rest wait for details; the faces keep their place. */
+  @media (min-width: 961px), (min-height: 701px), (hover: hover), (pointer: fine) {
+    .js .item--pack:not(.is-more) .plays--pack:has(.spine:nth-of-type(3)) {
+      flex-wrap: nowrap;
+      overflow: hidden;
+      padding-right: 4px; /* the last face leans past its box */
+    }
+
+    .js .item--pack:not(.is-more) .plays--pack:has(.spine:nth-of-type(3)) > * {
+      flex: none;
+    }
+
+    .js .item--pack:not(.is-more) .plays--pack:has(.spine:nth-of-type(3)) > .spine:nth-of-type(2) {
+      flex: 0 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent 96%);
+      mask-image: linear-gradient(90deg, #000 30%, transparent 96%);
+    }
+
+    .js .item--pack:not(.is-more) .plays--pack:has(.spine:nth-of-type(3)) > .spine:nth-of-type(n + 3) {
+      display: none;
+    }
+
+    /* (the second download's line sits closer under the status, so that card clears the top bar too) */
+    .item--pack .lite {
+      margin-top: 1px;
+    }
+  }
 }
 
 /* narrow desktop windows: the row scrolls under the cursor (main.js keepInView already does
