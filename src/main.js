@@ -1268,7 +1268,13 @@ function save() {
   history.replaceState(null, '', `#${S.tab}${id ? `/${id}` : ''}`);
 }
 function load() {
-  const [t, id] = decodeURIComponent(location.hash.slice(1)).split('/');
+  let hash = location.hash.slice(1);
+  try {
+    hash = decodeURIComponent(hash);
+  } catch {
+    /* a mangled link (#%E0%A4%A): read it as typed, and it lands on Games like any unknown name */
+  }
+  const [t, id] = hash.split('/');
   // the old page's anchors (#radrun, #radbro-4764, #bulk-os) still land somewhere sensible
   const bySlug = projects.find((p) => p.slug === t || p.cmd === t || p.aliases?.includes(t));
   const bro = LISTS.crew.find((m) => m.slug === t || m.npcOnly && m.num === t);

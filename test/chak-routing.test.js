@@ -29,3 +29,17 @@ test('Chak canonical and legacy links select one card and save the new URL', () 
     assert.equal(location.hash, `#crew/${member.num}`);
   }
 });
+
+test('a mangled link does not stop the menu: it is read as typed and lands on Games', () => {
+  const source = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  const hashFns = source.slice(source.indexOf('function save()'), source.indexOf('// ---- hints'));
+  const S = { tab: 'crew', crew: 0 }, location = { hash: '' };
+  const ctx = vm.createContext({ LISTS: { crew: [...crew.members, ...crew.npcs] }, S, location, projects, player: {},
+    TABS: ['games', 'crew', 'sites', 'contact'], show: tab => { S.tab = tab; }, locate() {}, openTipJar() {} });
+  vm.runInContext(hashFns, ctx);
+  for (const hash of ['#%E0%A4%A', '#%', '#games/%E0%A4%A']) {
+    S.tab = 'crew'; location.hash = hash;
+    assert.doesNotThrow(() => vm.runInContext('load()', ctx), hash);
+    assert.equal(S.tab, 'games', hash);
+  }
+});
