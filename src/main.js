@@ -1395,6 +1395,9 @@ function fitHints() {
 // ---- the stage: the waterline, who stands on it, what the water mirrors ----
 
 const FEET = 0.976; // src/duo.js: their feet sit at this share of the box height
+// the phone's pair: this much spare canvas either side of the 1.5:1 box they are framed in, so an arm or
+// hair that sways past it is drawn, not cut off in a straight line (they stand where they did)
+const SPILL = 16;
 const MODELS = Object.fromEntries([...crew.members, ...(crew.npcs ?? [])].map((m) => [m.num, m.model]));
 function rel(el) {
   const h = screen.getBoundingClientRect();
@@ -1430,7 +1433,7 @@ function framing(w, h) {
     if (S.tab === 'crew') return { spots: [screen.clientWidth > screen.clientHeight ? 0.5 : 0.62], tall: (h - 16) / h, feet: (h - 4) / h };
     const imgs = $$('.duo__poster img', duoEl);
     const widths = imgs.map((img, i) => h * (i ? 0.94 : 1) * (+img.getAttribute('width') / +img.getAttribute('height')));
-    const left = w - widths[0] - widths[1] - 6;
+    const left = w - SPILL - widths[0] - widths[1] - 6;
     return { spots: [(left + widths[0] / 2) / w, (left + widths[0] + 6 + widths[1] / 2) / w], tall: FEET, feet: FEET, width: widths[0] + widths[1] + 6 };
   }
   const a = w / h;
@@ -1537,7 +1540,7 @@ function fitWm() {
     const style = getComputedStyle(row);
     const inner = row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     // The 1.5:1 canvas includes transparent space; fit to the pair drawn at its right edge.
-    const left = box.b && duoMode() === 'side' ? box.b.x + box.b.w - framing(box.b.w, box.b.h).width : Infinity;
+    const left = box.b && duoMode() === 'side' ? box.b.x + box.b.w - SPILL - framing(box.b.w, box.b.h).width : Infinity;
     cw = screen.clientWidth > screen.clientHeight ? inner : Math.min(inner * 0.64, left - rel(row).x - parseFloat(style.paddingLeft) - 12);
   }
   if (cw > 0 && tw > cw) wm.style.fontSize = `${Math.max(phone.matches ? 40 : 0, Math.floor((parseFloat(getComputedStyle(wm).fontSize) * cw) / tw))}px`;
@@ -1569,6 +1572,9 @@ function layout() {
   });
   duoEl.classList.toggle('duo--off', !m);
   duoEl.classList.toggle('duo--side', m === 'side');
+  // (the phone's renders, which stand in until 3D loads, keep their place inside its wider canvas)
+  const poster = $('.duo__poster', duoEl);
+  if (poster) poster.style.right = ph && m === 'side' ? `${SPILL}px` : '';
   let b = null;
   if (m === 'stage' && vis) {
     b = rel(vis);
@@ -1583,16 +1589,16 @@ function layout() {
     if (ph) {
       const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
       h = Math.min(compact ? 136 : H < 760 ? 124 : 150, Math.max(0, feet - top));
-      w = h * 1.5;
+      w = h * 1.5 + 2 * SPILL;
       if (!compact) {
         const wm = $('.wm', onItem(S.tab));
         wm.style.fontSize = '40px';
         const range = document.createRange(); range.selectNodeContents(wm);
         if (range.getBoundingClientRect().width > W - safeRight - 16 - framing(w, h).width - 28) {
-          h = Math.min(h, 110); w = h * 1.5;
+          h = Math.min(h, 110); w = h * 1.5 + 2 * SPILL;
         }
       }
-      b = { x: W - 16 - safeRight - w, y: Math.max(top + h * (1 - FEET), feet - h * FEET), w, h };
+      b = { x: W - safeRight - w, y: Math.max(top + h * (1 - FEET), feet - h * FEET), w, h };
     } else b = { x: W - w - pad * 0.4 - safeRight, y: feet - h * FEET, w, h };
   }
   box.b = b;
@@ -1604,7 +1610,7 @@ function layout() {
     const band = Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2);
     if (b && m === 'side') {
       const top = $('.top').offsetHeight + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0);
-      if (band - top < b.h) { b.h = Math.max(0, band - top); b.w = b.h * 1.5; b.x = W - 16 - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0) - b.w; }
+      if (band - top < b.h) { b.h = Math.max(0, band - top); b.w = b.h * 1.5 + 2 * SPILL; b.x = W - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-right')) || 0) - b.w; }
       b.y = band - b.h * FEET;
     }
     box.wl = band;
@@ -1625,7 +1631,7 @@ function layout() {
     Object.assign(duoEl.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
     box.feet = b.y + b.h * FEET;
     const f = framing(b.w, b.h);
-    if (ph) duoEl.style.setProperty('--pair-left', `${f.width ? b.w - f.width : 0}px`);
+    if (ph) duoEl.style.setProperty('--pair-left', `${f.width ? b.w - SPILL - f.width : 0}px`);
     f.spots.forEach((x, k) => duoEl.style.setProperty(`--s${k}`, `${x * 100}%`));
     duoEl.style.setProperty('--ph', `${f.tall * 100}%`);
   }
@@ -1671,7 +1677,9 @@ function scene() {
     figure = { kind: 'duo', feet: box.feet };
     if (m0() === 'side') {
       const b = box.b;
-      halo = [b.x - b.w * 0.08, b.y + b.h * 0.02, b.w * 1.16, (box.feet - b.y) * 1.02];
+      // (the glow follows the pair's own box, not the phone's spare canvas either side of it)
+      const s = phone.matches ? SPILL : 0;
+      halo = [b.x + s - (b.w - 2 * s) * 0.08, b.y + b.h * 0.02, (b.w - 2 * s) * 1.16, (box.feet - b.y) * 1.02];
     }
   } else if (S.tab === 'crew') {
     const bro = $('.item.on .bro', panel);
@@ -1751,7 +1759,9 @@ document.addEventListener('pointerdown', (e) => {
   const u = (x - b.x) / b.w;
   const near = f.spots.map((s) => Math.abs(u - s));
   const i = near.indexOf(Math.min(...near));
-  if (near[i] > 0.16 * (b.h / b.w) + 0.05) return;
+  // (how near counts, from the pair's own box: the phone's has spare canvas either side)
+  const pw = phone.matches && m0() === 'side' ? b.w - 2 * SPILL : b.w;
+  if (near[i] * b.w > 0.16 * b.h + 0.05 * pw) return;
   audio.blip('ok');
   waveDuo(want()[i]);
 });
