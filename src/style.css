@@ -1036,12 +1036,33 @@ html:not(.js) .js-only {
    game fits across the screen; a screen too narrow for that still scrolls the row as before */
 .carts--games {
   --cw-row: var(--cw);
+  --cw-least: 84px;
   --fit: calc((100vw - 2 * var(--pad) - (var(--n, 12) - 1) * clamp(10px, 1.1vw, 18px) - 16px) / var(--n, 12));
 }
 
 @media (min-width: 761px) {
   .carts--games > .slot {
-    --cw: min(var(--cw-row), max(84px, var(--fit)));
+    --cw: min(var(--cw-row), max(var(--cw-least), var(--fit)));
+  }
+}
+
+/* laptop widths, under 1366px, where thirteen 84px cartridges run off the right edge: they come
+   down to 72px at the least (whole down to about 1136px wide), and the head keeps to the screen
+   between the gutters, so its count stays on it even when the row is wider. Desktop windows only:
+   a touch screen held sideways has the phone's shelf and keeps the 84px. */
+@media (min-width: 761px) and (max-width: 1365px) {
+  @media (min-width: 961px), (min-height: 701px), (hover: hover), (pointer: fine) {
+    .carts--games {
+      --cw-least: 72px;
+    }
+
+    .row__head {
+      max-width: calc(100vw - 2 * var(--pad));
+    }
+
+    .panel--games .row__head {
+      width: calc(100vw - 2 * var(--pad));
+    }
   }
 }
 
