@@ -224,6 +224,8 @@ function openTab(url) {
 
 // A pad press doesn't count as a click to the browser, so it may not be allowed to open a tab.
 // Then ask: open it here (leaving the menu), or a real link to click.
+const BACK_HERE = 'The browser’s Back returns to this menu.';
+const hereLine = (url) => `Open ${new URL(url).host.replace(/^www\./, '')} here? ${BACK_HERE}`;
 let ask = null;
 function askTab({ title, text, url }) {
   if (!ask) {
@@ -235,6 +237,8 @@ function askTab({ title, text, url }) {
       <div class="ask__acts"><button class="play" type="button" data-here><span class="g g--a" data-g="a">A</span>Open it here</button>
       <a class="play play--ghost" target="_blank" rel="noopener" data-tabby>New tab</a>
       <button class="play play--ghost" type="button" data-cancel><span class="g g--b" data-g="b">B</span>Back</button></div></div>`;
+    // (on a phone these take the big Play button's rules, which let "Open it here" break over three lines)
+    for (const b of $$('.play', ask)) b.style.whiteSpace = 'nowrap';
     ask.addEventListener('click', (e) => {
       if (e.target === ask || e.target.closest('[data-cancel]')) closeAsk();
       else if (e.target.closest('[data-here]')) location.assign(ask.dataset.url);
@@ -246,7 +250,11 @@ function askTab({ title, text, url }) {
   ask.dataset.url = url;
   $('#ask-title').textContent = title;
   $('#ask-text').textContent = text;
-  $('[data-tabby]', ask).href = url;
+  const tabby = $('[data-tabby]', ask);
+  tabby.href = url;
+  // a pad's press on New tab would be refused like the one that brought this up: a pad gets Open it here
+  // and Back (an inline style, because .play's display wins over the hidden attribute)
+  tabby.style.display = input.scheme === 'ps' || input.scheme === 'xbox' ? 'none' : '';
   input.paintGlyphs(ask);
   ask.hidden = false;
   ask.back = document.activeElement;
@@ -695,11 +703,8 @@ function play(p, { from, as } = {}) {
   // press may not be allowed to open
   const url = launchUrl(p, as);
   if (!openTab(url)) {
-    askTab({
-      title: p.name,
-      text: `${p.name} ${p.tabNote ? `opens in a new tab (${p.tabNote})` : 'can’t run inside this page'}, and the browser only opens new tabs from a click or a key. Open it in this tab instead (Back in the browser brings you here), or click New tab.`,
-      url,
-    });
+    const why = p.tabNote ? p.tabNote[0].toUpperCase() + p.tabNote.slice(1) : 'It can’t run inside this page';
+    askTab({ title: p.name, text: `${why}. Open it here? ${BACK_HERE}`, url });
   }
 }
 
@@ -711,7 +716,8 @@ function activate({ from, pad } = {}) {
     if (el.matches('[data-os]')) return openOS();
     if (el.matches('[data-settings]')) return settings.open();
     audio.blip('ok');
-    if (from === 'pad' && !openTab(el.href)) askTab({ title: el.querySelector('.mi__label').textContent, text: 'The browser only opens new tabs from a click or a key. Open it in this tab instead, or click New tab.', url: el.href });
+    // (the phone's label holds the name and its detail in two spans: the title is the name)
+    if (from === 'pad' && !openTab(el.href)) askTab({ title: (el.querySelector('.mi__label > span') || el.querySelector('.mi__label')).textContent, text: hereLine(el.href), url: el.href });
     else if (from !== 'pad') el.click();
     return;
   }
@@ -929,8 +935,17 @@ function act(name, info = {}) {
     if (name === 'details' && sheet && !sheet.hidden) return closeSheet();
     if (['left', 'right', 'up', 'down'].includes(name)) return walk(name);
     if (info.from !== 'pad') return false;
-    if (name === 'ok' || name === 'start') document.activeElement?.click?.();
-    else if (name === 'back') back();
+    if (name === 'ok' || name === 'start') {
+      const el = document.activeElement;
+      // a link in the details sheet opens a tab, which a pad press may not: it gets the same offer as Play
+      if (el?.matches?.('.sheet__body a[target="_blank"]:not([download])')) {
+        const url = el.href;
+        const label = (el.firstChild?.nodeValue || el.textContent).trim();
+        const title = label.endsWith(' in a new tab') ? current()?.name || label : label; // (the game's own link: its name)
+        closeSheet();
+        if (!openTab(url)) askTab({ title, text: hereLine(url), url });
+      } else el?.click?.();
+    } else if (name === 'back') back();
     return;
   }
   if (moving) {
