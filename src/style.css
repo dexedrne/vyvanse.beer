@@ -511,6 +511,7 @@ html:not(.js) .js-only {
   background: none;
   color: var(--muted);
   font: 400 19px/1 var(--pixel);
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -3092,6 +3093,11 @@ html:not(.js) .play {
 /* Installation/offline UI borrows the same wordmarks, ink and controls as the shelf. */
 .menu-back { display: none; }
 .screen:not([data-tab='games']) .menu-back { display: inline-flex; }
+/* from 1100px wide the back arrow stands in the left gutter, so the sign and the tabs stay where
+   they are on Games; narrower than that it has no room there and stays in the row */
+@media (min-width: 1100px) {
+  .menu-back { position: absolute; left: max(4px, calc(var(--safe-left) + (var(--pad) - 36px) / 2)); }
+}
 .pwa-update[hidden], .offline-card[hidden] { display: none; }
 .pwa-update { color: var(--amber); }
 .offline-card {
