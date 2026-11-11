@@ -12,6 +12,13 @@ export function createSettings({ audio }) {
     h('p', {}, 'launcher sound & picture'), music, sounds,
     h('label', { for:'quality' }, 'picture'), quality,
     h('button', { type:'button', onclick:() => el.close() }, 'close'));
+  // A click on the backdrop closes it, like the tip jar. This dialog has its own padding, and a click
+  // there lands on the dialog element too, so the point decides: only outside the panel's box.
+  el.addEventListener('click', (e) => {
+    if (e.target !== el) return;
+    const r = el.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) el.close();
+  });
   document.body.append(el);
   function paint() {
     for (const [button, source, label] of [[music,'music','music'],[sounds,'sfx','menu sounds']]) {
