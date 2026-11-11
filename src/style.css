@@ -3092,6 +3092,38 @@ html:not(.js) .play {
 .is-probe .hints, .is-probe .strip__ticker { display: none !important; }
 .viewport-probe { overflow-x: auto; white-space: nowrap; font: 400 15px/1 var(--pixel); }
 
+/* ---------- the sheet on a desktop screen ----------
+   A pad's "contents" on a Crew pack opens the sheet the phone uses (openSheet in src/main.js). Here it
+   is a panel in the middle of the screen, standing on the strip, with the phone sheet's values; the
+   phone block below has its own. */
+@media (min-width: 961px), (min-width: 761px) and (min-height: 701px), (min-width: 761px) and (hover: hover), (min-width: 761px) and (pointer: fine) {
+  .dim { position: absolute; z-index: 11; inset: 0; background: rgb(6 3 14 / 0.5); }
+  .sheet { position: absolute; z-index: 12; isolation: isolate; left: 50%; bottom: calc(var(--strip) + var(--safe-bottom) + 12px); display: flex; flex-direction: column; width: min(560px, 60vw); max-height: 70%; border: 1px solid var(--line-2); border-radius: 12px; background: var(--ink); box-shadow: 0 -20px 60px rgb(0 0 0 / 0.6); transform: translateX(-50%); }
+  .sheet__head, .sheet__foot { flex: none; }
+  .sheet__head { display: flex; align-items: center; gap: 10px; padding: 14px 18px 8px; }
+  .sheet__head h3 { margin: 0; font: 400 26px/1 var(--word); letter-spacing: 0.04em; }
+  .sheet__head .kind { margin-left: auto; color: var(--muted); font: 400 15px/1 var(--pixel); }
+  .sheet__body { position: relative; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 4px 18px 12px; }
+  .sheet.is-more .sheet__body { -webkit-mask-image: linear-gradient(#000 calc(100% - 44px), transparent); mask-image: linear-gradient(#000 calc(100% - 44px), transparent); }
+  .sheet__more { display: none; position: absolute; right: 18px; bottom: 84px; padding: 3px 9px 1px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface); color: var(--amber); font: 400 15px/1 var(--pixel); pointer-events: none; }
+  .sheet.is-more .sheet__more { display: block; }
+  .sheet__body p { margin: 0 0 10px; font: 400 15px/1.5 var(--sans); }
+  .sheet__body .credit { display: block; max-width: none; color: var(--muted); font-size: 13px; }
+  .sheet__body .sheet__fine { color: var(--muted); font: 400 17px/1.2 var(--pixel); }
+  .sheet .manifest { margin: 2px 0 14px; padding: 6px 12px 5px 8px; background: rgb(255 255 255 / 0.03); box-shadow: none; font-size: 17px; }
+  .sheet .manifest span { white-space: normal; }
+  .sheet a { text-decoration: none; }
+  .sheet .links { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .sheet .links li { color: var(--lilac); font: 400 15px/1 var(--sans); white-space: nowrap; }
+  .sheet .links a { display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: 46px; border-bottom: 1px solid var(--line); }
+  .sheet .links a > span:first-child { flex: none; }
+  .sheet .links .url { flex: 1; min-width: 0; margin-left: auto; overflow: hidden; color: var(--faint); font: 400 14px/1 var(--mono); text-align: right; text-overflow: ellipsis; }
+  .sheet__foot { display: flex; gap: 10px; padding: 10px 18px 14px; border-top: 1px solid var(--line); }
+  .sheet__foot .play { padding: 8px 20px 6px 9px; font-size: 28px; }
+  .sheet__foot .play .g { width: 30px; height: 30px; min-width: 30px; font-size: 20px; }
+  .sheet .ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 100px; min-height: 48px; padding: 2px 16px 0; border: 1px solid rgb(198 179 247 / 0.35); border-radius: 8px; background: rgb(12 8 22 / 0.72); color: var(--text); font: 400 19px/1 var(--pixel); cursor: pointer; }
+}
+
 @media (max-width: 760px), (hover: none) and (pointer: coarse) and (max-width: 960px) and (max-height: 700px) {
   :where(html:not(.js)) .screen:not([data-tab='games']) .sign { font-size: 18px;   }
   :where(html:not(.js)) .screen:not([data-tab='games']) #sfx { display: none;   }
