@@ -1643,12 +1643,22 @@ function layout() {
 // "click them to wave": under their feet, until the first wave
 let waved = false;
 function placeHint() {
-  // (on a phone, only on Crew: on Games it would sit on the words)
-  const on = live() && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !(phone.matches && S.tab !== 'crew');
-  hint.hidden = !on;
-  if (!on) return;
+  // (not on a phone: it would sit on the words, and the pad's strip says "wave" already)
+  const on = live() && box.b && !duoEl.classList.contains('duo--off') && !waved && !reduced.matches && !phone.matches;
+  // it goes between their feet and the row below, a pixel clear of the row's head and its count (on Crew,
+  // of the group buttons, which stand a little proud of the row). On a short screen that is less than its
+  // 26 px and a little air under their shoes: it gives up 2 px of padding top and bottom and sits as low
+  // as it can; with no room even for that, it's left out
+  const panel = panelOf(S.tab);
+  const row = on && $('.row', panel);
+  const proud = row ? $$('[data-crew-expand]', panel).filter((el) => el.offsetParent).map((el) => rel(el).y) : [];
+  const floor = row ? Math.min(rel(row).y, ...proud) - 1 : Infinity;
+  const tall = floor - box.feet < 29 ? 22 : 26;
+  hint.hidden = !on || floor - box.feet < tall;
+  if (hint.hidden) return;
   hint.style.left = `${box.b.x + box.b.w / 2}px`;
-  hint.style.top = `${Math.min(screen.clientHeight - 60, box.feet + 18)}px`;
+  hint.style.padding = tall < 26 ? '2px 9px' : '';
+  hint.style.top = `${Math.min(screen.clientHeight - 60, box.feet + 18, floor - tall)}px`;
 }
 
 const hexRgb = (hx) => {
