@@ -451,11 +451,10 @@ function labels() {
     slot.style.setProperty('--accent', eds[k].accent);
     for (const img of $$('[data-label]', slot)) img.classList.toggle('on', img.dataset.label === eds[k].cmd);
     // the name under the label follows the edition too (RetardioPayne, ZombieTardio)
+    // (written only when it changes; layout(), which follows every flip, fits it to the plastic)
     const name = $('.cart__name', slot);
-    if (name) {
-      name.textContent = eds[k].cartName || eds[k].name;
-      fitCartNames();
-    }
+    const text = eds[k].cartName || eds[k].name;
+    if (name && name.textContent !== text) name.textContent = text;
     $('.cart', slot).setAttribute('aria-controls', eds[k].slug);
   });
 }
@@ -1409,12 +1408,16 @@ function framing(w, h) {
 const box = { wl: 0, feet: 0, b: null };
 const m0 = () => (duoEl.classList.contains('duo--side') ? 'side' : null);
 // a long name on a cartridge (SankoSurvivors, RetardioPayne) comes down in size to fit its plastic
+// (three passes over the row: clear, measure, write, so the page is laid out twice, not once a name)
 function fitCartNames() {
-  for (const n of $$('.cart__name')) {
-    n.style.fontSize = '';
-    if (n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1)
-      n.style.fontSize = `${Math.floor((parseFloat(getComputedStyle(n).fontSize) * n.clientWidth) / n.scrollWidth * 10) / 10}px`;
-  }
+  const names = $$('.cart__name');
+  for (const n of names) n.style.fontSize = '';
+  const sizes = names.map((n) =>
+    n.clientWidth > 0 && n.scrollWidth > n.clientWidth + 1
+      ? Math.floor((parseFloat(getComputedStyle(n).fontSize) * n.clientWidth) / n.scrollWidth * 10) / 10
+      : 0,
+  );
+  names.forEach((n, j) => sizes[j] && (n.style.fontSize = `${sizes[j]}px`));
 }
 // a long name (RetardioPayne) comes down in size to fit its column instead of running off it
 function fitWm() {
