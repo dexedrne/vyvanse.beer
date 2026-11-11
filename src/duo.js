@@ -302,7 +302,8 @@ export function createCast(box, { calm, models, onReady, framing }) {
     w = Math.max(1, Math.round(w));
     h = Math.max(1, Math.round(h));
     const profile = renderProfile();
-    const size = renderSize(w, h, devicePixelRatio || 1, profile.dpr, profile.castPixels);
+    const dpr = devicePixelRatio || 1;
+    const size = renderSize(w, h, dpr, castCap(profile, dpr), profile.castPixels);
     renderer.setPixelRatio(size.ratio);
     renderer.setSize(w, h, false);
     const aspect = w / h;
@@ -341,6 +342,14 @@ export function createCast(box, { calm, models, onReady, framing }) {
     },
     renderer,
   };
+}
+
+// How many canvas pixels per CSS pixel the cast may draw at. On a phone that's the screen's own
+// density (up to 3): the pair's box there is small, and at the scene's 1.5 their hair stair-steps
+// beside crisp art. The profile's castPixels still bounds the buffer, so the Crew stage barely
+// changes; battery mode and desktops keep the profile's cap.
+export function castCap(profile, dpr) {
+  return profile.tier === 'phone' ? Math.max(profile.dpr, Math.min(dpr || 1, 3)) : profile.dpr;
 }
 
 // rotate a bone about an axis of the character's own frame, through its pivot
