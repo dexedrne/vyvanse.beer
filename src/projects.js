@@ -542,7 +542,7 @@ export const projects = [
     cmd: 'brogate', aliases: ['gate'], slug: 'brogate', group: 'games', section: 'worlds',
     name: 'BROGATE', kind: 'Party RPG: four of the crew at the gate', kindPhone: 'Party RPG at the gate',
     boot: 'one stuck gate, a lamp-lit ward, dice on every try',
-    blurb: 'A turn-based party RPG in Tallow, in a lamp-lit ward behind a gate that has stopped opening. Lead #85, #4764 and #652, with #723 joining at the notice board. Talk, tinker, sneak or brawl your way through, with dice on every try. An early preview. Keyboard or controller.',
+    blurb: 'A turn-based party RPG in Tallow, in a lamp-lit ward behind a gate that has stopped opening. Lead #85, #4764 and #652, with #723 joining at the notice board. Talk, tinker, sneak or brawl, with dice on every try. An early preview. Keyboard or controller.',
     url: 'https://brogate.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://brogate.vyvanse.beer' }],
     thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: ['85', '2214', '4764', '652', '723'],
