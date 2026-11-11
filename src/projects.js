@@ -79,7 +79,7 @@ export const projects = [
   {
     cmd: 'shitbox',
     featured: true, // the flagship: the menu opens on it
-    boot: '41 cars, free drive with friends and street takeovers', // the hero's boot log line
+    boot: '40+ cars, free drive with friends and street takeovers', // the hero's boot log line
     aliases: ['beater', 'car'],
     slug: 'shitbox',
     group: 'games',
@@ -89,7 +89,7 @@ export const projects = [
     kindPhone: "Odd jobs in a tired old four-door",
     blurbPhone: "Deliveries, rides, towing and the crew on the phone, in a car with a real manual. Keep it running, keep it fuelled, keep the lights on.",
     blurb:
-      'A tired 1993 four-door with a real five-speed and 41 cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. Keyboard or controller.',
+      'A tired 1993 four-door with a real five-speed and over forty cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. Keyboard or controller.',
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
@@ -149,7 +149,7 @@ export const projects = [
     blurb:
       'A fan game made for the Sanko community, with the SankoQuest team’s permission. Survive fifteen minutes in Greentown, on SankoQuest’s own map, against monsters from its bestiary while your weapons attack on their own. Eight weapons level up through SankoQuest’s tiers and evolve with the right item; four bosses lead up to the Dragon. Reward caskets hold real SankoQuest gear you keep and wear between runs, and there are quests, a leaderboard for each map and new maps to open as you clear them. Keyboard, controller or touch.',
     url: 'https://sankosurvivors.quest',
-    // it could be framed, but its saves live with its own web address: a copy in here would start over
+    // its site sends X-Frame-Options: DENY (and frame-ancestors 'none'), and its saves live with its own web address
     frame: false,
     tabNote: 'it keeps your saves on its own site',
     links: [{ label: 'Play', href: 'https://sankosurvivors.quest' }],
@@ -352,7 +352,7 @@ export const projects = [
     name: 'ZombieTardio',
     kind: 'First-person zombies, Retardios only',
     blurb:
-      'The same zombies game, all three maps and everything in them, played as the Retardios. Retardio Cousin Classic #85 leads, solo with a bot teammate, two on split screen or in an online room; Retardio Cousin #555 and Retardio Cousin Classic #2214 join as the third and fourth players online. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
+      'The same zombies game, all four maps and everything in them, played as the Retardios. Retardio Cousin Classic #85 leads, solo with a bot teammate, two on split screen or in an online room; Retardio Cousin #555 and Retardio Cousin Classic #2214 join as the third and fourth players online. Its own leaderboards and its own online rooms. Keyboard and mouse or a controller.',
     url: 'https://zombietardio.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://zombietardio.vyvanse.beer' }],
@@ -520,34 +520,34 @@ export const projects = [
     cmd: 'radquest', aliases: ['quest'], slug: 'radquest', group: 'games', section: 'worlds',
     name: 'RadQuest', kind: '3D RPG in a lantern-lit kingdom', kindPhone: '3D medieval RPG',
     boot: 'a lantern, a blade and the road out of the village',
-    blurb: 'A medieval RPG in 3D. A lantern-lit village at dusk, a road out through the hills, ruins to clear and villagers with work for a traveller. Quests, gear, and the crew along for the trip. Keyboard or controller.',
+    blurb: 'A village RPG in 3D, starring #652. Rad Hamlet at dusk, villagers with work for you, dungeons with their bosses and the Long Road out to Fallowmere. Skills to train and a companion to bring along. An early preview. Keyboard or controller.',
     url: 'https://radquest.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://radquest.vyvanse.beer' }],
-    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: RADBROS,
+    thumb: '/img/thumb/radquest.webp', shell: '#33200f', accent: '#ff9a52', cast: ['652'],
     phone: '50% 100%',
-    image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RadQuest: a lantern, a blade and the road out of the village.' },
+    image: { src: '/img/art/radquest.webp', width: 1600, height: 900, position: '50% 100%', alt: 'RadQuest: brown-haired #652 holds up a balisong and carries a lantern on a cobbled village lane at dusk, a small companion in a green frog hood beside him, timber houses and street lamps behind.' },
   },
   {
     cmd: 'radcraft', aliases: ['craft'], slug: 'radcraft', group: 'games', section: 'worlds',
     name: 'RADCRAFT', kind: 'Voxel sandbox: dig, build, keep the lights on', kindPhone: 'Voxel sandbox',
     boot: 'dig down, build up, mind the night',
-    blurb: 'A block world to dig into and build on. Mine, craft, farm and put a roof up before the sun goes down. Alone or with friends on one world. Keyboard or controller.',
+    blurb: 'A block world to dig into and build on. Mine, craft, farm and put a roof up before dark, when the radcats go feral. Pick one of six Radbros. Single player for now. An early preview. Keyboard or controller.',
     url: 'https://radcraft.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://radcraft.vyvanse.beer' }],
     thumb: '/img/thumb/radcraft.webp', shell: '#27421f', accent: '#bdf05a', cast: RADBROS,
     phone: '50% 100%',
-    image: { src: '/img/art/radcraft.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'RADCRAFT: dig down, build up, mind the night.' },
+    image: { src: '/img/art/radcraft.webp', width: 1600, height: 900, position: '50% 100%', alt: 'RADCRAFT: green-haired #3710 with a pickaxe over his shoulder on a grassy block cliff, a small companion in a frog hood beside him, with waterfalls, a half-built timber frame and castles across a block valley at sunset.' },
   },
   {
     cmd: 'brogate', aliases: ['gate'], slug: 'brogate', group: 'games', section: 'worlds',
     name: 'BROGATE', kind: 'Party RPG: four of the crew at the gate', kindPhone: 'Party RPG at the gate',
-    boot: 'four heroes, one gate, a d20',
-    blurb: 'Four of the crew at the gate of an old flooded city: a knight, a rogue, a ranger and a mage, a die rolled on every swing, loot to split and a long way in. Keyboard or controller.',
+    boot: 'one stuck gate, a lamp-lit ward, dice on every try',
+    blurb: 'A turn-based party RPG in Tallow, in a lamp-lit ward behind a gate that has stopped opening. Lead #85, #4764 and #652, with #723 joining at the notice board. Talk, tinker, sneak or brawl, with dice on every try. An early preview. Keyboard or controller.',
     url: 'https://brogate.vyvanse.beer', frame: true,
     links: [{ label: 'Play', href: 'https://brogate.vyvanse.beer' }],
-    thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: [...RADBROS, '2214'],
+    thumb: '/img/thumb/brogate.webp', shell: '#1c1b33', accent: '#f0b445', cast: ['85', '2214', '4764', '652', '723'],
     phone: '50% 100%',
-    image: { src: '/img/art/brogate.webp', width: 1600, height: 900, position: '50% 100%', lettered: 1, alt: 'BROGATE: four heroes, one gate, a d20.' },
+    image: { src: '/img/art/brogate.webp', width: 1600, height: 900, position: '50% 100%', alt: 'BROGATE: violet-haired #4764 casting a spell, brown-haired #652 with a sword and shield, yellow-haired #3704 in a hood with a dagger and green-haired #3710 holding up a lantern, on wet cobbles in a lamp-lit street at night.' },
   },
   {
     cmd: 'solscape',
@@ -694,7 +694,7 @@ export const projects = [
     kind: 'Sassy the Sasquatch: a chill 3D camping game and fan site',
     blurb:
       'Sassy Camp is a chill 3D camping game: fire, fishing, canoe, hammock, garden, skate park, guitar and stargazing. There is a meme maker too. Free in the browser, keyboard, touch or controller.',
-    url: 'https://sassysol.lol',
+    url: 'https://sassysol.lol/camp/',
     frame: false,
     links: [
       { label: 'Play Sassy Camp', href: 'https://sassysol.lol/camp/' },
