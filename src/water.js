@@ -316,7 +316,8 @@ export function spare(entries, keep) {
 }
 
 // canvas: sits in `host` (the .screen), covering it. Returns null without WebGL2.
-export function createWater(canvas, host, { calm }) {
+// onContext(): there is a WebGL context (called before the shaders compile, which takes a while).
+export function createWater(canvas, host, { calm, onContext }) {
   const gl = canvas.getContext('webgl2', {
     alpha: true,
     premultipliedAlpha: true,
@@ -326,6 +327,7 @@ export function createWater(canvas, host, { calm }) {
     powerPreference: 'low-power',
   });
   if (!gl) return null;
+  onContext?.();
   const draw = compile(gl, FRAG);
   const step = compile(gl, SIM);
   if (!draw || !step) return null;

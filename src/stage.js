@@ -17,6 +17,11 @@ export function createStage(shell, { screen, duoBox, models }) {
   let soon = []; // and who's likely next (prefetch)
   let water = null;
   let activateCast = null;
+  // three.js and the cast (src/duo.js): asked for as soon as there's a WebGL context, so it
+  // downloads while the water's shaders compile. Never on Save-Data.
+  const saveData = !!navigator.connection?.saveData;
+  let duo = null;
+  const loadDuo = () => (duo ||= import('./duo.js'));
 
   // ---- the water ----
   try {
@@ -24,7 +29,7 @@ export function createStage(shell, { screen, duoBox, models }) {
     canvas.className = 'water';
     canvas.setAttribute('aria-hidden', 'true');
     screen.querySelector('.scrim').before(canvas);
-    water = createWater(canvas, screen, { calm });
+    water = createWater(canvas, screen, { calm, onContext: () => saveData || loadDuo() });
     if (water) screen.classList.add('water-on');
     else canvas.remove();
   } catch (e) {
@@ -88,8 +93,8 @@ export function createStage(shell, { screen, duoBox, models }) {
       return false;
     }
   };
-  if (!navigator.connection?.saveData && (water || gl())) {
-    import('./duo.js')
+  if (!saveData && (duo || water || gl())) {
+    loadDuo()
       .then((m) => {
         activateCast = () => {
           activateCast = null;

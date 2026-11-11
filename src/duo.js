@@ -74,7 +74,8 @@ export function createCast(box, { calm, models, onReady, framing }) {
     if (cast.has(num)) return Promise.resolve(cast.get(num));
     if (loading.has(num)) return loading.get(num);
     clearTimeout(dracoT);
-    draco ||= new DRACOLoader().setDecoderPath('/draco/').setWorkerLimit(2);
+    // (preload: the decoder downloads alongside the model, not after it has arrived)
+    draco ||= new DRACOLoader().setDecoderPath('/draco/').setWorkerLimit(2).preload();
     const p = new GLTFLoader()
       .setDRACOLoader(draco)
       .loadAsync(models[num])
@@ -104,14 +105,16 @@ export function createCast(box, { calm, models, onReady, framing }) {
   const can = (n) => models[n] && !cast.has(n) && !bad.has(n);
 
   // fetch whoever's wanted (after a beat, so running the d-pad along the row doesn't fetch everyone
-  // it passes), and once that's done and the pick has held a moment, with the page idle, whoever's
-  // likely next, one at a time
+  // it passes; the very first pick at once), and once that's done and the pick has held a moment,
+  // with the page idle, whoever's likely next, one at a time
   let pumpT = 0;
+  let first = true;
   const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 2000 }) : setTimeout(f, 200));
   function pump() {
     clearTimeout(pumpT);
     if (want.some(can)) {
-      pumpT = setTimeout(() => want.filter(can).forEach((n) => load(n).then(settle)), 120);
+      pumpT = setTimeout(() => want.filter(can).forEach((n) => load(n).then(settle)), first ? 0 : 120);
+      first = false;
       return;
     }
     if (loading.size || !soon.some(can)) return;
