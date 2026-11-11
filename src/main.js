@@ -743,6 +743,8 @@ function details({ from } = {}) {
   if (!item) return;
   const open = item.classList.toggle('is-more');
   $('[data-more]', item)?.setAttribute('aria-expanded', String(open));
+  // the whole blurb while it's open, whole sentences again when it shuts, and room under the top bar
+  fitPitch();
   audio.blip(open ? 'ok' : 'back');
   emit();
 }
@@ -1445,6 +1447,31 @@ function fitCartNames() {
   );
   names.forEach((n, j) => sizes[j] && (n.style.fontSize = `${sizes[j]}px`));
 }
+// The opening lines end on a whole sentence. The stylesheet clamps the blurb to its first few lines, which
+// cuts it off part-way through one; this leaves out the sentences that don't fit whole (details, or the
+// phone's sheet, has them all). Each sentence gets a span and every character is kept, so the paragraph's
+// textContent, which phoneMarkup() saves and puts back, stays what it was.
+function fitPitch() {
+  const pitch = $('.item.on .pitch', panelOf(S.tab));
+  if (!pitch) return;
+  pitch.style.maxWidth = ''; // (fitInfo() may have widened it)
+  if (!pitch.children.length && pitch.textContent) {
+    const text = pitch.textContent;
+    const cuts = [0];
+    for (let i = 1; i < text.length - 1; i++) if ('.!?'.includes(text[i - 1]) && text[i] === ' ') cuts.push(i + 1);
+    pitch.replaceChildren(...cuts.map((at, j) => Object.assign(document.createElement('span'), { className: 'pitch__s', textContent: text.slice(at, cuts[j + 1]) })));
+  }
+  const parts = $$('.pitch__s', pitch);
+  for (const s of parts) s.hidden = false;
+  const style = getComputedStyle(pitch);
+  const room = parseInt(style.webkitLineClamp, 10) * parseFloat(style.lineHeight) + 1;
+  if (!(room > 0)) return; // details are open, or nothing clamps it: the whole blurb
+  // its height without the clamp (scrollHeight can't be trusted to see past one), a sentence fewer at a
+  // time; the first always stays, and if even that is too long the clamp cuts it as before
+  pitch.style.setProperty('-webkit-line-clamp', 'none');
+  for (let j = parts.length - 1; j > 0 && pitch.offsetHeight > room; j--) parts[j].hidden = true;
+  pitch.style.removeProperty('-webkit-line-clamp');
+}
 // a long name (RetardioPayne) comes down in size to fit its column instead of running off it
 function fitWm() {
   const wm = $('.item.on .wm', panelOf(S.tab));
@@ -1520,6 +1547,7 @@ function layout() {
   }
   box.b = b;
   fitWm();
+  fitPitch();
   fitCartNames();
   if (ph) {
     const band = Math.round(compact ? rel($('.shelf', panel)).y + scrolled + 14 : rel($('.words', onItem(S.tab))).y + scrolled + rel($('.words', onItem(S.tab))).h + 2);
