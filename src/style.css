@@ -136,6 +136,31 @@ a:hover {
   outline-offset: 3px;
 }
 
+/* A pad moves focus by script (the modal walk in src/main.js). Once the mouse has clicked a button,
+   browsers stop counting scripted focus as :focus-visible until a key is pressed, and the rings in
+   every dialog went missing. So while a pad is the input, plain focus draws the ring on whatever it
+   can walk to inside a dialog, the sheet, the terminal and the offline card. Text fields keep their
+   own look. */
+:is(html[data-input='ps'], html[data-input='xbox']) :is(dialog, .ask, .sheet, .term, .offline-card) :is(a, button, select, summary, [tabindex='0']):focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* (a gallery picture keeps its own focus look, the amber border alone) */
+:is(html[data-input='ps'], html[data-input='xbox']) :is(dialog, .ask, .sheet, .term, .offline-card) .pack-gallery__tile:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
+:is(html[data-input='ps'], html[data-input='xbox']) :is(dialog, .ask, .sheet, .term, .offline-card) .play:focus {
+  outline-offset: -5px;
+}
+
+/* (the filled look of .play:focus-visible; the ghost buttons stay dark under it, as they do for keys) */
+:is(html[data-input='ps'], html[data-input='xbox']) :is(dialog, .ask, .sheet, .term, .offline-card) .play:not(.play--ghost):focus {
+  background: #6d4de6;
+}
+
 kbd {
   display: inline-block;
   min-width: 1.5em;
