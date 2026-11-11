@@ -24,6 +24,9 @@ const MAX_SEGS = 6;
 const MAX_LIGHTS = 12;
 const MAX_INK = 8;
 const MIN_SCALE = 0.45;
+const RUN_GAP = 200; // ms: an art change this soon after the last is a run along the shelf (a held d-pad repeats every 120)
+const RUN_HOLD = 140; // ms a run's picture waits before it is decoded: the next step passes it over first
+const BEHIND = 300; // ms the water may trail the page's picture before the hush behind the duo lets go
 export const CAP_TEXT = 0.07;
 
 const VERT = `#version 300 es
@@ -305,6 +308,13 @@ function compile(gl, fs) {
   return { prog, u };
 }
 
+// Which art textures to let go of. entries: [key, used (a counter, higher is more recent), busy];
+// past `keep` of them the least recently shown go first, never one that's busy (in the crossfade).
+export function spare(entries, keep) {
+  const old = entries.filter((e) => !e[2]).sort((x, y) => x[1] - y[1]);
+  return old.slice(0, Math.max(0, Math.min(old.length, entries.length - keep))).map((e) => e[0]);
+}
+
 // canvas: sits in `host` (the .screen), covering it. Returns null without WebGL2.
 export function createWater(canvas, host, { calm }) {
   const gl = canvas.getContext('webgl2', {
@@ -333,29 +343,78 @@ export function createWater(canvas, host, { calm }) {
     return t;
   }
   // throws a SecurityError for pictures it may not read: the caller turns the water off
-  function upload(t, src) {
+  // (a bitmap was premultiplied when it was made: the unpack flag is not for it)
+  function upload(t, src, premultiply = true) {
     gl.bindTexture(gl.TEXTURE_2D, t);
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
     gl.generateMipmap(gl.TEXTURE_2D);
   }
   const figTex = texture();
   const noSim = texture(false);
-  const arts = new Map(); // img -> { tex, ready }
-  function artTex(img) {
+  // The art, one texture per picture. Uploading an <img> decodes it there and then, on this
+  // thread (so does making a bitmap of the <img>): some 70 ms of a 1600x900 picture, inside the
+  // key press of a shelf step. So the picture's bytes are asked for again (they are in the cache
+  // the <img> just filled) and decoded as a bitmap off this thread where the browser can, and
+  // only the upload is left for it. Where that can't be done, straight from the <img> as before.
+  // The last few stay on the GPU (trim), so stepping back uploads nothing.
+  const decoded = (img) => fetch(img.currentSrc || img.src, { cache: 'force-cache' })
+    .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(`art ${r.status}`))))
+    .then((bytes) => createImageBitmap(bytes, { premultiplyAlpha: 'premultiply' }));
+  const arts = new Map(); // img -> { tex, ready, src, used }
+  let stamp = 0;
+  const forget = (img, a) => {
+    gl.deleteTexture(a.tex);
+    if (arts.get(img) === a) arts.delete(img);
+  };
+  // wait: ms before the picture is decoded (the d-pad is running along the shelf: most are passed
+  // over before then, and never decoded at all)
+  function artTex(img, wait = 0) {
     let a = arts.get(img);
-    if (a) return a;
-    a = { tex: texture(), ready: false };
-    arts.set(img, a);
-    const go = () => {
-      if (arts.get(img) !== a) return;
-      upload(a.tex, img);
-      a.ready = true;
-    };
-    if (img.complete && img.naturalWidth) {
-      try { go(); } catch { fail(); }
-    } else img.addEventListener('load', () => { try { go(); } catch { fail(); } }, { once: true });
+    // (the <img> was given another picture since: make it again, unless it's in the crossfade)
+    if (a && a.src !== img.src && !busy(a)) {
+      forget(img, a);
+      a = null;
+    }
+    if (!a) {
+      a = { tex: texture(), ready: false, src: img.src, used: 0 };
+      arts.set(img, a);
+      const entry = a;
+      const mine = () => !dead && arts.get(img) === entry;
+      const put = (src, premultiply) => {
+        if (!mine()) return;
+        try {
+          upload(entry.tex, src, premultiply);
+          entry.ready = true;
+          promote();
+        } catch {
+          fail();
+        }
+      };
+      const plain = () => put(img, true);
+      const go = () => {
+        if (!mine()) return;
+        if (!globalThis.createImageBitmap || !globalThis.fetch) return plain();
+        decoded(img).then((bitmap) => {
+          put(bitmap, false);
+          bitmap.close();
+        }, plain);
+      };
+      const start = () => (wait ? setTimeout(go, wait) : go());
+      if (img.complete && img.naturalWidth) start();
+      else img.addEventListener('load', start, { once: true });
+    }
+    a.used = ++stamp;
     return a;
+  }
+  const busy = (a) => a === art.a?.tex || a === art.b?.tex || a === art.next?.tex;
+  // only the pictures in the crossfade have to be on the GPU; a few more are kept for stepping back
+  function trim() {
+    const keep = renderProfile().tier === 'desktop' ? 4 : 2;
+    for (const img of spare([...arts].map(([img, a]) => [img, a.used, busy(a)]), keep)) {
+      gl.deleteTexture(arts.get(img).tex);
+      arts.delete(img);
+    }
   }
 
   // ---- ripple sim (needs a float render target; without one, looping rain rings) ----
@@ -399,7 +458,9 @@ export function createWater(canvas, host, { calm }) {
   const view = { w: 1, h: 1, px: 1 };
   let scale = 1;
   const L = { water: 0, lights: [], ink: [] };
-  const art = { a: null, b: null, t0: -1e9 }; // { img, fit, look }
+  // a: the picture mirrored now, b: the one it's fading from, next: asked for, its texture not in
+  // yet (since: how long the page has been showing a picture the water hasn't got)
+  const art = { a: null, b: null, next: null, t0: -1e9, since: 0, asked: -1e9 }; // each { img, fit, look, tex }
   const fig = { src: null, live: false, rect: [0, 0, 1, 1], feet: 0, on: false, dirty: false };
   const halo = { rect: [0, 0, 0, 0], k: 0, want: 0 };
 
@@ -435,8 +496,7 @@ export function createWater(canvas, host, { calm }) {
       canvas.height = ch;
     }
     simSize(view.w, view.h);
-    if (art.a) art.a.fit = fitOf(art.a.img);
-    if (art.b) art.b.fit = fitOf(art.b.img);
+    for (const x of [art.a, art.b, art.next]) if (x) x.fit = fitOf(x.img);
   }
 
   // the scene, from the page: { water, art: <img>, soft, lettered, lights: [[el, rgb]], ink: [el], figure, halo }
@@ -444,23 +504,37 @@ export function createWater(canvas, host, { calm }) {
     L.water = s.water;
     halo.want = s.halo ? 1 : 0;
     if (s.halo) halo.rect = s.halo;
-    if (s.art && (!art.a || art.a.img !== s.art)) {
-      art.b = art.a;
-      art.a = { img: s.art, fit: fitOf(s.art), look: s.soft ? [4.2, 0.5, 0] : [0, 1, 0], tex: artTex(s.art) };
-      art.t0 = art.b ? now : -1e9;
-    } else if (art.a) {
-      art.a.fit = fitOf(art.a.img);
+    let cur = art.next || art.a; // the picture last asked for
+    if (s.art && cur?.img !== s.art) {
+      // passed over before it came in: forgotten (it's made again if it's asked for again)
+      if (art.next) forget(art.next.img, art.next.tex);
+      else art.since = now;
+      // one step straight after another is a run along the shelf: hold the decode a moment
+      const wait = now - art.asked < RUN_GAP ? RUN_HOLD : 0;
+      art.asked = now;
+      // (asked back to the one still showing: nothing to wait for)
+      cur = art.a?.img === s.art ? art.a : { img: s.art, fit: null, look: s.soft ? [4.2, 0.5, 0] : [0, 1, 0], tex: artTex(s.art, wait) };
+      art.next = cur === art.a ? null : cur;
     }
-    if (art.a) art.a.look[2] = s.lettered || 0;
+    if (cur) {
+      cur.fit = fitOf(cur.img);
+      cur.look[2] = s.lettered || 0;
+    }
+    promote(now);
     L.lights = s.lights.slice(0, MAX_LIGHTS).map(([el, c]) => ({ rect: rel(el), c }));
     L.ink = s.ink.slice(0, MAX_INK).map((el) => rel(el)).filter((b) => b[2] && b[3]);
     setFigure(s.figure);
-    // Only the two images participating in the art crossfade need GPU textures.
-    for (const [img, entry] of arts) {
-      if (img === art.a?.img || img === art.b?.img) continue;
-      gl.deleteTexture(entry.tex);
-      arts.delete(img);
-    }
+    trim();
+  }
+  // The picture asked for takes over once its texture is in, and the water fades to it from the
+  // one before; until then it keeps mirroring that one (never a blank puddle).
+  function promote(now = performance.now()) {
+    const n = art.next;
+    if (!n?.tex.ready) return;
+    art.next = null;
+    art.b = art.a;
+    art.a = n;
+    art.t0 = art.b ? now : -1e9;
   }
   // figure: { el (canvas or img), live, feet } or null
   function setFigure(f) {
@@ -646,7 +720,10 @@ export function createWater(canvas, host, { calm }) {
   function frame(dt, now, target) {
     if (dead) return;
     watch(now, target);
-    halo.k += (halo.want - halo.k) * Math.min(1, dt * 5);
+    // (the page has been showing a picture the water hasn't got for longer than a step takes, a
+    // run along the shelf: no hush of the old picture behind the duo meanwhile)
+    const behind = art.next && now - art.since > BEHIND;
+    halo.k += ((behind ? 0 : halo.want) - halo.k) * Math.min(1, dt * 5);
     try {
       // a live canvas is copied every frame, right after it drew (same task, so it's intact); a
       // render once it has fully come in (half-loaded, it's bad image data to WebGL)

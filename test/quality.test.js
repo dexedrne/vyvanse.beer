@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renderProfile, renderSize, nextRenderTime } from '../src/quality.js';
+import { spare } from '../src/water.js';
 
 test('Auto chooses a phone tier on mobile WebKit, with bounded buffers in every fold shape', () => {
   const profile = renderProfile('auto', {userAgent:'iPhone AppleWebKit',maxTouchPoints:5});
@@ -29,4 +30,14 @@ test('60 Hz draws are evenly paced on 120 Hz callbacks, including a long resume 
   assert.equal(frames.length,60);
   assert.ok(frames.every((tick,index) => tick === index*2));
   assert.ok(nextRenderTime(30000,next,60) > 30000);
+});
+
+test('art textures: the last few stay for stepping back, the oldest go first, never one in the crossfade', () => {
+  const art = (key,used,busy=false) => [key,used,busy];
+  assert.deepEqual(spare([art('a',1),art('b',2)],4),[]);
+  assert.deepEqual(spare([art('a',1),art('b',2),art('c',3,true),art('d',4,true),art('e',5)],4),['a']);
+  assert.deepEqual(spare([art('a',5),art('b',2),art('c',9,true),art('d',4),art('e',7,true),art('f',1)],4),['f','b']);
+  // a phone keeps only the crossfade (and the picture still on its way in)
+  assert.deepEqual(spare([art('a',1,true),art('b',2),art('c',3,true),art('d',4,true)],2),['b']);
+  assert.deepEqual(spare([art('a',1,true),art('b',2,true),art('c',3,true)],2),[]);
 });
