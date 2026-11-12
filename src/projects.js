@@ -89,7 +89,7 @@ export const projects = [
     kindPhone: "Odd jobs in a tired old four-door",
     blurbPhone: "Deliveries, rides, towing and the crew on the phone, in a car with a real manual. Keep it running, keep it fuelled, keep the lights on.",
     blurb:
-      'A tired 1993 four-door with a real five-speed and over forty cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. Keyboard or controller.',
+      'A tired 1993 four-door with a real five-speed and over forty cars to keep running. Take odd jobs, tune cars through three upgrade stages per family, or join friends for online free drive, street takeovers and police pursuits. Five cinematic views, including roadside, helicopter, wheel and drift cameras. Play as Retardio Cousin Classic #85 in the career or pick a crew driver online. The shops have dressed interiors, and LINE NOISE on Court St rents terminals by the half hour. Keyboard or controller.',
     url: 'https://shitbox.vyvanse.beer',
     frame: true,
     links: [{ label: 'Play', href: 'https://shitbox.vyvanse.beer' }],
