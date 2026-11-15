@@ -25,6 +25,7 @@ const TABS = [
   { id: 'games', label: 'Games', icon: 'cart' },
   { id: 'crew', label: 'Crew', icon: 'crew' },
   { id: 'sites', label: 'Sites', icon: 'site' },
+  { id: 'code', label: 'Code', icon: 'code' },
   { id: 'contact', label: 'Contact', icon: 'dm' },
 ];
 
@@ -263,6 +264,8 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
   // an edition's spine on Crew is its cartridge's plastic, with its own glow
   const shell = (p) => edsOf(p)?.[0].shell || p.shell;
   const sites = projects.filter((p) => p.group === 'sites');
+  // Code (reverse engineering, tools): the same monitor, words and grey cartridges as Sites
+  const code = projects.filter((p) => p.group === 'code');
   const g = Object.fromEntries(groups.map((x) => [x.id, x]));
   const [host, ...tld] = site.name.split('.');
   const lead = games.find((p) => p.featured) || games[0];
@@ -336,6 +339,12 @@ export function renderShell({ site, groups, projects, crew, contact, duo }) {
       g.sites.title,
       `<div class="items">${sites.map(siteItem).join('\n')}</div>
     ${row(`sites I built<span class="cap-long">: my own, and for other people’s projects</span>`, sites.map((p, i) => cart(p, i)).join(''), 'carts--sites')}`,
+    )}
+    ${panel(
+      'code',
+      g.code.title,
+      `<div class="items">${code.map(siteItem).join('\n')}</div>
+    ${row(`code<span class="cap-long">: reverse engineering and tools</span>`, code.map((p, i) => cart(p, i)).join(''), 'carts--sites carts--code')}`,
     )}
     ${panel(
       'contact',

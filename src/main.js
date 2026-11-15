@@ -107,7 +107,7 @@ function phoneMarkup() {
       shelf.append($('.menu', info), $('.fine', info));
       info.append(shelf);
     }
-    if (p?.group === 'sites') {
+    if (p?.group === 'sites' || p?.group === 'code') {
       if (p.phoneImage) $('.visual--site img', item).src = p.phoneImage;
       if (p.boot) $('.monitor__bar span', item).textContent = p.boot;
       $('[data-act] .play__label', item).textContent = 'Open';
@@ -139,7 +139,9 @@ function phoneMarkup() {
   phoneNodes.added.push(floor);
 }
 
-const TABS = ['games', 'crew', 'sites', 'contact'];
+const TABS = ['games', 'crew', 'sites', 'code', 'contact'];
+// the tabs laid out like Sites: a monitor, the words and grey cartridges (Code is reverse engineering and tools)
+const SITELIKE = ['sites', 'code'];
 // Games: one cartridge per game, each a list of its editions (src/projects.js, `of`)
 const SHELF = shelf(projects);
 const PACKS = crew.assets?.packs ?? [];
@@ -148,6 +150,7 @@ const LISTS = {
   games: SHELF,
   crew: [...crew.members, ...(crew.npcs ?? []), ...PACKS],
   sites: projects.filter((p) => p.group === 'sites'),
+  code: projects.filter((p) => p.group === 'code'),
   contact: $$('#contact .mi'),
 };
 const S = {
@@ -155,6 +158,7 @@ const S = {
   games: Math.max(0, SHELF.findIndex((eds) => eds.some((p) => p.featured))),
   crew: Math.max(0, crew.members.findIndex((m) => m.featured)),
   sites: 0,
+  code: 0,
   contact: 0,
 };
 
@@ -289,10 +293,10 @@ function bdFor(tab, i) {
     const { src, position: pos, lettered, width: w, height: h } = p.image;
     return { key: `games:${p.cmd}`, src, pos: phone.matches ? p.phone || '50% 22%' : pos, lettered, w, h };
   }
-  if (tab === 'sites') {
-    const p = LISTS.sites[i];
+  if (SITELIKE.includes(tab)) {
+    const p = LISTS[tab][i];
     const portrait = phone.matches && screen.clientWidth < screen.clientHeight;
-    return { key: `sites:${p.cmd}`, src: portrait ? p.phoneImage || p.image.src : p.image.src, soft: !portrait, pos: phone.matches ? '50% 42%' : undefined };
+    return { key: `${tab}:${p.cmd}`, src: portrait ? p.phoneImage || p.image.src : p.image.src, soft: !portrait, pos: phone.matches ? '50% 42%' : undefined };
   }
   if (tab === 'crew' && isPack(LISTS.crew[i])) {
     const p = LISTS.crew[i];
@@ -690,7 +694,7 @@ function dropMove({ put = false } = {}) {
 
 function current() {
   if (S.tab === 'crew' && isPack(LISTS.crew[S.crew])) return LISTS.crew[S.crew];
-  if (S.tab === 'games' || S.tab === 'sites') return at(S.tab, S[S.tab]);
+  if (S.tab === 'games' || SITELIKE.includes(S.tab)) return at(S.tab, S[S.tab]);
   return null;
 }
 
@@ -1216,10 +1220,10 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-settings]')) return settings.open();
   const mi = e.target.closest('.mi');
   if (mi) select(LISTS.contact.indexOf(mi), { sound: false });
-  if (phone.matches && S.tab === 'sites' && mode() === 'menu' && !e.target.closest('a, button, .body, .shelf, .top, .tabs, .strip')) {
+  if (phone.matches && SITELIKE.includes(S.tab) && mode() === 'menu' && !e.target.closest('a, button, .body, .shelf, .top, .tabs, .strip')) {
     if (performance.now() - swipedAt < 500) return;
     const y = e.clientY - screen.getBoundingClientRect().top;
-    if (y >= $('.top').getBoundingClientRect().bottom && y < $('.words', onItem('sites')).getBoundingClientRect().top) play(current());
+    if (y >= $('.top').getBoundingClientRect().bottom && y < $('.words', onItem(S.tab)).getBoundingClientRect().top) play(current());
   }
 });
 document.addEventListener('keydown', e => {
@@ -1281,7 +1285,7 @@ for (const ev of ['touchstart', 'touchmove']) screen.addEventListener(ev, e => {
 screen.addEventListener('gesturestart', e => mode() === 'menu' && e.preventDefault());
 screen.addEventListener('contextmenu', e => mode() === 'menu' && !e.target.closest('input, textarea') && e.preventDefault());
 
-// ---- the address bar keeps your place: #games/rbgo, #crew/85, #sites/sanic, #contact, #tip ----
+// ---- the address bar keeps your place: #games/rbgo, #crew/85, #sites/sanic, #code/txra, #contact, #tip ----
 
 function save() {
   if (player.current) return;
@@ -1309,7 +1313,7 @@ function load() {
   } else if (id && t === 'crew') {
     const j = LISTS.crew.findIndex((x) => x.slug === id || (x.num ?? x.id) === id);
     if (j >= 0) S.crew = j;
-  } else if (id && (t === 'games' || t === 'sites')) {
+  } else if (id && (t === 'games' || t === 'sites' || t === 'code')) {
     const p = projects.find((x) => x.group === t && named(x));
     if (p) locate(p);
   }
@@ -1333,7 +1337,7 @@ function hints() {
   const k = (n) => `<span class="g g--${n}">${input.glyph(n)}</span>`;
   const pad = input.scheme === 'ps' || input.scheme === 'xbox';
   const pack = S.tab === 'crew' && isPack(LISTS.crew[S.crew]);
-  const verb = { games: 'play', crew: pack ? 'get pack' : LISTS.crew[S.crew].download ? 'get model' : 'say hello', sites: 'open', contact: 'pick' }[S.tab];
+  const verb = { games: 'play', crew: pack ? 'get pack' : LISTS.crew[S.crew].download ? 'get model' : 'say hello', sites: 'open', code: 'open', contact: 'pick' }[S.tab];
   const nav = S.tab === 'contact' ? 'vmove' : 'move';
   const hint = (rank, html) => `<span class="hint" data-rank="${rank}">${html}</span>`;
   if (phone.matches && !moving) {
@@ -1347,7 +1351,7 @@ function hints() {
       : S.tab === 'crew' && !pack ? '◁ ▷ games'
       : `◁ ▷ ${verb} · ${pack ? 'contents' : 'details'}`;
     hintsEl.innerHTML = pad ? [hint(9, `${k('a')} ${verb}`),
-      pack || ['games', 'sites'].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
+      pack || ['games', ...SITELIKE].includes(S.tab) ? hint(8, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
       hint(7, sides),
       !pack && ['games', 'crew'].includes(S.tab) ? hint(6, `${k('x')} wave`) : '',
       landscape ? hint(5, `${k('lb')}${k('rb')} sections`) : ''].join('') : '';
@@ -1369,7 +1373,7 @@ function hints() {
     hint(9, `${k('a')} ${verb}`),
     pad ? hint(8, `${k('b')} back`) : '',
     hint(6, `${k('lb')}${k('rb')} sections`),
-    pack || S.tab === 'games' || S.tab === 'sites' ? hint(5, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
+    pack || S.tab === 'games' || SITELIKE.includes(S.tab) ? hint(5, `${k('y')} ${pack ? 'contents' : 'details'}`) : '',
     ROWS.includes(S.tab) ? hint(3.5, `${pad ? 'hold ' : ''}${k('grab')} move`) : '',
     pack ? '' : hint(2, `${k('x')} wave`),
     hint(3, `${k('select')} full screen`),

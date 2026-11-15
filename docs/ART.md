@@ -44,6 +44,12 @@ band at 1600 × 900 (×1.88, lossy WebP quality 86, method 6); the label is a 4:
 adventurer at 420 × 315 (quality 90, method 6), so the cartridge's centred 4:3 cover crop shows all of it.
 The share image is the game's only scene picture, so the key art is softer than art drawn at size.
 
+TXRA's card art is the game itself, captured from its native PC build (`--snapshots` during the
+repository's scripted race, tests/race-input.txt) by `scripts/txra-art.py`: the title screen and the
+first battle side by side at an exact 3x (1600 × 840), the battle alone for the phone backdrop
+(800 × 760), and the tunnel at 2x for the 480 × 320 cartridge label. Nearest-neighbour on whole pixels
+over a dark warm background, lossless WebP. Only the screenshots left the build machine; no ROM data.
+
 After `npm run build`, check archive exclusion with:
 
 ```sh

@@ -100,6 +100,7 @@ export function runAction(id, shell) {
 // asParam is set only after verifying that game's URL contract; unsupported games just open.
 export function launchUrl(p, as, nav) {
   const url = new URL(p.url);
+  if (p.group === 'code') return url.href; // a repository, not a game: no device flag
   if (p.asParam && p.cast?.includes(as)) url.searchParams.set('as', as);
   return gameUrl(url.href, nav ? isPhone(nav) : undefined);
 }

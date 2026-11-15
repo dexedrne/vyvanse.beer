@@ -151,7 +151,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     },
     ls: {
       usage: 'ls [section]',
-      desc: 'list games, crew, assets or sites',
+      desc: 'list games, crew, assets, sites or code',
       args: () => sections,
       run(args) {
         const want = args[0] ? norm(args[0]).replace(/\/$/, '') : null;
@@ -181,7 +181,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     },
     open: {
       usage: 'open <name>',
-      desc: 'play a game here, or open a site',
+      desc: 'play a game here, or open a site or a repo',
       args: (parts) => (parts.length > 2 ? ['--tab'] : projects.map((p) => p.cmd)),
       run(rawArgs, ctx) {
         const { names: args, want } = parseOpen(rawArgs, ctx.want);
@@ -285,7 +285,7 @@ export function createCommands({ site, groups, projects, crew, contact, term, sh
     },
     cd: {
       usage: 'cd <section>',
-      desc: 'go to games, crew, assets, sites or contact',
+      desc: 'go to games, crew, assets, sites, code or contact',
       args: () => places,
       run(args) {
         const to = args[0] ? norm(args[0]).replace(/\/$/, '') : '~';

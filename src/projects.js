@@ -8,7 +8,7 @@
 //   cmd       terminal name: `open <cmd>`, `info <cmd>`. Lowercase, no spaces.
 //   aliases   optional extra names the terminal accepts
 //   slug      anchor id on the page (vyvanse.beer/#slug)
-//   group     'games' or 'sites' (see `groups`)
+//   group     'games', 'sites' or 'code' (see `groups`); a code project is laid out like a site
 //   name      display name
 //   twoLines  games only: true for a two-word name too long for one line. The
 //             menu's wordmark then sets it on two balanced lines, still fitted to its column, instead
@@ -60,6 +60,7 @@ export const site = {
 export const groups = [
   { id: 'games', title: 'Games', line: 'Games I make. Free, in the browser, keyboard or controller.' },
   { id: 'sites', title: 'Sites I built', line: 'Websites I made: my own Solscape, and sites for other people’s projects.' },
+  { id: 'code', title: 'Code', line: 'Reverse engineering and tools.' },
 ];
 
 const MAIN_CAST = ['4764', '652', '3704', '3710'];
@@ -707,6 +708,34 @@ export const projects = [
       width: 800,
       height: 420,
       alt: 'Sassy the Sasquatch in a red beanie stands by a campfire on a lakeside dock, with an orange tent, a guitar and mountains behind, under the title $SASSY.',
+    },
+  },
+  {
+    cmd: 'txra',
+    aliases: ['decomp', 'tokyo'],
+    slug: 'txra',
+    group: 'code',
+    name: 'TXRA',
+    kind: 'A matching decompilation of Tokyo Xtreme Racer Advance (GBA)',
+    kindPhone: 'Matching decompilation of a GBA racer',
+    boot: 'GBA decompilation', // phones: the short line on its monitor and caption (the long one widens the monitor)
+    blurb:
+      'A complete matching decompilation of Tokyo Xtreme Racer Advance for the Game Boy Advance. All 228 entries in the function map are done: 194 functions are C that compiles byte for byte (92.9% of the mapped code), and 31 assembly routines are documented. The whole cartridge rebuilds byte for byte, checked by SHA-1. There is also a native PC recompiler; the Linux build is checked against recorded runs, and a Windows build is in progress. Source only, no ROM: you supply your own cartridge dump.',
+    url: 'https://github.com/dexedrne/txra-decomp',
+    // github.com refuses framing
+    frame: false,
+    links: [
+      { label: 'Source on GitHub', href: 'https://github.com/dexedrne/txra-decomp' },
+      { label: 'v1.0.0', href: 'https://github.com/dexedrne/txra-decomp/releases/tag/v1.0.0' },
+    ],
+    thumb: '/img/thumb/txra.webp',
+    accent: '#7bd34f',
+    phoneImage: '/img/txra-phone.webp',
+    image: {
+      src: '/img/art/txra.webp',
+      width: 1600,
+      height: 840,
+      alt: 'Two screens from the native PC build of Tokyo Xtreme Racer Advance: the title screen, with the green Xtreme Racer logo over two cars, and the start of a battle on a night highway, a purple car behind the rival White Shark.',
     },
   },
 ];

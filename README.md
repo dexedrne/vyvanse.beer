@@ -5,7 +5,7 @@ Phone game integrations: [viewport and menu contract](docs/player-viewport.md).
 Projects by dexedrne: [GitHub](https://github.com/dexedrne) · [X](https://x.com/dexedrne).
 Live at https://vyvanse.beer. To get in touch, DM [@dexedrne on X](https://x.com/dexedrne).
 
-A game-select screen on a rainy rooftop. Four tabs (**Games, Crew, Sites, Contact**), the selected
+A game-select screen on a rainy rooftop. Five tabs (**Games, Crew, Sites, Code, Contact**), the selected
 game's key art filling the screen over a puddle that mirrors it, the crew taking turns
 standing in the water in 3D (on Crew, each of the crew alone), and the cartridges along the
 bottom. Pick a game and it plays right here, full screen, with a keyboard, a mouse, touch or a
@@ -56,7 +56,8 @@ down the page. With JS the same markup becomes one screen with no page scroll.
 
 Add an entry to `projects` in `src/projects.js`. `group: 'games'` gets a cartridge on Games and
 its key art fills the screen (`image`, 1600×900 webp in `public/img/art/`); `group: 'sites'` gets
-a grey cartridge on Sites and its 800×420 screenshot in the preview monitor. Both want a
+a grey cartridge on Sites and its 800×420 screenshot in the preview monitor; `group: 'code'`
+(reverse engineering and tools, such as TXRA) is laid out the same way on Code. All want a
 textless cartridge label in `public/img/thumb/`, composed for a centred 4:3 cover crop, a `shell` colour for the plastic and an
 `accent` for the glow. A game's `cast` lists who you can play as (by crew `num`); Crew reads it
 for each one's "in" list. SankoQuest Survivors, a fan game made for the Sanko community with the
