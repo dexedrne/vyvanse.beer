@@ -21,6 +21,7 @@ test('Code is its own group and tab, after Sites, with TXRA laid out like a site
   assert.match(panel, /<article class="item item--site" id="txra"/);
   assert.match(panel, /class="carts carts--sites carts--code"/);
   assert.match(panel, /href="https:\/\/github\.com\/dexedrne\/txra-decomp\/releases\/tag\/v1\.1\.0"/);
+  assert.match(panel, /href="https:\/\/github\.com\/dexedrne\/txra-decomp\/releases\/tag\/v1\.2\.0"/);
   assert.doesNotMatch(html.match(/<section class="panel panel--sites"[^]*?<\/section>/)[0], /id="txra"/);
 });
 
@@ -59,7 +60,7 @@ test('the terminal lists, describes, opens and goes to Code', () => {
   assert.match(output.map(el => el.textContent).join(' '), /code\/[^]*txra[^]*TXRA/);
   output.length = 0;
   commands.run('info txra');
-  assert.match(output.map(el => el.textContent).join(' '), /TXRA[^]*byte for byte[^]*source on github[^]*windows and linux builds[^]*v1\.1\.0/);
+  assert.match(output.map(el => el.textContent).join(' '), /TXRA[^]*byte for byte[^]*source on github[^]*windows and linux builds[^]*v1\.1\.0[^]*iphone build \(sideload\)[^]*v1\.2\.0/);
   const links = output.flatMap(nodes).filter(el => el.tag === 'a').map(a => a.attributes.href);
   assert.deepEqual(links, txra.links.map(l => l.href));
   commands.run('open decomp');
